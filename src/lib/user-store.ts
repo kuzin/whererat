@@ -152,5 +152,5 @@ export async function updateStoredModeratorPassword({
       where id = $1 and password_hash = $2`,
     [userId, currentPassword, nextPassword],
   );
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }

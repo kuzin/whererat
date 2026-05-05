@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { ModeratorSession } from "@/lib/auth";
 
 function navClass(isActive: boolean) {
@@ -24,9 +25,14 @@ function isActivePath(pathname: string, href: string) {
 
 export function NavLinks({ session }: { session?: ModeratorSession }) {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  return (
-    <div className="flex flex-wrap items-center gap-2 text-sm">
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  const links = (
+    <>
       <Link className={navClass(isActivePath(pathname, "/"))} href="/">
         Catalog
       </Link>
@@ -56,6 +62,31 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
             />
           </Link>
         </>
+      ) : null}
+    </>
+  );
+
+  return (
+    <div className="text-sm">
+      <button
+        type="button"
+        className="inline-flex items-center rounded-lg border-2 border-stone-950/20 px-3 py-2 text-sm font-semibold text-stone-800 outline-none transition hover:bg-stone-950/8 hover:text-stone-950 focus-visible:ring-2 focus-visible:ring-stone-950 dark:border-white/20 dark:text-stone-100 dark:hover:bg-white/12 md:hidden"
+        aria-expanded={mobileOpen}
+        aria-controls="wr-mobile-nav"
+        onClick={() => setMobileOpen((value) => !value)}
+      >
+        {mobileOpen ? "Close" : "Menu"}
+      </button>
+
+      <div className="hidden flex-wrap items-center gap-2 md:flex">{links}</div>
+
+      {mobileOpen ? (
+        <div
+          id="wr-mobile-nav"
+          className="absolute left-4 right-4 top-[calc(100%+0.5rem)] z-30 grid gap-2 rounded-xl border-2 border-stone-950/25 bg-[var(--wr-header-bg)] p-3 shadow-[0_10px_30px_rgb(0_0_0/0.22)] backdrop-blur-md dark:border-white/16 md:hidden"
+        >
+          {links}
+        </div>
       ) : null}
     </div>
   );

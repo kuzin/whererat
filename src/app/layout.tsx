@@ -86,7 +86,7 @@ export default async function RootLayout({
             <div className="relative flex min-h-0 flex-1 flex-col">
               <div className="flex min-h-0 flex-1 flex-col">{children}</div>
               <footer className="relative z-0 mt-0 border-t-2 border-[var(--wr-footer-rule)] bg-[var(--wr-footer-bg)] text-[var(--wr-footer-fg)] transition-colors duration-150">
-                <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+                <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-center text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left lg:px-8">
                   <p className="max-w-xl leading-relaxed text-amber-100/95">
                     Copyright 2026. Design by{" "}
                     <a
@@ -99,7 +99,7 @@ export default async function RootLayout({
                     </a>
                     . All rights reserved.
                   </p>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
                     <Link
                       className="inline-flex w-fit items-center rounded-lg border-2 bg-[#fcd34d] px-4 py-2 text-sm font-bold text-stone-950 outline-none ring-offset-2 transition hover:bg-[#fde047] hover:brightness-[1.03] focus-visible:ring-2 focus-visible:ring-amber-300 dark:border-white/25 dark:bg-[#c9a82a] dark:text-stone-950 dark:ring-offset-stone-900 dark:hover:bg-[#d4b336]"
                       href="/guidelines"

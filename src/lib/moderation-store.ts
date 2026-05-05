@@ -79,7 +79,14 @@ function toDbSubmission(row: {
             alt: rec.alt ? String(rec.alt) : undefined,
           };
         })
-        .filter(Boolean)
+        .filter(
+          (
+            slot,
+          ): slot is {
+            url: string;
+            alt: string | undefined;
+          } => Boolean(slot),
+        )
     : undefined;
   const leadImage = images?.[0];
   return {
@@ -318,7 +325,7 @@ async function submissionToSyntheticSighting(
   submission: Submission,
   expectedMovieId: string,
   reviewedAtISO: string,
-): Sighting | undefined {
+): Promise<Sighting | undefined> {
   const movie =
     (submission.imdbId
       ? await getCatalogMovieByImdbId(submission.imdbId)
