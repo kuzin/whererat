@@ -200,7 +200,7 @@ export default async function MoviePage({
   return (
     <main
       style={rootStyle}
-      className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
+      className="wr-page-shell py-8 sm:py-10"
     >
       <div className="flex items-center justify-between gap-3">
         <Link

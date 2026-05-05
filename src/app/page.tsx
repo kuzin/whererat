@@ -139,26 +139,25 @@ export default async function Home({
       <section className="relative overflow-hidden">
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="wr-display mx-auto max-w-[18ch] text-[2.125rem] font-bold leading-[1.06] tracking-tight text-stone-950 sm:max-w-none sm:text-5xl lg:text-[3.25rem] dark:text-[#fff8ec]">
-              Movie rats{" "}
+            <h1 className="wr-display mx-auto max-w-[20ch] text-[2.2rem] font-black leading-[1.04] tracking-tight text-stone-950 sm:max-w-none sm:text-5xl lg:text-[3.35rem] dark:text-[#fff8ec]">
+              A Field Guide to{" "}
               <span className="relative whitespace-nowrap text-[#ea580c] dark:text-[#fdba74]">
-                clocked to the second
+                Rats in Film
                 <span
                   aria-hidden
-                  className="absolute -bottom-1 left-0 right-0 h-1.5 skew-x-[-8deg] rounded-sm bg-[#fde047]/90 dark:bg-amber-500/85"
+                  className="absolute -bottom-1 left-0 right-0 h-1 rounded-sm bg-[#f59e0b]/90 dark:bg-amber-500/85"
                 />
               </span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed font-medium text-stone-700 sm:max-w-3xl sm:text-xl dark:text-stone-300">
-              A living archive of cinematic rats, built by people who actually
-              notice them.
+              A living archive of cinema rats curated by people who actually notice them.
             </p>
 
             <div className="mt-10 flex flex-wrap justify-center gap-3 sm:mt-12">
               <Link
                 href="/submit"
-                className="wr-display inline-flex min-h-[3.5rem] min-w-[13rem] items-center justify-center rounded-3xl border-[3px] border-stone-950 bg-[#fca5a5] px-10 py-4 text-center text-xl font-bold text-stone-950 shadow-[6px_6px_0_0_rgb(28_25_23/0.88)] outline-none transition hover:brightness-[1.04] focus-visible:ring-2 focus-visible:ring-orange-600/60 focus-visible:ring-offset-2 active:translate-y-[2px] active:shadow-none sm:min-h-[4rem] sm:min-w-[15rem] sm:px-12 sm:py-5 sm:text-2xl dark:border-white/88 dark:bg-[#f97316] dark:text-stone-950 dark:shadow-[6px_6px_0_0_rgb(0_0_0/0.55)]"
+                className="wr-display inline-flex min-h-[3.5rem] min-w-[13rem] items-center justify-center rounded-3xl border-[3px] border-stone-950 bg-[#fb923c] px-10 py-4 text-center text-xl font-bold text-stone-950 shadow-[6px_6px_0_0_rgb(28_25_23/0.88)] outline-none transition hover:brightness-[1.04] focus-visible:ring-2 focus-visible:ring-orange-600/60 focus-visible:ring-offset-2 active:translate-y-[2px] active:shadow-none sm:min-h-[4rem] sm:min-w-[15rem] sm:px-12 sm:py-5 sm:text-2xl dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50 dark:shadow-[6px_6px_0_0_rgb(0_0_0/0.55)]"
               >
                 Submit a Sighting
               </Link>
@@ -168,7 +167,9 @@ export default async function Home({
       </section>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-2 pb-0 sm:px-6 sm:pt-3 sm:pb-0 lg:px-8">
-        <div className="overflow-hidden rounded-2xl rounded-b-none border-2 border-stone-950 bg-gradient-to-r from-[#fde047] via-[#fcd34d] to-[#fbbf24] shadow-[4px_4px_0_0_rgb(28_25_23/0.28)] dark:border-amber-400/35 dark:from-[#5c370d] dark:via-[#713f12] dark:to-[#5c370d] dark:shadow-[4px_4px_0_0_rgb(0_0_0/0.38)]">
+        <div
+          className="wr-cheese-stats-slab overflow-hidden rounded-2xl rounded-b-none border-2 border-stone-950 shadow-[4px_4px_0_0_rgb(28_25_23/0.28)] dark:border-amber-400/35 dark:shadow-[4px_4px_0_0_rgb(0_0_0/0.38)]"
+        >
           <div className="flex divide-x-2 divide-stone-950/20 dark:divide-white/15">
             {statsBarItems.map((item) => (
               <div
@@ -176,10 +177,10 @@ export default async function Home({
                 title={item.detailTitle ?? item.fullLabel}
                 className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-3 py-3.5 sm:px-8 sm:py-4"
               >
-                <p className="wr-display text-2xl font-black leading-none tabular-nums text-stone-950 dark:text-[#fff7dc] sm:text-3xl">
+                <p className="wr-display text-2xl font-black leading-none tracking-[0.02em] tabular-nums text-stone-950 dark:text-[#fff7dc] sm:text-3xl">
                   {item.value}
                 </p>
-                <p className="text-center text-[0.65rem] font-bold uppercase tracking-[0.14em] text-stone-800/85 dark:text-amber-200/85 sm:text-[0.7rem]">
+                <p className="text-center text-[0.84rem] font-bold uppercase tracking-[0.13em] text-stone-800/90 dark:text-amber-200/90 sm:text-[0.9rem]">
                   {item.shortLabel}
                 </p>
               </div>
@@ -192,7 +193,7 @@ export default async function Home({
         id="catalog"
         className="mx-auto max-w-7xl px-4 pt-0 pb-20 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
       >
-        <div className="wr-card rounded-t-none bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
+        <div className="wr-card rounded-t-none border-t-0 bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
           <form className="grid gap-3 md:grid-cols-[1.4fr_1fr_1fr_auto]">
             <label className="flex flex-col gap-2 text-sm font-bold text-stone-800 dark:text-stone-300">
               Search for title or note

@@ -222,6 +222,30 @@ body {
   box-shadow: 3px 3px 0 0 var(--wr-shadow-card-soft);
 }
 
+@utility wr-page-shell {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.wr-cheese-stats-slab {
+  background-color: #fbbf24;
+  background-image:
+    radial-gradient(circle at 12% 28%, rgb(146 64 14 / 0.16) 0 10px, transparent 11px),
+    radial-gradient(circle at 32% 72%, rgb(146 64 14 / 0.14) 0 8px, transparent 9px),
+    radial-gradient(circle at 58% 24%, rgb(146 64 14 / 0.15) 0 9px, transparent 10px),
+    radial-gradient(circle at 81% 66%, rgb(146 64 14 / 0.14) 0 11px, transparent 12px),
+    linear-gradient(to right, #fde047 0%, #fcd34d 44%, #fbbf24 100%);
+}
+
+.dark .wr-cheese-stats-slab {
+  background-color: #d97706;
+  background-image:
+    radial-gradient(circle at 12% 28%, rgb(120 53 15 / 0.2) 0 10px, transparent 11px),
+    radial-gradient(circle at 32% 72%, rgb(120 53 15 / 0.18) 0 8px, transparent 9px),
+    radial-gradient(circle at 58% 24%, rgb(146 64 14 / 0.19) 0 9px, transparent 10px),
+    radial-gradient(circle at 81% 66%, rgb(120 53 15 / 0.18) 0 11px, transparent 12px),
+    linear-gradient(to right, #f59e0b 0%, #d97706 44%, #b45309 100%);
+}
+
 @utility wr-btn {
   @apply inline-flex cursor-pointer items-center justify-center rounded-xl border-2 border-stone-950 px-5 py-2.5 text-center text-sm font-bold outline-none transition hover:brightness-[0.97] hover:shadow-[2px_2px_0_0_rgb(28_25_23/0.85)] focus-visible:ring-2 focus-visible:ring-stone-950 focus-visible:ring-offset-2 active:brightness-[0.94] active:shadow-none dark:border-white/25 dark:hover:shadow-[2px_2px_0_0_rgb(0_0_0/0.52)] dark:focus-visible:ring-amber-400 dark:focus-visible:ring-offset-stone-900;
   box-shadow: 3px 3px 0 0 var(--wr-shadow-btn);

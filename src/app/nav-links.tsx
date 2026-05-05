@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { ModeratorSession } from "@/lib/auth";
 
@@ -43,8 +44,16 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
           <Link
             className={navClass(isActivePath(pathname, "/profile"))}
             href="/profile"
+            aria-label="Profile"
+            title={session.name}
           >
-            {session.name}
+            <Image
+              src={session.avatarUrl}
+              alt={`${session.name} avatar`}
+              width={24}
+              height={24}
+              className="h-6 w-6 rounded-md border border-stone-900/15 object-cover dark:border-white/20"
+            />
           </Link>
         </>
       ) : null}

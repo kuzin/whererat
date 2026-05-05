@@ -15,7 +15,7 @@ export default async function SubmitPage() {
   const canAutoApprove = canAutoApproveSubmissions(moderatorSession);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="overflow-hidden rounded-2xl border border-amber-500/35 bg-[#9a3412] text-[#fef3c7]">
           <div className="p-8">

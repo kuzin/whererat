@@ -70,7 +70,7 @@ export default async function RootLayout({
                       className="wr-brand-wordmark h-5 w-auto max-w-[min(100%,11rem)] shrink-0 sm:h-7 sm:max-w-[14rem] md:h-8 md:max-w-[16rem]"
                     />
                   </Link>
-                  <ThemeDevToggle className="z-20 shrink-0" />
+                  <ThemeDevToggle className="z-20 ml-[5px] shrink-0" />
                 </div>
                 <NavLinks session={session} />
               </nav>

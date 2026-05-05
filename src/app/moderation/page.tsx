@@ -4,7 +4,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   formatColonTimecodeDisplay,
-  getCatalogStats,
   getImdbTitleUrl,
   getSubmissionImageRefs,
   getSubmissionSightingTitle,
@@ -18,7 +17,11 @@ import {
 } from "@/lib/auth";
 import { moderateSubmission } from "./actions";
 import { readModerationStore } from "@/lib/moderation-store";
-import { getCatalogMovieByImdbId, getCatalogMovieByTitleSearch } from "@/lib/movie-catalog";
+import {
+  getCatalogMovieByImdbId,
+  getCatalogMovieByTitleSearch,
+  getCatalogStatsWithCommunity,
+} from "@/lib/movie-catalog";
 import { removeSubmission, rereviewSubmission } from "./actions";
 import { readUserStore } from "@/lib/user-store";
 
@@ -118,7 +121,7 @@ export default async function ModerationPage({
   const editingAttachmentSlides = editingSubmission
     ? getSubmissionImageRefs(editingSubmission)
     : [];
-  const stats = getCatalogStats();
+  const stats = await getCatalogStatsWithCommunity();
   const userStore = await readUserStore();
   const trustSignalAccounts = [...userStore.accounts]
     .map((account) => ({
@@ -130,7 +133,7 @@ export default async function ModerationPage({
     }))
     .sort((a, b) => b.reviewCount - a.reviewCount || a.displayName.localeCompare(b.displayName));
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="space-y-6">
           <div className="rounded-2xl border border-amber-500/35 bg-[#9a3412] p-8 text-[#fef3c7]">
