@@ -65,8 +65,6 @@ function toDbSubmission(row: {
   curator_note: string | null;
   duplicate_hint: string | null;
   movie_poster_url: string | null;
-  image_url: string | null;
-  image_alt: string | null;
   images_json: unknown;
 }): Submission {
   const images = Array.isArray(row.images_json)
@@ -83,6 +81,7 @@ function toDbSubmission(row: {
         })
         .filter(Boolean)
     : undefined;
+  const leadImage = images?.[0];
   return {
     id: row.id,
     movieTitle: row.movie_title,
@@ -99,8 +98,8 @@ function toDbSubmission(row: {
     curatorNote: row.curator_note ?? undefined,
     duplicateHint: row.duplicate_hint ?? undefined,
     moviePosterUrl: row.movie_poster_url ?? undefined,
-    imageUrl: row.image_url ?? undefined,
-    imageAlt: row.image_alt ?? undefined,
+    imageUrl: leadImage?.url,
+    imageAlt: leadImage?.alt,
     images,
   };
 }
@@ -141,8 +140,8 @@ async function ensureSeedModerationStore() {
   for (const submission of seedSubmissions) {
     await pool.query(
       `insert into submissions
-        (id, movie_title, movie_year, imdb_id, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url, image_url, image_alt)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+        (id, movie_title, movie_year, imdb_id, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
        on conflict (id) do nothing`,
       [
         submission.id,
@@ -160,8 +159,6 @@ async function ensureSeedModerationStore() {
         submission.curatorNote ?? null,
         submission.duplicateHint ?? null,
         submission.moviePosterUrl ?? null,
-        submission.imageUrl ?? null,
-        submission.imageAlt ?? null,
       ],
     );
     for (const [index, slot] of (submission.images ?? []).entries()) {
@@ -215,8 +212,6 @@ export async function readModerationStore() {
       curator_note: string | null;
       duplicate_hint: string | null;
       movie_poster_url: string | null;
-      image_url: string | null;
-      image_alt: string | null;
       images_json: unknown;
     }>(
       `select s.*,
@@ -271,8 +266,8 @@ export async function addSubmission(
   };
   await pool.query(
     `insert into submissions
-      (id, movie_title, movie_year, imdb_id, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url, image_url, image_alt)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+      (id, movie_title, movie_year, imdb_id, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
     [
       nextSubmission.id,
       nextSubmission.movieTitle,
@@ -289,8 +284,6 @@ export async function addSubmission(
       nextSubmission.curatorNote ?? null,
       nextSubmission.duplicateHint ?? null,
       nextSubmission.moviePosterUrl ?? null,
-      nextSubmission.imageUrl ?? null,
-      nextSubmission.imageAlt ?? null,
     ],
   );
   for (const [index, slot] of (nextSubmission.images ?? []).entries()) {
@@ -515,8 +508,6 @@ export async function reviewSubmission({
             curator_note = $13,
             duplicate_hint = $14,
             movie_poster_url = $15,
-            image_url = $16,
-            image_alt = $17,
             updated_at = now()
       where id = $1`,
     [
@@ -535,8 +526,6 @@ export async function reviewSubmission({
       reviewedSubmission.curatorNote ?? null,
       reviewedSubmission.duplicateHint ?? null,
       reviewedSubmission.moviePosterUrl ?? null,
-      reviewedSubmission.imageUrl ?? null,
-      reviewedSubmission.imageAlt ?? null,
     ],
   );
   await pool.query(

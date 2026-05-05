@@ -138,9 +138,6 @@ export function SubmitForm({
             {errorFor("sightingTitle")}
           </span>
         ) : null}
-        <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-          Short headline for the sightings list (separate from the fuller description below).
-        </span>
       </label>
 
       <div className="grid gap-5 sm:grid-cols-2">
@@ -159,9 +156,6 @@ export function SubmitForm({
               {errorFor("timestamp")}
             </span>
           ) : null}
-          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-            When the rat first appears (film timecode).
-          </span>
         </label>
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
           Approx. rats on screen
@@ -173,9 +167,6 @@ export function SubmitForm({
             defaultValue={1}
             className="wr-input tabular-nums"
           />
-          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-            Ballpark count for this moment (powers the on-card presence meter and tallies).
-          </span>
         </label>
       </div>
 
@@ -222,15 +213,6 @@ export function SubmitForm({
               {errorFor("submitterName")}
             </span>
           ) : null}
-          {lockedSubmitterFields ? (
-            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-              Using your logged-in profile details.
-            </span>
-          ) : (
-            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-              Shown as &quot;Submitted by ...&quot; after moderation approves the sighting.
-            </span>
-          )}
         </label>
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
           Email (optional)

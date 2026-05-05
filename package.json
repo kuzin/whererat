@@ -10,7 +10,8 @@
     "seed:postgres:export": "tsx scripts/export-postgres-seed.ts",
     "db:schema:apply": "tsx scripts/db-apply-schema.ts",
     "db:seed": "tsx scripts/db-seed.ts",
-    "db:bootstrap": "npm run seed:postgres:export && npm run db:schema:apply && npm run db:seed"
+    "db:bootstrap": "npm run seed:postgres:export && npm run db:schema:apply && npm run db:seed",
+    "db:clear:content": "tsx scripts/db-clear-content.ts"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.2.8",
