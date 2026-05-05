@@ -12,7 +12,10 @@ export type MoviePageVisuals = {
 
 export async function getMoviePageVisuals(movie: Movie): Promise<MoviePageVisuals> {
   const enlargedPoster = upsizeAmazonPosterUrl(movie.posterUrl);
-  const tmdbBackdrop = await getTmdbBackdropUrl(movie.externalIds.tmdb);
+  const tmdbBackdrop = await getTmdbBackdropUrl({
+    tmdbId: movie.externalIds.tmdb,
+    imdbId: movie.externalIds.imdb,
+  });
 
   const bannerUrl = tmdbBackdrop ?? enlargedPoster ?? movie.posterUrl;
   const bannerIsWidescreen = Boolean(tmdbBackdrop);

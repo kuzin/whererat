@@ -138,7 +138,7 @@ export default async function ModerationPage({
         <aside className="space-y-6">
           <div className="rounded-2xl border border-amber-500/35 bg-[#9a3412] p-8 text-[#fef3c7]">
             <h1 className="wr-display text-4xl font-bold tracking-tight">
-              Moderation burrow
+              Moderation queue
             </h1>
             <p className="mt-5 leading-relaxed text-amber-50/82">
               Triage sightings with approve, tighten-up edits, or gentle rejections

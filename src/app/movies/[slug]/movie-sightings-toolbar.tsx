@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, type CSSProperties } from "react";
+import { useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -10,11 +10,6 @@ import {
   movieSightingsSortOptions,
   type MovieSightingsSortOption,
 } from "@/lib/whererat";
-
-function sortSelectChevronUrl(stroke: string) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="${stroke}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 8 4 4 4-4"/></svg>`;
-  return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
-}
 
 type SortProps = {
   slug: string;
@@ -48,13 +43,7 @@ export function MovieSightingsSortControl({ slug, sort, palette }: SortProps) {
         Sort by
       </span>
       <select
-        className={`wr-input min-w-[12.5rem] flex-1 appearance-none bg-[length:1.125rem_1.125rem] bg-[position:right_0.875rem_center] bg-no-repeat py-2 pl-3 pr-12 [background-image:var(--wr-sort-chevron)] sm:flex-initial dark:[background-image:var(--wr-sort-chevron-dark)] ${selectSkin}`}
-        style={
-          {
-            "--wr-sort-chevron": sortSelectChevronUrl("#57534e"),
-            "--wr-sort-chevron-dark": sortSelectChevronUrl("#d6d3d1"),
-          } as CSSProperties
-        }
+        className={`wr-select min-w-[12.5rem] flex-1 py-2 pl-3 sm:flex-initial ${selectSkin}`}
         value={sort}
         disabled={pending}
         onChange={(event) =>

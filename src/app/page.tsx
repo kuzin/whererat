@@ -17,11 +17,6 @@ function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function selectChevronUrl(stroke: string) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="${stroke}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 8 4 4 4-4"/></svg>`;
-  return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
-}
-
 const catalogSortOptions = [
   "latest-added-title",
   "latest-sighting",
@@ -135,7 +130,7 @@ export default async function Home({
   ];
 
   return (
-    <main className="wr-cheese-tile-cream">
+    <main className="wr-cheese-tile-cream relative">
       <section className="relative overflow-hidden">
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
           <div className="mx-auto max-w-3xl text-center">
@@ -209,13 +204,7 @@ export default async function Home({
               <select
                 name="genre"
                 defaultValue={genre}
-                className="wr-input h-11 appearance-none bg-[length:1.125rem_1.125rem] bg-[position:right_0.875rem_center] bg-no-repeat py-2 pl-4 pr-12 [background-image:var(--wr-select-chevron)] dark:[background-image:var(--wr-select-chevron-dark)]"
-                style={
-                  {
-                    "--wr-select-chevron": selectChevronUrl("#57534e"),
-                    "--wr-select-chevron-dark": selectChevronUrl("#d6d3d1"),
-                  } as Record<string, string>
-                }
+                className="wr-select h-11"
               >
                 <option value="all">All genres</option>
                 {availableGenres.map((item) => (
@@ -230,13 +219,7 @@ export default async function Home({
               <select
                 name="sort"
                 defaultValue={sort}
-                className="wr-input h-11 appearance-none bg-[length:1.125rem_1.125rem] bg-[position:right_0.875rem_center] bg-no-repeat py-2 pl-4 pr-12 [background-image:var(--wr-select-chevron)] dark:[background-image:var(--wr-select-chevron-dark)]"
-                style={
-                  {
-                    "--wr-select-chevron": selectChevronUrl("#57534e"),
-                    "--wr-select-chevron-dark": selectChevronUrl("#d6d3d1"),
-                  } as Record<string, string>
-                }
+                className="wr-select h-11"
               >
                 {catalogSortOptions.map((option) => (
                   <option key={option} value={option}>
@@ -325,6 +308,10 @@ export default async function Home({
           )}
         </div>
       </section>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-[var(--background)]"
+      />
     </main>
   );
 }

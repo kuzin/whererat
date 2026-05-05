@@ -90,7 +90,7 @@ export default async function ProfilePage({
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Role
-                <select name="role" defaultValue={account.role} className="wr-input">
+                <select name="role" defaultValue={account.role} className="wr-select">
                   <option value="owner">Owner</option>
                   <option value="moderator">Moderator</option>
                 </select>

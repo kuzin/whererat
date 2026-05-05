@@ -29,10 +29,11 @@ npm install
 cp .env.example .env.local
 ```
 
-3. Set `DATABASE_URL` in `.env.local`:
+3. Set env vars in `.env.local`:
 
 ```env
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/whererat
+TMDB_READ_ACCESS_TOKEN=your_tmdb_read_access_token
 ```
 
 4. Bootstrap schema + seed data:

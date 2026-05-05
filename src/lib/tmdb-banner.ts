@@ -15,16 +15,64 @@ type TmdbImagesResponse = {
   backdrops?: TmdbBackdrop[];
 };
 
+type TmdbFindResponse = {
+  movie_results?: Array<{ id?: number }>;
+};
+
 function bearerHeaders(): HeadersInit | null {
-  const token = process.env.TMDB_READ_ACCESS_TOKEN?.trim();
+  const token =
+    process.env.TMDB_READ_ACCESS_TOKEN?.trim() ||
+    process.env.TMDB_API_READ_ACCESS_TOKEN?.trim() ||
+    process.env.TMDB_BEARER_TOKEN?.trim();
   return token ? { Authorization: `Bearer ${token}` } : null;
 }
 
-/** Widescreen theatrical still; needs `TMDB_READ_ACCESS_TOKEN` + numeric TMDB movie id */
-export async function getTmdbBackdropUrl(tmdbId: string | undefined) {
-  if (!tmdbId) {
+function normalizeImdbId(value: string | undefined): string | null {
+  const match = value?.trim().match(/tt\d{7,9}/i);
+  return match?.[0]?.toLowerCase() ?? null;
+}
+
+async function resolveTmdbMovieId({
+  tmdbId,
+  imdbId,
+  headers,
+  cache,
+}: {
+  tmdbId?: string;
+  imdbId?: string;
+  headers: HeadersInit;
+  cache: { next: { revalidate: number } };
+}) {
+  if (tmdbId?.trim()) return tmdbId.trim();
+  const normalizedImdbId = normalizeImdbId(imdbId);
+  if (!normalizedImdbId) return null;
+
+  try {
+    const findRes = await fetch(
+      `${TMDB_API}/find/${encodeURIComponent(normalizedImdbId)}?external_source=imdb_id`,
+      {
+        headers: { Accept: "application/json", ...headers },
+        ...cache,
+      },
+    );
+    if (!findRes.ok) return null;
+    const payload = (await findRes.json()) as TmdbFindResponse;
+    const foundId = payload.movie_results?.[0]?.id;
+    return typeof foundId === "number" ? String(foundId) : null;
+  } catch {
     return null;
   }
+}
+
+/** Widescreen theatrical still; needs `TMDB_READ_ACCESS_TOKEN` + TMDB id or IMDb id */
+export async function getTmdbBackdropUrl({
+  tmdbId,
+  imdbId,
+}: {
+  tmdbId?: string;
+  imdbId?: string;
+}) {
+  if (!tmdbId?.trim() && !imdbId?.trim()) return null;
 
   const headers = bearerHeaders();
   if (!headers) {
@@ -32,10 +80,17 @@ export async function getTmdbBackdropUrl(tmdbId: string | undefined) {
   }
 
   const cache = { next: { revalidate: 86400 } } as const;
+  const resolvedTmdbId = await resolveTmdbMovieId({
+    tmdbId,
+    imdbId,
+    headers,
+    cache,
+  });
+  if (!resolvedTmdbId) return null;
 
   try {
     const detailRes = await fetch(
-      `${TMDB_API}/movie/${encodeURIComponent(tmdbId)}`,
+      `${TMDB_API}/movie/${encodeURIComponent(resolvedTmdbId)}`,
       {
         headers: { Accept: "application/json", ...headers },
         ...cache,
@@ -50,7 +105,7 @@ export async function getTmdbBackdropUrl(tmdbId: string | undefined) {
     }
 
     const imagesRes = await fetch(
-      `${TMDB_API}/movie/${encodeURIComponent(tmdbId)}/images`,
+      `${TMDB_API}/movie/${encodeURIComponent(resolvedTmdbId)}/images`,
       {
         headers: { Accept: "application/json", ...headers },
         ...cache,
