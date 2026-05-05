@@ -34,6 +34,12 @@ cp .env.example .env.local
 ```env
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/whererat
 TMDB_READ_ACCESS_TOKEN=your_tmdb_read_access_token
+AWS_REGION=us-east-1
+S3_BUCKET_NAME=your-whererat-bucket
+S3_PUBLIC_BASE_URL=https://your-cdn-or-bucket-hostname
+AWS_ACCESS_KEY_ID=optional_if_not_using_iam_role
+AWS_SECRET_ACCESS_KEY=optional_if_not_using_iam_role
+UPLOAD_FALLBACK_TO_LOCAL=true
 ```
 
 4. Bootstrap schema + seed data:
@@ -85,3 +91,5 @@ curl http://localhost:3000/api/health/db
 
 - Use `.env.local` (not `local.env`) for local configuration.
 - DB scripts explicitly load `.env.local`/`.env`.
+- Uploads use S3 automatically when `AWS_REGION` + `S3_BUCKET_NAME` are set.
+- If `S3_PUBLIC_BASE_URL` is set, uploaded image URLs use that host (CloudFront/CDN-ready).

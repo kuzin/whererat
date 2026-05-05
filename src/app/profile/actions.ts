@@ -1,7 +1,5 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -13,6 +11,7 @@ import {
   updateStoredModeratorPassword,
   updateStoredModeratorProfile,
 } from "@/lib/user-store";
+import { persistImageFile } from "@/lib/media-storage";
 
 async function getSessionOrRedirect() {
   const cookieStore = await cookies();
@@ -27,13 +26,6 @@ async function getSessionOrRedirect() {
   return { cookieStore, session };
 }
 
-const AVATAR_IMAGE_MIME_EXT: Record<string, string> = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/gif": ".gif",
-};
-
 const MAX_AVATAR_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 async function persistAvatarUpload(formData: FormData) {
@@ -42,17 +34,10 @@ async function persistAvatarUpload(formData: FormData) {
     return undefined;
   }
 
-  const ext = AVATAR_IMAGE_MIME_EXT[raw.type];
-  if (!ext || raw.size > MAX_AVATAR_UPLOAD_BYTES) {
-    return undefined;
-  }
-
-  const dir = path.join(process.cwd(), "public", "uploads", "avatars");
-  await mkdir(dir, { recursive: true });
-  const fileName = `${crypto.randomUUID()}${ext}`;
-  const bytes = Buffer.from(await raw.arrayBuffer());
-  await writeFile(path.join(dir, fileName), bytes);
-  return `/uploads/avatars/${fileName}`;
+  return persistImageFile(raw, {
+    folder: "avatars",
+    maxBytes: MAX_AVATAR_UPLOAD_BYTES,
+  });
 }
 
 export async function updateProfile(formData: FormData) {

@@ -1,5 +1,15 @@
 import type { NextConfig } from "next";
 
+const s3PublicBaseUrl = process.env.S3_PUBLIC_BASE_URL?.trim();
+const s3PublicHostname = (() => {
+  if (!s3PublicBaseUrl) return null;
+  try {
+    return new URL(s3PublicBaseUrl).hostname;
+  } catch {
+    return null;
+  }
+})();
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -19,6 +29,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      ...(s3PublicHostname
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: s3PublicHostname,
+            },
+          ]
+        : []),
     ],
   },
 };

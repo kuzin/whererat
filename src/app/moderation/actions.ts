@@ -1,7 +1,5 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -11,13 +9,7 @@ import {
 } from "@/lib/auth";
 import { deleteSubmissionById, reviewSubmission } from "@/lib/moderation-store";
 import { clampApproximateRatCount, type SightingImageSlot } from "@/lib/whererat";
-
-const SIGHTING_IMAGE_MIME_EXT: Record<string, string> = {
-  "image/jpeg": ".jpg",
-  "image/png": ".png",
-  "image/webp": ".webp",
-  "image/gif": ".gif",
-};
+import { persistSightingFiles } from "@/lib/media-storage";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 
@@ -39,29 +31,7 @@ async function persistSightingUploads(formData: FormData): Promise<SightingImage
   const files = raw.filter((e): e is File => e instanceof File && e.size > 0);
   const capped = files.slice(0, 5);
   if (!capped.length) return [];
-
-  const dir = path.join(process.cwd(), "public", "uploads", "sightings");
-  await mkdir(dir, { recursive: true });
-
-  const out: SightingImageSlot[] = [];
-  for (const file of capped) {
-    const ext = SIGHTING_IMAGE_MIME_EXT[file.type];
-    if (!ext || file.size > MAX_SIGHTING_UPLOAD_BYTES) continue;
-    try {
-      const buf = Buffer.from(await file.arrayBuffer());
-      const name = `${crypto.randomUUID()}${ext}`;
-      await writeFile(path.join(dir, name), buf);
-      const safeStem = file.name.replace(/[^\w.\- ]+/g, "").trim().slice(0, 96);
-      out.push({
-        url: `/uploads/sightings/${name}`,
-        alt: safeStem ? `${safeStem} (uploaded)` : "Uploaded sighting photo",
-      });
-    } catch {
-      continue;
-    }
-  }
-
-  return out.slice(0, 5);
+  return persistSightingFiles(capped, MAX_SIGHTING_UPLOAD_BYTES);
 }
 
 export async function moderateSubmission(formData: FormData) {

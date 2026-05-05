@@ -24,7 +24,8 @@ export function EditableSightingImagesField({
   );
 
   async function onFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const files = event.currentTarget.files;
+    const input = event.currentTarget;
+    const files = input.files;
     if (!files || files.length === 0 || !canAddMore) return;
     setIsUploading(true);
     setUploadError(null);
@@ -47,7 +48,7 @@ export function EditableSightingImagesField({
       setUploadError("Image upload failed. Please try again.");
     } finally {
       setIsUploading(false);
-      event.currentTarget.value = "";
+      input.value = "";
     }
   }
 

@@ -34,3 +34,4 @@ Once running with `DATABASE_URL`, you can verify connectivity:
 
 - `password_hash` in the seed export is currently plaintext from local dev accounts and should be replaced with proper hashed credentials before production rollout.
 - JSON store files in `data/` remain the live source until repositories/actions are switched to Postgres-backed adapters.
+
