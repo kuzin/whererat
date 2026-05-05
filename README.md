@@ -1,76 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WhereRat
 
-## Getting Started
+WhereRat is a Next.js app for tracking rat sightings in movies, with:
 
-First, run the development server:
+- public catalog + movie pages
+- public submission flow
+- moderator review queue and history
+- profile/account management
+- Postgres-backed data layer and seed/bootstrap scripts
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- React 19
+- Tailwind CSS
+- Postgres (`pg`)
+
+## Local Setup
+
+1. Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Postgres Setup
-
-1. Copy env template:
+2. Create env file:
 
 ```bash
 cp .env.example .env.local
 ```
 
-2. Export DB-ready seed:
+3. Set `DATABASE_URL` in `.env.local`:
 
-```bash
-npm run seed:postgres:export
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/whererat
 ```
 
-3. Apply schema and seed:
-
-```bash
-npm run db:schema:apply
-npm run db:seed
-```
-
-Or run all setup in one command:
+4. Bootstrap schema + seed data:
 
 ```bash
 npm run db:bootstrap
 ```
 
-4. Verify DB health:
+5. Run the app:
+
+```bash
+npm run dev
+```
+
+6. Verify DB health:
 
 ```bash
 curl http://localhost:3000/api/health/db
 ```
 
-## Production deploy checklist
+## Scripts
 
-- Provision Postgres and set `DATABASE_URL` in your host environment.
-- Run `npm run db:schema:apply` and `npm run db:seed` against the production DB before first traffic.
-- Deploy app (`npm run build`, then `npm run start` on host).
-- Hit `/api/health/db` after deploy to verify runtime DB connectivity.
+- `npm run dev` - start local dev server
+- `npm run build` - production build
+- `npm run start` - run production build
+- `npm run lint` - run ESLint
+- `npm run seed:postgres:export` - generate `db/seed.json` from in-repo seed structures
+- `npm run db:schema:apply` - apply `db/schema.sql` to `DATABASE_URL`
+- `npm run db:seed` - seed Postgres from `db/seed.json`
+- `npm run db:bootstrap` - export seed + apply schema + seed DB
 
-## Learn More
+## Database Files
 
-To learn more about Next.js, take a look at the following resources:
+- `db/schema.sql` - baseline relational schema
+- `db/seed.json` - generated DB-ready seed payload
+- `db/README.md` - extra notes for DB prep
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Production Checklist
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Provision managed Postgres.
+- Set `DATABASE_URL` in production environment.
+- Run:
+  - `npm run db:schema:apply`
+  - `npm run db:seed`
+- Deploy app (`npm run build` + `npm run start`, or platform equivalent).
+- Verify `GET /api/health/db` returns `{ ok: true }`.
 
-## Deploy on Vercel
+## Notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Use `.env.local` (not `local.env`) for local configuration.
+- DB scripts explicitly load `.env.local`/`.env`.
