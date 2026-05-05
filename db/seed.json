@@ -1,0 +1,1069 @@
+{
+  "accounts": [
+    {
+      "id": "curator",
+      "username": "curator",
+      "display_name": "Curator",
+      "email": "curator@whererat.local",
+      "avatar_url": "https://placehold.co/160x160/292524/fef3c7/png?text=Curator",
+      "role": "owner",
+      "password_hash": "ratpack"
+    },
+    {
+      "id": "film-burrow",
+      "username": "filmburrow",
+      "display_name": "FilmBurrow",
+      "email": "filmburrow@whererat.local",
+      "avatar_url": "https://placehold.co/160x160/78350f/fef3c7/png?text=FB",
+      "role": "moderator",
+      "password_hash": "burrow"
+    }
+  ],
+  "movies": [
+    {
+      "id": "ratatouille-2007",
+      "slug": "ratatouille-2007",
+      "title": "Ratatouille",
+      "release_year": 2007,
+      "runtime_minutes": 111,
+      "genres": [
+        "Animation",
+        "Comedy",
+        "Family"
+      ],
+      "poster_tone": "bg-amber-500",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BMTMzODU0NTkxMF5BMl5BanBnXkFtZTcwMjQ4MzMzMw@@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/fef3c7/78350f/png?text=Paris%20kitchen%20rat%20sighting",
+      "poster_alt": "Official poster for Ratatouille.",
+      "imdb_id": "tt0382932",
+      "tmdb_id": "2062",
+      "summary": "A rat who can cook makes an unusual alliance with a young kitchen worker at a famous Paris restaurant.",
+      "metadata": {
+        "tagline": "Dinner is served. Adventure is on the menu.",
+        "rating": "G",
+        "director": "Brad Bird, Jan Pinkava",
+        "originalLanguage": "English, French",
+        "productionCountries": [
+          "United States",
+          "France"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "Brad Bird (screenplay), Bob Peterson, Jim Capobianco, Jan Pinkava",
+        "cast": "Patton Oswalt, Ian Holm, Lou Romano, Brad Garrett, Peter O'Toole, Janeane Garofalo, Will Arnett",
+        "imdbRating": "8.1",
+        "imdbVotes": "935,000",
+        "metascore": "96",
+        "awards": "Won Oscar: Best Animated Feature (2008)"
+      }
+    },
+    {
+      "id": "the-departed-2006",
+      "slug": "the-departed-2006",
+      "title": "The Departed",
+      "release_year": 2006,
+      "runtime_minutes": 151,
+      "genres": [
+        "Crime",
+        "Thriller",
+        "Drama"
+      ],
+      "poster_tone": "bg-stone-600",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BMTI1MTY2OTIxNV5BMl5BanBnXkFtZTYwNjQ4NjY3._V1_QL75_UY562_CR0,0,380,562_.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/18181b/fef3c7/png?text=Balcony%20rat%20final%20shot",
+      "poster_alt": "Official poster for The Departed.",
+      "imdb_id": "tt0407887",
+      "tmdb_id": "1422",
+      "summary": "An undercover cop and a mole in the police attempt to identify each other while infiltrating an Irish gang in South Boston.",
+      "metadata": {
+        "tagline": "Lies. Betrayal. Sacrifice. How far will you take it?",
+        "rating": "R",
+        "director": "Martin Scorsese",
+        "originalLanguage": "English, Cantonese",
+        "productionCountries": [
+          "United States",
+          "Hong Kong"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "William Monahan",
+        "cast": "Leonardo DiCaprio, Matt Damon, Jack Nicholson, Mark Wahlberg, Martin Sheen, Ray Winstone, Vera Farmiga, Alec Baldwin",
+        "imdbRating": "8.5",
+        "imdbVotes": "1.4 million",
+        "metascore": "85",
+        "awards": "Won 4 Oscars incl. Best Picture and Best Director (2007)"
+      }
+    },
+    {
+      "id": "nosferatu-1922",
+      "slug": "nosferatu-1922",
+      "title": "Nosferatu: A Symphony of Horror",
+      "release_year": 1922,
+      "runtime_minutes": 94,
+      "genres": [
+        "Fantasy",
+        "Horror"
+      ],
+      "poster_tone": "bg-stone-500",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BNDg1OTI1M2MtMTVlMS00ZjFhLTgyMTAtYjIzOWUwZTkyZWE5XkEyXkFqcGc@._V1_SX300.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/44403c/fafaf9/png?text=Ship%20rats%20and%20shadow",
+      "poster_alt": "Official poster for Nosferatu: A Symphony of Horror.",
+      "imdb_id": "tt0013442",
+      "tmdb_id": "653",
+      "summary": "Vampire Count Orlok expresses interest in a new residence and real estate agent Hutter's wife.",
+      "metadata": {
+        "tagline": "A symphony of horror.",
+        "rating": "Not Rated",
+        "director": "F.W. Murnau",
+        "originalLanguage": "German, English",
+        "productionCountries": [
+          "Germany"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "Henrik Galeen",
+        "cast": "Max Schreck, Gustav von Wangenheim, Greta Schröder",
+        "imdbRating": "7.9",
+        "imdbVotes": "117,000",
+        "awards": "Landmark silent horror widely cited among the most influential films of the 1920s."
+      }
+    },
+    {
+      "id": "indiana-jones-last-crusade-1989",
+      "slug": "indiana-jones-last-crusade-1989",
+      "title": "Indiana Jones and the Last Crusade",
+      "release_year": 1989,
+      "runtime_minutes": 127,
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "poster_tone": "bg-orange-600",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BNGIxNzQ0YzYtMjNmYi00YjBlLWFjNzEtNGE3ZGFmYTczM2MwXkEyXkFqcGc@._V1_SX300.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/92400e/fff7ed/png?text=Venice%20catacomb%20rats",
+      "poster_alt": "Official poster for Indiana Jones and the Last Crusade.",
+      "imdb_id": "tt0097576",
+      "tmdb_id": "89",
+      "summary": "In 1938, Indiana Jones finds himself up against the Nazis again while searching for the Holy Grail.",
+      "metadata": {
+        "tagline": "The man with the hat is back. And this time, he's bringing his Dad.",
+        "rating": "PG-13",
+        "director": "Steven Spielberg",
+        "originalLanguage": "English, German, Greek, Latin, Italian",
+        "productionCountries": [
+          "United States",
+          "United Kingdom",
+          "Spain",
+          "Italy",
+          "Jordan"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "Jeffrey Boam, George Lucas, Menno Meyjes",
+        "cast": "Harrison Ford, Sean Connery, Alison Doody, Denholm Elliott, John Rhys-Davies, Julian Glover",
+        "imdbRating": "8.2",
+        "imdbVotes": "803,000",
+        "metascore": "65",
+        "awards": "Won Oscar for Best Sound Effects Editing (1990); nominee for Score and Sound."
+      }
+    },
+    {
+      "id": "willard-1971",
+      "slug": "willard-1971",
+      "title": "Willard",
+      "release_year": 1971,
+      "runtime_minutes": 95,
+      "genres": [
+        "Horror"
+      ],
+      "poster_tone": "bg-red-800",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BNDdiM2U3MzYtYmM3YS00MTI4LWIxYzctZmYzN2U3NDBkOTM4XkEyXkFqcGc@._V1_SX300.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/450a0a/fee2e2/png?text=Basement%20rat%20army",
+      "poster_alt": "Official poster for Willard.",
+      "imdb_id": "tt0067991",
+      "tmdb_id": "42504",
+      "summary": "A social misfit uses his only friends, his pet rats, to exact revenge on his tormentors.",
+      "metadata": {
+        "tagline": "This is Willard and his friend Ben.",
+        "rating": "PG",
+        "director": "Daniel Mann",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "Gilbert Ralston",
+        "cast": "Bruce Davison, Elsa Lanchester, Ernest Borgnine, Sondra Locke",
+        "imdbRating": "6.2",
+        "imdbVotes": "8,900",
+        "metascore": "65",
+        "awards": "Oscar nominee: Best Song (“Ben”) (1973)."
+      }
+    },
+    {
+      "id": "the-suicide-squad-2021",
+      "slug": "the-suicide-squad-2021",
+      "title": "The Suicide Squad",
+      "release_year": 2021,
+      "runtime_minutes": 132,
+      "genres": [
+        "Action",
+        "Comedy",
+        "Superhero"
+      ],
+      "poster_tone": "bg-orange-500",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BMWU3Y2NlZmEtMjJjNS00ZWMxLWE1MzctYWYyMjMzMDdkNTE4XkEyXkFqcGc@._V1_QL75_UX380_CR0,0,380,562_.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/1d4ed8/fdf2f8/png?text=Heroic%20rat%20swarm",
+      "poster_alt": "Official poster for The Suicide Squad.",
+      "imdb_id": "tt6334354",
+      "tmdb_id": "436969",
+      "summary": "Supervillains at Belle Reve join Task Force X for a mission on the remote island of Corto Maltese.",
+      "metadata": {
+        "tagline": "They're dying to save the world.",
+        "rating": "R",
+        "director": "James Gunn",
+        "originalLanguage": "English, Spanish, Japanese, Cantonese",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "James Gunn",
+        "cast": "Margot Robbie, Idris Elba, John Cena, Joel Kinnaman, Viola Davis, Daniela Melchior, Sylvester Stallone (voice)",
+        "imdbRating": "7.2",
+        "imdbVotes": "358,000",
+        "metascore": "72",
+        "awards": "Won Critics' Choice Movie Award for Best Villain — Idris Elba as Bloodsport."
+      }
+    },
+    {
+      "id": "flushed-away-2006",
+      "slug": "flushed-away-2006",
+      "title": "Flushed Away",
+      "release_year": 2006,
+      "runtime_minutes": 85,
+      "genres": [
+        "Animation",
+        "Action",
+        "Adventure"
+      ],
+      "poster_tone": "bg-orange-400",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BMTI1MzE1MDk2N15BMl5BanBnXkFtZTYwMjEwMzI3._V1_SX300.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/bae6fd/082f49/png?text=London%20sewer%20rat%20adventure",
+      "poster_alt": "Official poster for Flushed Away.",
+      "imdb_id": "tt0424095",
+      "tmdb_id": "11619",
+      "summary": "The story of an uptown rat that gets flushed from his penthouse apartment into the sewers of London.",
+      "metadata": {
+        "tagline": "Someone's going down.",
+        "rating": "PG",
+        "director": "David Bowers, Sam Fell",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United Kingdom",
+          "United States"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "Dick Clement, Ian La Frenais, Christopher Lloyd, Joe Keenan, William Davies",
+        "cast": "Hugh Jackman, Kate Winslet, Ian McKellen, Andy Serkis, Bill Nighy, Jean Reno",
+        "imdbRating": "6.6",
+        "imdbVotes": "128,000",
+        "metascore": "74",
+        "awards": "Annie nominee (Best Writing in a Feature), BAFTA nominee for Animated Film."
+      }
+    },
+    {
+      "id": "ben-1972",
+      "slug": "ben-1972",
+      "title": "Ben",
+      "release_year": 1972,
+      "runtime_minutes": 94,
+      "genres": [
+        "Drama",
+        "Horror",
+        "Thriller"
+      ],
+      "poster_tone": "bg-amber-800",
+      "poster_url": "https://m.media-amazon.com/images/M/MV5BNjMyMzM2MTUtZmQ4Ni00Y2ExLTliMDktMzE3NWRlZGQ4MzdhXkEyXkFqcGc@._V1_SX300.jpg",
+      "backdrop_url": "https://placehold.co/1200x600/7f1d1d/fee2e2/png?text=Ben%20killer%20rat%20swarm",
+      "poster_alt": "Official poster for Ben.",
+      "imdb_id": "tt0068264",
+      "tmdb_id": "57122",
+      "summary": "A lonely boy befriends Ben, the leader of a violent swarm of killer rats.",
+      "metadata": {
+        "tagline": "A lonely boy befriends the leader of a rat colony.",
+        "rating": "PG",
+        "director": "Phil Karlson",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "OMDb via IMDb ID",
+        "lastSyncedAt": "2026-05-04",
+        "writers": "Gilbert Ralston",
+        "cast": "Lee Montgomery, Joseph Campanella, Arthur O'Connell, Meredith Baxter",
+        "imdbRating": "5.4",
+        "imdbVotes": "5,300",
+        "awards": "Follow-up to Willard; cult horror sequel known for its Michael Jackson title song."
+      }
+    }
+  ],
+  "sightings": [
+    {
+      "id": "remy-first-cook",
+      "movie_id": "ratatouille-2007",
+      "timestamp_code": "00:17:42",
+      "title": "Remy is separated from the colony and begins his path toward Gusteau's kitchen.",
+      "description": "Remy is separated from the colony and begins his path toward Gusteau's kitchen.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ],
+      "approximate_rat_count": 12
+    },
+    {
+      "id": "ratatouille-linguini-marionette",
+      "movie_id": "ratatouille-2007",
+      "timestamp_code": "00:52:06",
+      "title": "Remy hides under Linguini's toque steering him like a marionette; kitchen chaos hinges …",
+      "description": "Remy hides under Linguini's toque steering him like a marionette; kitchen chaos hinges on puppet-cooking rats.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "ratatouille-finale-banquet-help",
+      "movie_id": "ratatouille-2007",
+      "timestamp_code": "01:41:58",
+      "title": "The expanded rat brigade rallies to serve the climactic banquet while keeping Remy's se…",
+      "description": "The expanded rat brigade rallies to serve the climactic banquet while keeping Remy's secret intact.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": true,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ],
+      "curator_note": "Verifies choreography through the climactic banquet; details discuss structural reveals.",
+      "approximate_rat_count": 48
+    },
+    {
+      "id": "departed-training-academy-mouse",
+      "movie_id": "the-departed-2006",
+      "timestamp_code": "00:54:42",
+      "title": "A stray rodent darts behind shelving during an early cadet-era interior beat—a tiny bli…",
+      "description": "A stray rodent darts behind shelving during an early cadet-era interior beat—a tiny blink-and-miss detail before Boston's undercover war heats up.",
+      "prominence": "blink-and-miss",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "departed-final-rat",
+      "movie_id": "the-departed-2006",
+      "timestamp_code": "02:25:21",
+      "title": "A rat crosses the balcony railing in the final shot, underlining the movie's informant …",
+      "description": "A rat crosses the balcony railing in the final shot, underlining the movie's informant motif.",
+      "prominence": "scene-stealer",
+      "scene_type": "final-shot",
+      "spoiler": true,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ],
+      "curator_note": "Final-shot rat symbolism varies slightly by grading—some streams crush the railing silhouette harder than theatrical prints."
+    },
+    {
+      "id": "nosferatu-ship-rats",
+      "movie_id": "nosferatu-1922",
+      "timestamp_code": "00:49:10",
+      "title": "Rats appear aboard the ship carrying Orlok, linking the vampire's arrival to plague ima…",
+      "description": "Rats appear aboard the ship carrying Orlok, linking the vampire's arrival to plague imagery.",
+      "prominence": "background",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "public-domain-print"
+      ],
+      "approximate_rat_count": 24
+    },
+    {
+      "id": "nosferatu-plague-town",
+      "movie_id": "nosferatu-1922",
+      "timestamp_code": "00:56:03",
+      "title": "Rats appear among the frightened townsfolk as plague symbolism intensifies around Orlok…",
+      "description": "Rats appear among the frightened townsfolk as plague symbolism intensifies around Orlok's shadow spreading through Wisborg.",
+      "prominence": "background",
+      "scene_type": "symbolic",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "public-domain-print"
+      ]
+    },
+    {
+      "id": "indy-library-to-catacombs",
+      "movie_id": "indiana-jones-last-crusade-1989",
+      "timestamp_code": "00:36:12",
+      "title": "Rats crawl from the Venetian library stacks into the dusty passage that drops Indy and …",
+      "description": "Rats crawl from the Venetian library stacks into the dusty passage that drops Indy and Elsa toward the submerged crypt.",
+      "prominence": "background",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ],
+      "curator_note": "Stacks plate used more reactive lighting than catacombs; compare noise on older HD masters before timing complaints."
+    },
+    {
+      "id": "indy-catacombs",
+      "movie_id": "indiana-jones-last-crusade-1989",
+      "timestamp_code": "00:38:08",
+      "title": "Rats flood the Venice catacombs as Indy and Elsa search beneath the library.",
+      "description": "Rats flood the Venice catacombs as Indy and Elsa search beneath the library.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "willard-basement",
+      "movie_id": "willard-1971",
+      "timestamp_code": "00:28:35",
+      "title": "Willard's bond with the rats deepens as the basement becomes their territory.",
+      "description": "Willard's bond with the rats deepens as the basement becomes their territory.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "willard-office-dinner-invite",
+      "movie_id": "willard-1971",
+      "timestamp_code": "01:06:42",
+      "title": "Willard's rodents crash a dinner-in-progress at his workplace, escalating from hidden m…",
+      "description": "Willard's rodents crash a dinner-in-progress at his workplace, escalating from hidden menace into open revenge spectacle.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": true,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "suicide-squad-sebastian",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:10:30",
+      "title": "Sebastian is introduced as Ratcatcher 2's companion before the larger swarm payoff.",
+      "description": "Sebastian is introduced as Ratcatcher 2's companion before the larger swarm payoff.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "suicide-squad-belle-reve-recruit",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:16:54",
+      "title": "Belle Reve sequences re-establish Ratcatcher 2 with caged rodents and practice commands…",
+      "description": "Belle Reve sequences re-establish Ratcatcher 2 with caged rodents and practice commands before the Corto Maltese deployment.",
+      "prominence": "background",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "suicide-squad-corto-maltese-wave",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "01:15:52",
+      "title": "Ratcatcher 2 whistles up a tidal wave of vermin—including street drains and cages—durin…",
+      "description": "Ratcatcher 2 whistles up a tidal wave of vermin—including street drains and cages—during the Corto Maltese assault choreography.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-01",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:03:15",
+      "title": "Demonstration catalog beat: stray rats scatter along a corridor at Belle Reve as guards…",
+      "description": "Demonstration catalog beat: stray rats scatter along a corridor at Belle Reve as guards walk past—padding data for paging UI.",
+      "prominence": "blink-and-miss",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-02",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:08:42",
+      "title": "Ratcatcher trains another pocket of recruits in an exercise yard; rodents thread throug…",
+      "description": "Ratcatcher trains another pocket of recruits in an exercise yard; rodents thread through chain-link shadows.",
+      "prominence": "background",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-03",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:22:10",
+      "title": "A maintenance tunnel shows fresh gnaw marks and a quick tail whip before the squad move…",
+      "description": "A maintenance tunnel shows fresh gnaw marks and a quick tail whip before the squad moves on.",
+      "prominence": "blink-and-miss",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-04",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:31:06",
+      "title": "Helicopter briefing insert: a blink of motion in a supply crate hinting at stowaway rats.",
+      "description": "Helicopter briefing insert: a blink of motion in a supply crate hinting at stowaway rats.",
+      "prominence": "blink-and-miss",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-05",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:44:18",
+      "title": "Staging deck before deployment: loose feed bags rustle with small bodies inside the car…",
+      "description": "Staging deck before deployment: loose feed bags rustle with small bodies inside the cargo net.",
+      "prominence": "background",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-06",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "00:58:40",
+      "title": "Brief insert of rats vanishing into a storm drain at the edge of the beachhead town.",
+      "description": "Brief insert of rats vanishing into a storm drain at the edge of the beachhead town.",
+      "prominence": "background",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-07",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "01:02:07",
+      "title": "Urban market texture pass: vendors shooing a small cluster of rodents from produce bins.",
+      "description": "Urban market texture pass: vendors shooing a small cluster of rodents from produce bins.",
+      "prominence": "background",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-08",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "01:08:22",
+      "title": "Ratcatcher whistles a smaller wave through rubble as cover for the squad advancing on a…",
+      "description": "Ratcatcher whistles a smaller wave through rubble as cover for the squad advancing on a side street.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-09",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "01:12:33",
+      "title": "Quiet beat in a hotel room: Sebastian scurries across paperwork while plans are laid out.",
+      "description": "Quiet beat in a hotel room: Sebastian scurries across paperwork while plans are laid out.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "suicide-squad-catalog-demo-10",
+      "movie_id": "the-suicide-squad-2021",
+      "timestamp_code": "01:18:07",
+      "title": "Late assault insert: additional rodent traffic through a blasted wall while gunfire con…",
+      "description": "Late assault insert: additional rodent traffic through a blasted wall while gunfire continues off-screen.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    },
+    {
+      "id": "flushed-away-roddy",
+      "movie_id": "flushed-away-2006",
+      "timestamp_code": "00:04:50",
+      "title": "Roddy is established as a pampered pet rat before being flushed into the London sewer w…",
+      "description": "Roddy is established as a pampered pet rat before being flushed into the London sewer world.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "flushed-away-sewer-jam-city",
+      "movie_id": "flushed-away-2006",
+      "timestamp_code": "00:22:43",
+      "title": "Roddy discovers Ratropolis—boats, dives, and market stalls—all populated by rival sewer…",
+      "description": "Roddy discovers Ratropolis—boats, dives, and market stalls—all populated by rival sewer rat crews after the plunge.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "flushed-away-toad-ballroom-swarm",
+      "movie_id": "flushed-away-2006",
+      "timestamp_code": "01:06:58",
+      "title": "The villain's ballroom scheme unleashes choreography where dozens of animated rats scra…",
+      "description": "The villain's ballroom scheme unleashes choreography where dozens of animated rats scramble through pipes and chandeliers.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": true,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "ben-rat-colony",
+      "movie_id": "ben-1972",
+      "timestamp_code": "00:12:20",
+      "title": "Ben and the rat colony become central to the story as Danny forms a bond with their lea…",
+      "description": "Ben and the rat colony become central to the story as Danny forms a bond with their leader.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "ben-kitchen-cheese-run",
+      "movie_id": "ben-1972",
+      "timestamp_code": "00:38:54",
+      "title": "Rats overrun the Schaefers' kitchen pantry in waves as Ben redirects the infestation to…",
+      "description": "Rats overrun the Schaefers' kitchen pantry in waves as Ben redirects the infestation toward escalating domestic horror beats.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "Curator",
+      "source_ids": [
+        "studio-watch-note"
+      ]
+    },
+    {
+      "id": "ben-hospital-corridor-finale",
+      "movie_id": "ben-1972",
+      "timestamp_code": "01:19:43",
+      "title": "The closing hospital corridor payoff leans heavily on swarm imagery as Ben calls in rei…",
+      "description": "The closing hospital corridor payoff leans heavily on swarm imagery as Ben calls in reinforcements meters from shocked onlookers.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": true,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "Moderator",
+      "source_ids": [
+        "community-citation"
+      ]
+    }
+  ],
+  "sighting_images": [
+    {
+      "sighting_id": "remy-first-cook",
+      "image_url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&w=900&q=80",
+      "image_alt": "Example photo: busy restaurant kitchen (not Ratatouille)—carousel demo slide 1.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "remy-first-cook",
+      "image_url": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&w=900&q=80",
+      "image_alt": "Example photo: salads and garnishes—carousel demo slide 2.",
+      "sort_order": 1
+    },
+    {
+      "sighting_id": "remy-first-cook",
+      "image_url": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&w=900&q=80",
+      "image_alt": "Example photo: plated meal overhead—carousel demo slide 3.",
+      "sort_order": 2
+    },
+    {
+      "sighting_id": "ratatouille-linguini-marionette",
+      "image_url": "https://placehold.co/900x500/f59e0b/431407/png?text=Remy%20hides%20under%20Linguini",
+      "image_alt": "Illustrated still for the marionette-cooking gag.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "ratatouille-finale-banquet-help",
+      "image_url": "https://placehold.co/900x500/ea580c/fffbeb/png?text=Rat%20brigade%20banquet",
+      "image_alt": "Illustrated still of rats helping plate the finale dinner.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "departed-training-academy-mouse",
+      "image_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&w=900&q=80",
+      "image_alt": "Example photo: hallway interior—carousel demo for The Departed sighting slide 1.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "departed-training-academy-mouse",
+      "image_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&w=900&q=80",
+      "image_alt": "Example photo: tall buildings facade—carousel demo slide 2.",
+      "sort_order": 1
+    },
+    {
+      "sighting_id": "departed-final-rat",
+      "image_url": "https://placehold.co/900x500/27272a/fef3c7/png?text=Final%20balcony%20rat",
+      "image_alt": "Illustrated still of the final balcony rat.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "nosferatu-ship-rats",
+      "image_url": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&w=900&q=80",
+      "image_alt": "Example image: small boat on open water—not from Nosferatu; placeholder for deck shots.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "nosferatu-plague-town",
+      "image_url": "https://placehold.co/900x500/44403c/e7e5e4/png?text=Plague%20town%20rats",
+      "image_alt": "Illustrated still of rats amid plague-town panic.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "indy-library-to-catacombs",
+      "image_url": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&w=900&q=80",
+      "image_alt": "Example image: library stacks—not from Indiana Jones; shows image + curator note styling.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "indy-catacombs",
+      "image_url": "https://placehold.co/900x500/92400e/fff7ed/png?text=Catacomb%20swarm",
+      "image_alt": "Illustrated still of rats in the Venice catacombs.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "willard-basement",
+      "image_url": "https://placehold.co/900x500/7f1d1d/fee2e2/png?text=Basement%20rats",
+      "image_alt": "Illustrated still of Willard's basement rats.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "willard-office-dinner-invite",
+      "image_url": "https://placehold.co/900x500/991b1b/fecaca/png?text=Office%20rat%20invasion",
+      "image_alt": "Illustrated still of rats overwhelming the dinner table.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-sebastian",
+      "image_url": "https://placehold.co/900x500/1d4ed8/fdf2f8/png?text=Sebastian%20appears",
+      "image_alt": "Illustrated still of Sebastian the rat.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-belle-reve-recruit",
+      "image_url": "https://placehold.co/900x500/1e3a8a/fbcfe8/png?text=Belle%20Reve%20rat%20cages",
+      "image_alt": "Illustrated still of cages and rat-handler drill.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-corto-maltese-wave",
+      "image_url": "https://placehold.co/900x500/2563eb/fce7f3/png?text=Rat%20wave%20Corto%20Maltese",
+      "image_alt": "Illustrated still of Ratcatcher 2 commanding a rodent tide.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-01",
+      "image_url": "https://placehold.co/900x500/312e81/e0e7ff/png?text=Paging%20demo%20corridor",
+      "image_alt": "Placeholder still for paging demo corridor rats.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-02",
+      "image_url": "https://placehold.co/900x500/1e1b4b/c7d2fe/png?text=Exercise%20yard%20rats",
+      "image_alt": "Placeholder still for yard training.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-03",
+      "image_url": "https://placehold.co/900x500/172554/dbeafe/png?text=Tunnel%20gnaw%20marks",
+      "image_alt": "Placeholder still for gnawed tunnel.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-04",
+      "image_url": "https://placehold.co/900x500/14532d/dcfce7/png?text=Crate%20tail%20blur",
+      "image_alt": "Placeholder still for helicopter crate.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-05",
+      "image_url": "https://placehold.co/900x500/365314/ecfccb/png?text=Feed%20bag%20swarm",
+      "image_alt": "Placeholder still for staging deck swarm.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-06",
+      "image_url": "https://placehold.co/900x500/134e4a/ccfbf1/png?text=Drain%20bolt",
+      "image_alt": "Placeholder still for storm drain.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-07",
+      "image_url": "https://placehold.co/900x500/831843/fce7f3/png?text=Market%20swarm",
+      "image_alt": "Placeholder still for market rats.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-08",
+      "image_url": "https://placehold.co/900x500/4c1d95/ede9fe/png?text=Rubble%20wave",
+      "image_alt": "Placeholder still for rubble swarm.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-09",
+      "image_url": "https://placehold.co/900x500/701a75/fdf2f8/png?text=Hotel%20Sebastian",
+      "image_alt": "Placeholder still for Sebastian on desk.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "suicide-squad-catalog-demo-10",
+      "image_url": "https://placehold.co/900x500/4a044e/fae8ff/png?text=Wall%20breach%20rats",
+      "image_alt": "Placeholder still for breached wall swarm.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "flushed-away-roddy",
+      "image_url": "https://images.unsplash.com/photo-1535241749838-299277b6305f?auto=format&w=900&q=80",
+      "image_alt": "Example image: concrete water channel—not from Flushed Away; suggests sewer-world mood.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "flushed-away-sewer-jam-city",
+      "image_url": "https://placehold.co/900x500/0ea5e9/082f49/png?text=Ratropolis%20market",
+      "image_alt": "Illustrated still of bustling Ratropolis.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "flushed-away-toad-ballroom-swarm",
+      "image_url": "https://placehold.co/900x500/0369a1/ecfccb/png?text=Toad%20ballroom%20rats",
+      "image_alt": "Illustrated still of ballroom rat swarm antics.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "ben-rat-colony",
+      "image_url": "https://placehold.co/900x500/7f1d1d/fee2e2/png?text=Ben%20rat%20colony",
+      "image_alt": "Illustrated still of Ben and the rat colony.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "ben-kitchen-cheese-run",
+      "image_url": "https://placehold.co/900x500/9f1239/ffe4e6/png?text=Kitchen%20rat%20waves",
+      "image_alt": "Illustrated still of pantry rat waves.",
+      "sort_order": 0
+    },
+    {
+      "sighting_id": "ben-hospital-corridor-finale",
+      "image_url": "https://placehold.co/900x500/450a0a/fecdd3/png?text=Hospital%20rat%20finale",
+      "image_alt": "Illustrated still of hallway rat payoff.",
+      "sort_order": 0
+    }
+  ],
+  "submissions": [
+    {
+      "id": "sub-muppets",
+      "movie_title": "The Muppets Take Manhattan",
+      "movie_year": 1984,
+      "imdb_id": "tt0087755",
+      "timestamp_code": "00:44:00",
+      "title": "Rizzo diner sequence",
+      "description": "Rizzo and other rats work in the diner sequence; needs exact timestamp pass.",
+      "spoiler": false,
+      "approximate_rat_count": 8,
+      "status": "pending",
+      "submitted_by": "RatFan17",
+      "movie_poster_url": "https://m.media-amazon.com/images/M/MV5BNWMyNmNjNmYtNGZkMy00OTY2LWFkOTAtMDZjYmQ2ODRkZDFiXkEyXkFqcGc@._V1_SX300.jpg"
+    },
+    {
+      "id": "sub-of-unknown-origin",
+      "movie_title": "Of Unknown Origin",
+      "movie_year": 1983,
+      "imdb_id": "tt0086036",
+      "timestamp_code": "00:31:00",
+      "title": "House takeover hunt",
+      "description": "A dangerous rat takes over the renovated house and drives Bart's increasingly obsessive hunt.",
+      "spoiler": false,
+      "approximate_rat_count": 1,
+      "status": "pending",
+      "submitted_by": "FilmBurrow",
+      "duplicate_hint": "Potential new movie; no current catalog match.",
+      "movie_poster_url": "https://m.media-amazon.com/images/M/MV5BZDQ1ZGQ1MWEtYWZkOS00MjQwLWE0MzgtMGY1MTk1MGJlOTIxXkEyXkFqcGc@._V1_SX300.jpg"
+    },
+    {
+      "id": "sub-departed-alt",
+      "movie_title": "The Departed",
+      "movie_year": 2006,
+      "imdb_id": "tt0407887",
+      "timestamp_code": "02:25:19",
+      "title": "Balcony rat in the final shot",
+      "description": "Final-shot rat on the balcony railing.",
+      "spoiler": true,
+      "approximate_rat_count": 1,
+      "status": "pending",
+      "submitted_by": "RatFan17",
+      "duplicate_hint": "Likely duplicate of departed-final-rat.",
+      "movie_poster_url": "https://placehold.co/600x900/27272a/fef3c7/png?text=The%20Departed"
+    }
+  ],
+  "submission_images": [
+    {
+      "submission_id": "sub-muppets",
+      "image_url": "https://placehold.co/900x500/f97316/fff7ed/png?text=Diner%20rat%20sighting",
+      "image_alt": "Submitted reference image placeholder for the diner rat sighting.",
+      "sort_order": 0
+    },
+    {
+      "submission_id": "sub-of-unknown-origin",
+      "image_url": "https://placehold.co/900x500/292524/fef3c7/png?text=House%20rat%20hunt",
+      "image_alt": "Submitted reference image placeholder for Of Unknown Origin.",
+      "sort_order": 0
+    },
+    {
+      "submission_id": "sub-departed-alt",
+      "image_url": "https://placehold.co/900x500/27272a/fef3c7/png?text=Balcony%20rat%20duplicate",
+      "image_alt": "Submitted reference image placeholder for the final balcony rat.",
+      "sort_order": 0
+    }
+  ],
+  "review_actions": []
+}

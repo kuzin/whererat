@@ -1,0 +1,149 @@
+import Image from "next/image";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import {
+  MODERATOR_SESSION_COOKIE,
+  parseModeratorSession,
+} from "@/lib/auth";
+import { getStoredModeratorById } from "@/lib/user-store";
+import { updatePassword, updateProfile } from "./actions";
+import { AvatarUploadField } from "./avatar-upload-field";
+
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams?: SearchParams;
+}) {
+  const cookieStore = await cookies();
+  const session = parseModeratorSession(
+    cookieStore.get(MODERATOR_SESSION_COOKIE)?.value,
+  );
+
+  if (!session) {
+    redirect("/login?next=/profile");
+  }
+
+  const account = await getStoredModeratorById(session.id);
+  await searchParams;
+
+  if (!account) {
+    redirect("/login?next=/profile");
+  }
+
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+        <aside className="rounded-2xl border border-amber-500/35 bg-[#9a3412] p-8 text-[#fef3c7]">
+          <Image
+            src={account.avatarUrl}
+            alt={`${account.name} profile picture`}
+            width={160}
+            height={160}
+            className="h-28 w-28 rounded-2xl border-2 border-amber-300/70 object-cover"
+          />
+          <h1 className="wr-display mt-6 text-4xl font-bold tracking-tight">
+            {account.name}
+          </h1>
+          <p className="mt-2 text-amber-50/72">
+            @{account.username} · {account.role}
+          </p>
+          <p className="mt-1 text-amber-50/72">{account.email}</p>
+
+        </aside>
+
+        <div className="space-y-6">
+          <section className="wr-card p-6 sm:p-7">
+            <h2 className="wr-display text-3xl font-black tracking-tight">Profile settings</h2>
+            <form action={updateProfile} className="mt-6 grid gap-4">
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Display name
+                <input
+                  name="name"
+                  required
+                  defaultValue={account.name}
+                  className="wr-input"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Username
+                <input
+                  value={`@${account.username}`}
+                  disabled
+                  readOnly
+                  className="wr-input opacity-80"
+                />
+                <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+                  Usernames are managed by admins. Contact an admin if you need to change yours.
+                </span>
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Email
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  defaultValue={account.email}
+                  className="wr-input"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Role
+                <select name="role" defaultValue={account.role} className="wr-input">
+                  <option value="owner">Owner</option>
+                  <option value="moderator">Moderator</option>
+                </select>
+              </label>
+              <AvatarUploadField initialAvatarUrl={account.avatarUrl} displayName={account.name} />
+              <button type="submit" className="wr-btn bg-[#fdba74] text-stone-950 dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50">
+                Save profile changes
+              </button>
+            </form>
+          </section>
+
+          <section className="wr-card p-6 sm:p-7">
+            <h2 className="wr-display text-3xl font-black tracking-tight">Update password</h2>
+            <form action={updatePassword} className="mt-6 grid gap-4">
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Current password
+                <input
+                  name="currentPassword"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  className="wr-input"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                New password
+                <input
+                  name="nextPassword"
+                  type="password"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  className="wr-input"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Confirm new password
+                <input
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  className="wr-input"
+                />
+              </label>
+              <button type="submit" className="wr-btn bg-[#fcd34d] text-stone-950 dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50">
+                Update passphrase
+              </button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </main>
+  );
+}

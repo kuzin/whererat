@@ -1,0 +1,296 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { MovieSearchField } from "./movie-search-field";
+import { SightingImageUpload } from "./sighting-image-upload";
+
+type SubmitFormProps = {
+  canAutoApprove: boolean;
+  moderatorName?: string;
+  loggedInName?: string;
+  loggedInEmail?: string;
+  submitAction: (formData: FormData) => void | Promise<void>;
+};
+
+function isValidTimestamp(value: string) {
+  return /^(?:\d{1,2}:)?[0-5]\d:[0-5]\d$/.test(value);
+}
+
+export function SubmitForm({
+  canAutoApprove,
+  moderatorName,
+  loggedInName,
+  loggedInEmail,
+  submitAction,
+}: SubmitFormProps) {
+  const lockedSubmitterFields = Boolean(loggedInName && loggedInEmail);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const inputErrorClass =
+    "border-red-700/70 focus-visible:border-red-700 dark:border-red-400/65 dark:focus-visible:border-red-400";
+
+  const errorFor = (name: string) => fieldErrors[name];
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const nextErrors: string[] = [];
+    const nextFieldErrors: Record<string, string> = {};
+
+    const selectedMovieTitle = String(data.get("movieTitle") ?? "").trim();
+    const movieTitle = selectedMovieTitle;
+    const timestamp = String(data.get("timestamp") ?? "").trim();
+    const sightingTitle = String(data.get("sightingTitle") ?? "").trim();
+    const description = String(data.get("description") ?? "").trim();
+    const submitterName = String(data.get("submitterName") ?? "").trim();
+    const submitterEmail = String(data.get("submitterEmail") ?? "").trim();
+
+    const setFieldError = (name: string, message: string) => {
+      if (!nextFieldErrors[name]) nextFieldErrors[name] = message;
+      nextErrors.push(message);
+    };
+
+    if (!movieTitle) {
+      setFieldError("movieSelection", "Select a movie from search.");
+    }
+    if (!sightingTitle) {
+      setFieldError("sightingTitle", "Sighting title is required.");
+    }
+    if (!timestamp) {
+      setFieldError("timestamp", "Starting time is required.");
+    } else if (!isValidTimestamp(timestamp)) {
+      setFieldError("timestamp", "Starting time must use mm:ss or hh:mm:ss format.");
+    }
+    if (!description) {
+      setFieldError("description", "Description is required.");
+    }
+    if (!submitterName) {
+      setFieldError("submitterName", "Your name is required.");
+    }
+    if (submitterEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail)) {
+      setFieldError("submitterEmail", "Enter a valid email address or leave it blank.");
+    }
+
+    if (nextErrors.length > 0) {
+      event.preventDefault();
+      setErrors(nextErrors);
+      setFieldErrors(nextFieldErrors);
+      const focusPriority = [
+        "movieSelection",
+        "sightingTitle",
+        "timestamp",
+        "description",
+        "submitterName",
+        "submitterEmail",
+      ];
+      const firstInvalidField = focusPriority.find((field) => nextFieldErrors[field]);
+      if (firstInvalidField) {
+        requestAnimationFrame(() => {
+          const target =
+            document.querySelector<HTMLElement>(`[data-field='${firstInvalidField}']`) ??
+            document.querySelector<HTMLElement>(`[name='${firstInvalidField}']`);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            target.focus();
+          }
+        });
+      }
+      return;
+    }
+
+    setErrors([]);
+    setFieldErrors({});
+  };
+
+  return (
+    <form
+      action={submitAction}
+      noValidate
+      onSubmit={onSubmit}
+      className="grid gap-5"
+    >
+      {errors.length > 0 ? (
+        <div className="rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm font-medium text-red-900 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
+          <p className="font-bold">Please fix the following:</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            {errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      <MovieSearchField fieldErrors={fieldErrors} />
+
+      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+        Sighting title
+        <input
+          data-field="sightingTitle"
+          name="sightingTitle"
+          required
+          placeholder="e.g., Stray rodent behind academy shelving"
+          aria-invalid={Boolean(errorFor("sightingTitle"))}
+          className={`wr-input ${errorFor("sightingTitle") ? inputErrorClass : ""}`}
+        />
+        {errorFor("sightingTitle") ? (
+          <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+            {errorFor("sightingTitle")}
+          </span>
+        ) : null}
+        <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+          Short headline for the sightings list (separate from the fuller description below).
+        </span>
+      </label>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+          Starting time
+          <input
+            data-field="timestamp"
+            name="timestamp"
+            required
+            placeholder="01:23:45"
+            aria-invalid={Boolean(errorFor("timestamp"))}
+            className={`wr-input tabular-nums ${errorFor("timestamp") ? inputErrorClass : ""}`}
+          />
+          {errorFor("timestamp") ? (
+            <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+              {errorFor("timestamp")}
+            </span>
+          ) : null}
+          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            When the rat first appears (film timecode).
+          </span>
+        </label>
+        <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+          Approx. rats on screen
+          <input
+            name="approximateRatCount"
+            type="number"
+            min={1}
+            max={9999}
+            defaultValue={1}
+            className="wr-input tabular-nums"
+          />
+          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            Ballpark count for this moment (powers the on-card presence meter and tallies).
+          </span>
+        </label>
+      </div>
+
+      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+        Description
+        <textarea
+          data-field="description"
+          name="description"
+          required
+          rows={5}
+          placeholder="Describe exactly where the rat appears and what it is doing."
+          aria-invalid={Boolean(errorFor("description"))}
+          className={`wr-input ${errorFor("description") ? inputErrorClass : ""}`}
+        />
+        {errorFor("description") ? (
+          <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+            {errorFor("description")}
+          </span>
+        ) : null}
+      </label>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+          Your name
+          {lockedSubmitterFields ? (
+            <input name="submitterName" type="hidden" value={loggedInName} />
+          ) : null}
+          <input
+            data-field="submitterName"
+            name={lockedSubmitterFields ? "submitterNameDisplay" : "submitterName"}
+            required
+            autoComplete="name"
+            placeholder="How we’ll credit you on the sighting"
+            defaultValue={lockedSubmitterFields ? loggedInName : undefined}
+            disabled={lockedSubmitterFields}
+            readOnly={lockedSubmitterFields}
+            aria-invalid={Boolean(errorFor("submitterName"))}
+            className={`wr-input ${
+              lockedSubmitterFields ? "opacity-80" : ""
+            } ${errorFor("submitterName") ? inputErrorClass : ""}`}
+          />
+          {errorFor("submitterName") ? (
+            <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+              {errorFor("submitterName")}
+            </span>
+          ) : null}
+          {lockedSubmitterFields ? (
+            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              Using your logged-in profile details.
+            </span>
+          ) : (
+            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              Shown as &quot;Submitted by ...&quot; after moderation approves the sighting.
+            </span>
+          )}
+        </label>
+        <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+          Email (optional)
+          {lockedSubmitterFields ? (
+            <input name="submitterEmail" type="hidden" value={loggedInEmail} />
+          ) : null}
+          <input
+            data-field="submitterEmail"
+            name={lockedSubmitterFields ? "submitterEmailDisplay" : "submitterEmail"}
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            placeholder="you@domain.com · visible to moderators only"
+            defaultValue={lockedSubmitterFields ? loggedInEmail : undefined}
+            disabled={lockedSubmitterFields}
+            readOnly={lockedSubmitterFields}
+            aria-invalid={Boolean(errorFor("submitterEmail"))}
+            className={`wr-input ${
+              lockedSubmitterFields ? "opacity-80" : ""
+            } ${errorFor("submitterEmail") ? inputErrorClass : ""}`}
+          />
+          {errorFor("submitterEmail") ? (
+            <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+              {errorFor("submitterEmail")}
+            </span>
+          ) : null}
+        </label>
+      </div>
+
+      <SightingImageUpload />
+
+      <label className="flex items-center gap-3 rounded-xl border border-stone-950/85 bg-[#fcd34d]/35 p-4 text-sm font-semibold text-stone-800 dark:border-white/16 dark:bg-stone-900/65 dark:text-stone-100">
+        <input
+          name="spoiler"
+          type="checkbox"
+          className="h-5 w-5 rounded border-2 border-stone-950/90"
+        />
+        Contains plot spoilers.
+      </label>
+
+      {canAutoApprove ? (
+        <label className="flex items-start gap-3 rounded-xl border border-amber-800/35 bg-[#fef3c7]/95 p-4 text-sm font-semibold text-amber-950">
+          <input
+            name="autoApprove"
+            type="checkbox"
+            className="mt-1 h-5 w-5 rounded border-2 border-amber-900/60"
+          />
+          <span>
+            <span className="block">Auto-approve this submission</span>
+            <span className="mt-1 block font-medium text-stone-700">
+              Signed in as {moderatorName}. This will skip the pending queue and
+              record you as the approving curator.
+            </span>
+          </span>
+        </label>
+      ) : null}
+
+      <button type="submit" className="wr-btn bg-[#fdba74] text-stone-950">
+        Submit for review
+      </button>
+    </form>
+  );
+}

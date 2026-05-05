@@ -20,6 +20,46 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Postgres Setup
+
+1. Copy env template:
+
+```bash
+cp .env.example .env.local
+```
+
+2. Export DB-ready seed:
+
+```bash
+npm run seed:postgres:export
+```
+
+3. Apply schema and seed:
+
+```bash
+npm run db:schema:apply
+npm run db:seed
+```
+
+Or run all setup in one command:
+
+```bash
+npm run db:bootstrap
+```
+
+4. Verify DB health:
+
+```bash
+curl http://localhost:3000/api/health/db
+```
+
+## Production deploy checklist
+
+- Provision Postgres and set `DATABASE_URL` in your host environment.
+- Run `npm run db:schema:apply` and `npm run db:seed` against the production DB before first traffic.
+- Deploy app (`npm run build`, then `npm run start` on host).
+- Hit `/api/health/db` after deploy to verify runtime DB connectivity.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

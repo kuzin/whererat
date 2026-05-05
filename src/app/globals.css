@@ -1,8 +1,72 @@
 @import "tailwindcss";
 
+/* Class-based dark mode for manual / dev toggle */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #fff9f1;
+  --foreground: #1c1410;
+  --wr-cheese: #fcd34d;
+  --wr-cheddar: #f59e0b;
+
+  --wr-header-bg: rgb(255 248 237 / 0.92);
+  --wr-header-border: rgb(28 25 23 / 0.8);
+  /** Header brand (mask fill) — warmed stone / cheese, not pure black */
+  --wr-brand-mark: #a16207;
+  --wr-brand-wordmark: #57534e;
+  --wr-footer-bg: #78350f;
+  --wr-footer-fg: #fef3c7;
+  --wr-footer-rule: rgb(28 25 23 / 0.2);
+
+  --wr-card-bg: #ffffff;
+  --wr-card-bg-soft: rgb(255 255 255 / 0.92);
+  --wr-card-border: rgb(28 25 23 / 0.9);
+  --wr-card-border-soft: rgb(28 25 23 / 0.75);
+
+  --wr-shadow-card: rgb(28 25 23 / 0.88);
+  --wr-shadow-card-soft: rgb(28 25 23 / 0.72);
+  --wr-shadow-btn: rgb(28 25 23 / 0.9);
+  --wr-shadow-btn-soft: rgb(28 25 23 / 0.55);
+  --wr-shadow-input-focus: rgb(251 191 36 / 0.65);
+
+  --wr-btn-ghost-hover: rgb(245 245 244);
+  --wr-btn-ghost-active: rgb(231 229 228);
+
+  --wr-input-bg: #ffffff;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #120e0c;
+  --foreground: #faf7f3;
+  --wr-cheese: #fbbf24;
+  --wr-cheddar: #fcd34d;
+
+  --wr-header-bg: rgb(22 17 14 / 0.94);
+  --wr-header-border: rgb(250 245 239 / 0.14);
+  --wr-brand-mark: #fbbf24;
+  --wr-brand-wordmark: #fef3c7;
+
+  --wr-footer-bg: #3d2616;
+  --wr-footer-fg: #fff7dc;
+  --wr-footer-rule: rgb(253 243 220 / 0.12);
+
+  --wr-card-bg: rgb(40 34 29);
+  --wr-card-bg-soft: rgb(40 34 29 / 0.94);
+  --wr-card-border: rgb(253 246 232 / 0.16);
+  --wr-card-border-soft: rgb(253 246 232 / 0.12);
+
+  --wr-shadow-card: rgb(0 0 0 / 0.55);
+  --wr-shadow-card-soft: rgb(0 0 0 / 0.45);
+  --wr-shadow-btn: rgb(0 0 0 / 0.65);
+  --wr-shadow-btn-soft: rgb(0 0 0 / 0.35);
+  --wr-shadow-input-focus: rgb(251 191 36 / 0.35);
+
+  --wr-btn-ghost-hover: rgb(53 46 41);
+  --wr-btn-ghost-active: rgb(63 54 46);
+
+  --wr-input-bg: rgb(32 27 23);
 }
 
 @theme inline {
@@ -10,17 +74,217 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-fredoka), ui-rounded, system-ui, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+.wr-shell {
+  position: relative;
+  background: var(--background);
+}
+
+.wr-shell > * {
+  position: relative;
+}
+
+.wr-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--wr-cheese) 88%, var(--wr-cheddar));
+  color: var(--foreground);
+}
+
+.dark ::selection {
+  background: color-mix(in srgb, var(--wr-cheese) 55%, var(--wr-cheddar));
+  color: var(--background);
+}
+
+/* Swiss cream tiling — light (two misaligned layers + larger tile = less obvious repeat) */
+.wr-cheese-tile-cream {
+  background-color: #fffbeb;
+  background-image:
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyODAnIGhlaWdodD0nMjgwJyB2aWV3Qm94PScwIDAgMjgwIDI4MCc+PHJlY3QgZmlsbD0nI2ZmZmJlYicgd2lkdGg9JzI4MCcgaGVpZ2h0PScyODAnLz48Y2lyY2xlIGN4PSc0MycgY3k9JzM4JyByPScxMCcgZmlsbD0nI2I0NTMwOScgb3BhY2l0eT0nMC4xJy8+PGNpcmNsZSBjeD0nMTE4JyBjeT0nNjInIHI9JzcnIGZpbGw9JyM5MjQwMGUnIG9wYWNpdHk9JzAuMTInLz48Y2lyY2xlIGN4PScyMDEnIGN5PSczMScgcj0nMTMnIGZpbGw9JyNiNDUzMDknIG9wYWNpdHk9JzAuMDknLz48Y2lyY2xlIGN4PScyMzgnIGN5PSc4OScgcj0nOCcgZmlsbD0nI2NhOGEwNCcgb3BhY2l0eT0nMC4xMScvPjxjaXJjbGUgY3g9JzcxJyBjeT0nMTE5JyByPScxMicgZmlsbD0nIzkyNDAwZScgb3BhY2l0eT0nMC4xJy8+PGNpcmNsZSBjeD0nMTY3JyBjeT0nMTA4JyByPSc2JyBmaWxsPScjYjQ1MzA5JyBvcGFjaXR5PScwLjEzJy8+PGNpcmNsZSBjeD0nMzEnIGN5PScxODQnIHI9JzknIGZpbGw9JyNjYThhMDQnIG9wYWNpdHk9JzAuMScvPjxjaXJjbGUgY3g9JzEyOScgY3k9JzE2Mycgcj0nMTEnIGZpbGw9JyM5MjQwMGUnIG9wYWNpdHk9JzAuMDknLz48Y2lyY2xlIGN4PScyMTknIGN5PScxNTEnIHI9JzgnIGZpbGw9JyNiNDUzMDknIG9wYWNpdHk9JzAuMTEnLz48Y2lyY2xlIGN4PSc5MScgY3k9JzIyOScgcj0nMTAnIGZpbGw9JyM5MjQwMGUnIG9wYWNpdHk9JzAuMScvPjxjaXJjbGUgY3g9JzE4OCcgY3k9JzIxOCcgcj0nNycgZmlsbD0nI2NhOGEwNCcgb3BhY2l0eT0nMC4xMicvPjxjaXJjbGUgY3g9JzI1MicgY3k9JzE5OCcgcj0nOScgZmlsbD0nI2I0NTMwOScgb3BhY2l0eT0nMC4wOCcvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMjUxJyByPSc4JyBmaWxsPScjOTI0MDBlJyBvcGFjaXR5PScwLjEnLz48Y2lyY2xlIGN4PScxNTYnIGN5PSc0Micgcj0nNicgZmlsbD0nI2NhOGEwNCcgb3BhY2l0eT0nMC4xMScvPjxjaXJjbGUgY3g9JzI1OScgY3k9JzI0Nicgcj0nMTEnIGZpbGw9JyNiNDUzMDknIG9wYWNpdHk9JzAuMDknLz48Y2lyY2xlIGN4PSc0OScgY3k9JzI1Micgcj0nNycgZmlsbD0nIzkyNDAwZScgb3BhY2l0eT0nMC4xJy8+PC9zdmc+"),
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxOTYnIGhlaWdodD0nMTk2JyB2aWV3Qm94PScwIDAgMTk2IDE5Nic+PHJlY3QgZmlsbD0ndHJhbnNwYXJlbnQnIHdpZHRoPScxOTYnIGhlaWdodD0nMTk2Jy8+PGNpcmNsZSBjeD0nMzMnIGN5PScyNycgcj0nNicgZmlsbD0nIzkyNDAwZScgb3BhY2l0eT0nMC4wOCcvPjxjaXJjbGUgY3g9Jzk3JyBjeT0nNTEnIHI9JzknIGZpbGw9JyNiNDUzMDknIG9wYWNpdHk9JzAuMDcnLz48Y2lyY2xlIGN4PScxNjEnIGN5PScxOScgcj0nNycgZmlsbD0nI2NhOGEwNCcgb3BhY2l0eT0nMC4wODUnLz48Y2lyY2xlIGN4PScxOCcgY3k9JzExMycgcj0nOCcgZmlsbD0nI2I0NTMwOScgb3BhY2l0eT0nMC4wNzUnLz48Y2lyY2xlIGN4PSc3OCcgY3k9JzEzOCcgcj0nNScgZmlsbD0nIzkyNDAwZScgb3BhY2l0eT0nMC4wOScvPjxjaXJjbGUgY3g9JzE0MicgY3k9JzExNycgcj0nMTAnIGZpbGw9JyNjYThhMDQnIG9wYWNpdHk9JzAuMDY1Jy8+PGNpcmNsZSBjeD0nMTgxJyBjeT0nMTcxJyByPSc3JyBmaWxsPScjOTI0MDBlJyBvcGFjaXR5PScwLjA4Jy8+PGNpcmNsZSBjeD0nNTUnIGN5PScxNzQnIHI9JzgnIGZpbGw9JyNiNDUzMDknIG9wYWNpdHk9JzAuMDcnLz48Y2lyY2xlIGN4PScxMjQnIGN5PScxODgnIHI9JzYnIGZpbGw9JyM5MjQwMGUnIG9wYWNpdHk9JzAuMDc1Jy8+PGNpcmNsZSBjeD0nMjknIGN5PSc3MScgcj0nNycgZmlsbD0nI2NhOGEwNCcgb3BhY2l0eT0nMC4wNycvPjwvc3ZnPg==");
+  background-size: 280px 280px, 196px 196px;
+  background-position: 0 0, 53px 41px;
+}
+
+/* Dark Swiss “aged cheddar” tiling */
+.dark .wr-cheese-tile-cream {
+  background-color: #2d241d;
+  background-image:
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyODAnIGhlaWdodD0nMjgwJyB2aWV3Qm94PScwIDAgMjgwIDI4MCc+PHJlY3QgZmlsbD0nIzJkMjQxZCcgd2lkdGg9JzI4MCcgaGVpZ2h0PScyODAnLz48Y2lyY2xlIGN4PSc0MycgY3k9JzM4JyByPScxMCcgZmlsbD0nI2ZjZDM0ZCcgb3BhY2l0eT0nMC4wNjUnLz48Y2lyY2xlIGN4PScxMTgnIGN5PSc2Micgcj0nNycgZmlsbD0nI2ZiYmYyNCcgb3BhY2l0eT0nMC4wNzUnLz48Y2lyY2xlIGN4PScyMDEnIGN5PSczMScgcj0nMTMnIGZpbGw9JyNmZGU2OGEnIG9wYWNpdHk9JzAuMDU1Jy8+PGNpcmNsZSBjeD0nMjM4JyBjeT0nODknIHI9JzgnIGZpbGw9JyNmY2QzNGQnIG9wYWNpdHk9JzAuMDY1Jy8+PGNpcmNsZSBjeD0nNzEnIGN5PScxMTknIHI9JzEyJyBmaWxsPScjZmJiZjI0JyBvcGFjaXR5PScwLjA2Jy8+PGNpcmNsZSBjeD0nMTY3JyBjeT0nMTA4JyByPSc2JyBmaWxsPScjZmNkMzRkJyBvcGFjaXR5PScwLjA3MicvPjxjaXJjbGUgY3g9JzMxJyBjeT0nMTg0JyByPSc5JyBmaWxsPScjZjU5ZTBiJyBvcGFjaXR5PScwLjA2Jy8+PGNpcmNsZSBjeD0nMTI5JyBjeT0nMTYzJyByPScxMScgZmlsbD0nI2ZjZDM0ZCcgb3BhY2l0eT0nMC4wNTUnLz48Y2lyY2xlIGN4PScyMTknIGN5PScxNTEnIHI9JzgnIGZpbGw9JyNmZGU2OGEnIG9wYWNpdHk9JzAuMDYyJy8+PGNpcmNsZSBjeD0nOTEnIGN5PScyMjknIHI9JzEwJyBmaWxsPScjZmJiZjI0JyBvcGFjaXR5PScwLjA1OCcvPjxjaXJjbGUgY3g9JzE4OCcgY3k9JzIxOCcgcj0nNycgZmlsbD0nI2ZjZDM0ZCcgb3BhY2l0eT0nMC4wNycvPjxjaXJjbGUgY3g9JzI1MicgY3k9JzE5OCcgcj0nOScgZmlsbD0nI2ZkZTY4YScgb3BhY2l0eT0nMC4wNDgnLz48Y2lyY2xlIGN4PScxNicgY3k9JzI1MScgcj0nOCcgZmlsbD0nI2ZiYmYyNCcgb3BhY2l0eT0nMC4wNTgnLz48Y2lyY2xlIGN4PScxNTYnIGN5PSc0Micgcj0nNicgZmlsbD0nI2Y1OWUwYicgb3BhY2l0eT0nMC4wNjUnLz48Y2lyY2xlIGN4PScyNTknIGN5PScyNDYnIHI9JzExJyBmaWxsPScjZmNkMzRkJyBvcGFjaXR5PScwLjA1MicvPjxjaXJjbGUgY3g9JzQ5JyBjeT0nMjUyJyByPSc3JyBmaWxsPScjZmJiZjI0JyBvcGFjaXR5PScwLjA1OCcvPjwvc3ZnPg=="),
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxOTYnIGhlaWdodD0nMTk2JyB2aWV3Qm94PScwIDAgMTk2IDE5Nic+PHJlY3QgZmlsbD0ndHJhbnNwYXJlbnQnIHdpZHRoPScxOTYnIGhlaWdodD0nMTk2Jy8+PGNpcmNsZSBjeD0nMzMnIGN5PScyNycgcj0nNicgZmlsbD0nI2ZiYmYyNCcgb3BhY2l0eT0nMC4wNDUnLz48Y2lyY2xlIGN4PSc5NycgY3k9JzUxJyByPSc5JyBmaWxsPScjZmNkMzRkJyBvcGFjaXR5PScwLjA0Jy8+PGNpcmNsZSBjeD0nMTYxJyBjeT0nMTknIHI9JzcnIGZpbGw9JyNmZGU2OGEnIG9wYWNpdHk9JzAuMDQ4Jy8+PGNpcmNsZSBjeD0nMTgnIGN5PScxMTMnIHI9JzgnIGZpbGw9JyNmY2QzNGQnIG9wYWNpdHk9JzAuMDQyJy8+PGNpcmNsZSBjeD0nNzgnIGN5PScxMzgnIHI9JzUnIGZpbGw9JyNmNTllMGInIG9wYWNpdHk9JzAuMDUnLz48Y2lyY2xlIGN4PScxNDInIGN5PScxMTcnIHI9JzEwJyBmaWxsPScjZmRlNjhhJyBvcGFjaXR5PScwLjAzOCcvPjxjaXJjbGUgY3g9JzE4MScgY3k9JzE3MScgcj0nNycgZmlsbD0nI2ZiYmYyNCcgb3BhY2l0eT0nMC4wNDUnLz48Y2lyY2xlIGN4PSc1NScgY3k9JzE3NCcgcj0nOCcgZmlsbD0nI2ZjZDM0ZCcgb3BhY2l0eT0nMC4wNCcvPjxjaXJjbGUgY3g9JzEyNCcgY3k9JzE4OCcgcj0nNicgZmlsbD0nI2ZkZTY4YScgb3BhY2l0eT0nMC4wNDInLz48Y2lyY2xlIGN4PScyOScgY3k9JzcxJyByPSc3JyBmaWxsPScjZmNkMzRkJyBvcGFjaXR5PScwLjA0Jy8+PC9zdmc+");
+  background-size: 280px 280px, 196px 196px;
+  background-position: 0 0, 67px 29px;
+}
+
+.wr-cheese-panel {
+  border-radius: 1.75rem;
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgb(28 25 23 / 0.75);
+  box-shadow: 3px 3px 0 0 rgb(28 25 23 / 0.72);
+}
+
+.dark .wr-cheese-panel {
+  border-color: rgb(250 243 229 / 0.18);
+  box-shadow: 3px 3px 0 0 rgb(0 0 0 / 0.45);
+}
+
+/* Movie detail: extracted palette uses a light fade in default mode, deeper base in dark */
+.movie-page-palette-bg {
+  --movie-skin-end: rgb(253 251 246);
+  background:
+    radial-gradient(
+      ellipse 90% 55% at 10% -6%,
+      color-mix(in srgb, var(--movie-accent) 28%, transparent) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      176deg,
+      var(--movie-wash) 0%,
+      var(--movie-column-wash) 94%,
+      var(--movie-skin-end) 100%
+    );
+}
+
+/**
+ * Extracted poster washes are baked for light UI; in dark mode we anchor to deep
+ * surfaces and keep only a low-mix tint of the accent so body text stays readable.
+ */
+.dark .movie-page-palette-bg {
+  --movie-skin-end: rgb(12 10 9);
+  background:
+    radial-gradient(
+      ellipse 92% 52% at 14% 0%,
+      color-mix(in srgb, var(--movie-accent) 16%, transparent) 0%,
+      transparent 56%
+    ),
+    linear-gradient(
+      168deg,
+      rgb(17 14 12) 0%,
+      color-mix(in srgb, var(--movie-accent) 9%, rgb(22 18 15)) 42%,
+      var(--movie-skin-end) 100%
+    );
+}
+
+/* Brand logos in header: CSS-masked SVG fills follow --wr-brand-* */
+.wr-brand-mark {
+  aspect-ratio: 353.26 / 311.52;
+  background-color: var(--wr-brand-mark);
+  mask-image: url("/brand/mark.svg");
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: url("/brand/mark.svg");
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.wr-brand-wordmark {
+  aspect-ratio: 799.2 / 187.86;
+  background-color: var(--wr-brand-wordmark);
+  mask-image: url("/brand/logo.svg");
+  mask-position: center left;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-image: url("/brand/logo.svg");
+  -webkit-mask-position: center left;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+@utility wr-card {
+  border-radius: 1.5rem;
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--wr-card-border);
+  background-color: var(--wr-card-bg);
+  box-shadow: 4px 4px 0 0 var(--wr-shadow-card);
+}
+
+@utility wr-card-soft {
+  border-radius: 1.5rem;
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--wr-card-border-soft);
+  background-color: var(--wr-card-bg-soft);
+  box-shadow: 3px 3px 0 0 var(--wr-shadow-card-soft);
+}
+
+@utility wr-btn {
+  @apply inline-flex cursor-pointer items-center justify-center rounded-xl border-2 border-stone-950 px-5 py-2.5 text-center text-sm font-bold outline-none transition hover:brightness-[0.97] hover:shadow-[2px_2px_0_0_rgb(28_25_23/0.85)] focus-visible:ring-2 focus-visible:ring-stone-950 focus-visible:ring-offset-2 active:brightness-[0.94] active:shadow-none dark:border-white/25 dark:hover:shadow-[2px_2px_0_0_rgb(0_0_0/0.52)] dark:focus-visible:ring-amber-400 dark:focus-visible:ring-offset-stone-900;
+  box-shadow: 3px 3px 0 0 var(--wr-shadow-btn);
+}
+
+@utility wr-btn-ghost {
+  @apply inline-flex items-center justify-center rounded-xl border-2 border-stone-950/90 px-5 py-2.5 text-center text-sm font-semibold text-stone-900 outline-none transition hover:shadow-none focus-visible:ring-2 focus-visible:ring-stone-950/40 focus-visible:ring-offset-2 active:brightness-[0.99] dark:border-white/22 dark:text-stone-100 dark:focus-visible:ring-amber-400/55 dark:focus-visible:ring-offset-stone-900;
+  background-color: var(--wr-card-bg);
+  box-shadow: 2px 2px 0 0 var(--wr-shadow-btn-soft);
+}
+
+.wr-btn-ghost:hover {
+  background-color: var(--wr-btn-ghost-hover);
+  box-shadow: none;
+}
+
+.wr-btn-ghost:active {
+  background-color: var(--wr-btn-ghost-active);
+}
+
+@utility wr-input {
+  @apply rounded-xl border-2 border-stone-950/90 px-4 py-2.5 text-sm font-medium text-stone-900 outline-none transition-shadow focus-visible:border-stone-950 dark:border-white/18 dark:text-stone-100 dark:focus-visible:border-amber-300/80;
+  background-color: var(--wr-input-bg);
+  box-shadow: 0 0 0 0 transparent;
+}
+
+.wr-input:focus-visible {
+  box-shadow: 0 0 0 3px var(--wr-shadow-input-focus);
+}
+
+@utility wr-pill-tag {
+  @apply rounded-full border border-stone-950 px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-stone-800 shadow-[1px_1px_0_0_rgb(28_25_23/0.5)] dark:border-white/22 dark:bg-stone-900/60 dark:text-stone-200 dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.45)];
+  background-color: var(--wr-card-bg);
+}
+
+/* Sighting image carousel slide-in (uses --wr-carousel-dx from inline style). */
+@keyframes wr-carousel-slide-fade {
+  from {
+    opacity: 0;
+    transform: translateX(var(--wr-carousel-dx, 12px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes wr-carousel-fade-soft {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.wr-carousel-slide-enter {
+  animation: wr-carousel-slide-fade 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-carousel-slide-enter {
+    animation: wr-carousel-fade-soft 0.18s ease-out both;
+  }
+}
+

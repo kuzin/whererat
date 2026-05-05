@@ -33,8 +33,15 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local prototype data
+/data/*.json
+
 # vercel
 .vercel
+
+# user-uploaded sighting images (prototype)
+/public/uploads/sightings/*
+!/public/uploads/sightings/.gitkeep
 
 # typescript
 *.tsbuildinfo
