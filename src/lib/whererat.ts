@@ -702,6 +702,21 @@ export const sources: Source[] = [
     label: "TMDB “rat” keyword",
     note: "Title appears on TMDB under the “rat” keyword; scene-level details need curator verification.",
   },
+  {
+    id: "wikipedia-en-intro",
+    label: "English Wikipedia intro",
+    note: "Automatically matched article introduction; summarizes the story, not verified frame-by-frame.",
+  },
+  {
+    id: "omdb-plot-short",
+    label: "OMDb short plot",
+    note: "Structured plot blurb from OMDb using the IMDb id; may omit specific rat moments.",
+  },
+  {
+    id: "reddit-snippet-unverified",
+    label: "Reddit discussion (unverified)",
+    note: "Informal snippet from public search results; anecdotes are not screened for accuracy.",
+  },
 ];
 
 const sightingsCatalogSeed: Sighting[] = [

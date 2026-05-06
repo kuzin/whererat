@@ -188,10 +188,11 @@ async function main() {
     for (const s of sightingsToInsert) {
       const imgSlots: { url: string; alt?: string }[] =
         Array.isArray(s.images) && s.images.length ? [...s.images] : [];
-      if (s.imageUrl?.trim()) {
-        const dup = imgSlots.some((x) => x.url === s.imageUrl.trim());
+      const legacyUrl = s.imageUrl?.trim();
+      if (legacyUrl) {
+        const dup = imgSlots.some((x) => x.url === legacyUrl);
         if (!dup)
-          imgSlots.push({ url: s.imageUrl.trim(), alt: s.imageAlt ?? undefined });
+          imgSlots.push({ url: legacyUrl, alt: s.imageAlt ?? undefined });
       }
 
       const res = await client.query(
