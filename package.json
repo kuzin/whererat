@@ -12,12 +12,7 @@
     "db:seed": "tsx scripts/db-seed.ts",
     "db:bootstrap": "npm run seed:postgres:export && npm run db:schema:apply && npm run db:seed",
     "db:clear:content": "tsx scripts/db-clear-content.ts",
-    "media:migrate:uploads-to-s3": "tsx scripts/migrate-local-uploads-to-s3.ts",
-    "seed:generate:bulk-rats": "tsx scripts/generate-bulk-rat-seed.ts",
-    "db:merge:bulk-rats": "NODE_ENV=production tsx scripts/merge-bulk-rat-seed-into-db.ts",
-    "db:merge:bulk-rats:dry-run": "NODE_ENV=production tsx scripts/merge-bulk-rat-seed-into-db.ts --dry-run",
-    "db:revert:bulk-rats": "NODE_ENV=production tsx scripts/revert-bulk-rat-seed-from-db.ts",
-    "db:revert:bulk-rats:dry-run": "NODE_ENV=production tsx scripts/revert-bulk-rat-seed-from-db.ts --dry-run"
+    "media:migrate:uploads-to-s3": "tsx scripts/migrate-local-uploads-to-s3.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1042.0",
@@ -26,6 +21,8 @@
     "pg": "^8.20.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "sharp": "^0.34.5"
   },
   "devDependencies": {

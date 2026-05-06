@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { movies } from "@/lib/whererat";
+import type { Movie } from "@/lib/whererat";
 import { getDeletedMovieIds } from "@/lib/movie-edit-store";
 import { getCatalogMovies } from "@/lib/movie-catalog";
 
@@ -55,7 +55,7 @@ function normalizeSearchTerm(value: string) {
 function searchSeedCatalog(
   query: string,
   deletedMovieIds: Set<string>,
-  catalogMovies: typeof movies,
+  catalogMovies: Movie[],
 ): MovieSearchResult[] {
   const normalizedQuery = normalizeSearchTerm(query);
 

@@ -1,5 +1,6 @@
 import {
   clampApproximateRatCount,
+  normalizeImdbId,
   reviewActions as seedReviewActions,
   submissions as seedSubmissions,
   getSubmissionSightingTitle,
@@ -476,10 +477,10 @@ export async function reviewSubmission({
     approximateRatCount: clampApproximateRatCount(merged.approximateRatCount),
   };
 
+  const lookupImdb = normalizeImdbId(reviewedSubmission.imdbId ?? "");
   const existingCatalogMovie =
-    (submission.imdbId
-      ? await getCatalogMovieByImdbId(submission.imdbId)
-      : undefined) ?? (await getCatalogMovieByTitleSearch(submission.movieTitle));
+    (lookupImdb ? await getCatalogMovieByImdbId(lookupImdb) : undefined) ??
+    (await getCatalogMovieByTitleSearch(reviewedSubmission.movieTitle));
   if (
     (decision === "approved" || decision === "edited and approved") &&
     !existingCatalogMovie

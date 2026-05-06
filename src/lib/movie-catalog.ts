@@ -1,4 +1,8 @@
 import { normalizeImdbId, type Movie } from "@/lib/whererat";
+
+function hasValidImdbId(imdbId: string | null | undefined): boolean {
+  return Boolean(normalizeImdbId(String(imdbId ?? "")));
+}
 import { getDbPool } from "@/lib/db";
 
 const FALLBACK_POSTER = "https://placehold.co/600x900/292524/fef3c7/png?text=Community+Movie";
@@ -38,28 +42,31 @@ export async function getCatalogMovies(): Promise<Movie[]> {
      where is_deleted = false
      order by created_at asc`,
   );
-  return result.rows.map((row) => ({
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    releaseYear: row.release_year,
-    runtimeMinutes: row.runtime_minutes,
-    genres: row.genres,
-    posterTone: row.poster_tone,
-    posterUrl: normalizeImageUrl(row.poster_url, FALLBACK_POSTER),
-    backdropUrl: normalizeImageUrl(row.backdrop_url, FALLBACK_BACKDROP),
-    posterAlt: row.poster_alt,
-    externalIds: {
-      imdb: row.imdb_id,
-      tmdb: row.tmdb_id ?? undefined,
-    },
-    summary: row.summary,
-    metadata: row.metadata,
-  })).map((movie) => ({
-    ...movie,
-    posterUrl: normalizeImageUrl(movie.posterUrl, FALLBACK_POSTER),
-    backdropUrl: normalizeImageUrl(movie.backdropUrl, FALLBACK_BACKDROP),
-  }));
+  return result.rows
+    .filter((row) => hasValidImdbId(row.imdb_id))
+    .map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      releaseYear: row.release_year,
+      runtimeMinutes: row.runtime_minutes,
+      genres: row.genres,
+      posterTone: row.poster_tone,
+      posterUrl: normalizeImageUrl(row.poster_url, FALLBACK_POSTER),
+      backdropUrl: normalizeImageUrl(row.backdrop_url, FALLBACK_BACKDROP),
+      posterAlt: row.poster_alt,
+      externalIds: {
+        imdb: normalizeImdbId(row.imdb_id),
+        tmdb: row.tmdb_id ?? undefined,
+      },
+      summary: row.summary,
+      metadata: row.metadata,
+    }))
+    .map((movie) => ({
+      ...movie,
+      posterUrl: normalizeImageUrl(movie.posterUrl, FALLBACK_POSTER),
+      backdropUrl: normalizeImageUrl(movie.backdropUrl, FALLBACK_BACKDROP),
+    }));
 }
 
 export async function getCatalogMovieBySlug(slug: string) {

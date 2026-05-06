@@ -2,7 +2,7 @@ const guidelines = [
   {
     icon: "🎬",
     title: "Sightings",
-    body: "A valid sighting needs an on-screen rat, a sighting title, an approximate point in the movie for when the rat first appears, a short description, an approximate rat count, and your display name (contact email optional, for moderator follow-up only).",
+    body: "A valid sighting needs an on-screen rat, a sighting title, an approximate point in the movie for when the rat first appears, a short description (Markdown formatting is welcome—bold, lists, links; use Show preview on the submit form to check rendering while you write), an approximate rat count, and your display name (contact email optional, for moderator follow-up only).",
   },
   {
     icon: "⚠️",

@@ -13,7 +13,7 @@ const toastMessages: Record<string, { title: string; body: string; tone: ToastTo
   },
   approved: {
     title: "Submission approved",
-    body: "The curator auto-approved this sighting and recorded the review.",
+    body: "The admin auto-approved this sighting and recorded the review.",
     tone: "success",
   },
   missing: {

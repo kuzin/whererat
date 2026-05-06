@@ -10,6 +10,7 @@ import {
   getSightingImageRefs,
   type Sighting,
 } from "@/lib/whererat";
+import { SightingMarkdown } from "@/components/sighting-markdown";
 import { SightingImageCarousel } from "./sighting-image-carousel";
 import { SightingRatPresenceVisual } from "./rat-presence-visual";
 
@@ -67,8 +68,8 @@ export function MovieSightingsCards({
                 {spoilerCountMovie}
               </span>{" "}
               {spoilerCountMovie === 1
-                ? "sighting hides its title and description"
-                : "sightings hide their titles and descriptions"}{" "}
+                ? "sighting hides its title, description, and images"
+                : "sightings hide their titles, descriptions, and images"}{" "}
               until you turn on the switch.
             </p>
           </div>
@@ -160,7 +161,10 @@ export function MovieSightingsCards({
               className={`overflow-hidden rounded-2xl border-2 shadow-[3px_3px_0_0_rgb(28_25_23/0.55)] dark:border-white/14 dark:bg-[rgb(36_30_26)] dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.4)] ${panelSkin}`}
             >
               {hasCarousel ? (
-                <SightingImageCarousel slides={imageSlides} />
+                <SightingImageCarousel
+                  slides={imageSlides}
+                  spoilerHidden={blackoutSpoiler}
+                />
               ) : null}
               <div
                 className={`p-5 sm:p-6 md:p-7 ${hasCarousel ? "" : "pt-6 sm:pt-7"}`}
@@ -247,9 +251,10 @@ export function MovieSightingsCards({
                       <h3 className="wr-display w-full max-w-none text-2xl font-bold leading-snug text-stone-950 md:text-3xl md:leading-[1.18] dark:text-stone-50">
                         {headlineText}
                       </h3>
-                      <p className="w-full min-w-0 max-w-none text-base leading-relaxed text-stone-700 dark:text-stone-300">
-                        {sighting.description}
-                      </p>
+                      <SightingMarkdown
+                        markdown={sighting.description}
+                        className="w-full min-w-0 max-w-none text-stone-700 dark:text-stone-300"
+                      />
                       {submittedByLine}
                       {editHref ? (
                         <div className="mt-2">

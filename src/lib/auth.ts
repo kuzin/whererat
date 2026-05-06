@@ -1,5 +1,9 @@
 export const MODERATOR_SESSION_COOKIE = "whererat_moderator";
 
+/** Matches seeded moderator avatar; used for favicon / PWA icons (single source of truth). */
+export const SEEDED_MODERATOR_AVATAR_URL =
+  "https://placehold.co/160x160/292524/fef3c7/png?text=Admin";
+
 export type ModeratorAccount = {
   id: string;
   username: string;
@@ -15,27 +19,17 @@ export type ModeratorSession = Omit<ModeratorAccount, "password">;
 export function getModeratorAccounts(): ModeratorAccount[] {
   return [
     {
-      id: "curator",
-      username: "curator",
-      name: "Curator",
-      email: "curator@whererat.local",
-      avatarUrl:
-        "https://placehold.co/160x160/292524/fef3c7/png?text=Curator",
+      id: "admin",
+      username: "admin",
+      name: "Admin",
+      email: "admin@whererat.local",
+      avatarUrl: SEEDED_MODERATOR_AVATAR_URL,
       role: "owner",
       password:
+        process.env.MODERATOR_ADMIN_PASSWORD ??
         process.env.MODERATOR_CURATOR_PASSWORD ??
         process.env.MODERATOR_PASSWORD ??
         "ratpack",
-    },
-    {
-      id: "film-burrow",
-      username: "filmburrow",
-      name: "FilmBurrow",
-      email: "filmburrow@whererat.local",
-      avatarUrl:
-        "https://placehold.co/160x160/78350f/fef3c7/png?text=FB",
-      role: "moderator",
-      password: process.env.MODERATOR_FILMBURROW_PASSWORD ?? "burrow",
     },
   ];
 }

@@ -67,6 +67,10 @@ export async function submitSighting(formData: FormData) {
     redirect("/submit?status=missing");
   }
 
+  if (!imdbId) {
+    redirect("/submit?status=no-imdb");
+  }
+
   const existingMovie =
     (imdbId ? await getCatalogMovieByImdbId(imdbId) : undefined) ??
     (await getCatalogMovieByTitleSearch(movieTitle));

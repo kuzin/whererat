@@ -774,6 +774,9 @@ export default async function MoviePage({
                   defaultValue={editingSighting.description}
                   className="wr-input"
                 />
+                <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+                  Markdown is supported; it renders on the public sighting card.
+                </span>
               </label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">

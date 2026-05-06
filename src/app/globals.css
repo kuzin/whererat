@@ -10,6 +10,7 @@
   --wr-cheese: #fcd34d;
   --wr-cheddar: #f59e0b;
 
+  /* Masthead surface + logo tints — tweak here or in `src/components/site-masthead.tsx` */
   --wr-header-bg: rgb(255 248 237 / 0.92);
   --wr-header-border: rgb(28 25 23 / 0.8);
   /** Header brand (mask fill) — warmed stone / cheese, not pure black */

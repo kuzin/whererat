@@ -1,95 +1,129 @@
 # WhereRat
 
-WhereRat is a Next.js app for tracking rat sightings in movies, with:
+Next.js app for a **spoiler-aware** public catalog of rat cameos in films, with submissions, moderator review, and Postgres-backed data.
 
-- public catalog + movie pages
-- public submission flow
-- moderator review queue and history
-- profile/account management
-- Postgres-backed data layer and seed/bootstrap scripts
+## Features
 
-## Tech Stack
+- Catalog home + per-movie sighting pages  
+- Public submit flow  
+- Moderator queue, edits, approvals  
+- Profile (moderator accounts)  
+- Optional S3 uploads; optional TMDB imagery for movie pages  
 
-- Next.js 16 (App Router)
-- React 19
-- Tailwind CSS
-- Postgres (`pg`)
+## Stack
 
-## Local Setup
+| Layer | Choice |
+|--------|--------|
+| Framework | Next.js 16 (App Router) |
+| UI | React 19, Tailwind CSS 4 |
+| Data | Postgres via `pg` |
 
-1. Install dependencies:
+## Prerequisites
+
+- Node.js (LTS recommended)  
+- Postgres instance and a `DATABASE_URL`  
+
+## Local setup
+
+**1.** Install dependencies:
 
 ```bash
 npm install
 ```
 
-2. Create env file:
-
-```bash
-cp .env.example .env.local
-```
-
-3. Set env vars in `.env.local`:
+**2.** Create `.env.local` in the repo root (Next and the DB scripts load `.env.local` / `.env` via `scripts/load-env.ts`). Example:
 
 ```env
+# Required
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/whererat
-TMDB_READ_ACCESS_TOKEN=your_tmdb_read_access_token
-AWS_REGION=us-east-1
-S3_BUCKET_NAME=your-whererat-bucket
-S3_PUBLIC_BASE_URL=https://your-cdn-or-bucket-hostname
-AWS_ACCESS_KEY_ID=optional_if_not_using_iam_role
-AWS_SECRET_ACCESS_KEY=optional_if_not_using_iam_role
+
+# Moderator login (defaults: admin / ratpack if unset — see src/lib/auth.ts)
+# MODERATOR_ADMIN_PASSWORD=
+# MODERATOR_PASSWORD=
+
+# Movie search / detail stills — optional but recommended for submit search + widescreen backdrops
+# TMDB_READ_ACCESS_TOKEN=
+
+# Uploads → S3 (omit to use local public/uploads when UPLOAD_FALLBACK_TO_LOCAL=true)
+# AWS_REGION=
+# S3_BUCKET_NAME=
+# S3_PUBLIC_BASE_URL=
+# AWS_ACCESS_KEY_ID=
+# AWS_SECRET_ACCESS_KEY=
 UPLOAD_FALLBACK_TO_LOCAL=true
 ```
 
-4. Bootstrap schema + seed data:
+**3.** Apply schema and seed:
 
 ```bash
 npm run db:bootstrap
 ```
 
-5. Run the app:
+This runs `seed:postgres:export` (writes `db/seed.json` from `src/lib/whererat.ts`), `db:schema:apply`, and `db:seed`.
+
+**4.** Dev server:
 
 ```bash
 npm run dev
 ```
 
-6. Verify DB health:
+**5.** Sanity check DB:
 
 ```bash
 curl http://localhost:3000/api/health/db
 ```
 
-## Scripts
+More database notes: [`db/README.md`](db/README.md).
 
-- `npm run dev` - start local dev server
-- `npm run build` - production build
-- `npm run start` - run production build
-- `npm run lint` - run ESLint
-- `npm run seed:postgres:export` - generate `db/seed.json` from in-repo seed structures
-- `npm run db:schema:apply` - apply `db/schema.sql` to `DATABASE_URL`
-- `npm run db:seed` - seed Postgres from `db/seed.json`
-- `npm run db:bootstrap` - export seed + apply schema + seed DB
+## NPM scripts
 
-## Database Files
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Run production server |
+| `npm run lint` | ESLint |
+| `npm run seed:postgres:export` | Regenerate `db/seed.json` from in-repo catalog + moderator accounts |
+| `npm run db:schema:apply` | Apply `db/schema.sql` to `DATABASE_URL` |
+| `npm run db:seed` | Truncate seeded tables and load `db/seed.json` |
+| `npm run db:bootstrap` | Export seed → apply schema → seed |
+| `npm run db:clear:content` | Clear catalog/submissions/etc.; **keeps** existing `accounts` rows |
+| `npm run media:migrate:uploads-to-s3` | Migrate legacy local uploads to S3 |
 
-- `db/schema.sql` - baseline relational schema
-- `db/seed.json` - generated DB-ready seed payload
-- `db/README.md` - extra notes for DB prep
+## Repo layout (high level)
 
-## Production Checklist
+| Path | Role |
+|------|------|
+| `src/app/` | Routes, layouts, server actions |
+| `src/components/site-masthead.tsx` | Sticky header (brand + nav) — primary place to tweak masthead markup |
+| `src/app/globals.css` | Theme tokens incl. masthead (`--wr-header-*`, `--wr-brand-*`) |
+| `public/brand/` | Header logo SVGs (`mark.svg`, `wordmark` uses `logo.svg`) |
+| `src/lib/` | Domain helpers, catalog types, DB, auth |
+| `db/schema.sql`, `db/seed.json` | Postgres schema + generated seed payload |
 
-- Provision managed Postgres.
-- Set `DATABASE_URL` in production environment.
-- Run:
-  - `npm run db:schema:apply`
-  - `npm run db:seed`
-- Deploy app (`npm run build` + `npm run start`, or platform equivalent).
-- Verify `GET /api/health/db` returns `{ ok: true }`.
+## Customizing the masthead
+
+Iterating on the **top bar** is easiest here:
+
+1. **`src/components/site-masthead.tsx`** — Structure, Tailwind classes for the bar (`sticky`, padding, blur), brand link hit area, inclusion of `ThemeDevToggle`.
+2. **`src/app/globals.css`** — Masthead chrome: `--wr-header-bg`, `--wr-header-border`, and logo mask colors `--wr-brand-mark`, `--wr-brand-wordmark` (both light `:root` and `.dark`).
+3. **`src/app/nav-links.tsx`** — Catalog / Submit / Moderate / Profile links and mobile drawer.
+4. **`public/brand/mark.svg`** & **`public/brand/logo.svg`** — Assets behind the CSS masks (see `.wr-brand-mark` / `.wr-brand-wordmark` in `globals.css`). Paths are exported from `src/lib/brand.ts` if you rename files.
+
+Icons / PWA: favicon + manifest icons use **`SEEDED_MODERATOR_AVATAR_URL`** (`src/lib/auth.ts`) plus `src/app/manifest.ts`.
+
+## Production checklist
+
+1. Provision Postgres; set **`DATABASE_URL`**.  
+2. Set strong moderator secrets (`MODERATOR_ADMIN_PASSWORD`, etc.).  
+3. Replace plaintext `password_hash` in **`db/seed.json`** workflow with proper hashing before running `db:seed` in prod (see [`db/README.md`](db/README.md)).  
+4. Run `npm run db:schema:apply` and **`npm run db:seed`** (or your migration pipeline).  
+5. Configure S3 / CDN vars if uploads should not stay on disk.  
+6. Deploy: `npm run build` → `npm run start` (or platform equivalent).  
+7. Confirm **`GET /api/health/db`** returns `{ ok: true }`.
 
 ## Notes
 
-- Use `.env.local` (not `local.env`) for local configuration.
-- DB scripts explicitly load `.env.local`/`.env`.
-- Uploads use S3 automatically when `AWS_REGION` + `S3_BUCKET_NAME` are set.
-- If `S3_PUBLIC_BASE_URL` is set, uploaded image URLs use that host (CloudFront/CDN-ready).
+- Use **`.env.local`** for local overrides (never commit secrets).  
+- **OMDb** (`OMDB_API_KEY`) improves movie title search when set (`src/app/api/movies/search`).  
+- **`TMDB_*`** improves backdrops/lightbox stills on movie pages (`src/lib/tmdb-banner.ts`); catalog can be empty until you rebuild seed/data.

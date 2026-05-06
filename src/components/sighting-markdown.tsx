@@ -1,0 +1,144 @@
+"use client";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import type { Components } from "react-markdown";
+
+const sightingMarkdownComponents: Components = {
+  h1: ({ children }) => (
+    <h3 className="mt-5 mb-2 text-xl font-bold text-stone-950 first:mt-0 dark:text-stone-50">
+      {children}
+    </h3>
+  ),
+  h2: ({ children }) => (
+    <h3 className="mt-5 mb-2 text-lg font-bold text-stone-950 first:mt-0 dark:text-stone-50">
+      {children}
+    </h3>
+  ),
+  h3: ({ children }) => (
+    <h3 className="mt-5 mb-2 border-b border-stone-200 pb-1 text-base font-bold text-stone-950 first:mt-0 dark:border-white/12 dark:text-stone-50">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }) => (
+    <h4 className="mt-4 mb-2 text-base font-bold text-stone-950 first:mt-0 dark:text-stone-50">
+      {children}
+    </h4>
+  ),
+  h5: ({ children }) => (
+    <h5 className="mt-4 mb-2 text-sm font-bold text-stone-950 first:mt-0 dark:text-stone-50">
+      {children}
+    </h5>
+  ),
+  h6: ({ children }) => (
+    <h6 className="mt-4 mb-2 text-sm font-bold text-stone-950 first:mt-0 dark:text-stone-50">
+      {children}
+    </h6>
+  ),
+  p: ({ children }) => (
+    <p className="mb-3 text-base leading-relaxed text-stone-700 last:mb-0 dark:text-stone-300">
+      {children}
+    </p>
+  ),
+  strong: ({ children }) => (
+    <strong className="font-bold text-stone-900 dark:text-stone-100">{children}</strong>
+  ),
+  em: ({ children }) => <em className="italic">{children}</em>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="break-words font-semibold text-amber-800 underline decoration-amber-700/40 underline-offset-2 hover:decoration-amber-900 dark:text-amber-300 dark:decoration-amber-400/40 dark:hover:decoration-amber-200"
+    >
+      {children}
+    </a>
+  ),
+  ul: ({ children }) => (
+    <ul className="my-3 list-disc space-y-1.5 pl-6 text-stone-700 dark:text-stone-300">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="my-3 list-decimal space-y-1.5 pl-6 text-stone-700 dark:text-stone-300">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+  blockquote: ({ children }) => (
+    <blockquote className="my-3 border-l-4 border-amber-600/50 pl-4 text-stone-600 italic dark:border-amber-400/45 dark:text-stone-400">
+      {children}
+    </blockquote>
+  ),
+  hr: () => (
+    <hr className="my-5 border-stone-300 dark:border-white/15" />
+  ),
+  pre: ({ children }) => (
+    <pre className="my-3 overflow-x-auto rounded-xl border border-stone-200 bg-stone-100 p-4 text-sm dark:border-white/12 dark:bg-stone-950/60">
+      {children}
+    </pre>
+  ),
+  code: ({ className, children }) => {
+    const isBlock =
+      typeof className === "string" && className.includes("language-");
+    if (isBlock) {
+      return (
+        <code
+          className={`block whitespace-pre font-mono text-[0.9rem] leading-relaxed text-stone-800 dark:text-stone-200 ${className ?? ""}`}
+        >
+          {children}
+        </code>
+      );
+    }
+    return (
+      <code className="rounded-md bg-stone-200/90 px-1.5 py-0.5 font-mono text-[0.9em] text-stone-900 dark:bg-stone-800 dark:text-stone-100">
+        {children}
+      </code>
+    );
+  },
+  table: ({ children }) => (
+    <div className="my-4 max-w-full overflow-x-auto rounded-lg border border-stone-200 dark:border-white/12">
+      <table className="w-full min-w-[16rem] border-collapse text-left text-sm">
+        {children}
+      </table>
+    </div>
+  ),
+  thead: ({ children }) => (
+    <thead className="bg-stone-100 dark:bg-stone-900/80">{children}</thead>
+  ),
+  tbody: ({ children }) => <tbody>{children}</tbody>,
+  tr: ({ children }) => (
+    <tr className="border-t border-stone-200 odd:bg-white even:bg-stone-50/80 dark:border-white/10 dark:odd:bg-stone-950/30 dark:even:bg-stone-900/40">
+      {children}
+    </tr>
+  ),
+  th: ({ children }) => (
+    <th className="border border-stone-200 px-3 py-2 font-bold text-stone-900 dark:border-white/12 dark:text-stone-100">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="border border-stone-200 px-3 py-2 text-stone-700 dark:border-white/12 dark:text-stone-300">
+      {children}
+    </td>
+  ),
+};
+
+export function SightingMarkdown({
+  markdown,
+  className = "",
+}: {
+  markdown: string;
+  className?: string;
+}) {
+  return (
+    <div className={`sighting-markdown min-w-0 max-w-none ${className}`.trim()}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={sightingMarkdownComponents}
+      >
+        {markdown}
+      </ReactMarkdown>
+    </div>
+  );
+}

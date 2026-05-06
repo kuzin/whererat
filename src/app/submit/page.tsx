@@ -7,7 +7,20 @@ import {
 import { submitSighting } from "./actions";
 import { SubmitForm } from "./submit-form";
 
-export default async function SubmitPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+function single(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function SubmitPage({
+  searchParams,
+}: {
+  searchParams?: SearchParams;
+}) {
+  const params = searchParams ? await searchParams : {};
+  const status = single(params.status);
+
   const cookieStore = await cookies();
   const moderatorSession = parseModeratorSession(
     cookieStore.get(MODERATOR_SESSION_COOKIE)?.value,
@@ -27,13 +40,21 @@ export default async function SubmitPage() {
             </h1>
             <p className="mt-5 leading-relaxed text-amber-50/82">
               Add the movie, scene time, estimated rat count, and a short
-              description of what appears on screen. You can attach up to five
+              description of what appears on screen (optional Markdown; use Show
+              preview on the form—it updates live while open). You can attach up to five
               images to help moderators review your submission.
             </p>
           </div>
         </div>
 
-        <div className="wr-card p-6 sm:p-7">
+        <div className="wr-card p-7 sm:p-8">
+          {status === "no-imdb" ? (
+            <div className="mb-6 rounded-xl border border-amber-800/35 bg-amber-50 p-4 text-sm font-medium text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100">
+              Choose a movie from the search dropdown so we store a real{" "}
+              <span className="font-bold">IMDb title ID</span> (tt…) and poster.
+              Free‑typed titles alone aren’t enough.
+            </div>
+          ) : null}
           <SubmitForm
             submitAction={submitSighting}
             canAutoApprove={canAutoApprove}

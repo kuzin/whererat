@@ -23,9 +23,18 @@ type Props = {
   slides: SightingImageSlot[];
   /** Subtle stripe style for prev/next resting on carousel */
   className?: string;
+  /**
+   * When the sighting is spoiler-flagged and the visitor has not enabled “show spoilers”,
+   * stills are blurred and an overlay explains why.
+   */
+  spoilerHidden?: boolean;
 };
 
-export function SightingImageCarousel({ slides, className = "" }: Props) {
+export function SightingImageCarousel({
+  slides,
+  className = "",
+  spoilerHidden = false,
+}: Props) {
   const baseId = useId();
   const [index, setIndex] = useState(0);
   const dirRef = useRef<1 | -1>(1);
@@ -104,16 +113,34 @@ export function SightingImageCarousel({ slides, className = "" }: Props) {
         >
           <Image
             src={current.url}
-            alt={current.alt?.trim() || "Sighting reference still"}
+            alt={
+              spoilerHidden
+                ? "Spoiler image hidden"
+                : current.alt?.trim() || "Sighting reference still"
+            }
             width={900}
             height={500}
-            className="h-full w-full object-cover"
+            className={`h-full w-full object-cover ${spoilerHidden ? "scale-[1.03] blur-2xl brightness-[0.65]" : ""}`}
             sizes="(min-width: 1024px) 900px, 100vw"
             priority={index === 0}
           />
         </div>
 
-        {n > 1 ? (
+        {spoilerHidden ? (
+          <div
+            className="pointer-events-none absolute inset-0 z-[5] flex flex-col items-center justify-center gap-2 bg-gradient-to-t from-black/75 via-black/45 to-black/25 px-6 text-center"
+            aria-hidden={true}
+          >
+            <p className="wr-display max-w-[20rem] text-lg font-black tracking-tight text-white drop-shadow-[0_2px_8px_rgb(0_0_0/0.85)] sm:text-xl">
+              Spoiler warning
+            </p>
+            <p className="max-w-[22rem] text-sm font-semibold text-white/90 drop-shadow-[0_1px_4px_rgb(0_0_0/0.75)]">
+              Turn on “Show spoilers” above to view these images.
+            </p>
+          </div>
+        ) : null}
+
+        {n > 1 && !spoilerHidden ? (
           <>
             <button
               type="button"
@@ -154,6 +181,10 @@ export function SightingImageCarousel({ slides, className = "" }: Props) {
               ))}
             </div>
           </>
+        ) : n > 1 && spoilerHidden ? (
+          <p className="sr-only">
+            Image carousel controls hidden until spoilers are shown.
+          </p>
         ) : null}
       </div>
     </div>

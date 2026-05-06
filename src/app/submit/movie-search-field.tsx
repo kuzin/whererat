@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 type MovieResult = {
   title: string;
@@ -75,6 +75,7 @@ export function MovieSearchField({
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
   const [error, setError] = useState<string | undefined>();
+  const helperId = useId();
 
   const canSearch = query.trim().length >= 2;
   const visibleResults = canSearch && !selectedMovie ? results : [];
@@ -130,7 +131,7 @@ export function MovieSearchField({
   }, [canSearch, query, selectedMovie]);
 
   return (
-    <div className="rounded-2xl border-2 border-stone-950/90 bg-amber-50 p-5 dark:border-white/15 dark:bg-stone-900/88">
+    <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
         IMDb title search
         <input
@@ -143,6 +144,7 @@ export function MovieSearchField({
           }}
           placeholder="Start typing: The Departed, Ratatouille..."
           aria-invalid={Boolean(fieldErrors.movieSelection)}
+          aria-describedby={helperId}
           className={`wr-input ${
             fieldErrors.movieSelection
               ? "border-red-700/70 focus-visible:border-red-700 dark:border-red-400/65 dark:focus-visible:border-red-400"
@@ -154,6 +156,12 @@ export function MovieSearchField({
             {fieldErrors.movieSelection}
           </span>
         ) : null}
+        <p
+          id={helperId}
+          className="text-xs font-medium text-stone-500 dark:text-stone-400"
+        >
+          {helperText}
+        </p>
       </label>
 
       <input name="movieTitle" type="hidden" value={selectedMovie?.title ?? ""} />
@@ -165,24 +173,20 @@ export function MovieSearchField({
         value={selectedMovie?.posterUrl ?? ""}
       />
 
-      <p className="mt-2 text-xs font-medium text-stone-500 dark:text-stone-400">
-        {helperText}
-      </p>
-
       {isLoading ? (
-        <div className="mt-4 rounded-xl border border-amber-700/35 bg-[#fef3c7] p-4 text-sm font-semibold text-amber-950">
+        <div className="rounded-xl border border-amber-700/35 bg-[#fef3c7] p-4 text-sm font-semibold text-amber-950">
           Searching movie titles...
         </div>
       ) : null}
 
       {visibleError ? (
-        <div className="mt-4 rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm font-semibold text-red-950">
+        <div className="rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm font-semibold text-red-950">
           {visibleError}
         </div>
       ) : null}
 
       {selectedMovie ? (
-        <div className="mt-4 grid overflow-hidden rounded-xl border-2 border-amber-200 bg-stone-950 text-amber-50 sm:grid-cols-[110px_1fr]">
+        <div className="grid overflow-hidden rounded-xl border-2 border-amber-600/35 bg-amber-50/60 shadow-sm sm:grid-cols-[110px_1fr] dark:border-amber-500/30 dark:bg-amber-950/25">
           <MoviePoster
             src={selectedMovie.posterUrl}
             alt={`${selectedMovie.title} poster`}
@@ -191,24 +195,26 @@ export function MovieSearchField({
             className="h-full w-full object-cover"
             title={selectedMovie.title}
           />
-          <div className="p-4">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-yellow-300">
+          <div className="flex flex-col justify-center p-4 sm:p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-900/80 dark:text-amber-200/90">
               Selected IMDb title
             </p>
-            <p className="mt-2 text-xl font-black">{selectedMovie.title}</p>
-            <p className="mt-1 text-sm text-amber-100/75">
+            <p className="mt-2 text-xl font-bold text-stone-950 dark:text-stone-50">
+              {selectedMovie.title}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-stone-600 dark:text-stone-300">
               {selectedMovie.year} · {selectedMovie.runtime ?? "Runtime TBD"} ·{" "}
               {selectedMovie.rating ?? "Rating TBD"}
             </p>
-            <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-amber-100/60">
-              {selectedMovie.imdbId} · {selectedMovie.source}
+            <p className="mt-2 text-xs font-bold uppercase tracking-[0.15em] text-amber-800 dark:text-amber-300">
+              IMDb {selectedMovie.imdbId} · {selectedMovie.source}
             </p>
           </div>
         </div>
       ) : null}
 
       {visibleResults.length > 0 ? (
-        <div className="mt-4 grid gap-3">
+        <div className="grid gap-3">
           {visibleResults.map((movie) => (
             <button
               key={movie.imdbId}

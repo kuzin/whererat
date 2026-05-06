@@ -10,17 +10,14 @@ function slugifyTitle(title: string) {
     .slice(0, 64);
 }
 
-function pseudoImdbId(seed: string) {
-  let hash = 0;
-  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
-  const num = (hash % 9_000_000) + 1_000_000;
-  return `tt${String(num)}`;
-}
+const COMMUNITY_POSTER_FALLBACK =
+  "https://placehold.co/600x900/292524/fef3c7/png?text=Community+Movie";
 
 function normalizePosterUrl(value: string | undefined) {
   const raw = value?.trim() ?? "";
+  if (!raw || raw === "N/A") return COMMUNITY_POSTER_FALLBACK;
   if (raw.startsWith("/") || /^https?:\/\//i.test(raw)) return raw;
-  return "https://placehold.co/600x900/292524/fef3c7/png?text=Community+Movie";
+  return COMMUNITY_POSTER_FALLBACK;
 }
 
 function rowToMovie(row: {
@@ -83,7 +80,9 @@ export async function getCommunityMovies() {
      where id like 'community-%' and is_deleted = false
      order by created_at desc`,
   );
-  return result.rows.map(rowToMovie);
+  return result.rows
+    .filter((row) => Boolean(normalizeImdbId(row.imdb_id)))
+    .map(rowToMovie);
 }
 
 async function backfillCommunityMoviesFromApprovedSubmissions() {
@@ -117,6 +116,7 @@ async function backfillCommunityMoviesFromApprovedSubmissions() {
     const title = submission.movieTitle?.trim();
     if (!title) continue;
     const imdbId = normalizeImdbId(submission.imdbId ?? "");
+    if (!imdbId) continue;
     const exists = current.some((movie) => {
       if (imdbId && movie.imdb_id === imdbId) return true;
       return movie.title.trim().toLowerCase() === title.toLowerCase();
@@ -151,7 +151,7 @@ async function backfillCommunityMoviesFromApprovedSubmissions() {
         normalizePosterUrl(submission.moviePosterUrl),
         "https://placehold.co/1200x600/292524/fef3c7/png?text=Community+Movie",
         `Poster for ${title}.`,
-        imdbId || pseudoImdbId(slug),
+        imdbId,
         submission.description.trim() || "Community-submitted movie entry.",
         {
           tagline: "",
@@ -174,7 +174,7 @@ async function backfillCommunityMoviesFromApprovedSubmissions() {
       id: `community-${slug}`,
       slug,
       title,
-      imdb_id: imdbId || pseudoImdbId(slug),
+      imdb_id: imdbId,
     });
   }
 }
@@ -185,6 +185,11 @@ export async function ensureCommunityMovieForSubmission(
   const title = submission.movieTitle.trim();
   if (!title) return undefined;
   const imdbId = normalizeImdbId(submission.imdbId ?? "");
+  if (!imdbId) {
+    throw new Error(
+      "Cannot add a catalog movie without an IMDb title ID (tt…). Use search results when submitting, or ask a moderator to attach an IMDb ID before approving.",
+    );
+  }
 
   const pool = getDbPool();
   const allMoviesRes = await pool.query<{
@@ -273,7 +278,7 @@ export async function ensureCommunityMovieForSubmission(
       normalizePosterUrl(submission.moviePosterUrl),
       "https://placehold.co/1200x600/292524/fef3c7/png?text=Community+Movie",
       `Poster for ${title}.`,
-      imdbId || pseudoImdbId(slug),
+      imdbId,
       submission.description.trim() || "Community-submitted movie entry.",
       metadata,
     ],

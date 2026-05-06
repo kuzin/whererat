@@ -10,6 +10,7 @@ import {
   getSubmissionSightingTitle,
 } from "@/lib/whererat";
 import { SightingImageCarousel } from "@/app/movies/[slug]/sighting-image-carousel";
+import { SightingMarkdown } from "@/components/sighting-markdown";
 import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import {
@@ -316,9 +317,9 @@ export default async function ModerationPage({
                     <p className="mt-3 text-sm font-bold text-stone-600 dark:text-stone-400">
                       Description
                     </p>
-                    <p className="mt-1 leading-7 text-stone-700 dark:text-stone-200">
-                      {submission.description}
-                    </p>
+                    <div className="mt-1 text-stone-700 dark:text-stone-200">
+                      <SightingMarkdown markdown={submission.description} />
+                    </div>
                 </div>
 
                 {attachmentSlides.length > 0 ? (
@@ -435,9 +436,9 @@ export default async function ModerationPage({
                         {submission.status}
                       </p>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-stone-700 dark:text-stone-300">
-                      {submission.description}
-                    </p>
+                    <div className="mt-2 text-sm text-stone-700 dark:text-stone-300">
+                      <SightingMarkdown markdown={submission.description} />
+                    </div>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
                       {historyTab === "approved" ? "Approved" : "Denied"} by{" "}
                       {historyReviewerBySubmissionId.get(submission.id) ?? "Unknown"}
@@ -584,6 +585,9 @@ export default async function ModerationPage({
                   defaultValue={editingSubmission.description}
                   className="wr-input"
                 />
+                <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+                  Markdown is supported (bold, lists, links, headings). It renders on movie pages.
+                </span>
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Curator message
