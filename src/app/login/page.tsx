@@ -41,7 +41,7 @@ export default async function LoginPage({
               className="wr-input"
             />
           </label>
-          <button type="submit" className="wr-btn bg-[#fcd34d] text-stone-950">
+          <button type="submit" className="wr-btn-primary">
             Let me moderate things
           </button>
         </form>

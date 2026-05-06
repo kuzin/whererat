@@ -23,7 +23,7 @@ export function MovieSightingsSortControl({ slug, sort, palette }: SortProps) {
 
   const selectSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
-    : "border-stone-950/85 bg-[#fffbf5]";
+    : "border-stone-950/85 bg-[var(--wr-surface-cream-muted)]";
 
   const pushSort = (nextSort: MovieSightingsSortOption) => {
     const href = buildMovieSightingsPath(slug, {
@@ -100,7 +100,7 @@ export function MovieSightingsPagingBar({
 
   const nextEnabledSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_58%,rgb(62_45_30))] bg-[color-mix(in_srgb,var(--movie-accent)_82%,rgb(253_224_71))] text-stone-950 dark:border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(245_240_232/0.38))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_52%,rgb(85_55_22))] dark:text-[color-mix(in_srgb,var(--movie-accent)_10%,rgb(255_252_244))]"
-    : "border-stone-950/90 bg-[#fcd34d] text-stone-950 dark:border-amber-400/40 dark:bg-amber-700/80 dark:text-amber-50";
+     : "border-stone-950/90 bg-[var(--wr-cheese)] text-stone-950 dark:border-amber-400/40 dark:bg-[var(--wr-accent-btn-dark)] dark:text-amber-50";
 
   const disabledSkin = palette
     ? "border-dashed border-[color-mix(in_srgb,var(--movie-accent)_24%,rgb(161_161_170))] text-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(120_113_108))] dark:border-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(113_113_122))] dark:text-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(161_161_170))]"

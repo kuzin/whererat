@@ -562,7 +562,7 @@ export default async function MoviePage({
                   className={`mt-6 rounded-2xl border-2 border-dashed px-6 py-14 text-center dark:border-white/18 ${
                     palette
                       ? "border-[color-mix(in_srgb,var(--movie-accent)_25%,rgb(214_211_209))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,white)] dark:bg-[rgb(34_29_25/0.65)]"
-                      : "border-stone-900/25 bg-[#fffdf8]/80 dark:bg-stone-900/40"
+                      : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
                   }`}
                 >
                   <p className="wr-display text-lg font-bold text-stone-800 dark:text-stone-100">
@@ -574,7 +574,7 @@ export default async function MoviePage({
                   </p>
                   <Link
                     href="/submit"
-                    className="mt-6 inline-flex wr-btn bg-[#fb923c] text-stone-950"
+                    className="mt-6 inline-flex wr-btn-primary"
                   >
                     Submit a sighting
                   </Link>
@@ -609,7 +609,7 @@ export default async function MoviePage({
 
       {editMovie && canEditMovie ? (
         <div className="fixed inset-0 z-[220] flex items-start justify-center bg-black/55 px-4 py-8 sm:py-12">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[#fffaf5] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
@@ -719,7 +719,7 @@ export default async function MoviePage({
                 </Link>
                 <button
                   type="submit"
-                  className="wr-btn bg-[#fb923c] text-stone-950 dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50"
+                  className="wr-btn-primary"
                 >
                   Save movie info
                 </button>
@@ -730,7 +730,7 @@ export default async function MoviePage({
       ) : null}
       {editingSighting && canEditSightings ? (
         <div className="fixed inset-0 z-[220] flex items-start justify-center bg-black/55 px-4 py-8 sm:py-12">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[#fffaf5] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black text-stone-950 dark:text-stone-100">
@@ -827,7 +827,7 @@ export default async function MoviePage({
                 </Link>
                 <button
                   type="submit"
-                  className="wr-btn bg-[#fb923c] text-stone-950 dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50"
+                  className="wr-btn-primary"
                 >
                   Save sighting
                 </button>

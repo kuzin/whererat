@@ -152,7 +152,7 @@ export default async function Home({
             <div className="mt-10 flex flex-wrap justify-center gap-3 sm:mt-12">
               <Link
                 href="/submit"
-                className="wr-display inline-flex min-h-[3.5rem] min-w-[13rem] items-center justify-center rounded-3xl border-[3px] border-stone-950 bg-[#fb923c] px-10 py-4 text-center text-xl font-bold text-stone-950 shadow-[6px_6px_0_0_rgb(28_25_23/0.88)] outline-none transition hover:brightness-[1.04] focus-visible:ring-2 focus-visible:ring-orange-600/60 focus-visible:ring-offset-2 active:translate-y-[2px] active:shadow-none sm:min-h-[4rem] sm:min-w-[15rem] sm:px-12 sm:py-5 sm:text-2xl dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50 dark:shadow-[6px_6px_0_0_rgb(0_0_0/0.55)]"
+                className="wr-display wr-btn-primary inline-flex min-h-[3.5rem] min-w-[13rem] items-center justify-center rounded-3xl border-[3px] px-10 py-4 text-center text-xl font-bold shadow-[6px_6px_0_0_rgb(28_25_23/0.88)] outline-none transition hover:brightness-[1.04] focus-visible:ring-2 focus-visible:ring-orange-600/60 focus-visible:ring-offset-2 active:translate-y-[2px] active:shadow-none sm:min-h-[4rem] sm:min-w-[15rem] sm:px-12 sm:py-5 sm:text-2xl dark:shadow-[6px_6px_0_0_rgb(0_0_0/0.55)]"
               >
                 Submit a Sighting
               </Link>
@@ -230,7 +230,7 @@ export default async function Home({
             </label>
             <button
               type="submit"
-              className="wr-btn h-11 self-end whitespace-nowrap bg-[#fb923c] text-stone-950 md:self-end"
+              className="wr-btn-primary h-11 self-end whitespace-nowrap md:self-end"
             >
               Dig in
             </button>
@@ -245,7 +245,7 @@ export default async function Home({
                   <Link
                     key={movie.id}
                     href={`/movies/${movie.slug}`}
-                    className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[#fffaf5] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[#fef3e2] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
+                    className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
                   >
                     <div className="relative min-h-48 overflow-hidden border-b-2 border-stone-950/90 bg-stone-900 sm:min-h-0 sm:border-r-2 sm:border-b-0 dark:border-white/14">
                       <Image
@@ -255,7 +255,7 @@ export default async function Home({
                         height={420}
                         className="h-full min-h-48 w-full scale-[1.04] object-cover transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-95 sm:min-h-full"
                       />
-                      <span className="pointer-events-none absolute bottom-3 left-3 z-[1] max-w-[calc(100%-1.25rem)] truncate rounded-lg border-2 border-stone-950/90 bg-[#fcd34d]/95 px-2 py-0.5 text-left text-[0.65rem] font-bold whitespace-nowrap text-stone-950 tabular-nums shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] backdrop-blur-[1px] sm:bottom-2.5 sm:left-2.5 sm:text-xs dark:border-white/20 dark:bg-[#b8982a]/95 dark:text-stone-50 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.42)]">
+                      <span className="pointer-events-none absolute bottom-3 left-3 z-[1] max-w-[calc(100%-1.25rem)] truncate rounded-lg border-2 border-stone-950/90 bg-[color-mix(in_srgb,var(--wr-cheese)_92%,transparent)] px-2 py-0.5 text-left text-[0.65rem] font-bold whitespace-nowrap text-stone-950 tabular-nums shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] backdrop-blur-[1px] sm:bottom-2.5 sm:left-2.5 sm:text-xs dark:border-white/20 dark:bg-[color-mix(in_srgb,var(--wr-cheese)_56%,rgb(41_37_33))] dark:text-stone-50 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.42)]">
                         {sightingCount} sighting
                         {sightingCount === 1 ? "" : "s"}
                       </span>

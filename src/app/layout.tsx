@@ -91,7 +91,7 @@ export default async function RootLayout({
                   </p>
                   <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
                     <Link
-                      className="inline-flex w-fit items-center rounded-lg border-2 bg-[#fcd34d] px-4 py-2 text-sm font-bold text-stone-950 outline-none ring-offset-2 transition hover:bg-[#fde047] hover:brightness-[1.03] focus-visible:ring-2 focus-visible:ring-amber-300 dark:border-white/25 dark:bg-[#c9a82a] dark:text-stone-950 dark:ring-offset-stone-900 dark:hover:bg-[#d4b336]"
+                      className="wr-btn-primary inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-bold outline-none ring-offset-2 transition hover:brightness-[1.03] focus-visible:ring-2 focus-visible:ring-amber-300 dark:ring-offset-stone-900"
                       href="/guidelines"
                     >
                       Guidelines →

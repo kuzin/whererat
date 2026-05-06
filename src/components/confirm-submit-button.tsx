@@ -49,7 +49,7 @@ export function ConfirmSubmitButton({
       </button>
       {open ? (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/55 px-4">
-          <div className="w-full max-w-md rounded-2xl border-2 border-stone-950/85 bg-[#fffaf5] p-5 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/16 dark:bg-stone-900">
+          <div className="w-full max-w-md rounded-2xl border-2 border-stone-950/85 bg-[var(--wr-surface-cream)] p-5 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/16 dark:bg-stone-900">
             <p className="text-sm font-semibold leading-relaxed text-stone-800 dark:text-stone-100">
               {confirmMessage}
             </p>

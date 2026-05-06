@@ -9,10 +9,14 @@
   --foreground: #1c1410;
   --wr-cheese: #fcd34d;
   --wr-cheddar: #f59e0b;
+  --wr-accent-btn: #fb923c;
+  --wr-accent-btn-hover: #f97316;
+  --wr-accent-btn-dark: #b45309;
+  --wr-accent-btn-dark-hover: #92400e;
 
   /* Masthead surface + logo tints — tweak here or in `src/components/site-masthead.tsx` */
-  --wr-header-bg: rgb(255 248 237 / 0.92);
-  --wr-header-border: rgb(28 25 23 / 0.8);
+  --wr-header-bg: #fff9f1;
+  --wr-header-border: rgb(28 25 23 / 0.18);
   /** Header brand (mask fill) — warmed stone / cheese, not pure black */
   --wr-brand-mark: #a16207;
   --wr-brand-wordmark: #57534e;
@@ -21,6 +25,9 @@
   --wr-footer-rule: rgb(28 25 23 / 0.2);
 
   --wr-card-bg: #ffffff;
+  --wr-surface-cream: #fffaf5;
+  --wr-surface-cream-soft: #fffdf8;
+  --wr-surface-cream-muted: #fffbf5;
   --wr-card-bg-soft: rgb(255 255 255 / 0.92);
   --wr-card-border: rgb(28 25 23 / 0.9);
   --wr-card-border-soft: rgb(28 25 23 / 0.75);
@@ -35,6 +42,9 @@
   --wr-btn-ghost-active: rgb(231 229 228);
 
   --wr-input-bg: #ffffff;
+  --wr-panel-warm-bg: #9a3412;
+  --wr-panel-warm-fg: #fef3c7;
+  --wr-panel-warm-border: rgb(245 158 11 / 0.35);
   --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2357534e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 
@@ -44,9 +54,13 @@
   --foreground: #faf7f3;
   --wr-cheese: #fbbf24;
   --wr-cheddar: #fcd34d;
+  --wr-accent-btn: #b45309;
+  --wr-accent-btn-hover: #92400e;
+  --wr-accent-btn-dark: #b45309;
+  --wr-accent-btn-dark-hover: #92400e;
 
-  --wr-header-bg: rgb(22 17 14 / 0.94);
-  --wr-header-border: rgb(250 245 239 / 0.14);
+  --wr-header-bg: rgb(18 14 12);
+  --wr-header-border: rgb(250 245 239 / 0.16);
   --wr-brand-mark: #fbbf24;
   --wr-brand-wordmark: #fef3c7;
 
@@ -55,6 +69,9 @@
   --wr-footer-rule: rgb(253 243 220 / 0.12);
 
   --wr-card-bg: rgb(40 34 29);
+  --wr-surface-cream: rgb(40 34 29);
+  --wr-surface-cream-soft: rgb(44 37 31);
+  --wr-surface-cream-muted: rgb(48 40 34);
   --wr-card-bg-soft: rgb(40 34 29 / 0.94);
   --wr-card-border: rgb(253 246 232 / 0.16);
   --wr-card-border-soft: rgb(253 246 232 / 0.12);
@@ -69,6 +86,9 @@
   --wr-btn-ghost-active: rgb(63 54 46);
 
   --wr-input-bg: rgb(32 27 23);
+  --wr-panel-warm-bg: rgb(80 34 18);
+  --wr-panel-warm-fg: #fff7dc;
+  --wr-panel-warm-border: rgb(251 191 36 / 0.25);
   --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 
@@ -254,6 +274,15 @@ body {
   box-shadow: 3px 3px 0 0 var(--wr-shadow-btn);
 }
 
+@utility wr-btn-primary {
+  @apply wr-btn text-stone-950 dark:text-amber-50;
+  background-color: var(--wr-accent-btn);
+}
+
+.wr-btn-primary:hover {
+  background-color: var(--wr-accent-btn-hover);
+}
+
 @utility wr-btn-ghost {
   @apply inline-flex items-center justify-center rounded-xl border-2 border-stone-950/90 px-5 py-2.5 text-center text-sm font-semibold text-stone-900 outline-none transition hover:shadow-none focus-visible:ring-2 focus-visible:ring-stone-950/40 focus-visible:ring-offset-2 active:brightness-[0.99] dark:border-white/22 dark:text-stone-100 dark:focus-visible:ring-amber-400/55 dark:focus-visible:ring-offset-stone-900;
   background-color: var(--wr-card-bg);
@@ -287,6 +316,12 @@ body {
 @utility wr-pill-tag {
   @apply rounded-full border border-stone-950 px-2.5 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-stone-800 shadow-[1px_1px_0_0_rgb(28_25_23/0.5)] dark:border-white/22 dark:bg-stone-900/60 dark:text-stone-200 dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.45)];
   background-color: var(--wr-card-bg);
+}
+
+@utility wr-panel-warm {
+  border-color: var(--wr-panel-warm-border);
+  background-color: var(--wr-panel-warm-bg);
+  color: var(--wr-panel-warm-fg);
 }
 
 /* Sighting image carousel slide-in (uses --wr-carousel-dx from inline style). */

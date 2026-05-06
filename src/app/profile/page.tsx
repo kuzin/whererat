@@ -35,7 +35,7 @@ export default async function ProfilePage({
   return (
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="rounded-2xl border border-amber-500/35 bg-[#9a3412] p-8 text-[#fef3c7]">
+        <aside className="rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
           <Image
             src={account.avatarUrl}
             alt={`${account.name} profile picture`}
@@ -96,7 +96,7 @@ export default async function ProfilePage({
                 </select>
               </label>
               <AvatarUploadField initialAvatarUrl={account.avatarUrl} displayName={account.name} />
-              <button type="submit" className="wr-btn bg-[#fdba74] text-stone-950 dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50">
+              <button type="submit" className="wr-btn-primary">
                 Save profile changes
               </button>
             </form>
@@ -137,7 +137,7 @@ export default async function ProfilePage({
                   className="wr-input"
                 />
               </label>
-              <button type="submit" className="wr-btn bg-[#fcd34d] text-stone-950 dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50">
+              <button type="submit" className="wr-btn-primary">
                 Update passphrase
               </button>
             </form>

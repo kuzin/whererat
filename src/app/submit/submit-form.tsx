@@ -317,7 +317,7 @@ export function SubmitForm({
         <SightingImageUpload />
       </div>
 
-      <label className="flex items-center gap-3 rounded-xl border border-stone-950/85 bg-[#fcd34d]/35 p-4 text-sm font-semibold text-stone-800 dark:border-white/16 dark:bg-stone-900/65 dark:text-stone-100">
+      <label className="flex items-center gap-3 rounded-xl border border-stone-950/85 bg-[color-mix(in_srgb,var(--wr-cheese)_35%,transparent)] p-4 text-sm font-semibold text-stone-800 dark:border-white/16 dark:bg-stone-900/65 dark:text-stone-100">
         <input
           name="spoiler"
           type="checkbox"
@@ -327,7 +327,7 @@ export function SubmitForm({
       </label>
 
       {canAutoApprove ? (
-        <label className="flex items-start gap-3 rounded-xl border border-amber-800/35 bg-[#fef3c7]/95 p-4 text-sm font-semibold text-amber-950">
+        <label className="flex items-start gap-3 rounded-xl border border-amber-800/35 bg-[color-mix(in_srgb,var(--wr-panel-warm-fg)_95%,transparent)] p-4 text-sm font-semibold text-amber-950">
           <input
             name="autoApprove"
             type="checkbox"
@@ -344,7 +344,7 @@ export function SubmitForm({
       ) : null}
 
       <div className="pt-2">
-        <button type="submit" className="wr-btn w-full bg-[#fdba74] text-stone-950 sm:w-auto">
+        <button type="submit" className="wr-btn-primary w-full sm:w-auto">
           Submit for review
         </button>
       </div>

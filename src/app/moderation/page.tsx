@@ -138,7 +138,7 @@ export default async function ModerationPage({
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="space-y-6">
-          <div className="rounded-2xl border border-amber-500/35 bg-[#9a3412] p-8 text-[#fef3c7]">
+          <div className="rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
             <h1 className="wr-display text-4xl font-bold tracking-tight">
               Moderation queue
             </h1>
@@ -231,7 +231,7 @@ export default async function ModerationPage({
               return (
               <article
                 key={submission.id}
-                className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[#fffaf5] dark:border-white/14 dark:bg-stone-900/70"
+                className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[var(--wr-surface-cream)] dark:border-white/14 dark:bg-stone-900/70"
               >
                 <div className="grid gap-0 md:grid-cols-[160px_1fr]">
                   <div className="bg-stone-950">
@@ -532,7 +532,7 @@ export default async function ModerationPage({
 
       {editingSubmission ? (
         <div className="fixed inset-0 z-[220] flex items-start justify-center bg-black/55 px-4 py-8 sm:py-12">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[#fffaf5] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
@@ -632,7 +632,7 @@ export default async function ModerationPage({
                   type="submit"
                   name="decision"
                   value="edited"
-                  className="wr-btn bg-[#fb923c] text-stone-950 dark:border-amber-400/30 dark:bg-amber-700/80 dark:text-amber-50"
+                  className="wr-btn-primary"
                 >
                   Save
                 </button>

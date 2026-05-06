@@ -30,7 +30,7 @@ export default async function SubmitPage({
   return (
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <div className="overflow-hidden rounded-2xl border border-amber-500/35 bg-[#9a3412] text-[#fef3c7]">
+        <div className="overflow-hidden rounded-2xl border wr-panel-warm">
           <div className="p-8">
             <div className="text-4xl leading-none sm:text-5xl">
               <span aria-hidden>🐀</span>

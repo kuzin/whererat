@@ -35,7 +35,7 @@ export default function GuidelinesPage() {
   return (
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="rounded-2xl border border-amber-500/35 bg-[#9a3412] p-8 text-[#fef3c7]">
+        <aside className="rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
           <h1 className="wr-display text-4xl font-bold tracking-tight">
             Guidelines
           </h1>
