@@ -30,7 +30,7 @@ export default async function SubmitPage({
   return (
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <div className="overflow-hidden rounded-2xl border wr-panel-warm">
+        <div className="self-start overflow-hidden rounded-2xl border wr-panel-warm">
           <div className="p-8">
             <div className="text-4xl leading-none sm:text-5xl">
               <span aria-hidden>🐀</span>
@@ -38,7 +38,7 @@ export default async function SubmitPage({
             <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
               Submit a rat sighting
             </h1>
-            <p className="mt-5 leading-relaxed text-amber-50/82">
+            <p className="mt-5 leading-relaxed text-orange-950/75 dark:text-amber-50/82">
               Add the movie, scene time, estimated rat count, and a short
               description of what appears on screen (optional Markdown; use Show
               preview on the form—it updates live while open). You can attach up to five

@@ -125,7 +125,7 @@ export function SubmitForm({
     >
       {errors.length > 0 ? (
         <div className="rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm font-medium text-red-900 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
-          <p className="font-bold">Please fix the following:</p>
+          <p className="font-bold">⚠️ Please fix the following:</p>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             {errors.map((error) => (
               <li key={error}>{error}</li>

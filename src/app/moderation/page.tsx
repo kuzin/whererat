@@ -123,6 +123,19 @@ export default async function ModerationPage({
   const editingAttachmentSlides = editingSubmission
     ? getSubmissionImageRefs(editingSubmission)
     : [];
+  const pendingMovieEntries = await Promise.all(
+    pendingSubmissions.map(async (submission) => {
+      const movie =
+        (submission.imdbId
+          ? await getCatalogMovieByImdbId(submission.imdbId)
+          : undefined) ?? (await getCatalogMovieByTitleSearch(submission.movieTitle));
+      return [submission.id, movie] as const;
+    }),
+  );
+  const catalogMovieBySubmissionId = new Map(
+    pendingMovieEntries.filter(([, movie]) => movie !== undefined),
+  );
+
   const stats = await getCatalogStatsWithCommunity();
   const userStore = await readUserStore();
   const trustSignalAccounts = [...userStore.accounts]
@@ -138,11 +151,14 @@ export default async function ModerationPage({
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="space-y-6">
-          <div className="rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
-            <h1 className="wr-display text-4xl font-bold tracking-tight">
+          <div className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
+            <div className="text-4xl leading-none sm:text-5xl">
+              <span aria-hidden>🔍</span>
+            </div>
+            <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
               Moderation queue
             </h1>
-            <p className="mt-5 leading-relaxed text-amber-50/82">
+            <p className="mt-5 leading-relaxed text-orange-950/75 dark:text-amber-50/82">
               Triage sightings with approve, tighten-up edits, or gentle rejections
               that explain why Netflix might not need another duplicate starting time.
             </p>
@@ -187,8 +203,8 @@ export default async function ModerationPage({
                       <p className="text-sm text-stone-500 dark:text-stone-400">{user.roleLabel}</p>
                     </div>
                   </div>
-                  <p className="text-right">
-                    <span className="block font-black text-stone-950 dark:text-stone-100">
+                  <p className="flex items-baseline gap-1.5 text-right">
+                    <span className="font-black text-stone-950 dark:text-stone-100">
                       {user.reviewCount}
                     </span>
                     <span className="text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
@@ -228,30 +244,15 @@ export default async function ModerationPage({
               const attachmentSlides = getSubmissionImageRefs(submission);
               const sightingTitle = getSubmissionSightingTitle(submission);
               const startingPretty = formatSightingMomentDisplay(submission.timestamp);
+              const catalogMovie = catalogMovieBySubmissionId.get(submission.id);
+              const posterUrl = catalogMovie?.posterUrl ?? submission.moviePosterUrl;
               return (
               <article
                 key={submission.id}
                 className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[var(--wr-surface-cream)] dark:border-white/14 dark:bg-stone-900/70"
               >
-                <div className="grid gap-0 md:grid-cols-[160px_1fr]">
-                  <div className="bg-stone-950">
-                    {submission.moviePosterUrl ? (
-                      <Image
-                        src={submission.moviePosterUrl}
-                        alt={`${submission.movieTitle} submitted poster image`}
-                        width={300}
-                        height={450}
-                        className="aspect-[2/3] h-56 w-full object-cover md:h-full md:min-h-[240px]"
-                      />
-                    ) : (
-                      <div className="grid h-56 place-items-center p-6 text-center text-sm font-black uppercase tracking-[0.2em] text-amber-50 md:h-full md:min-h-[240px]">
-                        No poster attached
-                      </div>
-                    )}
-                  </div>
                   <div className="relative p-5">
                 <div className="pr-12">
-                    <h3 className="text-2xl font-black text-stone-950 dark:text-stone-100">{sightingTitle}</h3>
                     <Link
                       href={`/moderation?edit=${submission.id}`}
                       className="wr-btn-ghost absolute top-5 right-5 inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
@@ -260,44 +261,81 @@ export default async function ModerationPage({
                     >
                       ✎
                     </Link>
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold text-stone-700 dark:text-stone-300">
-                      {submission.spoiler ? (
-                        <span className="rounded-md bg-red-100 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.14em] text-red-800 dark:bg-red-950/45 dark:text-red-200">
-                          Spoiler
-                        </span>
+
+                    {/* ── Movie block ── */}
+                    <div className="flex gap-4">
+                      {posterUrl ? (
+                        <Image
+                          src={posterUrl}
+                          alt={`${submission.movieTitle} poster`}
+                          width={80}
+                          height={120}
+                          className="w-14 shrink-0 self-center rounded-lg object-cover"
+                        />
                       ) : null}
-                    </div>
-                    <p className="mt-1 text-base font-bold text-stone-800 dark:text-stone-200">
-                      {submission.movieTitle}
-                      {submission.movieYear ? ` (${submission.movieYear})` : ""}
-                    </p>
-                    <dl className="mt-3 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1.5 text-sm">
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">
-                        Approx. point in movie
-                      </dt>
-                      <dd className="text-stone-700 dark:text-stone-200 tabular-nums">
-                        {startingPretty}
-                      </dd>
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">IMDb</dt>
-                      <dd className="text-stone-700 dark:text-stone-200">
-                        {submission.imdbId ? (
-                          <a
-                            href={getImdbTitleUrl(submission.imdbId)}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200"
-                          >
-                            View on IMDb ({submission.imdbId})
-                          </a>
+                      <div className="min-w-0 self-center">
+                        <h3 className="text-xl font-black text-stone-950 dark:text-stone-100">
+                          {submission.movieTitle}
+                          {submission.movieYear ? (
+                            <span className="ml-1.5 text-base font-semibold text-stone-500 dark:text-stone-400">
+                              ({submission.movieYear})
+                            </span>
+                          ) : null}
+                        </h3>
+                        {catalogMovie ? (
+                          <div className="mt-1 space-y-0.5 text-sm text-stone-600 dark:text-stone-400">
+                            {catalogMovie.metadata.director ? (
+                              <p>Dir. <span className="font-medium text-stone-800 dark:text-stone-200">{catalogMovie.metadata.director}</span></p>
+                            ) : null}
+                            {catalogMovie.genres.length > 0 ? (
+                              <p>{catalogMovie.genres.join(" · ")}</p>
+                            ) : null}
+                            <p className="flex flex-wrap gap-x-3">
+                              {catalogMovie.runtimeMinutes ? <span>{catalogMovie.runtimeMinutes} min</span> : null}
+                              {catalogMovie.metadata.rating ? <span>{catalogMovie.metadata.rating}</span> : null}
+                              {catalogMovie.metadata.imdbRating ? <span>★ {catalogMovie.metadata.imdbRating}</span> : null}
+                            </p>
+                          </div>
                         ) : (
-                          "Manual title (IMDb match needed)"
+                          <div className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+                            {submission.imdbId ? (
+                              <a href={getImdbTitleUrl(submission.imdbId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200">
+                                IMDb {submission.imdbId}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3 opacity-60" aria-hidden="true"><path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l5.22-5.22v1.69a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75h-3.5a.75.75 0 0 0 0 1.5h1.69L6.22 8.72Z"/><path d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 0 0 7 4H4.75A2.75 2.75 0 0 0 2 6.75v4.5A2.75 2.75 0 0 0 4.75 14h4.5A2.75 2.75 0 0 0 12 11.25V9a.75.75 0 0 0-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5Z"/></svg>
+                              </a>
+                            ) : (
+                              <span className="opacity-50">No IMDb match</span>
+                            )}
+                          </div>
                         )}
-                      </dd>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 border-t border-stone-950/8 dark:border-white/8" />
+
+                    {/* ── Sighting block ── */}
+                    <dl className="mt-3 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1.5 text-sm">
+                      <dt className="font-bold text-stone-600 dark:text-stone-400">Point in film</dt>
+                      <dd className="text-stone-700 dark:text-stone-200">{startingPretty.replace(" into movie", "")}</dd>
                       <dt className="font-bold text-stone-600 dark:text-stone-400">Approx. rats</dt>
-                      <dd className="text-stone-700 dark:text-stone-200">
-                        {submission.approximateRatCount}{" "}
-                        {submission.approximateRatCount === 1 ? "rat" : "rats"} on screen
-                      </dd>
+                      <dd className="text-stone-700 dark:text-stone-200">~{submission.approximateRatCount} {submission.approximateRatCount === 1 ? "rat" : "rats"}</dd>
+                      {submission.imdbId ? (
+                        <>
+                          <dt className="font-bold text-stone-600 dark:text-stone-400">IMDb</dt>
+                          <dd>
+                            <a href={getImdbTitleUrl(submission.imdbId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200">
+                              {submission.imdbId}
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3 opacity-60" aria-hidden="true"><path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l5.22-5.22v1.69a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75h-3.5a.75.75 0 0 0 0 1.5h1.69L6.22 8.72Z"/><path d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 0 0 7 4H4.75A2.75 2.75 0 0 0 2 6.75v4.5A2.75 2.75 0 0 0 4.75 14h4.5A2.75 2.75 0 0 0 12 11.25V9a.75.75 0 0 0-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5Z"/></svg>
+                            </a>
+                          </dd>
+                        </>
+                      ) : null}
+                      {submission.spoiler ? (
+                        <>
+                          <dt className="font-bold text-stone-600 dark:text-stone-400">Spoiler</dt>
+                          <dd className="font-semibold text-red-700 dark:text-red-400">Yes</dd>
+                        </>
+                      ) : null}
                       <dt className="font-bold text-stone-600 dark:text-stone-400">Submitted by</dt>
                       <dd className="text-stone-700 dark:text-stone-200">
                         {submission.submittedBy.trim()}
@@ -313,11 +351,11 @@ export default async function ModerationPage({
                           </>
                         ) : null}
                       </dd>
+                      <dt className="font-bold text-stone-600 dark:text-stone-400">Title</dt>
+                      <dd className="text-stone-700 dark:text-stone-200">{sightingTitle}</dd>
                     </dl>
-                    <p className="mt-3 text-sm font-bold text-stone-600 dark:text-stone-400">
-                      Description
-                    </p>
-                    <div className="mt-1 text-stone-700 dark:text-stone-200">
+                    <div className="mt-3 border-t border-stone-950/8 pt-3 dark:border-white/8">
+                      <p className="mb-1.5 text-sm font-bold text-stone-600 dark:text-stone-400">Description</p>
                       <SightingMarkdown markdown={submission.description} />
                     </div>
                 </div>
@@ -350,7 +388,7 @@ export default async function ModerationPage({
                         type="submit"
                         name="decision"
                         value="approved"
-                        className="wr-btn w-full bg-[#d97706] text-[#fffbeb]"
+                        className="wr-btn w-full bg-green-700 text-white hover:bg-green-800 dark:bg-green-600 dark:hover:bg-green-500"
                       >
                         Approve
                       </button>
@@ -358,14 +396,13 @@ export default async function ModerationPage({
                         type="submit"
                         name="decision"
                         value="rejected"
-                        className="wr-btn w-full bg-[#dc2626] text-white"
+                        className="wr-btn w-full bg-red-700 text-white hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-500"
                       >
                         Deny
                       </button>
                     </div>
                   </form>
                 </div>
-                  </div>
                 </div>
               </article>
               );

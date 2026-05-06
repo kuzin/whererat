@@ -181,7 +181,7 @@ export function MovieSearchField({
 
       {visibleError ? (
         <div className="rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm font-semibold text-red-950">
-          {visibleError}
+          ⚠️ {visibleError}
         </div>
       ) : null}
 

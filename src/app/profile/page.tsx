@@ -35,7 +35,7 @@ export default async function ProfilePage({
   return (
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
+        <aside className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
           <Image
             src={account.avatarUrl}
             alt={`${account.name} profile picture`}
@@ -46,10 +46,10 @@ export default async function ProfilePage({
           <h1 className="wr-display mt-6 text-4xl font-bold tracking-tight">
             {account.name}
           </h1>
-          <p className="mt-2 text-amber-50/72">
+          <p className="mt-2 text-orange-950/70 dark:text-amber-50/72">
             @{account.username} · {account.role}
           </p>
-          <p className="mt-1 text-amber-50/72">{account.email}</p>
+          <p className="mt-1 text-orange-950/70 dark:text-amber-50/72">{account.email}</p>
 
         </aside>
 

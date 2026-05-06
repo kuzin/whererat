@@ -118,7 +118,10 @@ export function ToastNotifications() {
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="wr-display font-bold">{toast.title}</p>
+            <p className="wr-display font-bold">
+              {toast.tone === "error" ? "⚠️ " : toast.tone === "success" ? "✅ " : "💬 "}
+              {toast.title}
+            </p>
             <p className="mt-1 text-sm leading-relaxed opacity-85">{toast.body}</p>
           </div>
           <button

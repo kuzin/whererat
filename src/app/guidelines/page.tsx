@@ -1,33 +1,48 @@
 const guidelines = [
   {
+    icon: "🐀",
+    title: "What counts as a sighting",
+    body: "A valid sighting must have an actual on-screen rat — live, dead, or animated — visible in the film frame. Background decorations, posters, stuffed animals, and metaphorical rats don't count. A quick cameo still qualifies; the rat just needs to be genuinely present on screen.",
+  },
+  {
     icon: "🎬",
-    title: "Sightings",
-    body: "A valid sighting needs an on-screen rat, a sighting title, an approximate point in the movie for when the rat first appears, a short description (Markdown formatting is welcome—bold, lists, links; use Show preview on the submit form to check rendering while you write), an approximate rat count, and your display name (contact email optional, for moderator follow-up only).",
+    title: "What to include",
+    body: "Every submission needs a sighting title, an approximate point in the film (as a percentage), a short description, an approximate rat count, and your display name. Contact email is optional and only used for moderator follow-up. Markdown formatting is welcome in descriptions — bold, italics, lists, and links all render. Use the preview on the submit form to check your formatting before submitting.",
   },
   {
     icon: "⚠️",
     title: "Spoilers",
-    body: "Mark any submission as a spoiler when the rat appears during a major reveal, death, ending, or joke that depends on surprise.",
+    body: "Mark a submission as a spoiler if the rat appears during a major plot reveal, a character's death, the ending, or a punchline that depends entirely on surprise. When in doubt, mark it — readers can always choose to reveal spoilers themselves.",
+  },
+  {
+    icon: "🤝",
+    title: "Be inclusive and kind",
+    body: "WhereRat is for everyone who loves film and rats. Submissions, descriptions, and display names must not contain hate speech, slurs, harassment, or content that demeans any person or group based on race, gender, sexuality, religion, disability, or any other characteristic. Descriptions should focus on the rat — keep it about the cinema.",
+  },
+  {
+    icon: "♿",
+    title: "Accessibility",
+    body: "Write descriptions that work for everyone. Describe what is actually visible on screen so that sightings are useful to people who are blind or have low vision. Avoid descriptions that rely purely on visual cues like \"the rat in the bottom left\" without additional context. Sighting titles should be meaningful, not just \"rat scene.\"",
   },
   {
     icon: "🔎",
-    title: "Sources",
-    body: "Prefer approximate points in the movie, public references, or curator watch notes. Avoid uploading copyrighted stills or clips until the storage policy is reviewed.",
+    title: "Sources and images",
+    body: "Descriptions should be based on personal viewing. If referencing a timestamp or external source, note it briefly. Uploaded images should be your own screenshots. Avoid uploading copyrighted promotional stills, watermarked press images, or clips — a clean frame grab from your own copy of the film is fine.",
+  },
+  {
+    icon: "🧾",
+    title: "Movie metadata",
+    body: "Every movie must be matched to an IMDb title. WhereRat uses the IMDb ID to fetch posters, genres, runtimes, ratings, and release info through an approved data provider. If a movie isn't in the catalog yet, include the IMDb title ID in your submission and a moderator will add it.",
   },
   {
     icon: "🛡️",
     title: "Moderation",
-    body: "Moderators can approve new sightings, reject unclear reports, edit submissions for clarity, or merge near-duplicates into existing entries.",
+    body: "Moderators review all submissions before they appear publicly. They may approve, reject, or lightly edit a submission for clarity, formatting, or accuracy. Rejections are not personal — common reasons include no rat on screen, duplicate sighting, or a description that needs more detail. You're welcome to resubmit with improvements.",
   },
   {
-    icon: "🧾",
-    title: "Metadata",
-    body: "Every movie should be selected through IMDb title search. WhereRat resolves the IMDb title ID behind the scenes, then fetches posters, genres, runtimes, ratings, and release metadata through an approved provider such as OMDb or licensed IMDb data.",
-  },
-  {
-    icon: "📈",
-    title: "Analytics",
-    body: "Launch tracking should measure search terms, popular movie pages, submission completion, and rejected duplicate patterns.",
+    icon: "🚫",
+    title: "What will be rejected",
+    body: "Submissions will be rejected for: no on-screen rat, duplicate of an existing sighting, hate speech or discriminatory content, spam or promotional content, descriptions that are unintelligible or contain only a single word, and images that are clearly watermarked or from press kits.",
   },
 ];
 
@@ -35,13 +50,15 @@ export default function GuidelinesPage() {
   return (
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
-          <h1 className="wr-display text-4xl font-bold tracking-tight">
+        <aside className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
+          <div className="text-4xl leading-none sm:text-5xl">
+            <span aria-hidden>📖</span>
+          </div>
+          <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
             Guidelines
           </h1>
-          <p className="mt-5 leading-relaxed text-amber-50/82">
-            Quick standards for submissions, spoilers, moderation, and metadata so
-            the catalog stays consistent and easy to trust.
+          <p className="mt-5 leading-relaxed text-orange-950/75 dark:text-amber-50/82">
+            Standards for submissions, spoilers, moderation, inclusivity, and accessibility — so the catalog stays accurate, welcoming, and easy to trust.
           </p>
         </aside>
 
@@ -58,6 +75,13 @@ export default function GuidelinesPage() {
                 <p className="mt-3 leading-relaxed text-stone-700 dark:text-stone-300">{item.body}</p>
               </article>
             ))}
+
+            <p className="select-none text-center text-[0.6rem] leading-loose tracking-widest text-stone-300 dark:text-stone-700" aria-hidden="true">
+              * rats have seen more films than most critics and charge nothing for their opinions
+              · they prefer the middle seat · their tiny claws make no noise during quiet scenes
+              · they will eat your popcorn but only the unpopped kernels, out of respect
+              · no rat has ever spoiled an ending · they are, frankly, professionals
+            </p>
         </section>
       </section>
     </main>

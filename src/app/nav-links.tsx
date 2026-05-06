@@ -33,33 +33,32 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
 
   const links = (
     <>
-      <Link className={navClass(false)} href="/">
+      <Link className="wr-btn-ghost" href="/">
         Browse the catalog
       </Link>
+      {session ? (
+        <Link className="wr-btn-ghost" href="/moderation">
+          Moderate
+        </Link>
+      ) : null}
       <Link className="wr-btn-primary" href="/submit">
         Submit a sighting
       </Link>
       {session ? (
         <>
           <Link
-            className={navClass(isActivePath(pathname, "/moderation"))}
-            href="/moderation"
-          >
-            Moderate
-          </Link>
-          <Link
-            className={navClass(isActivePath(pathname, "/profile"))}
+            className="inline-flex items-center justify-center overflow-hidden rounded-xl border-2 border-stone-950/90 outline-none transition shadow-[2px_2px_0_0_var(--wr-shadow-btn-soft)] hover:shadow-none focus-visible:ring-2 focus-visible:ring-stone-950/40 focus-visible:ring-offset-2 dark:border-white/22 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.45)] dark:focus-visible:ring-amber-400/55"
             href="/profile"
-            aria-label="Profile"
             title={session.name}
           >
             <Image
               src={session.avatarUrl}
-              alt={`${session.name} avatar`}
-              width={24}
-              height={24}
-              className="h-6 w-6 rounded-md border border-stone-900/15 object-cover dark:border-white/20"
+              alt=""
+              width={40}
+              height={40}
+              className="hidden h-[2.375rem] w-[2.375rem] object-cover md:block"
             />
+            <span className="px-3 py-2 text-sm font-semibold md:hidden">Edit Profile</span>
           </Link>
         </>
       ) : null}
@@ -70,7 +69,7 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
     <div className="text-sm">
       <button
         type="button"
-        className="inline-flex items-center rounded-lg border-2 border-stone-950/20 px-3 py-2 text-sm font-semibold text-stone-800 outline-none transition hover:bg-stone-950/8 hover:text-stone-950 focus-visible:ring-2 focus-visible:ring-stone-950 dark:border-white/20 dark:text-stone-100 dark:hover:bg-white/12 md:hidden"
+        className="wr-btn-ghost md:hidden"
         aria-expanded={mobileOpen}
         aria-controls="wr-mobile-nav"
         onClick={() => setMobileOpen((value) => !value)}
