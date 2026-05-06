@@ -1,4 +1,5 @@
 import type { ImdbRelatedTitle } from "@/lib/whererat";
+import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
 
 function formatRating(rating: number) {
@@ -91,20 +92,10 @@ export function MovieRatlatedTab({ titles, imdbId, palette }: Props) {
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
             Related:
           </h2>
-          <a
+          <ImdbLinkButton
             href={`https://www.imdb.com/title/${imdbId}/recommendations/`}
-            target="_blank"
-            rel="noreferrer"
-            title="More recommendations on IMDb"
-            aria-label="More recommendations on IMDb"
-            className="wr-btn-ghost inline-flex h-9 items-center gap-1.5 px-3 text-xs font-semibold"
-          >
-            View on IMDb
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3.5">
-              <path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l5.22-5.22v1.69a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75h-3.5a.75.75 0 0 0 0 1.5h1.69L6.22 8.72Z" />
-              <path d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 0 0 7 4H4.75A2.75 2.75 0 0 0 2 6.75v4.5A2.75 2.75 0 0 0 4.75 14h4.5A2.75 2.75 0 0 0 12 11.25V9a.75.75 0 0 0-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5Z" />
-            </svg>
-          </a>
+            label="More recommendations on IMDb"
+          />
         </div>
       </header>
 

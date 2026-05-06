@@ -88,8 +88,7 @@ async function fetchOmdbData(
 
 const IMDB_GRAPHQL_URL = "https://api.graphql.imdb.com/";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchImdbTrivia(imdbId: string): Promise<any[]> {
+async function fetchImdbTrivia(imdbId: string): Promise<unknown[]> {
   try {
     const query = `
       query {
@@ -117,8 +116,7 @@ async function fetchImdbTrivia(imdbId: string): Promise<any[]> {
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) return [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = (await res.json()) as Record<string, any>;
+    const json = (await res.json()) as { data?: { title?: { trivia?: { edges?: unknown[] } } } };
     return json?.data?.title?.trivia?.edges ?? [];
   } catch {
     return [];
@@ -129,8 +127,7 @@ async function fetchImdbTrivia(imdbId: string): Promise<any[]> {
 // IMDb user reviews (public GraphQL, no key required)
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchImdbReviews(imdbId: string): Promise<any[]> {
+async function fetchImdbReviews(imdbId: string): Promise<unknown[]> {
   try {
     const query = `
       query {
@@ -158,8 +155,7 @@ async function fetchImdbReviews(imdbId: string): Promise<any[]> {
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) return [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = (await res.json()) as Record<string, any>;
+    const json = (await res.json()) as { data?: { title?: { reviews?: { edges?: unknown[] } } } };
     return json?.data?.title?.reviews?.edges ?? [];
   } catch {
     return [];
