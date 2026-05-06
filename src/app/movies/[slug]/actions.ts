@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth";
 import {
   clampApproximateRatCount,
+  normalizeSightingTimestampInput,
   type SightingImageSlot,
 } from "@/lib/whererat";
 import {
@@ -118,7 +119,9 @@ export async function updateSightingInfo(formData: FormData) {
   const returnTo = String(formData.get("returnTo") ?? "").trim() || `/movies/${slug}`;
   const sightingId = String(formData.get("sightingId") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
-  const timestamp = String(formData.get("timestamp") ?? "").trim();
+  const timestamp = normalizeSightingTimestampInput(
+    String(formData.get("timestamp") ?? ""),
+  );
   const description = String(formData.get("description") ?? "").trim();
   const spoiler = formData.get("spoiler") === "on";
   const approximateRatCount = clampApproximateRatCount(

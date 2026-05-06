@@ -1,3 +1,5 @@
+import bulkRatSeed from "./generated/bulk-rat-seed.json";
+
 export type RatProminence = "blink-and-miss" | "background" | "scene-stealer";
 export type SceneType =
   | "live-action"
@@ -48,7 +50,11 @@ export type Movie = {
     director: string;
     originalLanguage: string;
     productionCountries: string[];
-    metadataProvider: "IMDb seed" | "OMDb via IMDb ID" | "Licensed IMDb data";
+    metadataProvider:
+      | "IMDb seed"
+      | "OMDb via IMDb ID"
+      | "Licensed IMDb data"
+      | "TMDB keyword seed";
     lastSyncedAt: string;
     /** Screenplay / story credits (IMDb-style line). */
     writers?: string;
@@ -81,7 +87,7 @@ export type SightingImageSlot = {
 export type Sighting = {
   id: string;
   movieId: string;
-  /** Moment the rat first appears (film timecode). */
+  /** Moment the rat first appears, stored as percent (e.g. "42%") or legacy timecode. */
   timestamp: string;
   /** Short headline for the card (separate from scene description). */
   title?: string;
@@ -122,6 +128,7 @@ export type Submission = {
   movieTitle: string;
   movieYear?: number;
   imdbId?: string;
+  /** Submission moment, stored as percent (e.g. "42%") or legacy timecode. */
   timestamp: string;
   /** Sighting headline shown on the movie page when promoted to the catalog. */
   title?: string;
@@ -278,6 +285,33 @@ function parseColonTimestamp(value: string): { h: number; m: number; s: number }
   return null;
 }
 
+function parsePercentIntoMovie(value: string): number | null {
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(\d{1,3})(?:\s*%)?$/);
+  if (!match) return null;
+  const percent = Number.parseInt(match[1] ?? "", 10);
+  if (!Number.isFinite(percent)) return null;
+  return Math.max(0, Math.min(100, percent));
+}
+
+export function getSightingTimestampPercent(value: string): number | null {
+  return parsePercentIntoMovie(value);
+}
+
+export function normalizeSightingTimestampInput(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  const percent = parsePercentIntoMovie(trimmed);
+  if (percent === null) return trimmed;
+  return `${percent}%`;
+}
+
+export function formatSightingMomentDisplay(raw: string): string {
+  const percent = parsePercentIntoMovie(raw);
+  if (percent !== null) return `${percent}% into movie`;
+  return formatOneTimecode(raw.trim());
+}
+
 function formatClockParts(parts: { h: number; m: number; s: number }): string {
   const sec = parts.s.toString().padStart(2, "0");
   if (parts.h === 0) {
@@ -295,7 +329,7 @@ function formatOneTimecode(raw: string): string {
 
 /** Human-friendly film time from a `HH:MM:SS` or `MM:SS` string. */
 export function formatColonTimecodeDisplay(raw: string): string {
-  return formatOneTimecode(raw.trim());
+  return formatSightingMomentDisplay(raw);
 }
 
 /**
@@ -341,7 +375,7 @@ function placeholderImage(
   return `https://placehold.co/${size}/${background}/${foreground}/png?text=${encodeURIComponent(text)}`;
 }
 
-export const movies: Movie[] = [
+const moviesCatalogSeed: Movie[] = [
   {
     id: "ratatouille-2007",
     slug: "ratatouille-2007",
@@ -661,11 +695,16 @@ export const sources: Source[] = [
   {
     id: "community-citation",
     label: "Community citation",
-    note: "Submitted with a starting time and description; awaiting a second pass.",
+    note: "Submitted with approximate position in the film and description; awaiting a second pass.",
+  },
+  {
+    id: "tmdb-keyword-rat",
+    label: "TMDB “rat” keyword",
+    note: "Title appears on TMDB under the “rat” keyword; scene-level details need curator verification.",
   },
 ];
 
-export const sightings: Sighting[] = [
+const sightingsCatalogSeed: Sighting[] = [
   {
     id: "remy-first-cook",
     movieId: "ratatouille-2007",
@@ -1304,6 +1343,30 @@ export const reviewActions: ReviewAction[] = [
   },
 ];
 
+const seedCatalogImdbIds = new Set(
+  moviesCatalogSeed.map((movie) => movie.externalIds.imdb.toLowerCase()),
+);
+
+const bulkRatMoviesMerged = (bulkRatSeed.movies as Movie[]).filter((movie) => {
+  const imdb = movie.externalIds?.imdb?.toLowerCase();
+  return Boolean(imdb) && !seedCatalogImdbIds.has(imdb);
+});
+
+const bulkRatMovieIds = new Set(bulkRatMoviesMerged.map((movie) => movie.id));
+
+const bulkRatSightingsMerged = (bulkRatSeed.sightings as Sighting[]).filter(
+  (sighting) => bulkRatMovieIds.has(sighting.movieId),
+);
+
+/** Hand-curated seed movies plus TMDB “rat” keyword bulk import (deduped by IMDb ID). */
+export const movies: Movie[] = [...moviesCatalogSeed, ...bulkRatMoviesMerged];
+
+/** Seed sightings plus bulk keyword rows (pending verification). */
+export const sightings: Sighting[] = [
+  ...sightingsCatalogSeed,
+  ...bulkRatSightingsMerged,
+];
+
 const sightingCatalogRank = new Map(
   sightings.map((sighting, index) => [sighting.id, index]),
 );
@@ -1322,6 +1385,10 @@ export function sightingNewestSortValue(sighting: Sighting): number {
 }
 
 export function sightingAppearanceStartSeconds(sighting: Sighting): number {
+  const percent = parsePercentIntoMovie(sighting.timestamp);
+  if (percent !== null) {
+    return percent * 60;
+  }
   const chunks = sighting.timestamp
     .trim()
     .split(":")
@@ -1339,6 +1406,20 @@ export function sightingAppearanceStartSeconds(sighting: Sighting): number {
     return chunks[0] * 60 + chunks[1];
   }
   return 0;
+}
+
+function sightingAppearanceSortValue(
+  sighting: Sighting,
+  runtimeMinutes?: number,
+): number {
+  const percent = parsePercentIntoMovie(sighting.timestamp);
+  if (percent !== null) return percent;
+  const seconds = sightingAppearanceStartSeconds(sighting);
+  const runtimeSeconds = Math.max(1, Math.floor((runtimeMinutes ?? 0) * 60));
+  if (runtimeSeconds > 1) {
+    return (seconds / runtimeSeconds) * 100;
+  }
+  return seconds;
 }
 
 export function parseMovieSightingsSortParam(
@@ -1386,11 +1467,13 @@ export function prepareMovieSightingsView({
   items,
   sort,
   page,
+  runtimeMinutes,
   pageSize = MOVIE_SIGHTINGS_PAGE_SIZE,
 }: {
   items: Sighting[];
   sort: MovieSightingsSortOption;
   page: number;
+  runtimeMinutes?: number;
   pageSize?: number;
 }): {
   pageSlice: Sighting[];
@@ -1411,20 +1494,23 @@ export function prepareMovieSightingsView({
         const dr = estimateRatsForAppearance(b) - estimateRatsForAppearance(a);
         if (dr !== 0) return dr;
         return (
-          sightingAppearanceStartSeconds(a) - sightingAppearanceStartSeconds(b)
+          sightingAppearanceSortValue(a, runtimeMinutes) -
+          sightingAppearanceSortValue(b, runtimeMinutes)
         );
       });
       break;
     case "appearance-early":
       ordered.sort(
         (a, b) =>
-          sightingAppearanceStartSeconds(a) - sightingAppearanceStartSeconds(b),
+          sightingAppearanceSortValue(a, runtimeMinutes) -
+          sightingAppearanceSortValue(b, runtimeMinutes),
       );
       break;
     case "appearance-late":
       ordered.sort(
         (a, b) =>
-          sightingAppearanceStartSeconds(b) - sightingAppearanceStartSeconds(a),
+          sightingAppearanceSortValue(b, runtimeMinutes) -
+          sightingAppearanceSortValue(a, runtimeMinutes),
       );
       break;
     default:

@@ -2,7 +2,7 @@ const guidelines = [
   {
     icon: "🎬",
     title: "Sightings",
-    body: "A valid sighting needs an on-screen rat, a sighting title, a starting-time timecode when the rat first appears, a short description, an approximate rat count, and your display name (contact email optional, for moderator follow-up only).",
+    body: "A valid sighting needs an on-screen rat, a sighting title, an approximate point in the movie for when the rat first appears, a short description, an approximate rat count, and your display name (contact email optional, for moderator follow-up only).",
   },
   {
     icon: "⚠️",
@@ -12,7 +12,7 @@ const guidelines = [
   {
     icon: "🔎",
     title: "Sources",
-    body: "Prefer starting times, public references, or curator watch notes. Avoid uploading copyrighted stills or clips until the storage policy is reviewed.",
+    body: "Prefer approximate points in the movie, public references, or curator watch notes. Avoid uploading copyrighted stills or clips until the storage policy is reviewed.",
   },
   {
     icon: "🛡️",

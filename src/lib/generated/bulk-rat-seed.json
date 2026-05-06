@@ -1,0 +1,4714 @@
+{
+  "movies": [
+    {
+      "id": "ratatouille-2007",
+      "slug": "ratatouille-2007",
+      "title": "Ratatouille",
+      "releaseYear": 2007,
+      "runtimeMinutes": 111,
+      "genres": [
+        "Animation",
+        "Comedy",
+        "Family",
+        "Fantasy"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/t3vaWRPSf6WjDSamIkKDs1iQWna.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xgDj56UWyeWQcxQ44f5A3RTWuSs.jpg",
+      "posterAlt": "Poster image for Ratatouille.",
+      "externalIds": {
+        "tmdb": "2062",
+        "imdb": "tt0382932"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Remy, a rat, possesses a palate far more refined than that of his fellow comrades. He dreams of becoming a chef, one who creates rather than scavenges. When fate deposits him in the sewers beneath one of Paris’s most famous restaurants, he finds himself ideally placed to fulfill his dream. Forming an unusual alliance with a hapless young kitchen worker, Remy begins a daring culinary double life.  As Remy pursues his vision, he must navigate the suspicions of the calculating Head Chef Skinner, the disapproval of Remy’s own colony, and the foreboding presence of renowned food critic Anton Ego, who strikes fear in the hearts of chefs all throughout France."
+    },
+    {
+      "id": "rampage-2018",
+      "slug": "rampage-2018",
+      "title": "Rampage",
+      "releaseYear": 2018,
+      "runtimeMinutes": 107,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/MGADip4thVSErP34FAAfzFBTZ5.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/vm8mhrjk5nQ562UQ0KbUzi0yOHr.jpg",
+      "posterAlt": "Poster image for Rampage.",
+      "externalIds": {
+        "tmdb": "427641",
+        "imdb": "tt2231461"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Primatologist Davis Okoye shares an unshakable bond with George, the extraordinarily intelligent, silverback gorilla who has been in his care since birth.  But a rogue genetic experiment gone awry mutates this gentle ape into a raging creature of enormous size.  To make matters worse, it’s soon discovered there are other similarly altered animals.  As these newly created alpha predators tear across North America, destroying everything in their path, Okoye teams with a discredited genetic engineer to secure an antidote, fighting his way through an ever-changing battlefield, not only to halt a global catastrophe but to save the fearsome creature that was once his friend."
+    },
+    {
+      "id": "flushed-away-2006",
+      "slug": "flushed-away-2006",
+      "title": "Flushed Away",
+      "releaseYear": 2006,
+      "runtimeMinutes": 85,
+      "genres": [
+        "Adventure",
+        "Animation",
+        "Comedy",
+        "Family"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/kgoZI4xh38RrEYEPVib6a12UPLn.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/7xQk3HdCvkNmk3gblDGn9fVnbsT.jpg",
+      "posterAlt": "Poster image for Flushed Away.",
+      "externalIds": {
+        "tmdb": "11619",
+        "imdb": "tt0424095"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "London high-society mouse, Roddy is flushed down the toilet by Sid, a common sewer rat. Hang on for a madcap adventure deep in the sewer bowels of Ratropolis, where Roddy meets the resourceful Rita, the rodent-hating Toad and his faithful thugs, Spike and Whitey."
+    },
+    {
+      "id": "teenage-mutant-ninja-turtles-out-of-the-shadows-2016",
+      "slug": "teenage-mutant-ninja-turtles-out-of-the-shadows-2016",
+      "title": "Teenage Mutant Ninja Turtles: Out of the Shadows",
+      "releaseYear": 2016,
+      "runtimeMinutes": 112,
+      "genres": [
+        "Action",
+        "Adventure",
+        "Comedy",
+        "Family",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/euVaCiCWz3AALcQXHT6aUqdGUo6.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/41objfan7PDTBG5MFXQl4ownQzJ.jpg",
+      "posterAlt": "Poster image for Teenage Mutant Ninja Turtles: Out of the Shadows.",
+      "externalIds": {
+        "tmdb": "308531",
+        "imdb": "tt3949660"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "After supervillain Shredder escapes custody, he joins forces with mad scientist Baxter Stockman and two dimwitted henchmen, Bebop and Rocksteady, to unleash a diabolical plan to take over the world. As the Turtles prepare to take on Shredder and his new crew, they find themselves facing an even greater evil with similar intentions: the notorious Krang."
+    },
+    {
+      "id": "nosferatu-1922",
+      "slug": "nosferatu-1922",
+      "title": "Nosferatu",
+      "releaseYear": 1922,
+      "runtimeMinutes": 89,
+      "genres": [
+        "Horror",
+        "Fantasy"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/zv7J85D8CC9qYagAEhPM63CIG6j.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/u06SympEEMb7pLhR9W3tvydHT9L.jpg",
+      "posterAlt": "Poster image for Nosferatu.",
+      "externalIds": {
+        "tmdb": "653",
+        "imdb": "tt0013442"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The mysterious Count Orlok summons a happily married real estate agent to his castle, located up in the Transylvanian mountains, to finalise a terrifying deal."
+    },
+    {
+      "id": "charlotte-s-web-2006",
+      "slug": "charlotte-s-web-2006",
+      "title": "Charlotte's Web",
+      "releaseYear": 2006,
+      "runtimeMinutes": 97,
+      "genres": [
+        "Comedy",
+        "Family",
+        "Fantasy"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/fU0IR5HF8KxQbZijuWKPTrY81Qv.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/x7B2zT2OL8fKM53Wgzqz6nc7r02.jpg",
+      "posterAlt": "Poster image for Charlotte's Web.",
+      "externalIds": {
+        "tmdb": "9986",
+        "imdb": "tt0413895"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Wilbur the pig is scared of the end of the season, because he knows that come that time, he will end up on the dinner table. He hatches a plan with Charlotte, a spider that lives in his pen, to ensure that this will never happen."
+    },
+    {
+      "id": "1922-2017",
+      "slug": "1922-2017",
+      "title": "1922",
+      "releaseYear": 2017,
+      "runtimeMinutes": 102,
+      "genres": [
+        "Horror",
+        "Crime",
+        "Drama"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/q4FQOiSRhTLWulHl5Vpg37FMArH.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/3uwyXMZN93PRkShUxvLrufwVAc2.jpg",
+      "posterAlt": "Poster image for 1922.",
+      "externalIds": {
+        "tmdb": "452507",
+        "imdb": "tt6214928"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A simple yet proud rancher conspires to murder his wife for financial gain, convincing his teenage son to participate."
+    },
+    {
+      "id": "kim-possible-movie-so-the-drama-2005",
+      "slug": "kim-possible-movie-so-the-drama-2005",
+      "title": "Kim Possible Movie: So the Drama",
+      "releaseYear": 2005,
+      "runtimeMinutes": 71,
+      "genres": [
+        "Animation",
+        "Adventure",
+        "Family",
+        "Action",
+        "Comedy",
+        "Science Fiction",
+        "TV Movie"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rQ5WS0zWDRau2lI0FYpGYDGmDVS.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/y8n9w26LU9BYiMIyARv6dbg6NO8.jpg",
+      "posterAlt": "Poster image for Kim Possible Movie: So the Drama.",
+      "externalIds": {
+        "tmdb": "20771",
+        "imdb": "tt0446724"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Dr. Drakken has an evil new plot for world domination, but his ultimate success depends upon finding out KP's weakness which may involve a new hottie at Middleton High School named Eric, who suddenly sparks feelings in Ron about Kim that resemble much more than friendship. To make matters worse, Bueno Nacho, Ron's favorite fast food chain has turned sour on him by bombarding him with little Devils."
+    },
+    {
+      "id": "the-housemaid-1960",
+      "slug": "the-housemaid-1960",
+      "title": "The Housemaid",
+      "releaseYear": 1960,
+      "runtimeMinutes": 112,
+      "genres": [
+        "Crime",
+        "Drama"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/fFRG3soeb7ceKjWoXu4EFDc8grO.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/5NfLEeakUxT0JcU9Q830niu2w8e.jpg",
+      "posterAlt": "Poster image for The Housemaid.",
+      "externalIds": {
+        "tmdb": "42506",
+        "imdb": "tt0150980"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A piano composer's family moves into a new house; when his pregnant wife collapses from working to support the family, he hires a housemaid to help with housework."
+    },
+    {
+      "id": "the-rat-catcher-2023",
+      "slug": "the-rat-catcher-2023",
+      "title": "The Rat Catcher",
+      "releaseYear": 2023,
+      "runtimeMinutes": 17,
+      "genres": [
+        "Comedy"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/29WJ7dOHt48AtXK1J1rONEEvIMN.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/aQuzqump4Zjh2bCoymZ2POLlNYt.jpg",
+      "posterAlt": "Poster image for The Rat Catcher.",
+      "externalIds": {
+        "tmdb": "1172674",
+        "imdb": "tt28912858"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "In an English village, a reporter and a mechanic listen to a ratcatcher explain his clever plan to outwit his prey."
+    },
+    {
+      "id": "the-amazing-maurice-2022",
+      "slug": "the-amazing-maurice-2022",
+      "title": "The Amazing Maurice",
+      "releaseYear": 2022,
+      "runtimeMinutes": 93,
+      "genres": [
+        "Animation",
+        "Adventure",
+        "Comedy",
+        "Family",
+        "Fantasy"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/ydhZeUjbzVEFclUpMhLfDZSavUY.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/70aVSo3fuZ94jyQ3rT64afEf8lV.jpg",
+      "posterAlt": "Poster image for The Amazing Maurice.",
+      "externalIds": {
+        "tmdb": "676710",
+        "imdb": "tt10473036"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Maurice is a streetwise ginger cat who comes up with a money-making scam by befriending a group of self-taught talking rats. When Maurice and the rodents meet a bookworm called Malicia, their little con soon goes down the drain."
+    },
+    {
+      "id": "fat-slags-2004",
+      "slug": "fat-slags-2004",
+      "title": "Fat Slags",
+      "releaseYear": 2004,
+      "runtimeMinutes": 73,
+      "genres": [
+        "Comedy"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/ysb1ys1JtBHjDC2CjS06xv74JLD.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/ageiQjqHfZUrczfuw6tqTi5dkdt.jpg",
+      "posterAlt": "Poster image for Fat Slags.",
+      "externalIds": {
+        "tmdb": "31120",
+        "imdb": "tt0382028"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Leaving their hometown of Fulchester in the North of England, Sandra and Tracey head for the bright lights of London, shagging and boozing their way to fame and fortune."
+    },
+    {
+      "id": "the-nutcracker-2010",
+      "slug": "the-nutcracker-2010",
+      "title": "The Nutcracker",
+      "releaseYear": 2010,
+      "runtimeMinutes": 108,
+      "genres": [
+        "Music",
+        "Fantasy",
+        "Family",
+        "Adventure"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/8qpovUSOZiqFOpsHoByfKojI8iC.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/y6ttkVRr6S3FCLxlohx9tyNdeIJ.jpg",
+      "posterAlt": "Poster image for The Nutcracker.",
+      "externalIds": {
+        "tmdb": "49852",
+        "imdb": "tt1041804"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "In 1920s Vienna, a young girl receives a magical doll on Christmas Eve."
+    },
+    {
+      "id": "pet-2016",
+      "slug": "pet-2016",
+      "title": "Pet",
+      "releaseYear": 2016,
+      "runtimeMinutes": 94,
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/cO5debLXk54GhgXd92GVD0Hpinv.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/jXtB3ax1wxN4deKhMHelOjeE0cs.jpg",
+      "posterAlt": "Poster image for Pet.",
+      "externalIds": {
+        "tmdb": "353979",
+        "imdb": "tt1183374"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A man bumps into an old crush and becomes obsessed. After several failed attempts at winning her over, he kidnaps her and holds her captive underneath the animal shelter where he works."
+    },
+    {
+      "id": "shimajiro-to-ururu-no-heroland-2019",
+      "slug": "shimajiro-to-ururu-no-heroland-2019",
+      "title": "Shimajiro to Ururu no Heroland",
+      "releaseYear": 2019,
+      "runtimeMinutes": 60,
+      "genres": [
+        "Family",
+        "Animation",
+        "Fantasy"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/yGthNH49g4ezKLrn6cUNKygcbtz.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/jQMHu7B7LOY3R2PNJA4bBahEewN.jpg",
+      "posterAlt": "Poster image for Shimajiro to Ururu no Heroland.",
+      "externalIds": {
+        "tmdb": "657149",
+        "imdb": "tt11407890"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Hero Land is a world where you can meet the heroes and heroines you have been waiting for, created by the inventor girl \"Ururu\". Shimajiro and his friends were overexcited, but a bad robot appeared there and Hero Land was in big danger. Can Shimajiro and his friends work together to help?"
+    },
+    {
+      "id": "willard-2003",
+      "slug": "willard-2003",
+      "title": "Willard",
+      "releaseYear": 2003,
+      "runtimeMinutes": 100,
+      "genres": [
+        "Horror",
+        "Drama",
+        "Thriller"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/hRVP8Ud9ehv7tp5WWQ4CHk2XNus.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xH9BdS2DzkX20Ly9FG8Iwczi3M.jpg",
+      "posterAlt": "Poster image for Willard.",
+      "externalIds": {
+        "tmdb": "10929",
+        "imdb": "tt0310357"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Desperate for companionship, the repressed Willard befriends a group of rats that inhabit his late father's deteriorating mansion. In these furry creatures, Willard finds temporary refuge from daily abuse at the hands of his bedridden mother and his father's old partner, Frank. Soon it becomes clear that the brood of rodents is ready and willing to exact a vicious, deadly revenge on anyone who dares to bully their sensitive new master."
+    },
+    {
+      "id": "ben-1972",
+      "slug": "ben-1972",
+      "title": "Ben",
+      "releaseYear": 1972,
+      "runtimeMinutes": 94,
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/LvTapjbjdg9bGzt79hZAp2idcn.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/d1tL5FbQq7QfEaIYS2NqGa9Dsnx.jpg",
+      "posterAlt": "Poster image for Ben.",
+      "externalIds": {
+        "tmdb": "42476",
+        "imdb": "tt0068264"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A lonely boy becomes good friends with Ben, a rat. This rat is also the leader of a pack of vicious killer rats, killing lots of people."
+    },
+    {
+      "id": "graveyard-shift-1990",
+      "slug": "graveyard-shift-1990",
+      "title": "Graveyard Shift",
+      "releaseYear": 1990,
+      "runtimeMinutes": 89,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/vITvLxFsDbbg6TMgpYWWscMOf0G.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/d69Mloif5hP7Ajl0YbJjREyrfXC.jpg",
+      "posterAlt": "Poster image for Graveyard Shift.",
+      "externalIds": {
+        "tmdb": "19158",
+        "imdb": "tt0099697"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "John Hall is a drifter who wanders into a small town in Maine. He needs a job and decides to seek employment at the community's top business: a large textile mill. He is hired to work the \"graveyard shift\" -- from around midnight to dawn -- and, along with a few others, he is charged with cleaning out the basement. This task strikes the workers as simple enough, but then, as they proceed deeper underground, they encounter an unspeakable monstrosity intent on devouring them all."
+    },
+    {
+      "id": "willard-1971",
+      "slug": "willard-1971",
+      "title": "Willard",
+      "releaseYear": 1971,
+      "runtimeMinutes": 95,
+      "genres": [
+        "Horror",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/uhDAH8JRO9R1ROjSH24GoJPaJBJ.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/goim0tvdXQBnCRv6unuGc0v0Xvh.jpg",
+      "posterAlt": "Poster image for Willard.",
+      "externalIds": {
+        "tmdb": "42532",
+        "imdb": "tt0067991"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A social misfit, Willard is made fun of by his co-workers, and squeezed out of the company started by his deceased father by his boss. His only friends are a couple of rats he raised at home, Ben and Socrates. However, when one of them is killed at work, he goes on a rampage using his rats to attack those who have been tormenting him."
+    },
+    {
+      "id": "alien-invasion-s-u-m-1-2017",
+      "slug": "alien-invasion-s-u-m-1-2017",
+      "title": "Alien Invasion: S.U.M.1",
+      "releaseYear": 2017,
+      "runtimeMinutes": 95,
+      "genres": [
+        "Science Fiction"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/RSEWZD65hUkfl4vwx75DYiVcet.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/x9bnxn4vEPzEdNca79wcZFKuxeg.jpg",
+      "posterAlt": "Poster image for Alien Invasion: S.U.M.1.",
+      "externalIds": {
+        "tmdb": "457665",
+        "imdb": "tt4279116"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "An aggressive race of aliens took over Planet Earth and humanity's at its end, living in giant bunkers below ground. Young Military rookie S.U.M.1 (Iwan Rheon) is sent to the surface to save a group of unprotected survivors."
+    },
+    {
+      "id": "day-of-the-animals-1977",
+      "slug": "day-of-the-animals-1977",
+      "title": "Day of the Animals",
+      "releaseYear": 1977,
+      "runtimeMinutes": 97,
+      "genres": [
+        "Science Fiction",
+        "Horror"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/ceU1f2Jg0KCPj3VAPPpsMz36uP2.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/h914VysrTeJz9ZtOwse6ZCvUZml.jpg",
+      "posterAlt": "Poster image for Day of the Animals.",
+      "externalIds": {
+        "tmdb": "64976",
+        "imdb": "tt0075913"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The depletion of the earth's ozone layer causes animals above the altitude of 5000 feet to run amok, which is very unfortunate for a group of hikers who get dropped off up there by helicopter just before the quarantine is announced."
+    },
+    {
+      "id": "el-norte-1983",
+      "slug": "el-norte-1983",
+      "title": "El Norte",
+      "releaseYear": 1983,
+      "runtimeMinutes": 141,
+      "genres": [
+        "Adventure",
+        "Drama"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/bgpz7gTpWmmBb26CcjVtiPE7Kfo.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/5G54yKy3A6MFfwzQ5Q6rrYyjvrY.jpg",
+      "posterAlt": "Poster image for El Norte.",
+      "externalIds": {
+        "tmdb": "17435",
+        "imdb": "tt0085482"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Brother and sister Enrique and Rosa flee persecution at home in Guatemala and journey north, through Mexico and on to the United States, with the dream of starting a new life."
+    },
+    {
+      "id": "your-friend-the-rat-2007",
+      "slug": "your-friend-the-rat-2007",
+      "title": "Your Friend the Rat",
+      "releaseYear": 2007,
+      "runtimeMinutes": 11,
+      "genres": [
+        "Animation",
+        "Family",
+        "Comedy",
+        "Documentary"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/sgjkYw2LLdsMzCuhKDZBYbhe7QB.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/2oqiYVnxApzeGNC7hFprr2EHJdi.jpg",
+      "posterAlt": "Poster image for Your Friend the Rat.",
+      "externalIds": {
+        "tmdb": "13061",
+        "imdb": "tt1134859"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Let's face it, rats are not the most beloved creatures on earth. However, maybe this little tale about the history of human and rat interaction will change the world's tune. At least that is the hope of Remy, the star of Ratatouille, and his reluctant brother Emile as they guide us through world history from a rat's perspective. Why can't we all just get along?"
+    },
+    {
+      "id": "the-phantom-of-the-opera-1962",
+      "slug": "the-phantom-of-the-opera-1962",
+      "title": "The Phantom of the Opera",
+      "releaseYear": 1962,
+      "runtimeMinutes": 84,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/sLNKIDXC9dFt9EnjNFxYMctZH1z.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/3mzii3oIuePoXCl1Y961IUUj2iv.jpg",
+      "posterAlt": "Poster image for The Phantom of the Opera.",
+      "externalIds": {
+        "tmdb": "46330",
+        "imdb": "tt0056347"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A London opera house is haunted by tragic events on its opening night, but when its star is kidnapped, a producer tracks down the Phantom who is intent on seeking his revenge."
+    },
+    {
+      "id": "the-food-of-the-gods-1976",
+      "slug": "the-food-of-the-gods-1976",
+      "title": "The Food of the Gods",
+      "releaseYear": 1976,
+      "runtimeMinutes": 88,
+      "genres": [
+        "Horror",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/1aalvl6E6Ruz9S4B9UOPONytqyR.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xeXkl6xhaCZgfPsCQpHotZVLozU.jpg",
+      "posterAlt": "Poster image for The Food of the Gods.",
+      "externalIds": {
+        "tmdb": "42245",
+        "imdb": "tt0074540"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Morgan and his friends are on a hunting trip on a remote Canadian island when they are attacked by a swarm of giant wasps. Looking for help, Morgan stumbles across a barn inhabited by an enormous killer chicken. After doing some exploring, they discover the entire island is crawling with animals that have somehow grown to giant size. The most dangerous of all of these, however, are the rats, who are mobilizing to do battle with the human intruders."
+    },
+    {
+      "id": "the-phantom-of-the-opera-1998",
+      "slug": "the-phantom-of-the-opera-1998",
+      "title": "The Phantom of the Opera",
+      "releaseYear": 1998,
+      "runtimeMinutes": 104,
+      "genres": [
+        "Horror",
+        "Romance",
+        "Mystery"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/uHKKGS3jrPo6wTMhIuBDpWMi7VT.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/iw7WWV96g2mTQWPSRq5DuAdMlZK.jpg",
+      "posterAlt": "Poster image for The Phantom of the Opera.",
+      "externalIds": {
+        "tmdb": "10593",
+        "imdb": "tt0119889"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A series of terrifying accidents and brutal murders leave a bloody trail into the subterranean caverns of an Opera house. Below the theatre stalks a man raised by creatures of the underworld."
+    },
+    {
+      "id": "love-affair-or-the-case-of-the-missing-switchboard-operator-1967",
+      "slug": "love-affair-or-the-case-of-the-missing-switchboard-operator-1967",
+      "title": "Love Affair, or the Case of the Missing Switchboard Operator",
+      "releaseYear": 1967,
+      "runtimeMinutes": 69,
+      "genres": [
+        "Drama",
+        "Romance"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/yMt9UFVIiTfX5PIZNHzA5uE1uKw.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/wL8kf5WXBeNWcacQfQpoHLA05SI.jpg",
+      "posterAlt": "Poster image for Love Affair, or the Case of the Missing Switchboard Operator.",
+      "externalIds": {
+        "tmdb": "42696",
+        "imdb": "tt0061912"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "After many adventures, a young female switchboard operator starts a love relationship with a serious young man. But while he's away on business, she gets lonely and succumbs to her colleague's passes."
+    },
+    {
+      "id": "of-unknown-origin-1983",
+      "slug": "of-unknown-origin-1983",
+      "title": "Of Unknown Origin",
+      "releaseYear": 1983,
+      "runtimeMinutes": 88,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/btZt9kQIhYTsgoitcYFUhkEUmMl.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/9GItoC0VWXwzOUCmBXa9Zhc2rIn.jpg",
+      "posterAlt": "Poster image for Of Unknown Origin.",
+      "externalIds": {
+        "tmdb": "37227",
+        "imdb": "tt0086036"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A man who recently completed rebuilding a townhouse becomes obsessed with a rat infestation until it becomes an interspecies duel."
+    },
+    {
+      "id": "the-wind-in-the-willows-1996",
+      "slug": "the-wind-in-the-willows-1996",
+      "title": "The Wind in the Willows",
+      "releaseYear": 1996,
+      "runtimeMinutes": 88,
+      "genres": [
+        "Fantasy",
+        "Comedy",
+        "Family",
+        "Adventure"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/nsOM52BsDeHzc0yI27bah2OWems.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/rzjexcxnYvATkfeyRE7ujpiA7Al.jpg",
+      "posterAlt": "Poster image for The Wind in the Willows.",
+      "externalIds": {
+        "tmdb": "47168",
+        "imdb": "tt0118172"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Jailed for his reckless driving, rambunctious Mr. Toad has to escape from prison when his beloved Toad Hall comes under threat from the wily weasels, who plan to build a dog food factory on the very meadow sold to them by Toad himself."
+    },
+    {
+      "id": "the-premature-burial-1962",
+      "slug": "the-premature-burial-1962",
+      "title": "The Premature Burial",
+      "releaseYear": 1962,
+      "runtimeMinutes": 81,
+      "genres": [
+        "Horror",
+        "Drama",
+        "Mystery",
+        "Thriller"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/lHy5kqRrLPKnO61HG2xehGW9oLX.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/4wlsQhrSPKI1ogfcPZJ5EZXtqEI.jpg",
+      "posterAlt": "Poster image for The Premature Burial.",
+      "externalIds": {
+        "tmdb": "29235",
+        "imdb": "tt0056368"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "An artist grows distant from his new wife as an irrational fear of premature burial consumes him."
+    },
+    {
+      "id": "truly-madly-deeply-1991",
+      "slug": "truly-madly-deeply-1991",
+      "title": "Truly Madly Deeply",
+      "releaseYear": 1991,
+      "runtimeMinutes": 106,
+      "genres": [
+        "Fantasy",
+        "Drama",
+        "Comedy",
+        "Romance"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/jjLEXLTXfJPYtl31knRS8bjclf0.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/GFi1vzXUncFnxfUITfxVBDv8N4.jpg",
+      "posterAlt": "Poster image for Truly Madly Deeply.",
+      "externalIds": {
+        "tmdb": "18317",
+        "imdb": "tt0103129"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Nina is totally heartbroken at the death of her boyfriend Jamie, but is even more unprepared for his return as a ghost. At first it's almost as good as it used to be – hey, even the rats that infested her house have disappeared. But Jamie starts bringing ghostly friends home and behaving more and more oddly."
+    },
+    {
+      "id": "rats-2003",
+      "slug": "rats-2003",
+      "title": "Rats",
+      "releaseYear": 2003,
+      "runtimeMinutes": 92,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/uVP3Ssc4CJBqT1D7bO5ATm23fkd.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/uVP3Ssc4CJBqT1D7bO5ATm23fkd.jpg",
+      "posterAlt": "Poster image for Rats.",
+      "externalIds": {
+        "tmdb": "29556",
+        "imdb": "tt0277986"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The Brookedale Psychiatric Hospital is a crumbling institution which barely has enough money to remain open. Formerly a prison, it sits atop a warren of tunnels and sewage system viaducts. But Brookdale has a secret - a secret known by only one person. There's something living in the tunnels - something that's developed a taste for human blood..."
+    },
+    {
+      "id": "the-highway-rat-2018",
+      "slug": "the-highway-rat-2018",
+      "title": "The Highway Rat",
+      "releaseYear": 2018,
+      "runtimeMinutes": 25,
+      "genres": [
+        "Family",
+        "Animation",
+        "Comedy",
+        "TV Movie"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/dxNKtY0e5pm6BFCdDMP3riRVBTb.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/muXYdzOL7DSlzoWYuu6QOCdy7vZ.jpg",
+      "posterAlt": "Poster image for The Highway Rat.",
+      "externalIds": {
+        "tmdb": "494603",
+        "imdb": "tt7546096"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The tale of a ravenous rat who craves buns, biscuits and all sweet things. Tearing along the highway, he searches for sugary treats to steal, until his sweet tooth leads him to a sticky end."
+    },
+    {
+      "id": "tales-of-the-riverbank-2008",
+      "slug": "tales-of-the-riverbank-2008",
+      "title": "Tales of the Riverbank",
+      "releaseYear": 2008,
+      "runtimeMinutes": 76,
+      "genres": [
+        "Animation",
+        "Family"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/xgH4e8Lcmf98gokwTe99193ZxQf.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/jkbFBsPnskIC2piW7xevUJe691z.jpg",
+      "posterAlt": "Poster image for Tales of the Riverbank.",
+      "externalIds": {
+        "tmdb": "38401",
+        "imdb": "tt1043748"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Tales of the Riverbank tells the story of three friends - Hammy Hamster, Roderick Rat and GP the Guinea Pig - who, having swept down the river in a violent storm, embark on an epic journey in search of their lost homes. Their journey, full of comic incident and dramatic danger, becomes even more precarious when they discover that the whole riverbank is threatened by a waffle, Marmalade and Doughnut (WMD) factory which, owned by the evil Fat Cats, is polluting the countryside with increasingly dangerous emissions...the Big Dirt!"
+    },
+    {
+      "id": "oss-117-panic-in-bangkok-1964",
+      "slug": "oss-117-panic-in-bangkok-1964",
+      "title": "OSS 117: Panic in Bangkok",
+      "releaseYear": 1964,
+      "runtimeMinutes": 118,
+      "genres": [
+        "Action",
+        "Crime"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/eZ6FPs1OqDYsxbpXk0zrv7yiev3.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/4a1N1lXEOCiREWo0QNHTRmwew0g.jpg",
+      "posterAlt": "Poster image for OSS 117: Panic in Bangkok.",
+      "externalIds": {
+        "tmdb": "115082",
+        "imdb": "tt0140834"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A secret agent sets out to stop an evil scientist who is about to unleash on the world a virulent biological strain he has developed during experiments on rats."
+    },
+    {
+      "id": "hood-rat-2001",
+      "slug": "hood-rat-2001",
+      "title": "Hood Rat",
+      "releaseYear": 2001,
+      "runtimeMinutes": 87,
+      "genres": [
+        "Action",
+        "Thriller",
+        "Horror",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-teal-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/bSvOruo67gjkciJGBSllpQ9pwiw.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/vrQNbWXgSDPFh0z9nkrPrGWysbk.jpg",
+      "posterAlt": "Poster image for Hood Rat.",
+      "externalIds": {
+        "tmdb": "73807",
+        "imdb": "tt0277370"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Think of it as Willard in the hood, the debut feature from director Leslie Small finds a Isaiah Washington playing a kindly man who turns maniacal with revenge and enlists the help of some man-eating rodents. Living in a rat-infested apartment building, Max is pushed to the edge when his handicapped brother is killed due to the conditions of the inner-city slum. With the rats as his willing soldiers, Max sets out to avenge the senseless death. Hood Rat also stars rapper-turned-actor Ice-T."
+    },
+    {
+      "id": "the-rats-2002",
+      "slug": "the-rats-2002",
+      "title": "The Rats",
+      "releaseYear": 2002,
+      "runtimeMinutes": 94,
+      "genres": [
+        "Horror",
+        "Science Fiction",
+        "TV Movie"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/7XXsqPK8m8brdsFcPlgmVIbqVCA.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/jiyfBgEnX13SGIiEVeO19Khp7er.jpg",
+      "posterAlt": "Poster image for The Rats.",
+      "externalIds": {
+        "tmdb": "28594",
+        "imdb": "tt0282418"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A clan of evil rats overtakes a Manhattan department store and threatens to overrun the city."
+    },
+    {
+      "id": "castle-of-purity-1973",
+      "slug": "castle-of-purity-1973",
+      "title": "Castle of Purity",
+      "releaseYear": 1973,
+      "runtimeMinutes": 110,
+      "genres": [
+        "Drama"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/lkJX8gEpbME4a5iDUlr8xYNqLVu.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/8Klg7fisTMkgYT2QJE9abFLgD3P.jpg",
+      "posterAlt": "Poster image for Castle of Purity.",
+      "externalIds": {
+        "tmdb": "47582",
+        "imdb": "tt0068348"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A disciplined and sexually driven man forces his family to stay isolated in their home in order to protect them from the “evil nature” of human beings."
+    },
+    {
+      "id": "deadly-eyes-1982",
+      "slug": "deadly-eyes-1982",
+      "title": "Deadly Eyes",
+      "releaseYear": 1982,
+      "runtimeMinutes": 87,
+      "genres": [
+        "Horror",
+        "Science Fiction",
+        "Thriller"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/6lBpTv2bIOZsqxWM4naEqdCMzHH.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/nMfMWPq0cnBvrxbzVjmhJuCWi3n.jpg",
+      "posterAlt": "Poster image for Deadly Eyes.",
+      "externalIds": {
+        "tmdb": "49332",
+        "imdb": "tt0083801"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Corn grain contaminated with steroids produces large rats the size of small dogs who begin feeding on the residents of Toronto. Paul, a college basketball coach, teams up with Kelly, a local health inspector, to uncover the source of the mysterious rat attacks and they eventually try to prevent the opening of a new subway line as well as find the mutant rats nest quickly, or there will be a huge massacre of the entire city!"
+    },
+    {
+      "id": "rats-night-of-terror-1984",
+      "slug": "rats-night-of-terror-1984",
+      "title": "Rats: Night of Terror",
+      "releaseYear": 1984,
+      "runtimeMinutes": 97,
+      "genres": [
+        "Horror",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-teal-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/aa2pwEECMyKDjaGwTfpBhLR8TKL.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/rJJPtDRiglOMrGkclhQg64hYjey.jpg",
+      "posterAlt": "Poster image for Rats: Night of Terror.",
+      "externalIds": {
+        "tmdb": "83223",
+        "imdb": "tt0086176"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "One hundred years after a nuclear war has devastated the planet, society has been reborn into two factions; the underground society and the scavangers above in the wastelands. A group of scavangers on bikes come across a town infested with flesh eating rats, and soon the gore is spilling everywhere."
+    },
+    {
+      "id": "mulberry-street-2006",
+      "slug": "mulberry-street-2006",
+      "title": "Mulberry Street",
+      "releaseYear": 2006,
+      "runtimeMinutes": 84,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/lFj91spTLqP5nqj82q0pNWTqi7Q.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/uOXblZjvwKP305AQjGCW2RIE50M.jpg",
+      "posterAlt": "Poster image for Mulberry Street.",
+      "externalIds": {
+        "tmdb": "17245",
+        "imdb": "tt0473514"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A deadly infection breaks out in Manhattan, causing humans to devolve into blood-thirsty rat creatures. Six recently evicted tenants must survive the night and protect their downtown apartment building as the city quickly spirals out of control."
+    },
+    {
+      "id": "food-of-the-gods-ii-1989",
+      "slug": "food-of-the-gods-ii-1989",
+      "title": "Food of the Gods II",
+      "releaseYear": 1989,
+      "runtimeMinutes": 91,
+      "genres": [
+        "Horror",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/qraPjfqWfNNBQsXIqRfCTv52LMw.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/kFzsCAntTMa8TpJwD6mkdb3BJdC.jpg",
+      "posterAlt": "Poster image for Food of the Gods II.",
+      "externalIds": {
+        "tmdb": "68347",
+        "imdb": "tt0097371"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A growth hormone experiment gets out of hand, when the the resulting giant man-eating rats escape, reaking havoc on the unsuspecting campus. Much blood-letting follows."
+    },
+    {
+      "id": "junkrat-train-2021",
+      "slug": "junkrat-train-2021",
+      "title": "Junkrat Train",
+      "releaseYear": 2021,
+      "runtimeMinutes": 92,
+      "genres": [
+        "Horror",
+        "Thriller",
+        "Mystery"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/oD51TucgNiQfNI35h5sWSCucH1I.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/kCuWouYYRRdWBrYIrnIwgoxfLsN.jpg",
+      "posterAlt": "Poster image for Junkrat Train.",
+      "externalIds": {
+        "tmdb": "783701",
+        "imdb": "tt15450156"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A Chinese Department of Health junior clerk Su Zhenghuai is with his eldest daughter Su Wei and son Su Yuexuan are on their way to visit relatives in the provincial city when they meet the long-lost second daughter Su Ling. Unfortunately, the train is attacked by rats. Su Yuexuan is bitten by a rat and goes into a coma. In order to save his young son and many bitten passengers, Su Zhenghuai and Su Wei decide to make the dangerous venture to Xiaobaihe Hospital to get medicine."
+    },
+    {
+      "id": "the-shadow-of-the-cat-1961",
+      "slug": "the-shadow-of-the-cat-1961",
+      "title": "The Shadow of the Cat",
+      "releaseYear": 1961,
+      "runtimeMinutes": 79,
+      "genres": [
+        "Horror",
+        "Thriller"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/94KSOe2KWLvMSXyB4vOvNc29mSy.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/mGltZBHM7oUlwXTCIMFdaqo8RaZ.jpg",
+      "posterAlt": "Poster image for The Shadow of the Cat.",
+      "externalIds": {
+        "tmdb": "28720",
+        "imdb": "tt0055438"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Tabitha, once the placid, gentle and devoted pet, adopts all the characteristics of a ferocious, wild animal following the murder of her mistress. The three guilty people are all trapped by the cat's power and each will come to untimely deaths of horrific proportions without anyone being able to solve the mystery that surrounds their brutal death."
+    },
+    {
+      "id": "sitcom-1998",
+      "slug": "sitcom-1998",
+      "title": "Sitcom",
+      "releaseYear": 1998,
+      "runtimeMinutes": 80,
+      "genres": [
+        "Comedy",
+        "Drama",
+        "Thriller",
+        "Romance"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2rbWkcmHertfXMWUmn54px5DSjI.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/20eu7LBcBnQg6hmQLfp6jXd22go.jpg",
+      "posterAlt": "Poster image for Sitcom.",
+      "externalIds": {
+        "tmdb": "46761",
+        "imdb": "tt0157044"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The adventures of an upper-class suburban family abruptly confronted with the younger brother's discovery of his homosexuality, the elder sister's suicide attempt and sadomasochist tendencies, and the intrusion of a very free-spirited maid and her husband. And it all started with the arrival in the family of an innocent looking rat."
+    },
+    {
+      "id": "nutcracker-the-motion-picture-1986",
+      "slug": "nutcracker-the-motion-picture-1986",
+      "title": "Nutcracker: The Motion Picture",
+      "releaseYear": 1986,
+      "runtimeMinutes": 85,
+      "genres": [
+        "Family",
+        "Fantasy",
+        "Music"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rEskWZgPj4SCkTMJPDCYxP94CB.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/jFrIqkIcgiMKHLo7WXC2XRtiEkx.jpg",
+      "posterAlt": "Poster image for Nutcracker: The Motion Picture.",
+      "externalIds": {
+        "tmdb": "71316",
+        "imdb": "tt0091658"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "In this Pacific Northwest Ballet performance, it is Christmas Eve and festivities are underway. Clara is excited when her godfather arrives with a bag full of gifts, one of which is an intriguing wooden nutcracker. That night, while the household sleeps, Clara visits the Christmas tree to inspect her nutcracker and soon finds herself immersed in a dream world both dark and enchanting."
+    },
+    {
+      "id": "nezulla-the-rat-monster-2002",
+      "slug": "nezulla-the-rat-monster-2002",
+      "title": "Nezulla the Rat Monster",
+      "releaseYear": 2002,
+      "runtimeMinutes": 90,
+      "genres": [
+        "Horror",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/7b1xwVxU2FjY5U2JPuuaUrd6jGh.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/vtetU9B0NohjVOHVa0eP1kff41F.jpg",
+      "posterAlt": "Poster image for Nezulla the Rat Monster.",
+      "externalIds": {
+        "tmdb": "259979",
+        "imdb": "tt1306994"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A Japanese Company funded by the USA experimenting with anti-bacteriological weapons creates a mutated humanoid rat creature which becomes violent and murders the lab technicians. The lab is condemned and its horrifying experiments kept a secret. However the strange bacteria leak from the lab and spreads to the nearby inhabitants causing a humanoid epidemic! Three people are sent to the lab to uncover the US government conspiracy that unleashed a bloodthirsty monster beyond their wildest imagination."
+    },
+    {
+      "id": "criminal-act-1989",
+      "slug": "criminal-act-1989",
+      "title": "Criminal Act",
+      "releaseYear": 1989,
+      "runtimeMinutes": 93,
+      "genres": [
+        "Thriller",
+        "Horror",
+        "Crime"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/vJNSj9aLLib5vh35rGVKYIcUl4z.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/vJNSj9aLLib5vh35rGVKYIcUl4z.jpg",
+      "posterAlt": "Poster image for Criminal Act.",
+      "externalIds": {
+        "tmdb": "354401",
+        "imdb": "tt0097124"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Two investigative reporters track down reports of giant rats in a city sewer system."
+    },
+    {
+      "id": "rat-man-1988",
+      "slug": "rat-man-1988",
+      "title": "Rat Man",
+      "releaseYear": 1988,
+      "runtimeMinutes": 82,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/5bqFnf9wLJOFgKZIG7I1je3f2vP.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/jMT9D1ySJzYBzNfO5I983g0ky5Y.jpg",
+      "posterAlt": "Poster image for Rat Man.",
+      "externalIds": {
+        "tmdb": "94016",
+        "imdb": "tt0095942"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "After a model is brutally murdered on a Caribbean island, her sister's investigation uncovers a horrifying rat-like creature."
+    },
+    {
+      "id": "hunchback-of-the-morgue-1973",
+      "slug": "hunchback-of-the-morgue-1973",
+      "title": "Hunchback of the Morgue",
+      "releaseYear": 1973,
+      "runtimeMinutes": 82,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rhZFmQLYrhzuA9PT6kW9XARUB0G.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/qWuyJ9kaa2cUyXOL147BWklgDEN.jpg",
+      "posterAlt": "Poster image for Hunchback of the Morgue.",
+      "externalIds": {
+        "tmdb": "28409",
+        "imdb": "tt0068772"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A hunchback working in a morgue falls in love with a sick woman. He goes berserk when she dies and seeks help from a scientist to bring her back from the dead."
+    },
+    {
+      "id": "the-mutation-2021",
+      "slug": "the-mutation-2021",
+      "title": "The Mutation",
+      "releaseYear": 2021,
+      "runtimeMinutes": 87,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-teal-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/inorTD5FpesgGfono5S6tVyu8XD.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/njsbaSvQRfaV2r3JGxGpFvHqe8a.jpg",
+      "posterAlt": "Poster image for The Mutation.",
+      "externalIds": {
+        "tmdb": "801583",
+        "imdb": "tt12060172"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A mutated rat has been let loose in a city."
+    },
+    {
+      "id": "revenge-of-the-rats-2001",
+      "slug": "revenge-of-the-rats-2001",
+      "title": "Revenge of the Rats",
+      "releaseYear": 2001,
+      "runtimeMinutes": 104,
+      "genres": [
+        "Thriller",
+        "Horror",
+        "TV Movie"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/53sDr7EFyGR8hELvktef2lAMNkA.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/53sDr7EFyGR8hELvktef2lAMNkA.jpg",
+      "posterAlt": "Poster image for Revenge of the Rats.",
+      "externalIds": {
+        "tmdb": "36289",
+        "imdb": "tt0269764"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A municipal worker's strike combined with Frankfurt's hottest summer in 150 years brings infected rats out onto the streets."
+    },
+    {
+      "id": "tommy-can-t-sleep-2017",
+      "slug": "tommy-can-t-sleep-2017",
+      "title": "Tommy Can't Sleep",
+      "releaseYear": 2017,
+      "runtimeMinutes": 5,
+      "genres": [
+        "Horror",
+        "Music"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/mZDEf043NSb3HhVn9YgmpEVHdre.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/mZDEf043NSb3HhVn9YgmpEVHdre.jpg",
+      "posterAlt": "Poster image for Tommy Can't Sleep.",
+      "externalIds": {
+        "tmdb": "1259973",
+        "imdb": "tt7353582"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Little Tommy unable to sleep and not comforted by his parents over that matter is invited by mysterious Rat Girl to go down the rat hole."
+    },
+    {
+      "id": "the-pied-piper-1986",
+      "slug": "the-pied-piper-1986",
+      "title": "The Pied Piper",
+      "releaseYear": 1986,
+      "runtimeMinutes": 53,
+      "genres": [
+        "Animation",
+        "Fantasy",
+        "Drama"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/gw4ZXFrj1fuwbbtLwg9C7JAfEy4.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/cY3sSQRZZc7olOMYHVqeYAEGRvd.jpg",
+      "posterAlt": "Poster image for The Pied Piper.",
+      "externalIds": {
+        "tmdb": "82094",
+        "imdb": "tt0174834"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A darkly brilliant stop-motion adaptation of The Pied Piper of Hamelin about a plague of rats that punish townsfolk corrupt with greed.  One of Czechoslovakia's most ambitious animation projects of the 1980s, notable for its unusual dark art direction, innovative animation techniques and use of a fictitious language."
+    },
+    {
+      "id": "a-rat-in-the-darkness-1979",
+      "slug": "a-rat-in-the-darkness-1979",
+      "title": "A Rat in the Darkness",
+      "releaseYear": 1979,
+      "runtimeMinutes": 85,
+      "genres": [
+        "Horror",
+        "Mystery",
+        "Thriller"
+      ],
+      "posterTone": "bg-teal-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/r0qsCnynuE23gq4DmQnQH3KagLi.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/2TmSHeqIoqsTbheO5p2zLceWRWs.jpg",
+      "posterAlt": "Poster image for A Rat in the Darkness.",
+      "externalIds": {
+        "tmdb": "163279",
+        "imdb": "tt0290038"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Two sisters buy an old dark house, soon they discover it's haunted."
+    },
+    {
+      "id": "footrot-flats-the-dog-s-tale-1986",
+      "slug": "footrot-flats-the-dog-s-tale-1986",
+      "title": "Footrot Flats: The Dog's Tale",
+      "releaseYear": 1986,
+      "runtimeMinutes": 71,
+      "genres": [
+        "Comedy",
+        "Animation"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/6xWNTZx4ght4KToWu8rAQkEK80B.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/ylUeYaLRi4jahAHWN1DjUo38vP8.jpg",
+      "posterAlt": "Poster image for Footrot Flats: The Dog's Tale.",
+      "externalIds": {
+        "tmdb": "20579",
+        "imdb": "tt0131400"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Featuring the characters from Murray Ball's \"Footrot Flats\" (New Zealands most beloved local cartoon strip), questions to be answered include: Will Wal Footrot win the affections of Cheeky Hobson over the sleazy Spit Murphy? Will the Dog win the affections of the lovely Jess? Will Wal make a good impression on the selectors at Saturday's rugby match? Can Rangi and Pongo save Cooch's prize stag from the depths of Blackwater Station, home of the Murphys, their vicious dogs and deadly croco-pigs? All this and more will be answered as the small town of Raupo comes to life on the big screen."
+    },
+    {
+      "id": "ratburger-2017",
+      "slug": "ratburger-2017",
+      "title": "Ratburger",
+      "releaseYear": 2017,
+      "runtimeMinutes": 67,
+      "genres": [
+        "Adventure",
+        "Comedy",
+        "Family",
+        "TV Movie"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/myJfIWuo24PNrzfVP98xBjETSR.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/7zf7ztn8AChLHmdACNG67VWAJkA.jpg",
+      "posterAlt": "Poster image for Ratburger.",
+      "externalIds": {
+        "tmdb": "494566",
+        "imdb": "tt7136060"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A girl rescues a rat which a malevolent salesman wants to turn into a burger and feed the local schoolchildren with."
+    },
+    {
+      "id": "the-tale-of-the-rat-that-wrote-1999",
+      "slug": "the-tale-of-the-rat-that-wrote-1999",
+      "title": "The Tale of the Rat That Wrote",
+      "releaseYear": 1999,
+      "runtimeMinutes": 14,
+      "genres": [],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/opDVmdvjvnImEiU6tfyKETzKWak.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/opDVmdvjvnImEiU6tfyKETzKWak.jpg",
+      "posterAlt": "Poster image for The Tale of the Rat That Wrote.",
+      "externalIds": {
+        "tmdb": "745504",
+        "imdb": "tt0220086"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A Dickensian tale of rats, recompense and retribution."
+    },
+    {
+      "id": "the-rats-are-coming-the-werewolves-are-here-1972",
+      "slug": "the-rats-are-coming-the-werewolves-are-here-1972",
+      "title": "The Rats Are Coming! The Werewolves Are Here!",
+      "releaseYear": 1972,
+      "runtimeMinutes": 92,
+      "genres": [
+        "Horror",
+        "Mystery",
+        "Thriller"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/f3yBTXt112FyMPMUIrur2aFaU9Y.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/5maqKcb27QWhZiEf5wgbXG6Zk5x.jpg",
+      "posterAlt": "Poster image for The Rats Are Coming! The Werewolves Are Here!.",
+      "externalIds": {
+        "tmdb": "74826",
+        "imdb": "tt0069162"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The daughter in a family of werewolves decides to put an end to the family curse."
+    },
+    {
+      "id": "the-wind-in-the-willows-1900",
+      "slug": "the-wind-in-the-willows-1900",
+      "title": "The Wind in the Willows",
+      "releaseYear": 1900,
+      "runtimeMinutes": 92,
+      "genres": [
+        "Fantasy",
+        "Adventure",
+        "Family"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "backdropUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "posterAlt": "Poster image for The Wind in the Willows.",
+      "externalIds": {
+        "tmdb": "850538",
+        "imdb": "tt1600212"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Jailed for his reckless driving, rambunctious Mr. Toad has to escape from prison when his beloved Toad Hall comes under threat from the wily weasels, who plan to build a dog food factory on the very meadow sold to them by Toad himself."
+    },
+    {
+      "id": "beasts-during-barty-s-party-1976",
+      "slug": "beasts-during-barty-s-party-1976",
+      "title": "Beasts: During Barty's Party",
+      "releaseYear": 1976,
+      "runtimeMinutes": 49,
+      "genres": [
+        "Horror",
+        "TV Movie",
+        "Mystery",
+        "Drama"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/x10mWH8tkK6ktgwN2EDD1kwdItB.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/x10mWH8tkK6ktgwN2EDD1kwdItB.jpg",
+      "posterAlt": "Poster image for Beasts: During Barty's Party.",
+      "externalIds": {
+        "tmdb": "930057",
+        "imdb": "tt0520324"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A suburban couple are held under siege by a pack of frighteningly intelligent rats."
+    },
+    {
+      "id": "the-scarlet-worm-2011",
+      "slug": "the-scarlet-worm-2011",
+      "title": "The Scarlet Worm",
+      "releaseYear": 2011,
+      "runtimeMinutes": 93,
+      "genres": [
+        "Western"
+      ],
+      "posterTone": "bg-teal-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/qc0kYLczaCohzKJeoYtaTn51nQ1.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/qc0kYLczaCohzKJeoYtaTn51nQ1.jpg",
+      "posterAlt": "Poster image for The Scarlet Worm.",
+      "externalIds": {
+        "tmdb": "92127",
+        "imdb": "tt1711510"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "An aging killer trains a young hired gun in a plot to assassinate a meek brothel owner performing barbaric abortion acts on his prostitutes."
+    },
+    {
+      "id": "alice-s-picnic-1927",
+      "slug": "alice-s-picnic-1927",
+      "title": "Alice's Picnic",
+      "releaseYear": 1927,
+      "runtimeMinutes": 7,
+      "genres": [
+        "Animation"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rwYflV0XU43KlR6MiXx5cGJbuQK.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/rwYflV0XU43KlR6MiXx5cGJbuQK.jpg",
+      "posterAlt": "Poster image for Alice's Picnic.",
+      "externalIds": {
+        "tmdb": "374156",
+        "imdb": "tt0017615"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Alice and her friends decide to go to the park and have a picnic. Everything is going well until a gang of rats steals their food. Alice and her friends decide to go after the rats and get their food back."
+    },
+    {
+      "id": "wind-in-the-willows-1988",
+      "slug": "wind-in-the-willows-1988",
+      "title": "Wind in the Willows",
+      "releaseYear": 1988,
+      "runtimeMinutes": 49,
+      "genres": [
+        "Animation",
+        "Family",
+        "Comedy"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/cbyKD4muUXixILFtQdBVu7BtWXH.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/hWDRLWeVsIPvHf9W2hzGdMHorGX.jpg",
+      "posterAlt": "Poster image for Wind in the Willows.",
+      "externalIds": {
+        "tmdb": "50708",
+        "imdb": "tt0787244"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Based on Kenneth Grahame's classic children's yarn, this charming animated tale follows four colorful talking critters: the blithe Mr. Toad, the sensible Mole, the urbane Rat and the cranky but insightful Badger. When Mr. Toad's passion for cars lands him in dutch, it's up to his three woodland cohorts to bail him out and restore his reputation by outfoxing a horde of underhanded weasels."
+    },
+    {
+      "id": "monster-2019",
+      "slug": "monster-2019",
+      "title": "Monster",
+      "releaseYear": 2019,
+      "runtimeMinutes": 139,
+      "genres": [
+        "Drama",
+        "Comedy",
+        "Family"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/rimsU3RY7PpiDC7uG0iUUI3M6tv.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/nFUZQqghlWnvfpePtXTFZoXsAIa.jpg",
+      "posterAlt": "Poster image for Monster.",
+      "externalIds": {
+        "tmdb": "562696",
+        "imdb": "tt9077038"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A compassionate man faces a test of his faith from a rat that shows no sign of leaving his home."
+    },
+    {
+      "id": "the-rat-savior-1976",
+      "slug": "the-rat-savior-1976",
+      "title": "The Rat Savior",
+      "releaseYear": 1976,
+      "runtimeMinutes": 80,
+      "genres": [
+        "Science Fiction",
+        "Horror",
+        "Drama"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/y4IJmmYNzO0nRkkGtavK8cweayb.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xOMghIHzJHd69RnING3M5Zh1Nmq.jpg",
+      "posterAlt": "Poster image for The Rat Savior.",
+      "externalIds": {
+        "tmdb": "169250",
+        "imdb": "tt0074701"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A poor writer discovers that a species of rats has banded together to impersonate humans and supplant them unnoticed, in a manner reminiscent of the transformations in Eugene Ionesco's Rhinoceros, or the covert conspiracy of pod-people in The Invasion of the Body Snatchers. This film's story is based on a book by the Soviet writer Alexander Grin."
+    },
+    {
+      "id": "the-monster-of-camp-sunshine-or-how-i-learned-to-stop-worrying-a-1964",
+      "slug": "the-monster-of-camp-sunshine-or-how-i-learned-to-stop-worrying-a-1964",
+      "title": "The Monster of Camp Sunshine or How I Learned to Stop Worrying and Love Nature",
+      "releaseYear": 1964,
+      "runtimeMinutes": 75,
+      "genres": [
+        "Comedy",
+        "Horror"
+      ],
+      "posterTone": "bg-teal-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/5VCJgoTNmlnVQpJkakgCveYW9Oi.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/hRwkE0sYoV9CWZdNgSMpPVLbfmL.jpg",
+      "posterAlt": "Poster image for The Monster of Camp Sunshine or How I Learned to Stop Worrying and Love Nature.",
+      "externalIds": {
+        "tmdb": "95567",
+        "imdb": "tt0126456"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A scientist carelessly dumps some toxic waste into a river. The gardener at a nudist camp drinks the water, turns into a monster and attacks all the (female) nudists."
+    },
+    {
+      "id": "rat-scratch-fever-2011",
+      "slug": "rat-scratch-fever-2011",
+      "title": "Rat Scratch Fever",
+      "releaseYear": 2011,
+      "runtimeMinutes": 90,
+      "genres": [
+        "Science Fiction",
+        "Horror"
+      ],
+      "posterTone": "bg-amber-500",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/2S2TBxOylgjx17XUQvA4oxFWoYw.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/zFp5Ah6KRO524fdAz1lejYjSHnn.jpg",
+      "posterAlt": "Poster image for Rat Scratch Fever.",
+      "externalIds": {
+        "tmdb": "143192",
+        "imdb": "tt1311083"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Brought back from a doomed space mission, an army of giant rats develop a big appetite for Los Angeles residents."
+    },
+    {
+      "id": "rats-2016",
+      "slug": "rats-2016",
+      "title": "Rats",
+      "releaseYear": 2016,
+      "runtimeMinutes": 84,
+      "genres": [
+        "Documentary"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/plypMjxhpRo5IyMm9Pmlxj3WpJb.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xL0mMT8yZHEkY6KfhkFnNIXPHAf.jpg",
+      "posterAlt": "Poster image for Rats.",
+      "externalIds": {
+        "tmdb": "410794",
+        "imdb": "tt4033926"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Based on Robert Sullivan’s bestselling book, Morgan Spurlock and his team travel around the world to bring viewers face to face with rats while delving into humans’ complicated relationship with the creepy creatures."
+    },
+    {
+      "id": "dog-watch-1945",
+      "slug": "dog-watch-1945",
+      "title": "Dog Watch",
+      "releaseYear": 1945,
+      "runtimeMinutes": 7,
+      "genres": [
+        "Animation"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/ogA6xBDaewsRrVbQjJdMbtCMUP1.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/k92troVqGgUDOCEPOmB8DyjbGpb.jpg",
+      "posterAlt": "Poster image for Dog Watch.",
+      "externalIds": {
+        "tmdb": "68493",
+        "imdb": "tt0037649"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "As a ship's crew is on shore leave, seadog Pluto is left to stand watch. He sees a threatening shape, but it turns out to be a cache of bones. He grabs one and settles in contentedly. A rat sneaks on, and Pluto springs into action. The rat toys with him, until it finds the officer's mess. He bribes Pluto, until he hears an officer approaching. The rat hides, and Pluto gets thrown in the brig, while the rat sneaks off with his sandwich. But Pluto gets even."
+    },
+    {
+      "id": "growth-vitamin-1988",
+      "slug": "growth-vitamin-1988",
+      "title": "Growth Vitamin",
+      "releaseYear": 1988,
+      "runtimeMinutes": 6,
+      "genres": [
+        "Animation",
+        "Comedy"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/pV3whfrqEPh8XM3qeSm2ZjoQr0j.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/pV3whfrqEPh8XM3qeSm2ZjoQr0j.jpg",
+      "posterAlt": "Poster image for Growth Vitamin.",
+      "externalIds": {
+        "tmdb": "273956",
+        "imdb": "tt4131060"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The teacher at school made a scientific experiment - he put two rats in different cages. One of the rats was given carrots containing vitamin of growth, and the other did not feed. Time passed, and the rat, to whom nothing was given, became thicker than the rat that was fed. It turned out that one student from pity fed another rat."
+    },
+    {
+      "id": "a-short-vision-1956",
+      "slug": "a-short-vision-1956",
+      "title": "A Short Vision",
+      "releaseYear": 1956,
+      "runtimeMinutes": 6,
+      "genres": [
+        "Animation",
+        "War",
+        "Horror"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/d8XLAzWaBmA1OluP3QRG75vLjcm.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/wNKyJEcXhaZ7IWpGSf2r0YHfYZ5.jpg",
+      "posterAlt": "Poster image for A Short Vision.",
+      "externalIds": {
+        "tmdb": "326545",
+        "imdb": "tt1446470"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The leaders, the wise men, the leopard, the deer, the owl and the rat all look up in the sky in fear as a strange object flies through the sky."
+    },
+    {
+      "id": "rat-film-2016",
+      "slug": "rat-film-2016",
+      "title": "Rat Film",
+      "releaseYear": 2016,
+      "runtimeMinutes": 82,
+      "genres": [
+        "Documentary"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/xueQOFVFmRY7Fgulc1PRRNYTXjX.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/2pDkhrRKCEhjcq55RVr4hIXuGRN.jpg",
+      "posterAlt": "Poster image for Rat Film.",
+      "externalIds": {
+        "tmdb": "409109",
+        "imdb": "tt5840448"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Across walls, fences, and alleys, rats not only expose our boundaries of separation but make homes in them. \"Rat Film\" is a feature-length documentary that uses the rat—as well as the humans that love them, live with them, and kill them--to explore the history of Baltimore."
+    },
+    {
+      "id": "vilddyr-2010",
+      "slug": "vilddyr-2010",
+      "title": "Vilddyr",
+      "releaseYear": 2010,
+      "runtimeMinutes": 30,
+      "genres": [
+        "Drama",
+        "Horror",
+        "Mystery",
+        "Fantasy"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/97NcJXZf1t2ikgAiYOl2ITKTJ5N.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/97NcJXZf1t2ikgAiYOl2ITKTJ5N.jpg",
+      "posterAlt": "Poster image for Vilddyr.",
+      "externalIds": {
+        "tmdb": "198085",
+        "imdb": "tt1734495"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "After a violent episode in biology class, the outsider Lykke begins to change. There is something very wrong and soon a big showdown with the outside world awaits. The beast in her has been awakened."
+    },
+    {
+      "id": "rats-1900",
+      "slug": "rats-1900",
+      "title": "Rats!",
+      "releaseYear": 1900,
+      "runtimeMinutes": 92,
+      "genres": [
+        "Horror"
+      ],
+      "posterTone": "bg-amber-800",
+      "posterUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "backdropUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "posterAlt": "Poster image for Rats!.",
+      "externalIds": {
+        "tmdb": "1473962",
+        "imdb": "tt36770530"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "New York City races against time to stop a killer rat infestation unlike anything the world has ever seen."
+    },
+    {
+      "id": "the-rat-thing-2007",
+      "slug": "the-rat-thing-2007",
+      "title": "The Rat Thing",
+      "releaseYear": 2007,
+      "runtimeMinutes": 99,
+      "genres": [
+        "Comedy"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/nypmiK08Nuh194pe3nymsHQwDx1.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/nypmiK08Nuh194pe3nymsHQwDx1.jpg",
+      "posterAlt": "Poster image for The Rat Thing.",
+      "externalIds": {
+        "tmdb": "367820",
+        "imdb": "tt0982917"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Two down and out friends living in Venice, California, struggle in social and economic deprivation. They reach the point where they can't go on. Escalating pressures force them to hatch a wild get-rich-quick scheme in a last ditch attempt to solve \"all of their problems\". The far-fetched scheme involves one of them being bitten by a rat in a major supermarket with the fantastical hopes of winning an outrageously huge settlement. What transpires is a perfect example of \"the best laid plans of mice and men\" where reality trumps delusion and, in one comic turn after another, depravity gives way to humanity."
+    },
+    {
+      "id": "lili-2008",
+      "slug": "lili-2008",
+      "title": "Lili",
+      "releaseYear": 2008,
+      "runtimeMinutes": 14,
+      "genres": [
+        "Animation",
+        "War"
+      ],
+      "posterTone": "bg-orange-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/xW2huqhwE36Mw8Oo5Cnhkgz00S6.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/xW2huqhwE36Mw8Oo5Cnhkgz00S6.jpg",
+      "posterAlt": "Poster image for Lili.",
+      "externalIds": {
+        "tmdb": "837291",
+        "imdb": "tt1758693"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A herd of war-torn and hungry rats tries to get an answer to the question of who is Lili Marleen from a mortally wounded young soldier stuck in a projectile funnel. Is it a reminder of first love or first relationship with a prostitute earning her daily bread? Lili Marleen is not just a distant heroine from a song. Every soldier boy has her own Lili, be it his first love from school or just an imagination. But always, no matter what happens, she is waiting for her soldier underneath the lantern by the barrack gate..."
+    },
+    {
+      "id": "alice-the-piper-1924",
+      "slug": "alice-the-piper-1924",
+      "title": "Alice the Piper",
+      "releaseYear": 1924,
+      "runtimeMinutes": 7,
+      "genres": [
+        "Animation"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/iP9TZ7GnE50AQYSTCQRSM8ShgkI.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/iP9TZ7GnE50AQYSTCQRSM8ShgkI.jpg",
+      "posterAlt": "Poster image for Alice the Piper.",
+      "externalIds": {
+        "tmdb": "374133",
+        "imdb": "tt0014658"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The rats are out of control in Hamlin; they've taken over the kitchen, but when they take over the King's bedroom, that's the last straw. He posts a $5 reward, which the rats change to $5,000. Alice and Julius accept the challenge; they play a tune and the rats gather around, but they won't fall for the old \"follow me into the river\" trick. Fortunately, a very powerful vacuum cleaner is nearby, and Alice and Julius suck all the rats into it. The king gives them their reward: $5."
+    },
+    {
+      "id": "the-war-1987",
+      "slug": "the-war-1987",
+      "title": "The War",
+      "releaseYear": 1987,
+      "runtimeMinutes": 15,
+      "genres": [
+        "Animation",
+        "War"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/zoNnKl3hGWvxWo3zYAwnIRs384T.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/zoNnKl3hGWvxWo3zYAwnIRs384T.jpg",
+      "posterAlt": "Poster image for The War.",
+      "externalIds": {
+        "tmdb": "523085",
+        "imdb": "tt0452418"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "The protagonist of the film is the Bat living in an old mill and fighting rats and crows. It’s the war fought by disproportioned forces, where the battle is won by cleverness, skill and cunning. Somewhere outside the mill another war is fought."
+    },
+    {
+      "id": "rat-city-2023",
+      "slug": "rat-city-2023",
+      "title": "Rat City",
+      "releaseYear": 2023,
+      "runtimeMinutes": 43,
+      "genres": [
+        "Documentary"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/gLntSD2NlEN2nQQBUxAjKVPTAw1.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/gLntSD2NlEN2nQQBUxAjKVPTAw1.jpg",
+      "posterAlt": "Poster image for Rat City.",
+      "externalIds": {
+        "tmdb": "1620758",
+        "imdb": "tt30295285"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "They climb, squeeze through crevices, bite through lead pipes and conquer their environment again and again. A scientific journey of discovery into the world of rats."
+    },
+    {
+      "id": "metalstasis-2001",
+      "slug": "metalstasis-2001",
+      "title": "Metalstasis",
+      "releaseYear": 2001,
+      "runtimeMinutes": 8,
+      "genres": [
+        "Animation",
+        "Drama",
+        "Science Fiction"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/pAC9Licnzk2JGZmSX6j7Tv2i27z.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/gXGUAgR75rYhdpA818VZky9RzIO.jpg",
+      "posterAlt": "Poster image for Metalstasis.",
+      "externalIds": {
+        "tmdb": "327292",
+        "imdb": "tt0385090"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "An animated science-fiction short directed by Matthew Hood. A mechanical man finds his routine of life disturbed by illness from an unusual source."
+    },
+    {
+      "id": "les-rats-2015",
+      "slug": "les-rats-2015",
+      "title": "Les Rats",
+      "releaseYear": 2015,
+      "runtimeMinutes": 10,
+      "genres": [
+        "Animation"
+      ],
+      "posterTone": "bg-stone-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/qdPhyU8dgYofxHPQC1GbKch87g7.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/qdPhyU8dgYofxHPQC1GbKch87g7.jpg",
+      "posterAlt": "Poster image for Les Rats.",
+      "externalIds": {
+        "tmdb": "483409",
+        "imdb": "tt7497872"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Imported from TMDB because the title is tagged with the “rat” keyword; overview unavailable."
+    },
+    {
+      "id": "living-without-menace-2022",
+      "slug": "living-without-menace-2022",
+      "title": "Living Without Menace",
+      "releaseYear": 2022,
+      "runtimeMinutes": 44,
+      "genres": [
+        "Documentary"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/y1aCnHJYIV8Er57OyUCN5H5fiBr.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/7WIKE6iLxvAgplxWYJD2b4nmDDM.jpg",
+      "posterAlt": "Poster image for Living Without Menace.",
+      "externalIds": {
+        "tmdb": "1029414",
+        "imdb": "tt32654619"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Since 1950, Alberta's fabled Rat Patrol has kept the province rat-free. But as pest control meets ecology in the 21st century, what does the future hold for this mythic institution and their \"enemy?\""
+    },
+    {
+      "id": "caracas-2006",
+      "slug": "caracas-2006",
+      "title": "Caracas",
+      "releaseYear": 2006,
+      "runtimeMinutes": 9,
+      "genres": [
+        "Adventure",
+        "Animation"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "backdropUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "posterAlt": "Poster image for Caracas.",
+      "externalIds": {
+        "tmdb": "346966",
+        "imdb": "tt2364730"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A marine adventure on the persecution of dreams becomes a pretext to play with art forms."
+    },
+    {
+      "id": "ratgirl-2025",
+      "slug": "ratgirl-2025",
+      "title": "Ratgirl",
+      "releaseYear": 2025,
+      "runtimeMinutes": 19,
+      "genres": [
+        "Drama"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/kjRNnBYBjqHPWXzyiMYEijfMThQ.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xQSrT12x7SColewNKtHUFKYzkAo.jpg",
+      "posterAlt": "Poster image for Ratgirl.",
+      "externalIds": {
+        "tmdb": "1227845",
+        "imdb": "tt30743247"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Ratgirl, a diffident 19 year-old woman, as she and her older roommate Alice discover their apartment is infested with rats — a claim which is adamantly ignored by their miserly landlord. Over the course of a hellish fourty-eight hours, Ratgirl unconfidently navigates sexual harassment, housing instability, ex-friendships, and suppressed mental illness."
+    },
+    {
+      "id": "jerry-on-the-job-cheating-the-piper-1920",
+      "slug": "jerry-on-the-job-cheating-the-piper-1920",
+      "title": "Jerry on the Job: Cheating the Piper",
+      "releaseYear": 1920,
+      "runtimeMinutes": 4,
+      "genres": [
+        "Comedy",
+        "Animation"
+      ],
+      "posterTone": "bg-lime-700",
+      "posterUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "backdropUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "posterAlt": "Poster image for Jerry on the Job: Cheating the Piper.",
+      "externalIds": {
+        "tmdb": "313949",
+        "imdb": "tt1669096"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "When the New Monia station is overrun with mice, Mr. Givney can only shoot them one at a time, but Jerry uses a flute to lure them out, \"Pied Piper of Hamlin\" style."
+    },
+    {
+      "id": "las-aventuras-de-rataldo-2007",
+      "slug": "las-aventuras-de-rataldo-2007",
+      "title": "Las Aventuras de Rataldo",
+      "releaseYear": 2007,
+      "runtimeMinutes": 92,
+      "genres": [
+        "Family",
+        "Comedy"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/thwDDPxhHkV8fpz9K7YZeziXML3.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w500/thwDDPxhHkV8fpz9K7YZeziXML3.jpg",
+      "posterAlt": "Poster image for Las Aventuras de Rataldo.",
+      "externalIds": {
+        "tmdb": "874918",
+        "imdb": "tt12123396"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Imported from TMDB because the title is tagged with the “rat” keyword; overview unavailable."
+    },
+    {
+      "id": "swiss-army-knife-with-rats-and-pigeons-1980",
+      "slug": "swiss-army-knife-with-rats-and-pigeons-1980",
+      "title": "Swiss Army Knife with Rats and Pigeons",
+      "releaseYear": 1980,
+      "runtimeMinutes": 6,
+      "genres": [
+        "Animation"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "backdropUrl": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+      "posterAlt": "Poster image for Swiss Army Knife with Rats and Pigeons.",
+      "externalIds": {
+        "tmdb": "211244",
+        "imdb": "tt0483175"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "Utilising an apparently new-found obsession with the colour red and reinvigorating some of the circular imagery of A Man and His Dog Out for Air and 69, Breer delves into the very basis of animation to explore how a variety of easily recognisable objects can be portrayed and manipulated differently using pixillation and classically drawn animation.  -Malcolm Turner"
+    },
+    {
+      "id": "one-rat-short-2006",
+      "slug": "one-rat-short-2006",
+      "title": "One Rat Short",
+      "releaseYear": 2006,
+      "runtimeMinutes": 10,
+      "genres": [
+        "Animation"
+      ],
+      "posterTone": "bg-emerald-700",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/idSAi3x30VjaDc86YOUb6v7iPwJ.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/nFgSpaKYE0rLtLUwCPmsbbGuK4o.jpg",
+      "posterAlt": "Poster image for One Rat Short.",
+      "externalIds": {
+        "tmdb": "38094",
+        "imdb": "tt0818125"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "A city rat pursues a nearly empty bag of cheese snacks  that's drifting in the breeze. His journey takes him through a vent into a highly mechanized rat lab, where one particular white female gets his attention."
+    },
+    {
+      "id": "uncle-sam-and-the-bolsheviki-i-w-w-rat-1919",
+      "slug": "uncle-sam-and-the-bolsheviki-i-w-w-rat-1919",
+      "title": "Uncle Sam and the Bolsheviki-I.W.W. Rat",
+      "releaseYear": 1919,
+      "runtimeMinutes": 1,
+      "genres": [
+        "Animation"
+      ],
+      "posterTone": "bg-yellow-600",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/ennywTZrLGz1x3RjXJhUbHUdhB0.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/5FySUIoTNeGGGjWVaLjNFgOK2Lk.jpg",
+      "posterAlt": "Poster image for Uncle Sam and the Bolsheviki-I.W.W. Rat.",
+      "externalIds": {
+        "tmdb": "174980",
+        "imdb": "tt1496024"
+      },
+      "metadata": {
+        "tagline": "",
+        "rating": "",
+        "director": "",
+        "originalLanguage": "",
+        "productionCountries": [],
+        "metadataProvider": "TMDB keyword seed",
+        "lastSyncedAt": "2026-05-06"
+      },
+      "summary": "This short 1919 cartoon, produced by Ford Motor Company, shows a farmer Uncle Sam braining a huge rat branded with \"I.W.W.\" (Industrial Workers of the World) before it can eat the grain."
+    }
+  ],
+  "sightings": [
+    {
+      "id": "bulk-rat-2062",
+      "movieId": "ratatouille-2007",
+      "timestamp": "19%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Remy, a rat, possesses a palate far more refined than that of his fellow comrades. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/t3vaWRPSf6WjDSamIkKDs1iQWna.jpg",
+          "alt": "Ratatouille: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-427641",
+      "movieId": "rampage-2018",
+      "timestamp": "14%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Primatologist Davis Okoye shares an unshakable bond with George, the extraordinarily intelligent, silverback gorilla who has been in his care since birth. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/MGADip4thVSErP34FAAfzFBTZ5.jpg",
+          "alt": "Rampage: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-11619",
+      "movieId": "flushed-away-2006",
+      "timestamp": "82%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "London high-society mouse, Roddy is flushed down the toilet by Sid, a common sewer rat. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/kgoZI4xh38RrEYEPVib6a12UPLn.jpg",
+          "alt": "Flushed Away: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-308531",
+      "movieId": "teenage-mutant-ninja-turtles-out-of-the-shadows-2016",
+      "timestamp": "14%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "After supervillain Shredder escapes custody, he joins forces with mad scientist Baxter Stockman and two dimwitted henchmen, Bebop and Rocksteady, to unleash a diabolical plan to take over the world. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/euVaCiCWz3AALcQXHT6aUqdGUo6.jpg",
+          "alt": "Teenage Mutant Ninja Turtles: Out of the Shadows: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-653",
+      "movieId": "nosferatu-1922",
+      "timestamp": "88%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The mysterious Count Orlok summons a happily married real estate agent to his castle, located up in the Transylvanian mountains, to finalise a terrifying deal. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/zv7J85D8CC9qYagAEhPM63CIG6j.jpg",
+          "alt": "Nosferatu: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-9986",
+      "movieId": "charlotte-s-web-2006",
+      "timestamp": "33%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Wilbur the pig is scared of the end of the season, because he knows that come that time, he will end up on the dinner table. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/fU0IR5HF8KxQbZijuWKPTrY81Qv.jpg",
+          "alt": "Charlotte's Web: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-452507",
+      "movieId": "1922-2017",
+      "timestamp": "28%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A simple yet proud rancher conspires to murder his wife for financial gain, convincing his teenage son to participate. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/q4FQOiSRhTLWulHl5Vpg37FMArH.jpg",
+          "alt": "1922: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-20771",
+      "movieId": "kim-possible-movie-so-the-drama-2005",
+      "timestamp": "38%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Dr. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/rQ5WS0zWDRau2lI0FYpGYDGmDVS.jpg",
+          "alt": "Kim Possible Movie: So the Drama: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-42506",
+      "movieId": "the-housemaid-1960",
+      "timestamp": "47%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A piano composer's family moves into a new house; when his pregnant wife collapses from working to support the family, he hires a housemaid to help with housework. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/fFRG3soeb7ceKjWoXu4EFDc8grO.jpg",
+          "alt": "The Housemaid: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-1172674",
+      "movieId": "the-rat-catcher-2023",
+      "timestamp": "53%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "In an English village, a reporter and a mechanic listen to a ratcatcher explain his clever plan to outwit his prey. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/29WJ7dOHt48AtXK1J1rONEEvIMN.jpg",
+          "alt": "The Rat Catcher: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-676710",
+      "movieId": "the-amazing-maurice-2022",
+      "timestamp": "65%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Maurice is a streetwise ginger cat who comes up with a money-making scam by befriending a group of self-taught talking rats. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/ydhZeUjbzVEFclUpMhLfDZSavUY.jpg",
+          "alt": "The Amazing Maurice: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-31120",
+      "movieId": "fat-slags-2004",
+      "timestamp": "79%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Leaving their hometown of Fulchester in the North of England, Sandra and Tracey head for the bright lights of London, shagging and boozing their way to fame and fortune. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/ysb1ys1JtBHjDC2CjS06xv74JLD.jpg",
+          "alt": "Fat Slags: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-49852",
+      "movieId": "the-nutcracker-2010",
+      "timestamp": "89%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "In 1920s Vienna, a young girl receives a magical doll on Christmas Eve. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/8qpovUSOZiqFOpsHoByfKojI8iC.jpg",
+          "alt": "The Nutcracker: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-353979",
+      "movieId": "pet-2016",
+      "timestamp": "32%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A man bumps into an old crush and becomes obsessed. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/cO5debLXk54GhgXd92GVD0Hpinv.jpg",
+          "alt": "Pet: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-657149",
+      "movieId": "shimajiro-to-ururu-no-heroland-2019",
+      "timestamp": "84%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Hero Land is a world where you can meet the heroes and heroines you have been waiting for, created by the inventor girl \"Ururu\". Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/yGthNH49g4ezKLrn6cUNKygcbtz.jpg",
+          "alt": "Shimajiro to Ururu no Heroland: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-10929",
+      "movieId": "willard-2003",
+      "timestamp": "8%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Desperate for companionship, the repressed Willard befriends a group of rats that inhabit his late father's deteriorating mansion. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/hRVP8Ud9ehv7tp5WWQ4CHk2XNus.jpg",
+          "alt": "Willard: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-42476",
+      "movieId": "ben-1972",
+      "timestamp": "55%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A lonely boy becomes good friends with Ben, a rat. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/LvTapjbjdg9bGzt79hZAp2idcn.jpg",
+          "alt": "Ben: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-19158",
+      "movieId": "graveyard-shift-1990",
+      "timestamp": "41%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "John Hall is a drifter who wanders into a small town in Maine. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/vITvLxFsDbbg6TMgpYWWscMOf0G.jpg",
+          "alt": "Graveyard Shift: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-42532",
+      "movieId": "willard-1971",
+      "timestamp": "63%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A social misfit, Willard is made fun of by his co-workers, and squeezed out of the company started by his deceased father by his boss. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/uhDAH8JRO9R1ROjSH24GoJPaJBJ.jpg",
+          "alt": "Willard: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-457665",
+      "movieId": "alien-invasion-s-u-m-1-2017",
+      "timestamp": "40%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "An aggressive race of aliens took over Planet Earth and humanity's at its end, living in giant bunkers below ground. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/RSEWZD65hUkfl4vwx75DYiVcet.jpg",
+          "alt": "Alien Invasion: S.U.M.1: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-64976",
+      "movieId": "day-of-the-animals-1977",
+      "timestamp": "75%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The depletion of the earth's ozone layer causes animals above the altitude of 5000 feet to run amok, which is very unfortunate for a group of hikers who get dropped off up there by helicopter just before the quarantine is announced. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/ceU1f2Jg0KCPj3VAPPpsMz36uP2.jpg",
+          "alt": "Day of the Animals: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-17435",
+      "movieId": "el-norte-1983",
+      "timestamp": "16%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Brother and sister Enrique and Rosa flee persecution at home in Guatemala and journey north, through Mexico and on to the United States, with the dream of starting a new life. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/bgpz7gTpWmmBb26CcjVtiPE7Kfo.jpg",
+          "alt": "El Norte: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-13061",
+      "movieId": "your-friend-the-rat-2007",
+      "timestamp": "30%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Let's face it, rats are not the most beloved creatures on earth. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/sgjkYw2LLdsMzCuhKDZBYbhe7QB.jpg",
+          "alt": "Your Friend the Rat: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-46330",
+      "movieId": "the-phantom-of-the-opera-1962",
+      "timestamp": "65%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A London opera house is haunted by tragic events on its opening night, but when its star is kidnapped, a producer tracks down the Phantom who is intent on seeking his revenge. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/sLNKIDXC9dFt9EnjNFxYMctZH1z.jpg",
+          "alt": "The Phantom of the Opera: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-42245",
+      "movieId": "the-food-of-the-gods-1976",
+      "timestamp": "22%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Morgan and his friends are on a hunting trip on a remote Canadian island when they are attacked by a swarm of giant wasps. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/1aalvl6E6Ruz9S4B9UOPONytqyR.jpg",
+          "alt": "The Food of the Gods: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-10593",
+      "movieId": "the-phantom-of-the-opera-1998",
+      "timestamp": "46%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A series of terrifying accidents and brutal murders leave a bloody trail into the subterranean caverns of an Opera house. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/uHKKGS3jrPo6wTMhIuBDpWMi7VT.jpg",
+          "alt": "The Phantom of the Opera: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-42696",
+      "movieId": "love-affair-or-the-case-of-the-missing-switchboard-operator-1967",
+      "timestamp": "25%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "After many adventures, a young female switchboard operator starts a love relationship with a serious young man. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/yMt9UFVIiTfX5PIZNHzA5uE1uKw.jpg",
+          "alt": "Love Affair, or the Case of the Missing Switchboard Operator: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-37227",
+      "movieId": "of-unknown-origin-1983",
+      "timestamp": "30%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A man who recently completed rebuilding a townhouse becomes obsessed with a rat infestation until it becomes an interspecies duel. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/btZt9kQIhYTsgoitcYFUhkEUmMl.jpg",
+          "alt": "Of Unknown Origin: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-47168",
+      "movieId": "the-wind-in-the-willows-1996",
+      "timestamp": "25%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Jailed for his reckless driving, rambunctious Mr. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/nsOM52BsDeHzc0yI27bah2OWems.jpg",
+          "alt": "The Wind in the Willows: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-29235",
+      "movieId": "the-premature-burial-1962",
+      "timestamp": "80%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "An artist grows distant from his new wife as an irrational fear of premature burial consumes him. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/lHy5kqRrLPKnO61HG2xehGW9oLX.jpg",
+          "alt": "The Premature Burial: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-18317",
+      "movieId": "truly-madly-deeply-1991",
+      "timestamp": "56%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Nina is totally heartbroken at the death of her boyfriend Jamie, but is even more unprepared for his return as a ghost. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/jjLEXLTXfJPYtl31knRS8bjclf0.jpg",
+          "alt": "Truly Madly Deeply: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-29556",
+      "movieId": "rats-2003",
+      "timestamp": "89%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The Brookedale Psychiatric Hospital is a crumbling institution which barely has enough money to remain open. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/uVP3Ssc4CJBqT1D7bO5ATm23fkd.jpg",
+          "alt": "Rats: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-494603",
+      "movieId": "the-highway-rat-2018",
+      "timestamp": "34%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The tale of a ravenous rat who craves buns, biscuits and all sweet things. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/dxNKtY0e5pm6BFCdDMP3riRVBTb.jpg",
+          "alt": "The Highway Rat: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-38401",
+      "movieId": "tales-of-the-riverbank-2008",
+      "timestamp": "38%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Tales of the Riverbank tells the story of three friends - Hammy Hamster, Roderick Rat and GP the Guinea Pig - who, having swept down the river in a violent storm, embark on an epic journey in search of their lost homes. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/xgH4e8Lcmf98gokwTe99193ZxQf.jpg",
+          "alt": "Tales of the Riverbank: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-115082",
+      "movieId": "oss-117-panic-in-bangkok-1964",
+      "timestamp": "9%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A secret agent sets out to stop an evil scientist who is about to unleash on the world a virulent biological strain he has developed during experiments on rats. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/eZ6FPs1OqDYsxbpXk0zrv7yiev3.jpg",
+          "alt": "OSS 117: Panic in Bangkok: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-73807",
+      "movieId": "hood-rat-2001",
+      "timestamp": "22%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Think of it as Willard in the hood, the debut feature from director Leslie Small finds a Isaiah Washington playing a kindly man who turns maniacal with revenge and enlists the help of some man-eating rodents. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/bSvOruo67gjkciJGBSllpQ9pwiw.jpg",
+          "alt": "Hood Rat: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-28594",
+      "movieId": "the-rats-2002",
+      "timestamp": "13%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A clan of evil rats overtakes a Manhattan department store and threatens to overrun the city. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/7XXsqPK8m8brdsFcPlgmVIbqVCA.jpg",
+          "alt": "The Rats: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-47582",
+      "movieId": "castle-of-purity-1973",
+      "timestamp": "35%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A disciplined and sexually driven man forces his family to stay isolated in their home in order to protect them from the “evil nature” of human beings. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/lkJX8gEpbME4a5iDUlr8xYNqLVu.jpg",
+          "alt": "Castle of Purity: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-49332",
+      "movieId": "deadly-eyes-1982",
+      "timestamp": "27%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Corn grain contaminated with steroids produces large rats the size of small dogs who begin feeding on the residents of Toronto. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/6lBpTv2bIOZsqxWM4naEqdCMzHH.jpg",
+          "alt": "Deadly Eyes: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-83223",
+      "movieId": "rats-night-of-terror-1984",
+      "timestamp": "28%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "One hundred years after a nuclear war has devastated the planet, society has been reborn into two factions; the underground society and the scavangers above in the wastelands. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/aa2pwEECMyKDjaGwTfpBhLR8TKL.jpg",
+          "alt": "Rats: Night of Terror: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-17245",
+      "movieId": "mulberry-street-2006",
+      "timestamp": "38%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A deadly infection breaks out in Manhattan, causing humans to devolve into blood-thirsty rat creatures. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/lFj91spTLqP5nqj82q0pNWTqi7Q.jpg",
+          "alt": "Mulberry Street: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-68347",
+      "movieId": "food-of-the-gods-ii-1989",
+      "timestamp": "16%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A growth hormone experiment gets out of hand, when the the resulting giant man-eating rats escape, reaking havoc on the unsuspecting campus. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/qraPjfqWfNNBQsXIqRfCTv52LMw.jpg",
+          "alt": "Food of the Gods II: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-783701",
+      "movieId": "junkrat-train-2021",
+      "timestamp": "66%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A Chinese Department of Health junior clerk Su Zhenghuai is with his eldest daughter Su Wei and son Su Yuexuan are on their way to visit relatives in the provincial city when they meet the long-lost second daughter Su Ling. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/oD51TucgNiQfNI35h5sWSCucH1I.jpg",
+          "alt": "Junkrat Train: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-28720",
+      "movieId": "the-shadow-of-the-cat-1961",
+      "timestamp": "31%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Tabitha, once the placid, gentle and devoted pet, adopts all the characteristics of a ferocious, wild animal following the murder of her mistress. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/94KSOe2KWLvMSXyB4vOvNc29mSy.jpg",
+          "alt": "The Shadow of the Cat: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-46761",
+      "movieId": "sitcom-1998",
+      "timestamp": "16%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The adventures of an upper-class suburban family abruptly confronted with the younger brother's discovery of his homosexuality, the elder sister's suicide attempt and sadomasochist tendencies, and the intrusion of a very free-spirited maid and her husband. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/2rbWkcmHertfXMWUmn54px5DSjI.jpg",
+          "alt": "Sitcom: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-71316",
+      "movieId": "nutcracker-the-motion-picture-1986",
+      "timestamp": "47%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "In this Pacific Northwest Ballet performance, it is Christmas Eve and festivities are underway. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/rEskWZgPj4SCkTMJPDCYxP94CB.jpg",
+          "alt": "Nutcracker: The Motion Picture: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-259979",
+      "movieId": "nezulla-the-rat-monster-2002",
+      "timestamp": "44%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A Japanese Company funded by the USA experimenting with anti-bacteriological weapons creates a mutated humanoid rat creature which becomes violent and murders the lab technicians. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/7b1xwVxU2FjY5U2JPuuaUrd6jGh.jpg",
+          "alt": "Nezulla the Rat Monster: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-354401",
+      "movieId": "criminal-act-1989",
+      "timestamp": "80%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Two investigative reporters track down reports of giant rats in a city sewer system. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/vJNSj9aLLib5vh35rGVKYIcUl4z.jpg",
+          "alt": "Criminal Act: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-94016",
+      "movieId": "rat-man-1988",
+      "timestamp": "71%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "After a model is brutally murdered on a Caribbean island, her sister's investigation uncovers a horrifying rat-like creature. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/5bqFnf9wLJOFgKZIG7I1je3f2vP.jpg",
+          "alt": "Rat Man: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-28409",
+      "movieId": "hunchback-of-the-morgue-1973",
+      "timestamp": "48%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A hunchback working in a morgue falls in love with a sick woman. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/rhZFmQLYrhzuA9PT6kW9XARUB0G.jpg",
+          "alt": "Hunchback of the Morgue: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-801583",
+      "movieId": "the-mutation-2021",
+      "timestamp": "16%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A mutated rat has been let loose in a city. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/inorTD5FpesgGfono5S6tVyu8XD.jpg",
+          "alt": "The Mutation: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-36289",
+      "movieId": "revenge-of-the-rats-2001",
+      "timestamp": "68%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A municipal worker's strike combined with Frankfurt's hottest summer in 150 years brings infected rats out onto the streets. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/53sDr7EFyGR8hELvktef2lAMNkA.jpg",
+          "alt": "Revenge of the Rats: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-1259973",
+      "movieId": "tommy-can-t-sleep-2017",
+      "timestamp": "42%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Little Tommy unable to sleep and not comforted by his parents over that matter is invited by mysterious Rat Girl to go down the rat hole. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/mZDEf043NSb3HhVn9YgmpEVHdre.jpg",
+          "alt": "Tommy Can't Sleep: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-82094",
+      "movieId": "the-pied-piper-1986",
+      "timestamp": "51%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A darkly brilliant stop-motion adaptation of The Pied Piper of Hamelin about a plague of rats that punish townsfolk corrupt with greed. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/gw4ZXFrj1fuwbbtLwg9C7JAfEy4.jpg",
+          "alt": "The Pied Piper: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-163279",
+      "movieId": "a-rat-in-the-darkness-1979",
+      "timestamp": "88%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Two sisters buy an old dark house, soon they discover it's haunted. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/r0qsCnynuE23gq4DmQnQH3KagLi.jpg",
+          "alt": "A Rat in the Darkness: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-20579",
+      "movieId": "footrot-flats-the-dog-s-tale-1986",
+      "timestamp": "72%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Featuring the characters from Murray Ball's \"Footrot Flats\" (New Zealands most beloved local cartoon strip), questions to be answered include: Will Wal Footrot win the affections of Cheeky Hobson over the sleazy Spit Murphy? Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/6xWNTZx4ght4KToWu8rAQkEK80B.jpg",
+          "alt": "Footrot Flats: The Dog's Tale: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-494566",
+      "movieId": "ratburger-2017",
+      "timestamp": "41%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A girl rescues a rat which a malevolent salesman wants to turn into a burger and feed the local schoolchildren with. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/myJfIWuo24PNrzfVP98xBjETSR.jpg",
+          "alt": "Ratburger: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-745504",
+      "movieId": "the-tale-of-the-rat-that-wrote-1999",
+      "timestamp": "15%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A Dickensian tale of rats, recompense and retribution. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/opDVmdvjvnImEiU6tfyKETzKWak.jpg",
+          "alt": "The Tale of the Rat That Wrote: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-74826",
+      "movieId": "the-rats-are-coming-the-werewolves-are-here-1972",
+      "timestamp": "57%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The daughter in a family of werewolves decides to put an end to the family curse. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/f3yBTXt112FyMPMUIrur2aFaU9Y.jpg",
+          "alt": "The Rats Are Coming! The Werewolves Are Here!: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-850538",
+      "movieId": "the-wind-in-the-willows-1900",
+      "timestamp": "19%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Jailed for his reckless driving, rambunctious Mr. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+          "alt": "The Wind in the Willows: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-930057",
+      "movieId": "beasts-during-barty-s-party-1976",
+      "timestamp": "76%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A suburban couple are held under siege by a pack of frighteningly intelligent rats. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/x10mWH8tkK6ktgwN2EDD1kwdItB.jpg",
+          "alt": "Beasts: During Barty's Party: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-92127",
+      "movieId": "the-scarlet-worm-2011",
+      "timestamp": "10%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "An aging killer trains a young hired gun in a plot to assassinate a meek brothel owner performing barbaric abortion acts on his prostitutes. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/qc0kYLczaCohzKJeoYtaTn51nQ1.jpg",
+          "alt": "The Scarlet Worm: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-374156",
+      "movieId": "alice-s-picnic-1927",
+      "timestamp": "15%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Alice and her friends decide to go to the park and have a picnic. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/rwYflV0XU43KlR6MiXx5cGJbuQK.jpg",
+          "alt": "Alice's Picnic: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-50708",
+      "movieId": "wind-in-the-willows-1988",
+      "timestamp": "27%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Based on Kenneth Grahame's classic children's yarn, this charming animated tale follows four colorful talking critters: the blithe Mr. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/cbyKD4muUXixILFtQdBVu7BtWXH.jpg",
+          "alt": "Wind in the Willows: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-562696",
+      "movieId": "monster-2019",
+      "timestamp": "19%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A compassionate man faces a test of his faith from a rat that shows no sign of leaving his home. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/rimsU3RY7PpiDC7uG0iUUI3M6tv.jpg",
+          "alt": "Monster: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-169250",
+      "movieId": "the-rat-savior-1976",
+      "timestamp": "81%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A poor writer discovers that a species of rats has banded together to impersonate humans and supplant them unnoticed, in a manner reminiscent of the transformations in Eugene Ionesco's Rhinoceros, or the covert conspiracy of pod-people in The Invasion of the Body Snatchers. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/y4IJmmYNzO0nRkkGtavK8cweayb.jpg",
+          "alt": "The Rat Savior: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-95567",
+      "movieId": "the-monster-of-camp-sunshine-or-how-i-learned-to-stop-worrying-a-1964",
+      "timestamp": "10%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A scientist carelessly dumps some toxic waste into a river. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/5VCJgoTNmlnVQpJkakgCveYW9Oi.jpg",
+          "alt": "The Monster of Camp Sunshine or How I Learned to Stop Worrying and Love Nature: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-143192",
+      "movieId": "rat-scratch-fever-2011",
+      "timestamp": "81%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Brought back from a doomed space mission, an army of giant rats develop a big appetite for Los Angeles residents. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/2S2TBxOylgjx17XUQvA4oxFWoYw.jpg",
+          "alt": "Rat Scratch Fever: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-410794",
+      "movieId": "rats-2016",
+      "timestamp": "89%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Based on Robert Sullivan’s bestselling book, Morgan Spurlock and his team travel around the world to bring viewers face to face with rats while delving into humans’ complicated relationship with the creepy creatures. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/plypMjxhpRo5IyMm9Pmlxj3WpJb.jpg",
+          "alt": "Rats: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-68493",
+      "movieId": "dog-watch-1945",
+      "timestamp": "86%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "As a ship's crew is on shore leave, seadog Pluto is left to stand watch. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/ogA6xBDaewsRrVbQjJdMbtCMUP1.jpg",
+          "alt": "Dog Watch: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-273956",
+      "movieId": "growth-vitamin-1988",
+      "timestamp": "75%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The teacher at school made a scientific experiment - he put two rats in different cages. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/pV3whfrqEPh8XM3qeSm2ZjoQr0j.jpg",
+          "alt": "Growth Vitamin: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-326545",
+      "movieId": "a-short-vision-1956",
+      "timestamp": "32%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The leaders, the wise men, the leopard, the deer, the owl and the rat all look up in the sky in fear as a strange object flies through the sky. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/d8XLAzWaBmA1OluP3QRG75vLjcm.jpg",
+          "alt": "A Short Vision: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-409109",
+      "movieId": "rat-film-2016",
+      "timestamp": "8%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Across walls, fences, and alleys, rats not only expose our boundaries of separation but make homes in them. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/xueQOFVFmRY7Fgulc1PRRNYTXjX.jpg",
+          "alt": "Rat Film: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-198085",
+      "movieId": "vilddyr-2010",
+      "timestamp": "60%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "After a violent episode in biology class, the outsider Lykke begins to change. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/97NcJXZf1t2ikgAiYOl2ITKTJ5N.jpg",
+          "alt": "Vilddyr: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-1473962",
+      "movieId": "rats-1900",
+      "timestamp": "45%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "New York City races against time to stop a killer rat infestation unlike anything the world has ever seen. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+          "alt": "Rats!: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-367820",
+      "movieId": "the-rat-thing-2007",
+      "timestamp": "19%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Two down and out friends living in Venice, California, struggle in social and economic deprivation. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/nypmiK08Nuh194pe3nymsHQwDx1.jpg",
+          "alt": "The Rat Thing: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-837291",
+      "movieId": "lili-2008",
+      "timestamp": "80%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A herd of war-torn and hungry rats tries to get an answer to the question of who is Lili Marleen from a mortally wounded young soldier stuck in a projectile funnel. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/xW2huqhwE36Mw8Oo5Cnhkgz00S6.jpg",
+          "alt": "Lili: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-374133",
+      "movieId": "alice-the-piper-1924",
+      "timestamp": "24%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The rats are out of control in Hamlin; they've taken over the kitchen, but when they take over the King's bedroom, that's the last straw. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/iP9TZ7GnE50AQYSTCQRSM8ShgkI.jpg",
+          "alt": "Alice the Piper: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-523085",
+      "movieId": "the-war-1987",
+      "timestamp": "24%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "The protagonist of the film is the Bat living in an old mill and fighting rats and crows. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/zoNnKl3hGWvxWo3zYAwnIRs384T.jpg",
+          "alt": "The War: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-1620758",
+      "movieId": "rat-city-2023",
+      "timestamp": "81%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "They climb, squeeze through crevices, bite through lead pipes and conquer their environment again and again. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/gLntSD2NlEN2nQQBUxAjKVPTAw1.jpg",
+          "alt": "Rat City: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-327292",
+      "movieId": "metalstasis-2001",
+      "timestamp": "65%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "An animated science-fiction short directed by Matthew Hood. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/pAC9Licnzk2JGZmSX6j7Tv2i27z.jpg",
+          "alt": "Metalstasis: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-483409",
+      "movieId": "les-rats-2015",
+      "timestamp": "32%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "TMDB lists this film under the keyword “rat”. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/qdPhyU8dgYofxHPQC1GbKch87g7.jpg",
+          "alt": "Les Rats: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-1029414",
+      "movieId": "living-without-menace-2022",
+      "timestamp": "43%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Since 1950, Alberta's fabled Rat Patrol has kept the province rat-free. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/y1aCnHJYIV8Er57OyUCN5H5fiBr.jpg",
+          "alt": "Living Without Menace: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-346966",
+      "movieId": "caracas-2006",
+      "timestamp": "13%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A marine adventure on the persecution of dreams becomes a pretext to play with art forms. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+          "alt": "Caracas: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-1227845",
+      "movieId": "ratgirl-2025",
+      "timestamp": "84%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Ratgirl, a diffident 19 year-old woman, as she and her older roommate Alice discover their apartment is infested with rats — a claim which is adamantly ignored by their miserly landlord. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/kjRNnBYBjqHPWXzyiMYEijfMThQ.jpg",
+          "alt": "Ratgirl: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-313949",
+      "movieId": "jerry-on-the-job-cheating-the-piper-1920",
+      "timestamp": "14%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "When the New Monia station is overrun with mice, Mr. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+          "alt": "Jerry on the Job: Cheating the Piper: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-874918",
+      "movieId": "las-aventuras-de-rataldo-2007",
+      "timestamp": "25%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "TMDB lists this film under the keyword “rat”. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/thwDDPxhHkV8fpz9K7YZeziXML3.jpg",
+          "alt": "Las Aventuras de Rataldo: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-211244",
+      "movieId": "swiss-army-knife-with-rats-and-pigeons-1980",
+      "timestamp": "11%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "Utilising an apparently new-found obsession with the colour red and reinvigorating some of the circular imagery of A Man and His Dog Out for Air and 69, Breer delves into the very basis of animation to explore how a variety of easily recognisable objects can be portrayed and manipulated differently using pixillation and classically drawn animation. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://placehold.co/600x900/292524/fef3c7/png?text=Rat+movie",
+          "alt": "Swiss Army Knife with Rats and Pigeons: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-38094",
+      "movieId": "one-rat-short-2006",
+      "timestamp": "31%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "A city rat pursues a nearly empty bag of cheese snacks  that's drifting in the breeze. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/idSAi3x30VjaDc86YOUb6v7iPwJ.jpg",
+          "alt": "One Rat Short: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    },
+    {
+      "id": "bulk-rat-174980",
+      "movieId": "uncle-sam-and-the-bolsheviki-i-w-w-rat-1919",
+      "timestamp": "15%",
+      "title": "Rat keyword listing (needs scene pass)",
+      "description": "This short 1919 cartoon, produced by Ford Motor Company, shows a farmer Uncle Sam braining a huge rat branded with \"I.W.W.\" (Industrial Workers of the World) before it can eat the grain. Scene timing, spoiler status, prominence, and count are placeholders from the TMDB bulk import and should be reviewed by a curator.",
+      "prominence": "background",
+      "sceneType": "animated",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verificationState": "pending",
+      "verifiedBy": "TMDB bulk import",
+      "sourceIds": [
+        "tmdb-keyword-rat"
+      ],
+      "approximateRatCount": 1,
+      "images": [
+        {
+          "url": "https://image.tmdb.org/t/p/w780/ennywTZrLGz1x3RjXJhUbHUdhB0.jpg",
+          "alt": "Uncle Sam and the Bolsheviki-I.W.W. Rat: TMDB poster still (bulk keyword seed)."
+        }
+      ]
+    }
+  ]
+}

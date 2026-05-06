@@ -3,7 +3,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
-  formatColonTimecodeDisplay,
+  formatSightingMomentDisplay,
+  getSightingTimestampPercent,
   getImdbTitleUrl,
   getSubmissionImageRefs,
   getSubmissionSightingTitle,
@@ -225,7 +226,7 @@ export default async function ModerationPage({
             {pendingSubmissions.map((submission) => {
               const attachmentSlides = getSubmissionImageRefs(submission);
               const sightingTitle = getSubmissionSightingTitle(submission);
-              const startingPretty = formatColonTimecodeDisplay(submission.timestamp);
+              const startingPretty = formatSightingMomentDisplay(submission.timestamp);
               return (
               <article
                 key={submission.id}
@@ -270,7 +271,9 @@ export default async function ModerationPage({
                       {submission.movieYear ? ` (${submission.movieYear})` : ""}
                     </p>
                     <dl className="mt-3 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1.5 text-sm">
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">Starting time</dt>
+                      <dt className="font-bold text-stone-600 dark:text-stone-400">
+                        Approx. point in movie
+                      </dt>
                       <dd className="text-stone-700 dark:text-stone-200 tabular-nums">
                         {startingPretty}
                       </dd>
@@ -558,13 +561,19 @@ export default async function ModerationPage({
                 />
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Starting time
+                Approx. point in movie
                 <input
                   name="timestamp"
-                  required
-                  defaultValue={editingSubmission.timestamp}
-                  className="wr-input tabular-nums"
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  defaultValue={getSightingTimestampPercent(editingSubmission.timestamp) ?? 50}
+                  className="accent-amber-700 dark:accent-amber-400"
                 />
+                <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+                  Stored as a percentage into the movie.
+                </p>
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Description

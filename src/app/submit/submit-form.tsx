@@ -12,10 +12,6 @@ type SubmitFormProps = {
   submitAction: (formData: FormData) => void | Promise<void>;
 };
 
-function isValidTimestamp(value: string) {
-  return /^(?:\d{1,2}:)?[0-5]\d:[0-5]\d$/.test(value);
-}
-
 export function SubmitForm({
   canAutoApprove,
   moderatorName,
@@ -26,6 +22,7 @@ export function SubmitForm({
   const lockedSubmitterFields = Boolean(loggedInName && loggedInEmail);
   const [errors, setErrors] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [sightingPercent, setSightingPercent] = useState(50);
 
   const inputErrorClass =
     "border-red-700/70 focus-visible:border-red-700 dark:border-red-400/65 dark:focus-visible:border-red-400";
@@ -58,9 +55,14 @@ export function SubmitForm({
       setFieldError("sightingTitle", "Sighting title is required.");
     }
     if (!timestamp) {
-      setFieldError("timestamp", "Starting time is required.");
-    } else if (!isValidTimestamp(timestamp)) {
-      setFieldError("timestamp", "Starting time must use mm:ss or hh:mm:ss format.");
+      setFieldError("timestamp", "Approximate point in movie is required.");
+    } else if (!/^\d{1,3}%?$/.test(timestamp)) {
+      setFieldError("timestamp", "Use a percentage from 0 to 100.");
+    } else {
+      const percent = Number.parseInt(timestamp.replace("%", ""), 10);
+      if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+        setFieldError("timestamp", "Use a percentage from 0 to 100.");
+      }
     }
     if (!description) {
       setFieldError("description", "Description is required.");
@@ -142,20 +144,35 @@ export function SubmitForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          Starting time
+          Approx. point in movie
+          <div className="flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300">
+            <span>Opening</span>
+            <span className="tabular-nums">{sightingPercent}%</span>
+            <span>Ending</span>
+          </div>
           <input
             data-field="timestamp"
             name="timestamp"
             required
-            placeholder="01:23:45"
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={sightingPercent}
+            onChange={(event) =>
+              setSightingPercent(Number.parseInt(event.currentTarget.value, 10) || 0)
+            }
             aria-invalid={Boolean(errorFor("timestamp"))}
-            className={`wr-input tabular-nums ${errorFor("timestamp") ? inputErrorClass : ""}`}
+            className={`${errorFor("timestamp") ? "accent-red-700 dark:accent-red-400" : ""}`}
           />
           {errorFor("timestamp") ? (
             <span className="text-xs font-semibold text-red-700 dark:text-red-300">
               {errorFor("timestamp")}
             </span>
           ) : null}
+          <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            Estimate how far into the movie the sighting begins.
+          </p>
         </label>
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
           Approx. rats on screen

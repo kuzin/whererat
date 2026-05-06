@@ -10,6 +10,7 @@ import {
 import {
   clampApproximateRatCount,
   normalizeImdbId,
+  normalizeSightingTimestampInput,
   type SightingImageSlot,
 } from "@/lib/whererat";
 import { addSubmission, reviewSubmission } from "@/lib/moderation-store";
@@ -42,7 +43,9 @@ export async function submitSighting(formData: FormData) {
   const movieYear = Number(formData.get("movieYear") || "");
   const moviePosterUrl = String(formData.get("moviePosterUrl") || "").trim();
   const sightingTitle = String(formData.get("sightingTitle") ?? "").trim();
-  const timestamp = String(formData.get("timestamp") ?? "").trim();
+  const timestamp = normalizeSightingTimestampInput(
+    String(formData.get("timestamp") ?? ""),
+  );
   const description = String(formData.get("description") ?? "").trim();
   const submitterName = String(formData.get("submitterName") ?? "").trim();
   const submitterEmail = normalizeOptionalSubmitterEmail(

@@ -8,7 +8,11 @@ import {
   parseModeratorSession,
 } from "@/lib/auth";
 import { deleteSubmissionById, reviewSubmission } from "@/lib/moderation-store";
-import { clampApproximateRatCount, type SightingImageSlot } from "@/lib/whererat";
+import {
+  clampApproximateRatCount,
+  normalizeSightingTimestampInput,
+  type SightingImageSlot,
+} from "@/lib/whererat";
 import { persistSightingFiles } from "@/lib/media-storage";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
@@ -99,7 +103,9 @@ export async function moderateSubmission(formData: FormData) {
   const edits = hasEditFields
     ? {
         title: String(formData.get("sightingTitle") ?? "").trim(),
-        timestamp: String(formData.get("timestamp") ?? "").trim(),
+        timestamp: normalizeSightingTimestampInput(
+          String(formData.get("timestamp") ?? ""),
+        ),
         description: String(formData.get("description") ?? "").trim(),
         spoiler: formData.get("spoiler") === "on",
         approximateRatCount: clampApproximateRatCount(

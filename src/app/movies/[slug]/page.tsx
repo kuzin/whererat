@@ -25,6 +25,7 @@ import {
   getImdbNameSearchUrl,
   getImdbTitleUrl,
   getSightingImageRefs,
+  getSightingTimestampPercent,
   parseMovieSightingsPageParam,
   parseMovieSightingsSortParam,
   prepareMovieSightingsView,
@@ -134,6 +135,7 @@ export default async function MoviePage({
     items: movieSightings,
     sort,
     page,
+    runtimeMinutes: movie.runtimeMinutes,
   });
 
   if (page !== sightingsView.safePage) {
@@ -752,8 +754,16 @@ export default async function MoviePage({
                 <input name="title" required defaultValue={editingSighting.title} className="wr-input" />
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Timestamp
-                <input name="timestamp" required defaultValue={editingSighting.timestamp} className="wr-input" />
+                Approx. point in movie
+                <input
+                  name="timestamp"
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  defaultValue={getSightingTimestampPercent(editingSighting.timestamp) ?? 50}
+                  className="accent-amber-700 dark:accent-amber-400"
+                />
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Description
