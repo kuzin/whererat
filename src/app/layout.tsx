@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import {
   MODERATOR_SESSION_COOKIE,
   parseModeratorSession,
-  SEEDED_MODERATOR_AVATAR_URL,
 } from "@/lib/auth";
 import { SiteMasthead } from "@/components/site-masthead";
 import { TooltipProvider } from "@/components/tooltip-provider";
@@ -38,23 +37,17 @@ const boogaloo = Boogaloo({
 
 
 export const metadata: Metadata = {
-  title: "WhereRat",
-  description: "The fun, spoiler-aware catalog of rat cameos in movies.",
+  title: {
+    default: "WhereRat",
+    template: "%s | WhereRat",
+  },
+  description: "The catalog of rat appearances in film and TV.",
   icons: {
     icon: [
-      {
-        url: SEEDED_MODERATOR_AVATAR_URL,
-        sizes: "160x160",
-        type: "image/png",
-      },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/brand/icon.svg", type: "image/svg+xml" },
     ],
-    apple: [
-      {
-        url: SEEDED_MODERATOR_AVATAR_URL,
-        sizes: "160x160",
-        type: "image/png",
-      },
-    ],
+    apple: [{ url: "/brand/icon.svg" }],
   },
   appleWebApp: {
     title: "WhereRat",
