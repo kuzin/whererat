@@ -98,6 +98,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-fredoka), ui-rounded, system-ui, sans-serif;
+  --font-hero: var(--font-boogaloo), system-ui, sans-serif;
 }
 
 body {

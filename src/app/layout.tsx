@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fredoka, Geist, Geist_Mono } from "next/font/google";
+import { Boogaloo, Fredoka, Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
@@ -28,6 +28,13 @@ const fredoka = Fredoka({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
 });
+
+const boogaloo = Boogaloo({
+  variable: "--font-boogaloo",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 
 export const metadata: Metadata = {
   title: "WhereRat",
@@ -67,7 +74,7 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} ${boogaloo.variable} h-full antialiased`}
     >
       <body className="bg-background text-foreground min-h-full transition-colors duration-150">
         <TooltipProvider>
@@ -77,6 +84,8 @@ export default async function RootLayout({
               <div className="flex min-h-0 flex-1 flex-col">{children}</div>
               <footer className="relative z-0 mt-0 border-t-2 border-[var(--wr-footer-rule)] bg-[var(--wr-footer-bg)] text-[var(--wr-footer-fg)] transition-colors duration-150">
                 <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-center text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left lg:px-8">
+                  <div>
+                  <p className="mb-1.5 text-sm text-amber-100/70">Spoiler-aware · Crowd-sourced · Obsessively maintained</p>
                   <p className="max-w-xl leading-relaxed text-amber-100/95">
                     Copyright 2026. Design by{" "}
                     <a
@@ -89,6 +98,7 @@ export default async function RootLayout({
                     </a>
                     . All rights reserved.
                   </p>
+                  </div>
                   <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
                     <Link
                       className="wr-btn-primary inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-bold outline-none ring-offset-2 transition hover:brightness-[1.03] focus-visible:ring-2 focus-visible:ring-amber-300 dark:ring-offset-stone-900"

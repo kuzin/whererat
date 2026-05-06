@@ -29,10 +29,6 @@ export function SiteMasthead({ session }: SiteMastheadProps) {
             <span className="sr-only">WhereRat — home</span>
             <span
               aria-hidden
-              className="wr-brand-mark h-9 w-auto shrink-0 sm:h-10"
-            />
-            <span
-              aria-hidden
               className="wr-brand-wordmark h-5 w-auto max-w-[min(100%,11rem)] shrink-0 sm:h-7 sm:max-w-[14rem] md:h-8 md:max-w-[16rem]"
             />
           </Link>

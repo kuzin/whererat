@@ -26,10 +26,10 @@ const catalogSortOptions = [
 type CatalogSortOption = (typeof catalogSortOptions)[number];
 
 const catalogSortLabels: Record<CatalogSortOption, string> = {
-  "latest-added-title": "Latest added title",
-  "latest-sighting": "Latest sighting",
-  "most-rats-logged": "Most rats logged",
-  "total-sightings": "Total sightings",
+  "latest-added-title": "Latest Added Title",
+  "latest-sighting": "Latest Sighting",
+  "most-rats-logged": "Most Rats Logged",
+  "total-sightings": "Total Sightings",
 };
 
 function parseCatalogSort(value: string | undefined): CatalogSortOption {
@@ -130,41 +130,21 @@ export default async function Home({
   ];
 
   return (
-    <main className="wr-cheese-tile-cream relative">
-      <section className="relative overflow-hidden">
-        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="wr-display mx-auto max-w-[20ch] text-[2.2rem] font-black leading-[1.04] tracking-tight text-stone-950 sm:max-w-none sm:text-5xl lg:text-[3.35rem] dark:text-[#fff8ec]">
-              A Field Guide to{" "}
-              <span className="relative whitespace-nowrap text-[#ea580c] dark:text-[#fdba74]">
-                Rats in Film
-                <span
-                  aria-hidden
-                  className="absolute -bottom-1 left-0 right-0 h-1 rounded-sm bg-[#f59e0b]/90 dark:bg-amber-500/85"
-                />
-              </span>
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed font-medium text-stone-700 sm:max-w-3xl sm:text-xl dark:text-stone-300">
-              A living archive of cinema rats curated by people who actually notice them.
-            </p>
-
-            <div className="mt-10 flex flex-wrap justify-center gap-3 sm:mt-12">
-              <Link
-                href="/submit"
-                className="wr-display wr-btn-primary inline-flex min-h-[3.5rem] min-w-[13rem] items-center justify-center rounded-3xl border-[3px] px-10 py-4 text-center text-xl font-bold shadow-[6px_6px_0_0_rgb(28_25_23/0.88)] outline-none transition hover:brightness-[1.04] focus-visible:ring-2 focus-visible:ring-orange-600/60 focus-visible:ring-offset-2 active:translate-y-[2px] active:shadow-none sm:min-h-[4rem] sm:min-w-[15rem] sm:px-12 sm:py-5 sm:text-2xl dark:shadow-[6px_6px_0_0_rgb(0_0_0/0.55)]"
-              >
-                Submit a Sighting
-              </Link>
-            </div>
-          </div>
+    <main className="relative">
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <h1
+            className="tracking-normal text-stone-950 dark:text-[#fff8ec]"
+            style={{ fontFamily: "var(--font-hero)", fontSize: "clamp(1.5rem, 3.5vw, 3rem)" }}
+          >
+            An obsessive guide to{" "}
+            <span className="inline-block -scale-x-100">🐀</span> on film.
+          </h1>
         </div>
       </section>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-2 pb-0 sm:px-6 sm:pt-3 sm:pb-0 lg:px-8">
-        <div
-          className="wr-cheese-stats-slab overflow-hidden rounded-2xl rounded-b-none border-2 border-stone-950 shadow-[4px_4px_0_0_rgb(28_25_23/0.28)] dark:border-amber-400/35 dark:shadow-[4px_4px_0_0_rgb(0_0_0/0.38)]"
-        >
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-0 sm:px-6 sm:pb-0 lg:px-8">
+        <div className="wr-cheese-stats-slab overflow-hidden rounded-2xl rounded-b-none border-2 border-stone-950 shadow-[4px_4px_0_0_rgb(28_25_23/0.28)] dark:border-amber-400/35 dark:shadow-[4px_4px_0_0_rgb(0_0_0/0.38)]">
           <div className="flex divide-x-2 divide-stone-950/20 dark:divide-white/15">
             {statsBarItems.map((item) => (
               <div
@@ -173,7 +153,7 @@ export default async function Home({
                 className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-3 py-3.5 sm:px-8 sm:py-4"
               >
                 <p className="wr-display text-2xl font-black leading-none tracking-[0.02em] tabular-nums text-stone-950 dark:text-[#fff7dc] sm:text-3xl">
-                  {item.value}
+                  {item.value.toLocaleString()}
                 </p>
                 <p className="text-center text-[0.84rem] font-bold uppercase tracking-[0.13em] text-stone-800/90 dark:text-amber-200/90 sm:text-[0.9rem]">
                   {item.shortLabel}
@@ -191,11 +171,11 @@ export default async function Home({
         <div className="wr-card rounded-t-none border-t-0 bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
           <form className="grid gap-3 md:grid-cols-[1.4fr_1fr_1fr_auto]">
             <label className="flex flex-col gap-2 text-sm font-bold text-stone-800 dark:text-stone-300">
-              Search for title or note
+              Search
               <input
                 name="q"
                 defaultValue={query}
-                placeholder="Enter title, IMDb ID, or note…"
+                placeholder="Enter title or IMDb ID…"
                 className="wr-input h-11"
               />
             </label>

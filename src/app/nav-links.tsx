@@ -33,11 +33,11 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
 
   const links = (
     <>
-      <Link className={navClass(isActivePath(pathname, "/"))} href="/">
-        Catalog
+      <Link className={navClass(false)} href="/">
+        Browse the catalog
       </Link>
-      <Link className={navClass(isActivePath(pathname, "/submit"))} href="/submit">
-        Submit
+      <Link className="wr-btn-primary" href="/submit">
+        Submit a sighting
       </Link>
       {session ? (
         <>
