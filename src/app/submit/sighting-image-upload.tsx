@@ -81,9 +81,7 @@ export function SightingImageUpload() {
         ) : null}
       </div>
       <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-        JPEG, PNG, WebP, or GIF — up to 8 MB each. Saved under{" "}
-        <span className="font-mono">/public/uploads/sightings</span> for moderator
-        review (local prototype).
+        JPEG, PNG, WebP, or GIF — up to 8 MB each.
       </span>
     </label>
   );

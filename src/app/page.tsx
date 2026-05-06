@@ -10,27 +10,13 @@ import {
   getCatalogStatsWithCommunity,
 } from "@/lib/movie-catalog";
 import { getMergedSightingsForMovie } from "@/lib/moderation-store";
+import { CatalogFilters, catalogSortOptions, type CatalogSortOption } from "./catalog-filters";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
-
-const catalogSortOptions = [
-  "latest-added-title",
-  "latest-sighting",
-  "most-rats-logged",
-  "total-sightings",
-] as const;
-type CatalogSortOption = (typeof catalogSortOptions)[number];
-
-const catalogSortLabels: Record<CatalogSortOption, string> = {
-  "latest-added-title": "Latest Added Title",
-  "latest-sighting": "Latest Sighting",
-  "most-rats-logged": "Most Rats Logged",
-  "total-sightings": "Total Sightings",
-};
 
 function parseCatalogSort(value: string | undefined): CatalogSortOption {
   if (
@@ -169,52 +155,12 @@ export default async function Home({
         className="mx-auto max-w-7xl px-4 pt-0 pb-20 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
       >
         <div className="wr-card rounded-t-none border-t-0 bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
-          <form className="grid gap-3 md:grid-cols-[1.4fr_1fr_1fr_auto]">
-            <label className="flex flex-col gap-2 text-sm font-bold text-stone-800 dark:text-stone-300">
-              Search
-              <input
-                name="q"
-                defaultValue={query}
-                placeholder="Enter title or IMDb ID…"
-                className="wr-input h-11"
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm font-bold text-stone-800 dark:text-stone-300">
-              Genre
-              <select
-                name="genre"
-                defaultValue={genre}
-                className="wr-select h-11"
-              >
-                <option value="all">All genres</option>
-                {availableGenres.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-2 text-sm font-bold text-stone-800 dark:text-stone-300">
-              Sort by
-              <select
-                name="sort"
-                defaultValue={sort}
-                className="wr-select h-11"
-              >
-                {catalogSortOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {catalogSortLabels[option]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="submit"
-              className="wr-btn-primary h-11 self-end whitespace-nowrap md:self-end"
-            >
-              Dig in
-            </button>
-          </form>
+          <CatalogFilters
+            availableGenres={availableGenres}
+            defaultQuery={query}
+            defaultGenre={genre}
+            defaultSort={sort}
+          />
 
           {results.length > 0 ? (
             <div className="mt-10 grid gap-5 lg:grid-cols-2">
