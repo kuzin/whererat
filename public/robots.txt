@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /moderation
+Disallow: /api/
+
+Sitemap: https://whererat.com/sitemap.xml

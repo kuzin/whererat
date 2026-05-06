@@ -76,6 +76,15 @@ export default async function ModerationPage({
   const safeHistoryPage = Math.min(requestedHistoryPage, historyPageCount);
   const historyStart = (safeHistoryPage - 1) * HISTORY_PAGE_SIZE;
   const historySlice = historyItems.slice(historyStart, historyStart + HISTORY_PAGE_SIZE);
+  const pendingPageRaw = Number.parseInt(String(single(params.page) ?? "1"), 10);
+  const requestedPendingPage =
+    Number.isFinite(pendingPageRaw) && pendingPageRaw > 0 ? Math.floor(pendingPageRaw) : 1;
+  const pendingPageCount = Math.max(1, Math.ceil(pendingSubmissions.length / HISTORY_PAGE_SIZE));
+  const safePendingPage = Math.min(requestedPendingPage, pendingPageCount);
+  const pendingStart = (safePendingPage - 1) * HISTORY_PAGE_SIZE;
+  const pendingSlice = pendingSubmissions.slice(pendingStart, pendingStart + HISTORY_PAGE_SIZE);
+  const pendingPath = (page: number) =>
+    page <= 1 ? "/moderation" : `/moderation?page=${page}`;
   const historyReviewerBySubmissionId = new Map<string, string>();
   const relevantHistoryActions =
     historyTab === "approved"
@@ -125,7 +134,7 @@ export default async function ModerationPage({
     ? getSubmissionImageRefs(editingSubmission)
     : [];
   const pendingMovieEntries = await Promise.all(
-    pendingSubmissions.map(async (submission) => {
+    pendingSlice.map(async (submission) => {
       const movie =
         (submission.imdbId
           ? await getCatalogMovieByImdbId(submission.imdbId)
@@ -241,7 +250,7 @@ export default async function ModerationPage({
               </div>
             ) : null}
 
-            {pendingSubmissions.map((submission) => {
+            {pendingSlice.map((submission) => {
               const attachmentSlides = getSubmissionImageRefs(submission);
               const sightingTitle = getSubmissionSightingTitle(submission);
               const startingPretty = formatSightingMomentDisplay(submission.timestamp);
@@ -409,6 +418,28 @@ export default async function ModerationPage({
               );
             })}
           </div>
+
+          {pendingPageCount > 1 ? (
+            <div className="mt-8 flex items-center justify-between gap-3">
+              <Link
+                href={pendingPath(safePendingPage - 1)}
+                className={`wr-btn-ghost ${safePendingPage === 1 ? "pointer-events-none opacity-40" : ""}`}
+                aria-disabled={safePendingPage === 1}
+              >
+                ← Previous
+              </Link>
+              <p className="text-sm font-semibold text-stone-600 dark:text-stone-300">
+                Showing {pendingStart + 1}–{pendingStart + pendingSlice.length} of {pendingSubmissions.length}
+              </p>
+              <Link
+                href={pendingPath(safePendingPage + 1)}
+                className={`wr-btn-ghost ${safePendingPage === pendingPageCount ? "pointer-events-none opacity-40" : ""}`}
+                aria-disabled={safePendingPage === pendingPageCount}
+              >
+                Next →
+              </Link>
+            </div>
+          ) : null}
 
           <div className="mt-10 border-t border-stone-900/15 pt-8 dark:border-white/12">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

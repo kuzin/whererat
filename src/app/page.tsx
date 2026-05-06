@@ -10,7 +10,7 @@ import {
   getCatalogStatsWithCommunity,
 } from "@/lib/movie-catalog";
 import { getMergedSightingsForMovie } from "@/lib/moderation-store";
-import { CatalogFilters, catalogSortOptions, type CatalogSortOption } from "./catalog-filters";
+import { CatalogFilters, type CatalogSortOption } from "./catalog-filters";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 

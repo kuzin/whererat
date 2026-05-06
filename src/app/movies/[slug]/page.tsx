@@ -39,6 +39,43 @@ import {
   type Movie,
 } from "@/lib/whererat";
 import { getCatalogMovieBySlug, getCatalogMovies } from "@/lib/movie-catalog";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const baseMovie = await getCatalogMovieBySlug(slug);
+  if (!baseMovie) return {};
+
+  const movieOverride = await getMovieOverride(baseMovie.id);
+  const movie = applyMovieOverride(baseMovie, movieOverride);
+
+  const sightings = await getMergedSightingsForMovie(movie.id);
+  const count = sightings.length;
+  const s = count === 1 ? "" : "s";
+
+  const title = `${movie.title} (${movie.releaseYear}) — Rat Sightings on WhereRat`;
+  const description = `See where rats appear in ${movie.title}. ${count} rat sighting${s} catalogued on WhereRat.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [{ url: movie.posterUrl, width: 300, height: 450, alt: movie.title }],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
+}
 
 function trimMeta(value: string | undefined): string {
   return value?.trim() ?? "";
@@ -258,7 +295,7 @@ export default async function MoviePage({
             href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
             className={`inline-flex items-center gap-1.5 text-sm ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
           >
-            + Submit a {movie.title} Sighting
+            + Submit<span className="hidden sm:inline"> a {movie.title}</span> Sighting
           </Link>
         </div>
       </div>
@@ -433,9 +470,9 @@ export default async function MoviePage({
           tabs={[
             { id: "sightings", label: "Featured Rats" },
             ...(ratFacts.length > 0 ? [{ id: "rat-facts", label: "Rat Facts" }] : []),
-            ...(imdbReviews.length > 0 ? [{ id: "rat-views", label: "Reviews" }] : []),
-            ...((imdbVideos.length > 0 || imdbImages.length > 0) ? [{ id: "rat-media", label: "Media" }] : []),
-            ...(imdbRelated.length > 0 ? [{ id: "ratlated", label: "Related" }] : []),
+            { id: "rat-views", label: "Reviews" },
+            { id: "rat-media", label: "Media" },
+            { id: "ratlated", label: "Related" },
           ]}
           sidebarContent={
             <>
@@ -687,33 +724,27 @@ export default async function MoviePage({
             </div>
           ) : null}
 
-          {/* Panel 2 — Reviews (conditional, must match tab condition) */}
-          {imdbReviews.length > 0 ? (
-            <MovieRatviewsTab
-              reviews={imdbReviews}
-              imdbId={movie.externalIds.imdb}
-              palette={Boolean(palette)}
-            />
-          ) : null}
+          {/* Panel 2 — Reviews */}
+          <MovieRatviewsTab
+            reviews={imdbReviews}
+            imdbId={movie.externalIds.imdb}
+            palette={Boolean(palette)}
+          />
 
-          {/* Panel 3 — Media (conditional, must match tab condition) */}
-          {(imdbVideos.length > 0 || imdbImages.length > 0) ? (
-            <MovieRatMediaTab
-              videos={imdbVideos}
-              images={imdbImages}
-              imdbId={movie.externalIds.imdb}
-              palette={Boolean(palette)}
-            />
-          ) : null}
+          {/* Panel 3 — Media */}
+          <MovieRatMediaTab
+            videos={imdbVideos}
+            images={imdbImages}
+            imdbId={movie.externalIds.imdb}
+            palette={Boolean(palette)}
+          />
 
-          {/* Panel 4 — Related (conditional, must match tab condition — last) */}
-          {imdbRelated.length > 0 ? (
-            <MovieRatlatedTab
-              titles={imdbRelated}
-              imdbId={movie.externalIds.imdb}
-              palette={Boolean(palette)}
-            />
-          ) : null}
+          {/* Panel 4 — Related */}
+          <MovieRatlatedTab
+            titles={imdbRelated}
+            imdbId={movie.externalIds.imdb}
+            palette={Boolean(palette)}
+          />
         </MovieTabsShell>
       </section>
 

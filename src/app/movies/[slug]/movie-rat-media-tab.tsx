@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { ImdbImage, ImdbVideo } from "@/lib/whererat";
 import { ImdbLinkButton } from "@/components/imdb-link-button";
-import { tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
+import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
@@ -250,9 +250,15 @@ export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
       </header>
 
       {!hasContent ? (
-        <p className="py-8 text-center text-sm text-stone-500 dark:text-stone-400">
-          No media synced yet. Hit <strong>Resync</strong> to pull videos &amp; photos from IMDb.
-        </p>
+        <div className={`rounded-2xl border-2 border-dashed px-6 py-14 text-center ${tabCardColors(palette)}`}>
+          <p className="text-4xl leading-none" aria-hidden>📷</p>
+          <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
+            No media yet
+          </p>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-stone-600 dark:text-stone-400">
+            Resync to pull photos and videos from IMDb.
+          </p>
+        </div>
       ) : (
         <div>
           {videos.length > 0 ? (

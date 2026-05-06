@@ -83,6 +83,11 @@ export default async function SubmitPage({
               Free‑typed titles alone aren’t enough.
             </div>
           ) : null}
+          {status === "rate-limited" ? (
+            <div className="mb-6 rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm font-medium text-red-900 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
+              Too many submissions. Please wait before submitting again.
+            </div>
+          ) : null}
           <SubmitForm
             submitAction={submitSighting}
             canAutoApprove={canAutoApprove}

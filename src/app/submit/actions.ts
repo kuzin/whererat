@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   canAutoApproveSubmissions,
@@ -16,6 +16,29 @@ import {
 import { addSubmission, reviewSubmission } from "@/lib/moderation-store";
 import { getCatalogMovieByImdbId, getCatalogMovieByTitleSearch } from "@/lib/movie-catalog";
 import { persistSightingFiles } from "@/lib/media-storage";
+
+// In-memory rate limiter. Resets on serverless cold starts — acceptable for now
+// since we don't have Redis. Each entry tracks request count and expiry per IP.
+const _rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+async function isRateLimited(): Promise<boolean> {
+  const headerStore = await headers();
+  const forwarded = headerStore.get("x-forwarded-for");
+  const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown";
+  const now = Date.now();
+  const entry = _rateLimitMap.get(ip);
+  if (!entry || entry.resetAt <= now) {
+    _rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  entry.count++;
+  return false;
+}
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 
@@ -37,6 +60,10 @@ async function persistSightingUploads(formData: FormData): Promise<SightingImage
 }
 
 export async function submitSighting(formData: FormData) {
+  if (await isRateLimited()) {
+    redirect("/submit?status=rate-limited");
+  }
+
   const selectedMovieTitle = String(formData.get("movieTitle") ?? "").trim();
   const movieTitle = selectedMovieTitle;
   const imdbId = normalizeImdbId(String(formData.get("imdbId") ?? ""));
