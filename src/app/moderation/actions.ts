@@ -129,7 +129,7 @@ export async function moderateSubmission(formData: FormData) {
       edits,
     });
     revalidatePath("/moderation");
-    return;
+    redirect("/moderation?toast=moderation-approved");
   }
 
   if (decision === "edited") {
@@ -155,6 +155,12 @@ export async function moderateSubmission(formData: FormData) {
     edits,
   });
   revalidatePath("/moderation");
+  if (decision === "approved") {
+    redirect("/moderation?toast=moderation-approved");
+  }
+  if (decision === "rejected") {
+    redirect("/moderation?toast=moderation-rejected");
+  }
 }
 
 export async function removeSubmission(formData: FormData) {
@@ -166,7 +172,10 @@ export async function removeSubmission(formData: FormData) {
   }
   await deleteSubmissionById(submissionId);
   revalidatePath("/moderation");
-  redirect(returnTo);
+  const returnToWithToast = returnTo.includes("?")
+    ? `${returnTo}&toast=deleted`
+    : `${returnTo}?toast=deleted`;
+  redirect(returnToWithToast);
 }
 
 export async function rereviewSubmission(formData: FormData) {
@@ -183,5 +192,8 @@ export async function rereviewSubmission(formData: FormData) {
     reason: "Returned to pending queue for re-review.",
   });
   revalidatePath("/moderation");
-  redirect(returnTo);
+  const requeuedReturnTo = returnTo.includes("?")
+    ? `${returnTo}&toast=moderation-requeued`
+    : `${returnTo}?toast=moderation-requeued`;
+  redirect(requeuedReturnTo);
 }

@@ -101,11 +101,12 @@ async function fetchOmdbDetails(imdbId: string, apiKey: string) {
   return details;
 }
 
-async function fetchOmdbSearch(query: string, apiKey: string) {
+async function fetchOmdbSearch(query: string, apiKey: string, page = 1) {
   const searchUrl = new URL("https://www.omdbapi.com/");
   searchUrl.searchParams.set("apikey", apiKey);
   searchUrl.searchParams.set("s", query);
   searchUrl.searchParams.set("type", "movie");
+  if (page > 1) searchUrl.searchParams.set("page", String(page));
 
   const response = await fetch(searchUrl, { next: { revalidate: 60 * 60 } });
   if (!response.ok) return undefined;
@@ -138,6 +139,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const rawQuery = searchParams.get("q") ?? "";
   const query = rawQuery.trim();
+  const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
   const normalizedQuery = query.replace(/\s+/g, " ");
   const apiKey = process.env.OMDB_API_KEY;
   const deletedMovieIds = await getDeletedMovieIds();
@@ -159,7 +161,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const payload = await fetchOmdbSearch(normalizedQuery, apiKey);
+  const payload = await fetchOmdbSearch(normalizedQuery, apiKey, page);
   if (!payload) {
     return NextResponse.json(
       { configured: true, error: "Movie search failed.", results: [] },
@@ -210,9 +212,12 @@ export async function GET(request: Request) {
     });
   }
 
-  const visibleItems = searchItems
-    .filter((item) => !deletedImdbIds.has(item.imdbID.toLowerCase()))
-    .slice(0, 6);
+  const filteredItems = searchItems.filter(
+    (item) => !deletedImdbIds.has(item.imdbID.toLowerCase()),
+  );
+  // OMDb returns up to 10 per page; if we got a full page there are likely more
+  const hasMore = searchItems.length === 10;
+  const visibleItems = filteredItems.slice(0, 10);
   const details = await Promise.all(
     visibleItems.map((item) => fetchOmdbDetails(item.imdbID, apiKey)),
   );
@@ -235,5 +240,5 @@ export async function GET(request: Request) {
     },
   );
 
-  return NextResponse.json({ configured: true, results });
+  return NextResponse.json({ configured: true, results, hasMore, page });
 }

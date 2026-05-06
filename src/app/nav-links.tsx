@@ -6,22 +6,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { ModeratorSession } from "@/lib/auth";
 
-function navClass(isActive: boolean) {
-  return [
-    "rounded-lg border-2 border-transparent px-3 py-2 text-sm font-semibold outline-none transition-colors",
-    isActive
-      ? "border-stone-950/80 bg-[#ffd33d] text-stone-950 dark:border-white/40 dark:bg-[#e6b82e] dark:text-stone-950"
-      : "text-stone-700 hover:bg-stone-950/8 hover:text-stone-950 focus-visible:border-stone-950 focus-visible:bg-amber-50 dark:text-stone-300 dark:hover:bg-white/12 dark:hover:text-stone-100 dark:focus-visible:border-amber-300/65 dark:focus-visible:bg-stone-800/80",
-  ].join(" ");
-}
-
-function isActivePath(pathname: string, href: string) {
-  if (href === "/") {
-    return pathname === "/";
-  }
-
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
 
 export function NavLinks({ session }: { session?: ModeratorSession }) {
   const pathname = usePathname();
@@ -31,19 +15,39 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
     setMobileOpen(false);
   }, [pathname]);
 
+  const currentPage = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+
+  const ghostLink = (href: string, label: string) => {
+    if (currentPage(href)) {
+      return (
+        <span
+          aria-current="page"
+          className="rounded-lg border-2 border-transparent px-3 py-2 text-sm font-semibold cursor-default select-none opacity-40"
+        >
+          {label}
+        </span>
+      );
+    }
+    return <Link className="wr-btn-ghost" href={href}>{label}</Link>;
+  };
+
   const links = (
     <>
-      <Link className="wr-btn-ghost" href="/">
-        Browse the catalog
-      </Link>
-      {session ? (
-        <Link className="wr-btn-ghost" href="/moderation">
-          Moderate
+      {ghostLink("/", "Browse the catalog")}
+      {session ? ghostLink("/moderation", "Moderate") : null}
+      {currentPage("/submit") ? (
+        <span
+          aria-current="page"
+          className="wr-btn-primary cursor-default select-none opacity-50 shadow-none"
+        >
+          Submit a sighting
+        </span>
+      ) : (
+        <Link className="wr-btn-primary" href="/submit">
+          Submit a sighting
         </Link>
-      ) : null}
-      <Link className="wr-btn-primary" href="/submit">
-        Submit a sighting
-      </Link>
+      )}
       {session ? (
         <>
           <Link

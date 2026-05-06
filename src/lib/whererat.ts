@@ -1,3 +1,45 @@
+export type ImdbReview = {
+  id: string;
+  author: string;
+  summary: string;
+  text: string;
+  /** IMDb author rating 1–10, if the reviewer left one. */
+  rating?: number;
+  /** ISO date string, e.g. "2003-04-12". */
+  date: string;
+  mentionsRat: boolean;
+};
+
+export type ImdbRelatedTitle = {
+  /** IMDb title ID, e.g. "tt0368226". */
+  id: string;
+  title: string;
+  year?: number;
+  posterUrl?: string;
+  /** IMDb aggregate user rating (e.g. 7.4). */
+  rating?: number;
+};
+
+export type ImdbVideo = {
+  /** IMDb video ID, e.g. "vi1234567890". */
+  id: string;
+  name: string;
+  /** Human label for the content type, e.g. "Trailer", "Clip", "Featurette". */
+  contentType?: string;
+  thumbnailUrl?: string;
+  /** Duration in seconds. */
+  runtimeSeconds?: number;
+};
+
+export type ImdbImage = {
+  /** IMDb image ID. */
+  id: string;
+  url: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+};
+
 export type RatProminence = "blink-and-miss" | "background" | "scene-stealer";
 export type SceneType =
   | "live-action"
@@ -66,6 +108,19 @@ export type Movie = {
     metascore?: string;
     /** Short awards / honors line from public listings. */
     awards?: string;
+    /**
+     * IMDb trivia entries that mention rats, fetched via Just One API during resync.
+     * Plain text, HTML tags stripped, up to 3 entries.
+     */
+    ratFacts?: string[];
+    /** User reviews pulled from IMDb's public GraphQL API during resync (up to 20). */
+    imdbReviews?: ImdbReview[];
+    /** Titles IMDb recommends as "more like this" (up to 12). */
+    imdbRelated?: ImdbRelatedTitle[];
+    /** Trailers / clips listed on the IMDb title page (up to 10). */
+    imdbVideos?: ImdbVideo[];
+    /** Production stills / photos listed on the IMDb title page (up to 24). */
+    imdbImages?: ImdbImage[];
   };
   summary: string;
 };
@@ -315,7 +370,7 @@ export function normalizeSightingTimestampInput(value: string): string {
 
 export function formatSightingMomentDisplay(raw: string): string {
   const percent = parsePercentIntoMovie(raw);
-  if (percent !== null) return `${percent}% into movie`;
+  if (percent !== null) return `${percent}%`;
   return formatOneTimecode(raw.trim());
 }
 
@@ -664,26 +719,30 @@ export function estimateRatsForAppearance(sighting: Sighting): number {
   return 1;
 }
 
-export type RatPresenceCaption = "Solitary" | "A Few" | "Several" | "Many" | "Swarm";
+export type RatPresenceCaption =
+  | "Lone scout"
+  | "Small pack"
+  | "Growing colony"
+  | "Swarm forming"
+  | "Full swarm"
+  | "Rat apocalypse";
 
 export type RatPresenceScale = {
-  /** How many of the five meter segments are “on” (1–5). */
-  slotsFilled: 1 | 2 | 3 | 4 | 5;
+  slotsFilled: 1 | 2 | 3 | 4 | 5 | 6;
   caption: RatPresenceCaption;
+  sublabel: string;
 };
 
-/**
- * Buckets estimated count into a five-step visual presence scale (solo → swarm).
- */
 export function getRatPresenceScale(estimatedCount: number): RatPresenceScale {
   let n = Math.floor(Number(estimatedCount));
   if (!Number.isFinite(n) || n < 1) n = 1;
-  n = Math.min(9999, n);
-  if (n === 1) return { slotsFilled: 1, caption: "Solitary" };
-  if (n <= 3) return { slotsFilled: 2, caption: "A Few" };
-  if (n <= 8) return { slotsFilled: 3, caption: "Several" };
-  if (n <= 24) return { slotsFilled: 4, caption: "Many" };
-  return { slotsFilled: 5, caption: "Swarm" };
+  n = Math.min(999, n);
+  if (n === 1) return { slotsFilled: 1, caption: "Lone scout", sublabel: "A solitary rat. Brave." };
+  if (n <= 3) return { slotsFilled: 2, caption: "Small pack", sublabel: "A couple of friends." };
+  if (n <= 7) return { slotsFilled: 3, caption: "Growing colony", sublabel: "Things are getting ratty." };
+  if (n <= 15) return { slotsFilled: 4, caption: "Swarm forming", sublabel: "Someone call an exterminator." };
+  if (n <= 40) return { slotsFilled: 5, caption: "Full swarm", sublabel: "Absolute chaos." };
+  return { slotsFilled: 6, caption: "Rat apocalypse", sublabel: "We bow to our new overlords." };
 }
 
 /**

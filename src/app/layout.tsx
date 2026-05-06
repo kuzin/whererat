@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth";
 import { SiteMasthead } from "@/components/site-masthead";
 import { TooltipProvider } from "@/components/tooltip-provider";
+import { Suspense } from "react";
 import { ToastNotifications } from "./toast-notifications";
 import { logoutModerator } from "./login/actions";
 import "./globals.css";
@@ -86,6 +87,7 @@ export default async function RootLayout({
                 <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-center text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left lg:px-8">
                   <div>
                   <p className="mb-1.5 text-sm text-amber-100/70">Spoiler-aware · Crowd-sourced · Obsessively maintained</p>
+                  <p className="mb-2 text-sm italic text-amber-100/55">For Kaitlyn. ❤️</p>
                   <p className="max-w-xl leading-relaxed text-amber-100/95">
                     Copyright 2026. Design by{" "}
                     <a
@@ -128,7 +130,7 @@ export default async function RootLayout({
               </footer>
             </div>
           </div>
-          <ToastNotifications />
+          <Suspense><ToastNotifications /></Suspense>
         </TooltipProvider>
       </body>
     </html>

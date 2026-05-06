@@ -8,6 +8,11 @@ import { getMergedSightingsForMovie } from "@/lib/moderation-store";
 import { MODERATOR_SESSION_COOKIE, parseModeratorSession } from "@/lib/auth";
 import { applyMovieOverride, getDeletedMovieIds, getMovieOverride } from "@/lib/movie-edit-store";
 import { MovieSightingsCards } from "./movie-sightings-cards";
+import { MovieTabsShell } from "./movie-tabs-shell";
+import { MovieRatviewsTab } from "./movie-ratviews-tab";
+import { MovieRatlatedTab } from "./movie-ratlated-tab";
+import { MovieRatMediaTab } from "./movie-rat-media-tab";
+import { tabCardClass, tabHeaderBorderClass } from "./movie-tab-classes";
 import { MovieSightingsPagingBar, MovieSightingsSortControl } from "./movie-sightings-toolbar";
 import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
@@ -182,6 +187,11 @@ export default async function MoviePage({
   const writers = trimMeta(movie.metadata.writers);
   const cast = trimMeta(movie.metadata.cast);
   const awards = trimMeta(movie.metadata.awards);
+  const ratFacts = (movie.metadata.ratFacts ?? []).filter((f) => f.trim());
+  const imdbReviews = movie.metadata.imdbReviews ?? [];
+  const imdbRelated = movie.metadata.imdbRelated ?? [];
+  const imdbVideos = movie.metadata.imdbVideos ?? [];
+  const imdbImages = movie.metadata.imdbImages ?? [];
   const imdbRating = trimMeta(movie.metadata.imdbRating);
   const imdbVotes = trimMeta(movie.metadata.imdbVotes);
   const metascore = trimMeta(movie.metadata.metascore);
@@ -211,37 +221,45 @@ export default async function MoviePage({
         >
           ← Back to catalog
         </Link>
-        {canEditMovie ? (
-          <div className="flex items-center gap-2">
-            <form action={resyncMovieFromImdb}>
-              <input type="hidden" name="slug" value={slug} />
-              <button
-                type="submit"
-                className="wr-btn-ghost inline-flex px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+        <div className="flex items-center gap-2">
+          {canEditMovie ? (
+            <div className="flex items-center gap-2">
+              <form action={resyncMovieFromImdb}>
+                <input type="hidden" name="slug" value={slug} />
+                <button
+                  type="submit"
+                  className="wr-btn-ghost inline-flex px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+                >
+                  Resync
+                </button>
+              </form>
+              <form action={deleteMovie}>
+                <input type="hidden" name="slug" value={slug} />
+                <ConfirmSubmitButton
+                  confirmMessage="Delete this movie? This cannot be undone."
+                  type="submit"
+                  className="wr-btn-ghost inline-flex px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-red-800 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/35"
+                >
+                  Delete
+                </ConfirmSubmitButton>
+              </form>
+              <Link
+                href={`/movies/${slug}?editMovie=1`}
+                className="wr-btn-ghost inline-flex h-9 w-9 items-center justify-center px-0 text-lg"
+                aria-label="Edit movie information"
+                title="Edit movie information"
               >
-                Resync
-              </button>
-            </form>
-            <form action={deleteMovie}>
-              <input type="hidden" name="slug" value={slug} />
-              <ConfirmSubmitButton
-                confirmMessage="Delete this movie? This cannot be undone."
-                type="submit"
-                className="wr-btn-ghost inline-flex px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-red-800 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/35"
-              >
-                Delete
-              </ConfirmSubmitButton>
-            </form>
-            <Link
-              href={`/movies/${slug}?editMovie=1`}
-              className="wr-btn-ghost inline-flex h-9 w-9 items-center justify-center px-0 text-lg"
-              aria-label="Edit movie information"
-              title="Edit movie information"
-            >
-              ✎
-            </Link>
-          </div>
-        ) : null}
+                ✎
+              </Link>
+            </div>
+          ) : null}
+          <Link
+            href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
+            className={`inline-flex items-center gap-1.5 text-sm ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
+          >
+            + Submit a {movie.title} Sighting
+          </Link>
+        </div>
       </div>
 
       <section
@@ -362,6 +380,36 @@ export default async function MoviePage({
                     {approxRatsInMovie}
                   </dd>
                 </div>
+                {imdbRating ? (
+                  <div
+                    className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
+                      palette
+                        ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
+                        : "border-white/22 bg-black/42"
+                    }`}
+                  >
+                    <dt
+                      className={
+                        palette
+                          ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
+                          : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78"
+                      }
+                    >
+                      IMDb rating
+                    </dt>
+                    <dd
+                      className={`wr-display mt-1 flex items-baseline gap-1.5 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
+                        palette
+                          ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
+                          : "text-amber-50"
+                      }`}
+                    >
+                      <span className="text-amber-400">★</span>
+                      {imdbRating}
+                      <span className="text-base font-normal opacity-60">/10</span>
+                    </dd>
+                  </div>
+                ) : null}
               </dl>
               <a
                 href={getImdbTitleUrl(movie.externalIds.imdb)}
@@ -379,170 +427,171 @@ export default async function MoviePage({
           </div>
         </div>
 
-        <div className="grid gap-10 p-6 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-14 lg:p-10">
-          <aside
-            className={`order-2 flex min-w-0 flex-col gap-8 lg:order-none lg:border-r lg:pr-11 lg:pt-0.5 ${
-              palette
-                ? "lg:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(120_113_108/0.85))] dark:lg:border-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(245_240_232/0.28))]"
-                : "lg:border-stone-900/22 dark:lg:border-white/18"
-            }`}
-          >
-            <Image
-              src={movie.posterUrl}
-              alt={movie.posterAlt}
-              width={480}
-              height={720}
-              className={`aspect-[2/3] w-full shrink-0 rounded-xl object-cover ring-2 dark:ring-white/12 ${palette ? "ring-[color-mix(in_srgb,var(--movie-accent)_22%,transparent)]" : "ring-stone-950/10"}`}
-            />
-            <section className="space-y-2.5">
-              <h2 className={sidebarSectionTitleClass}>Synopsis</h2>
-              <p className="text-sm leading-[1.65] text-stone-800 dark:text-stone-200">
-                {movie.summary}
-              </p>
-            </section>
-            <section className="space-y-3">
-              <h2 className={sidebarSectionTitleClass}>Genres</h2>
-              <ul className="flex flex-wrap gap-2">
-                {movie.genres.map((genre) => (
-                  <li key={genre}>
-                    <span
-                      className={`inline-flex rounded-lg border px-2.5 py-1.5 text-xs font-semibold leading-none shadow-[1px_1px_0_0_rgb(28_25_23/0.12)] dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.35)] ${
-                        palette
-                          ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_88%,white)] text-stone-900 dark:border-amber-400/45 dark:bg-stone-900 dark:text-amber-100"
-                          : "border-stone-400/65 bg-white text-stone-900 dark:border-amber-500/40 dark:bg-stone-800 dark:text-amber-100"
-                      }`}
-                    >
-                      {genre}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-            {hasDetailsSection ? (
-              <section
-                className={`space-y-5 border-t pt-8 ${
-                  palette
-                    ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.7))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
-                    : "border-stone-900/18 dark:border-white/14"
-                }`}
-              >
-                <h2 className={sidebarSectionTitleClass}>Details</h2>
-                <dl className="space-y-5 text-sm text-stone-800 dark:text-stone-100">
-                  {runtimeLabel ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Runtime</dt>
-                      <dd className="mt-1 font-semibold">{runtimeLabel}</dd>
-                    </div>
-                  ) : null}
-                  {certificate ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Certificate</dt>
-                      <dd className="mt-1 font-semibold">{certificate}</dd>
-                    </div>
-                  ) : null}
-                  {imdbRating ? (
-                    <div>
-                      <dt className={sidebarDtClass}>IMDb score</dt>
-                      <dd className="mt-1">
-                        <a
-                          href={imdbTitleUrlResolved}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="group font-semibold text-stone-900 underline decoration-stone-400 decoration-1 underline-offset-2 hover:decoration-amber-600 dark:text-amber-100 dark:decoration-amber-500/55 dark:hover:decoration-amber-400"
-                        >
-                          <span className="tabular-nums text-[1.06em] tracking-tight">
-                            ★ {imdbRating}
-                          </span>
-                          <span className="font-medium text-stone-600 dark:text-stone-300">
-                            /10
-                          </span>
-                          {imdbVotes ? (
-                            <span className="font-normal text-stone-600 dark:text-stone-400">
-                              {" "}
-                              ({imdbVotes} votes)
-                            </span>
-                          ) : null}
-                        </a>
-                      </dd>
-                    </div>
-                  ) : null}
-                  {metascore ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Metacritic</dt>
-                      <dd className="mt-1 font-semibold tabular-nums">
-                        {metascore}/100 Metascore
-                      </dd>
-                    </div>
-                  ) : null}
-                  {writers ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Writers</dt>
-                      <dd className="mt-1 leading-snug">
-                        <ImdbCreditsInline line={writers} />
-                      </dd>
-                    </div>
-                  ) : null}
-                  {director ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Director</dt>
-                      <dd className="mt-1 leading-snug">
-                        <ImdbCreditsInline line={director} />
-                      </dd>
-                    </div>
-                  ) : null}
-                  {cast ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Cast (top billed)</dt>
-                      <dd className="mt-1 leading-relaxed">
-                        <ImdbCreditsInline line={cast} />
-                      </dd>
-                    </div>
-                  ) : null}
-                  {originalLanguage ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Language</dt>
-                      <dd className="mt-1 font-medium">{originalLanguage}</dd>
-                    </div>
-                  ) : null}
-                  {countriesLine ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Countries</dt>
-                      <dd className="mt-1 font-medium leading-snug">
-                        {countriesLine}
-                      </dd>
-                    </div>
-                  ) : null}
-                  {awards ? (
-                    <div>
-                      <dt className={sidebarDtClass}>Honors</dt>
-                      <dd className="mt-1 text-sm italic leading-snug text-stone-600 dark:text-stone-400">
-                        {awards}
-                      </dd>
-                    </div>
-                  ) : null}
-                </dl>
+        <MovieTabsShell
+          palette={Boolean(palette)}
+          tabs={[
+            { id: "sightings", label: "Featured Rats" },
+            ...(ratFacts.length > 0 ? [{ id: "rat-facts", label: "Rat Facts" }] : []),
+            ...(imdbReviews.length > 0 ? [{ id: "rat-views", label: "Reviews" }] : []),
+            ...((imdbVideos.length > 0 || imdbImages.length > 0) ? [{ id: "rat-media", label: "Media" }] : []),
+            ...(imdbRelated.length > 0 ? [{ id: "ratlated", label: "Related" }] : []),
+          ]}
+          sidebarContent={
+            <>
+              <Image
+                src={movie.posterUrl}
+                alt={movie.posterAlt}
+                width={480}
+                height={720}
+                className={`aspect-[2/3] w-full shrink-0 rounded-xl object-cover ring-2 dark:ring-white/12 ${palette ? "ring-[color-mix(in_srgb,var(--movie-accent)_22%,transparent)]" : "ring-stone-950/10"}`}
+              />
+              <section className="space-y-2.5">
+                <h2 className={sidebarSectionTitleClass}>Synopsis</h2>
+                <p className="text-sm leading-[1.65] text-stone-800 dark:text-stone-200">
+                  {movie.summary}
+                </p>
               </section>
-            ) : null}
-          </aside>
-
-          <div className="order-1 min-w-0 lg:order-none">
-            <header
-              className={`flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 ${
-                palette
-                  ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(120_113_108/0.75))] dark:border-[color-mix(in_srgb,var(--movie-accent)_30%,rgb(245_240_232/0.24))]"
-                  : "border-stone-900/22 dark:border-white/18"
-              }`}
-            >
-              <h2 className="wr-display shrink-0 text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                On-screen Rats:
-              </h2>
-              {movieSightings.length > 0 ? (
-                <MovieSightingsSortControl
-                  slug={slug}
-                  sort={sort}
-                  palette={Boolean(palette)}
-                />
+              <section className="space-y-3">
+                <h2 className={sidebarSectionTitleClass}>Genres</h2>
+                <ul className="flex flex-wrap gap-2">
+                  {movie.genres.map((genre) => (
+                    <li key={genre}>
+                      <span
+                        className={`inline-flex rounded-lg border px-2.5 py-1.5 text-xs font-semibold leading-none shadow-[1px_1px_0_0_rgb(28_25_23/0.12)] dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.35)] ${
+                          palette
+                            ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_88%,white)] text-stone-900 dark:border-amber-400/45 dark:bg-stone-900 dark:text-amber-100"
+                            : "border-stone-400/65 bg-white text-stone-900 dark:border-amber-500/40 dark:bg-stone-800 dark:text-amber-100"
+                        }`}
+                      >
+                        {genre}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              {hasDetailsSection ? (
+                <section
+                  className={`space-y-5 border-t pt-8 ${
+                    palette
+                      ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.7))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
+                      : "border-stone-900/18 dark:border-white/14"
+                  }`}
+                >
+                  <h2 className={sidebarSectionTitleClass}>Details</h2>
+                  <dl className="space-y-5 text-sm text-stone-800 dark:text-stone-100">
+                    {runtimeLabel ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Runtime</dt>
+                        <dd className="mt-1 font-semibold">{runtimeLabel}</dd>
+                      </div>
+                    ) : null}
+                    {certificate ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Certificate</dt>
+                        <dd className="mt-1 font-semibold">{certificate}</dd>
+                      </div>
+                    ) : null}
+                    {imdbRating ? (
+                      <div>
+                        <dt className={sidebarDtClass}>IMDb score</dt>
+                        <dd className="mt-1">
+                          <a
+                            href={imdbTitleUrlResolved}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="group font-semibold text-stone-900 underline decoration-stone-400 decoration-1 underline-offset-2 hover:decoration-amber-600 dark:text-amber-100 dark:decoration-amber-500/55 dark:hover:decoration-amber-400"
+                          >
+                            <span className="tabular-nums text-[1.06em] tracking-tight">
+                              ★ {imdbRating}
+                            </span>
+                            <span className="font-medium text-stone-600 dark:text-stone-300">
+                              /10
+                            </span>
+                            {imdbVotes ? (
+                              <span className="font-normal text-stone-600 dark:text-stone-400">
+                                {" "}
+                                ({imdbVotes} votes)
+                              </span>
+                            ) : null}
+                          </a>
+                        </dd>
+                      </div>
+                    ) : null}
+                    {metascore ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Metacritic</dt>
+                        <dd className="mt-1 font-semibold tabular-nums">
+                          {metascore}/100 Metascore
+                        </dd>
+                      </div>
+                    ) : null}
+                    {writers ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Writers</dt>
+                        <dd className="mt-1 leading-snug">
+                          <ImdbCreditsInline line={writers} />
+                        </dd>
+                      </div>
+                    ) : null}
+                    {director ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Director</dt>
+                        <dd className="mt-1 leading-snug">
+                          <ImdbCreditsInline line={director} />
+                        </dd>
+                      </div>
+                    ) : null}
+                    {cast ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Cast (top billed)</dt>
+                        <dd className="mt-1 leading-relaxed">
+                          <ImdbCreditsInline line={cast} />
+                        </dd>
+                      </div>
+                    ) : null}
+                    {originalLanguage ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Language</dt>
+                        <dd className="mt-1 font-medium">{originalLanguage}</dd>
+                      </div>
+                    ) : null}
+                    {countriesLine ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Countries</dt>
+                        <dd className="mt-1 font-medium leading-snug">
+                          {countriesLine}
+                        </dd>
+                      </div>
+                    ) : null}
+                    {awards ? (
+                      <div>
+                        <dt className={sidebarDtClass}>Honors</dt>
+                        <dd className="mt-1 text-sm italic leading-snug text-stone-600 dark:text-stone-400">
+                          {awards}
+                        </dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                </section>
               ) : null}
+            </>
+          }
+        >
+          {/* Panel 0 — On-screen Rats */}
+          <div>
+            <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
+              <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="wr-display shrink-0 text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+                  Featured Rats:
+                </h2>
+                {movieSightings.length > 0 ? (
+                  <MovieSightingsSortControl
+                    slug={slug}
+                    sort={sort}
+                    palette={Boolean(palette)}
+                  />
+                ) : null}
+              </div>
             </header>
 
             {movieSightings.length > 0 ? (
@@ -556,7 +605,7 @@ export default async function MoviePage({
               />
             ) : null}
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               {movieSightings.length === 0 ? (
                 <div
                   className={`mt-6 rounded-2xl border-2 border-dashed px-6 py-14 text-center dark:border-white/18 ${
@@ -573,7 +622,7 @@ export default async function MoviePage({
                     back after the queue catches up—or submit what you spotted.
                   </p>
                   <Link
-                    href="/submit"
+                    href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
                     className="mt-6 inline-flex wr-btn-primary"
                   >
                     Submit a sighting
@@ -604,7 +653,77 @@ export default async function MoviePage({
               />
             ) : null}
           </div>
-        </div>
+
+          {/* Panel 1 — Rat Facts (conditional, must match tab condition) */}
+          {ratFacts.length > 0 ? (
+            <div>
+              <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
+                <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+                    Rat Facts:
+                  </h2>
+                  <a
+                    href={`https://www.imdb.com/title/${movie.externalIds.imdb}/trivia/`}
+                    target="_blank"
+                    rel="noreferrer"
+                    title="All trivia on IMDb"
+                    aria-label="All trivia on IMDb"
+                    className="wr-btn-ghost inline-flex h-9 items-center gap-1.5 px-3 text-xs font-semibold"
+                  >
+                    View on IMDb
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3.5">
+                      <path d="M6.22 8.72a.75.75 0 0 0 1.06 1.06l5.22-5.22v1.69a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75h-3.5a.75.75 0 0 0 0 1.5h1.69L6.22 8.72Z" />
+                      <path d="M3.5 6.75c0-.69.56-1.25 1.25-1.25H7A.75.75 0 0 0 7 4H4.75A2.75 2.75 0 0 0 2 6.75v4.5A2.75 2.75 0 0 0 4.75 14h4.5A2.75 2.75 0 0 0 12 11.25V9a.75.75 0 0 0-1.5 0v2.25c0 .69-.56 1.25-1.25 1.25h-4.5c-.69 0-1.25-.56-1.25-1.25v-4.5Z" />
+                    </svg>
+                  </a>
+                </div>
+              </header>
+              <div className="space-y-4">
+                {ratFacts.map((fact, i) => (
+                  <div key={i} className={tabCardClass(Boolean(palette))}>
+                    <p className="wr-display mb-3 text-base font-black uppercase tracking-widest text-stone-600 dark:text-stone-300">
+                      Rat Fact #{i + 1}
+                    </p>
+                    <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+                      {fact}
+                    </p>
+                    <p className="mt-3 text-xs text-stone-400 dark:text-stone-500">
+                      Source: IMDb trivia
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Panel 2 — Reviews (conditional, must match tab condition) */}
+          {imdbReviews.length > 0 ? (
+            <MovieRatviewsTab
+              reviews={imdbReviews}
+              imdbId={movie.externalIds.imdb}
+              palette={Boolean(palette)}
+            />
+          ) : null}
+
+          {/* Panel 3 — Media (conditional, must match tab condition) */}
+          {(imdbVideos.length > 0 || imdbImages.length > 0) ? (
+            <MovieRatMediaTab
+              videos={imdbVideos}
+              images={imdbImages}
+              imdbId={movie.externalIds.imdb}
+              palette={Boolean(palette)}
+            />
+          ) : null}
+
+          {/* Panel 4 — Related (conditional, must match tab condition — last) */}
+          {imdbRelated.length > 0 ? (
+            <MovieRatlatedTab
+              titles={imdbRelated}
+              imdbId={movie.externalIds.imdb}
+              palette={Boolean(palette)}
+            />
+          ) : null}
+        </MovieTabsShell>
       </section>
 
       {editMovie && canEditMovie ? (
@@ -730,12 +849,15 @@ export default async function MoviePage({
       ) : null}
       {editingSighting && canEditSightings ? (
         <div className="fixed inset-0 z-[220] flex items-start justify-center bg-black/55 px-4 py-8 sm:py-12">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-black text-stone-950 dark:text-stone-100">
+                <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
                   {editingSighting.title}
                 </h2>
+                <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
+                  {movie.title}
+                </p>
               </div>
               <Link
                 href={sightingsBasePath}
@@ -750,7 +872,7 @@ export default async function MoviePage({
               <input type="hidden" name="sightingId" value={editingSighting.id} />
               <input type="hidden" name="returnTo" value={sightingsBasePath} />
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Title
+                Sighting title
                 <input name="title" required defaultValue={editingSighting.title} className="wr-input" />
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
@@ -764,6 +886,21 @@ export default async function MoviePage({
                   defaultValue={getSightingTimestampPercent(editingSighting.timestamp) ?? 50}
                   className="accent-amber-700 dark:accent-amber-400"
                 />
+                <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+                  Stored as a percentage into the movie.
+                </p>
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Approx. rats
+                <input
+                  name="approximateRatCount"
+                  type="number"
+                  min={1}
+                  max={999}
+                  required
+                  defaultValue={editingSighting.approximateRatCount}
+                  className="wr-input tabular-nums"
+                />
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Description
@@ -775,41 +912,29 @@ export default async function MoviePage({
                   className="wr-input"
                 />
                 <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Markdown is supported; it renders on the public sighting card.
+                  Markdown is supported (bold, lists, links, headings). It renders on movie pages.
                 </span>
               </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Estimated rats
-                  <input
-                    name="approximateRatCount"
-                    type="number"
-                    min={0}
-                    max={9999}
-                    defaultValue={editingSighting.approximateRatCount}
-                    className="wr-input"
-                  />
-                </label>
-                <label className="flex items-center gap-2 text-sm font-bold text-stone-700 dark:text-stone-200 sm:pt-8">
-                  <input
-                    name="spoiler"
-                    type="checkbox"
-                    defaultChecked={editingSighting.spoiler}
-                    className="h-4 w-4 rounded border-stone-400 text-amber-600 focus:ring-amber-500"
-                  />
-                  Contains spoiler content
-                </label>
-              </div>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Curator message
                 <textarea
                   name="curatorNote"
                   rows={3}
                   defaultValue={editingSighting.curatorNote ?? ""}
+                  placeholder="Optional note shown with the published sighting."
                   className="wr-input"
                 />
               </label>
               <EditableSightingImagesField initialImages={editingSightingImages} />
+              <label className="flex items-center gap-3 rounded-2xl bg-amber-100 p-4 text-sm font-bold text-stone-700 dark:bg-amber-900/45 dark:text-amber-100">
+                <input
+                  name="spoiler"
+                  type="checkbox"
+                  defaultChecked={editingSighting.spoiler}
+                  className="h-5 w-5"
+                />
+                Contains spoilers
+              </label>
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <ConfirmSubmitButton
                   confirmMessage="Delete this sighting? This cannot be undone."
@@ -825,10 +950,7 @@ export default async function MoviePage({
                 >
                   Cancel
                 </Link>
-                <button
-                  type="submit"
-                  className="wr-btn-primary"
-                >
+                <button type="submit" className="wr-btn-primary">
                   Save sighting
                 </button>
               </div>

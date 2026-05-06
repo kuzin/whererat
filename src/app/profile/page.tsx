@@ -46,10 +46,10 @@ export default async function ProfilePage({
           <h1 className="wr-display mt-6 text-4xl font-bold tracking-tight">
             {account.name}
           </h1>
-          <p className="mt-2 text-orange-950/70 dark:text-amber-50/72">
+          <p className="mt-2 text-orange-950 dark:text-amber-50/90">
             @{account.username} · {account.role}
           </p>
-          <p className="mt-1 text-orange-950/70 dark:text-amber-50/72">{account.email}</p>
+          <p className="mt-1 text-orange-950 dark:text-amber-50/90">{account.email}</p>
 
         </aside>
 

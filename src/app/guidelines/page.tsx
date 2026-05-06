@@ -57,7 +57,7 @@ export default function GuidelinesPage() {
           <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
             Guidelines
           </h1>
-          <p className="mt-5 leading-relaxed text-orange-950/75 dark:text-amber-50/82">
+          <p className="mt-5 leading-relaxed text-orange-950 dark:text-amber-50/90">
             Standards for submissions, spoilers, moderation, inclusivity, and accessibility — so the catalog stays accurate, welcoming, and easy to trust.
           </p>
         </aside>

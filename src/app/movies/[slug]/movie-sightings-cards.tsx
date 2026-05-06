@@ -41,13 +41,11 @@ export function MovieSightingsCards({
     ? "border-[color-mix(in_srgb,var(--movie-accent)_12%,rgb(41_37_36))] bg-[color-mix(in_srgb,var(--movie-column-wash)_48%,rgb(253_251_246))]"
     : "border-stone-950/90 bg-[var(--wr-surface-cream-soft)]";
 
-  const spoilerRedactTitle = palette
-    ? "block w-full max-w-full select-none rounded-md border border-stone-900/18 bg-[color-mix(in_srgb,rgb(28_25_23)_30%,rgb(253_251_246))] px-0 py-1 text-transparent shadow-[inset_0_1px_2px_rgb(28_25_23/0.1)] dark:border-white/12 dark:bg-[color-mix(in_srgb,rgb(0_0_0)_40%,rgb(36_30_26))] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.3)]"
-    : "block w-full max-w-full select-none rounded-md border border-stone-900/14 bg-[color-mix(in_srgb,rgb(28_25_23)_18%,rgb(255_253_248))] px-0 py-1 text-transparent shadow-[inset_0_1px_2px_rgb(28_25_23/0.08)] dark:border-white/10 dark:bg-[color-mix(in_srgb,rgb(0_0_0)_36%,rgb(36_30_26))] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.28)]";
+  const spoilerRedactTitle =
+    "select-none text-transparent [text-shadow:0_0_12px_rgb(120_113_108/0.75)] dark:[text-shadow:0_0_12px_rgb(168_162_158/0.6)]";
 
-  const spoilerRedactDesc = palette
-    ? "select-none rounded-md border border-stone-900/18 bg-[color-mix(in_srgb,rgb(28_25_23)_28%,rgb(253_251_246))] px-0 py-1.5 text-base leading-relaxed text-transparent shadow-[inset_0_1px_2px_rgb(28_25_23/0.1)] dark:border-white/12 dark:bg-[color-mix(in_srgb,rgb(0_0_0)_38%,rgb(36_30_26))] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.3)]"
-    : "select-none rounded-md border border-stone-900/14 bg-[color-mix(in_srgb,rgb(28_25_23)_16%,rgb(255_253_248))] px-0 py-1.5 text-base leading-relaxed text-transparent shadow-[inset_0_1px_2px_rgb(28_25_23/0.08)] dark:border-white/10 dark:bg-[color-mix(in_srgb,rgb(0_0_0)_34%,rgb(36_30_26))] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.28)]";
+  const spoilerRedactDescWrapper =
+    "select-none pointer-events-none [&_*]:text-transparent [&_*]:[text-shadow:0_0_9px_rgb(120_113_108/0.65)] dark:[&_*]:[text-shadow:0_0_9px_rgb(168_162_158/0.5)]";
 
   const toggleSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
@@ -130,24 +128,13 @@ export function MovieSightingsCards({
               : undefined;
 
           const headerRight = (
-            <div
-              className={
-                blackoutSpoiler
-                  ? "flex max-w-[min(100%,22rem)] flex-row flex-wrap items-center justify-end gap-2 md:max-w-none"
-                  : "ml-auto flex max-w-full shrink-0 flex-row flex-wrap items-center justify-end gap-2"
-              }
-            >
+            <div className="flex shrink-0 flex-row flex-wrap items-center gap-2">
               <SightingRatPresenceVisual
                 estimatedCount={ratEstimate}
                 palette={palette}
               />
-              {sighting.spoiler ? (
-                <span className="rounded-md border border-red-800/30 bg-[#fecaca] px-2.5 py-0.5 text-xs font-semibold text-red-950 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
-                  Spoiler
-                </span>
-              ) : null}
               <span
-                className="rounded-md border border-amber-900/25 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
+                className="inline-flex h-9 items-center rounded-lg border border-amber-900/25 bg-amber-50 px-3 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
                 title="Estimated rats on screen for this moment"
               >
                 {formatApproximateRatLine(ratEstimate)}
@@ -169,117 +156,68 @@ export function MovieSightingsCards({
               <div
                 className={`p-5 sm:p-6 md:p-7 ${hasCarousel ? "" : "pt-6 sm:pt-7"}`}
               >
-                {blackoutSpoiler ? (
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-                      <p
-                        className="inline-flex max-w-full flex-wrap items-baseline gap-x-1.5 gap-y-0.5 rounded-md border border-orange-800/25 bg-orange-50 px-2.5 py-1 text-sm font-semibold tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
-                        title="Rat sighting starting time"
-                        aria-label={`Rat sighting; starting time ${startingTimeLabel}`}
-                      >
-                        <span className="font-bold">Rat sighting</span>
-                        <span className="font-semibold opacity-85" aria-hidden={true}>
-                          ·
-                        </span>
-                        <span className="tabular-nums font-semibold">
-                          {startingTimeLabel}
-                        </span>
-                      </p>
-                      {headerRight}
-                    </div>
-                    <div className="flex flex-col gap-3">
-                      <h3
-                        aria-hidden={true}
-                        className={`wr-display w-full max-w-none text-2xl font-bold leading-snug md:text-3xl md:leading-[1.18] ${spoilerRedactTitle}`}
-                      >
-                        {headlineText}
-                      </h3>
-                      <span className="sr-only">
-                        Sighting title hidden: spoiler toggle is off.
-                      </span>
-                      <p
-                        aria-hidden={true}
-                        className={`text-base leading-relaxed ${spoilerRedactDesc}`}
-                      >
-                        {sighting.description}
-                      </p>
-                      <p className="sr-only">
-                        Description hidden: turn on spoiler display to read it.
-                      </p>
-                      {submittedByLine}
-                      {editHref ? (
-                        <div className="mt-2">
-                          <Link
-                            href={editHref}
-                            className="text-xs font-bold uppercase tracking-[0.14em] text-amber-800 underline decoration-amber-700/40 underline-offset-2 hover:decoration-amber-800 dark:text-amber-300 dark:decoration-amber-300/40 dark:hover:decoration-amber-300"
-                          >
-                            Edit sighting
-                          </Link>
-                        </div>
-                      ) : null}
-                    </div>
-                    {curatorNote ? (
-                      <div className="rounded-xl border border-stone-200/90 bg-stone-50 p-4 shadow-sm dark:border-amber-200/22 dark:bg-[rgb(26_22_18)] dark:shadow-none sm:p-5">
-                        <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
-                          Curator note
-                        </p>
-                        <p className="mt-3 text-sm leading-relaxed text-stone-800 dark:text-stone-200">
-                          {curatorNote}
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-6 md:gap-7">
-                    <div className="flex flex-col gap-2 md:gap-2.5">
-                      <div className="flex w-full flex-wrap items-start justify-between gap-x-4 gap-y-3">
-                        <p
-                          className="inline-flex max-w-full flex-wrap items-baseline gap-x-1.5 gap-y-0.5 rounded-md border border-orange-800/25 bg-orange-50 px-2.5 py-1 text-sm font-semibold tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
-                          title="Rat sighting starting time"
-                          aria-label={`Rat sighting; starting time ${startingTimeLabel}`}
-                        >
-                          <span className="font-bold">Rat sighting</span>
-                          <span className="font-semibold opacity-85" aria-hidden={true}>
-                            ·
-                          </span>
-                          <span className="tabular-nums font-semibold">
-                            {startingTimeLabel}
-                          </span>
-                        </p>
-                        {headerRight}
-                      </div>
-                      <h3 className="wr-display w-full max-w-none text-2xl font-bold leading-snug text-stone-950 md:text-3xl md:leading-[1.18] dark:text-stone-50">
-                        {headlineText}
-                      </h3>
+                <div className="flex flex-col gap-4">
+                  {/* Content */}
+                  <div className="flex flex-col gap-2 md:gap-2.5">
+                    <h3
+                      aria-hidden={blackoutSpoiler}
+                      className={`wr-display w-full max-w-none text-2xl font-bold leading-snug md:text-3xl md:leading-[1.18] ${blackoutSpoiler ? spoilerRedactTitle : "text-stone-950 dark:text-stone-50"}`}
+                    >
+                      {headlineText}
+                    </h3>
+                    {blackoutSpoiler ? <span className="sr-only">Sighting title hidden: spoiler toggle is off.</span> : null}
+                    <div
+                      aria-hidden={blackoutSpoiler}
+                      className={blackoutSpoiler ? spoilerRedactDescWrapper : undefined}
+                    >
                       <SightingMarkdown
                         markdown={sighting.description}
                         className="w-full min-w-0 max-w-none text-stone-700 dark:text-stone-300"
                       />
-                      {submittedByLine}
+                    </div>
+                    {blackoutSpoiler ? <span className="sr-only">Description hidden: turn on spoiler display to read it.</span> : null}
+                    {submittedByLine}
+                  </div>
+                  {curatorNote ? (
+                    <div className="rounded-xl border border-stone-200/90 bg-stone-50 p-4 shadow-sm dark:border-amber-200/22 dark:bg-[rgb(26_22_18)] dark:shadow-none sm:p-5">
+                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
+                        Curator note
+                      </p>
+                      <p className="mt-3 text-sm leading-relaxed text-stone-800 dark:text-stone-200">
+                        {curatorNote}
+                      </p>
+                    </div>
+                  ) : null}
+                  {/* Footer bar */}
+                  <div className="flex w-full flex-wrap items-center gap-2 border-t border-stone-900/10 pt-3 dark:border-white/10">
+                    <p
+                      className="inline-flex h-9 items-center gap-x-1 rounded-lg border border-orange-800/25 bg-orange-50 px-3 text-sm tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
+                      title="Position in film"
+                      aria-label={`Sighting at ${startingTimeLabel} into the film`}
+                    >
+                      <span className="font-bold tabular-nums">{startingTimeLabel}</span>
+                      <span className="font-medium opacity-70">into film</span>
+                    </p>
+                    {sighting.spoiler ? (
+                      <span className="inline-flex h-9 items-center rounded-lg border border-red-800/30 bg-[#fecaca] px-3 text-xs font-semibold text-red-950 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
+                        Spoiler
+                      </span>
+                    ) : null}
+                    <div className="ml-auto flex items-center gap-2">
+                      {headerRight}
                       {editHref ? (
-                        <div className="mt-2">
-                          <Link
-                            href={editHref}
-                            className="text-xs font-bold uppercase tracking-[0.14em] text-amber-800 underline decoration-amber-700/40 underline-offset-2 hover:decoration-amber-800 dark:text-amber-300 dark:decoration-amber-300/40 dark:hover:decoration-amber-300"
-                          >
-                            Edit sighting
-                          </Link>
-                        </div>
+                        <Link
+                          href={editHref}
+                          className="wr-btn-ghost inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
+                          aria-label="Edit sighting"
+                          title="Edit sighting"
+                        >
+                          ✎
+                        </Link>
                       ) : null}
                     </div>
-
-                    {curatorNote ? (
-                      <div className="rounded-xl border border-stone-200/90 bg-stone-50 p-4 shadow-sm dark:border-amber-200/22 dark:bg-[rgb(26_22_18)] dark:shadow-none sm:p-5">
-                        <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
-                          Curator note
-                        </p>
-                        <p className="mt-3 text-sm leading-relaxed text-stone-800 dark:text-stone-200">
-                          {curatorNote}
-                        </p>
-                      </div>
-                    ) : null}
                   </div>
-                )}
+                </div>
               </div>
             </article>
           );

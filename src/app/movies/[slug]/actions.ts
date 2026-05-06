@@ -10,6 +10,7 @@ import {
 import {
   clampApproximateRatCount,
   normalizeSightingTimestampInput,
+  type ImdbReview,
   type SightingImageSlot,
 } from "@/lib/whererat";
 import {
@@ -17,6 +18,7 @@ import {
   deleteMovieById,
   updateMovieOverride,
 } from "@/lib/movie-edit-store";
+import { fetchImdbMedia, fetchImdbRelated, syncMovieFromImdb } from "@/lib/movie-imdb-sync";
 import { reviewSubmission } from "@/lib/moderation-store";
 import { deleteSightingById, updateSightingOverride } from "@/lib/sighting-edit-store";
 import { getCatalogMovieBySlug } from "@/lib/movie-catalog";
@@ -83,8 +85,147 @@ export async function updateMovieInfo(formData: FormData) {
 
   revalidatePath(`/movies/${slug}`);
   revalidatePath("/moderation");
-  redirect(`/movies/${slug}`);
+  redirect(`/movies/${slug}?toast=movie-saved`);
 }
+
+type RatFactsResult =
+  | { status: "http-error"; httpStatus: number }
+  | { status: "api-error" }
+  | { status: "no-edges" }
+  | { status: "no-rat-facts"; totalTrivia: number }
+  | { status: "found"; facts: string[]; totalTrivia: number };
+
+/** Fetch IMDb trivia and classify the result for toast feedback. */
+async function fetchRatFacts(imdbId: string): Promise<RatFactsResult> {
+  const IMDB_GRAPHQL_URL = "https://api.graphql.imdb.com/";
+  const query = `
+    query {
+      title(id: "${imdbId}") {
+        trivia(first: 50) {
+          edges {
+            node {
+              id
+              displayableArticle { body { plaidHtml } }
+            }
+          }
+        }
+      }
+    }
+  `;
+  let res: Response;
+  try {
+    res = await fetch(IMDB_GRAPHQL_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch {
+    return { status: "http-error", httpStatus: 0 };
+  }
+  if (!res.ok) return { status: "http-error", httpStatus: res.status };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const json = (await res.json()) as Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const edges: any[] = json?.data?.title?.trivia?.edges ?? [];
+  if (!edges.length) {
+    if (!json?.data?.title) return { status: "api-error" };
+    return { status: "no-edges" };
+  }
+
+  const facts: string[] = [];
+  for (const edge of edges) {
+    if (facts.length >= 3) break;
+    const raw: string = edge?.node?.displayableArticle?.body?.plaidHtml ?? "";
+    if (!raw) continue;
+    const plain = raw.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    if (plain && /\brat(s|ty|like|proof|infested|catcher)?\b/i.test(plain)) facts.push(plain);
+  }
+  if (!facts.length) return { status: "no-rat-facts", totalTrivia: edges.length };
+  return { status: "found", facts, totalTrivia: edges.length };
+}
+
+/** Fetch up to 20 IMDb user reviews. Returns an empty array on any failure. */
+async function fetchReviewsForResync(imdbId: string): Promise<ImdbReview[]> {
+  const IMDB_GRAPHQL_URL = "https://api.graphql.imdb.com/";
+  const query = `
+    query {
+      title(id: "${imdbId}") {
+        reviews(first: 20) {
+          edges {
+            node {
+              id
+              author { nickName }
+              summary { originalText }
+              text { originalText { plainText } }
+              authorRating
+              submissionDate
+            }
+          }
+        }
+      }
+    }
+  `;
+  try {
+    const res = await fetch(IMDB_GRAPHQL_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) return [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const json = (await res.json()) as Record<string, any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const edges: any[] = json?.data?.title?.reviews?.edges ?? [];
+    const reviews: ImdbReview[] = [];
+    for (const edge of edges) {
+      const node = edge?.node;
+      if (!node) continue;
+      const summary = String(node.summary?.originalText ?? "").replace(/<[^>]*>/g, " ").trim();
+      const text = String(node.text?.originalText?.plainText ?? "").replace(/<[^>]*>/g, " ").trim();
+      if (!summary && !text) continue;
+      const combined = `${summary} ${text}`;
+      const mentionsRat = /\brat(s|ty|like|proof|infested|catcher)?\b/i.test(combined);
+      const ratingRaw = node.authorRating;
+      reviews.push({
+        id: String(node.id ?? reviews.length),
+        author: String(node.author?.nickName ?? "Anonymous"),
+        summary,
+        text,
+        rating: typeof ratingRaw === "number" ? ratingRaw : undefined,
+        date: String(node.submissionDate ?? ""),
+        mentionsRat,
+      });
+    }
+    return reviews.sort((a, b) => Number(b.mentionsRat) - Number(a.mentionsRat));
+  } catch {
+    return [];
+  }
+}
+
+type OmdbFullDetails = {
+  Title: string;
+  Year: string;
+  Rated?: string;
+  Runtime?: string;
+  Genre?: string;
+  Director?: string;
+  Writer?: string;
+  Actors?: string;
+  Plot?: string;
+  Language?: string;
+  Country?: string;
+  Awards?: string;
+  Poster?: string;
+  Metascore?: string;
+  imdbRating?: string;
+  imdbVotes?: string;
+  Response: "True" | "False";
+};
 
 export async function resyncMovieFromImdb(formData: FormData) {
   await requireModerator();
@@ -92,10 +233,120 @@ export async function resyncMovieFromImdb(formData: FormData) {
   const movie = await getCatalogMovieBySlug(slug);
   if (!movie) redirect("/#catalog");
 
-  await clearMovieOverride(movie.id);
+  const apiKey = process.env.OMDB_API_KEY;
+  const imdbId = movie.externalIds.imdb;
+
+  if (!apiKey || !imdbId) {
+    await clearMovieOverride(movie.id);
+    revalidatePath(`/movies/${slug}`);
+    revalidatePath("/moderation");
+    redirect(`/movies/${slug}?toast=resync-no-key`);
+  }
+
+  const url = new URL("https://www.omdbapi.com/");
+  url.searchParams.set("apikey", apiKey);
+  url.searchParams.set("i", imdbId);
+  url.searchParams.set("plot", "full");
+
+  let omdb: OmdbFullDetails | undefined;
+  try {
+    const response = await fetch(url.toString(), { cache: "no-store" });
+    if (response.ok) {
+      const json = (await response.json()) as OmdbFullDetails;
+      if (json.Response === "True") omdb = json;
+    }
+  } catch {
+    // Network failure — proceed without OMDb data
+  }
+
+  if (!omdb) {
+    revalidatePath(`/movies/${slug}`);
+    redirect(`/movies/${slug}?toast=resync-failed`);
+  }
+
+  function omdbStr(val: string | undefined) {
+    return val && val !== "N/A" ? val.trim() : undefined;
+  }
+
+  const runtimeMinutes = omdb.Runtime
+    ? Number.parseInt(omdb.Runtime, 10) || undefined
+    : undefined;
+
+  const genres = omdbStr(omdb.Genre)
+    ? omdb.Genre!.split(",").map((g) => g.trim()).filter(Boolean)
+    : undefined;
+
+  const productionCountries = omdbStr(omdb.Country)
+    ? omdb.Country!.split(",").map((c) => c.trim()).filter(Boolean)
+    : undefined;
+
+  const posterUrl =
+    omdb.Poster && omdb.Poster !== "N/A" ? omdb.Poster : undefined;
+
+  const [ratFactsResult, imdbReviews, imdbRelated, imdbMedia] = await Promise.all([
+    fetchRatFacts(imdbId),
+    fetchReviewsForResync(imdbId),
+    fetchImdbRelated(imdbId),
+    fetchImdbMedia(imdbId),
+  ]);
+  const ratFacts = ratFactsResult.status === "found" ? ratFactsResult.facts : [];
+
+  await updateMovieOverride(movie.id, {
+    ...(omdbStr(omdb.Title) ? { title: omdb.Title } : {}),
+    ...(omdb.Year ? { releaseYear: Number.parseInt(omdb.Year, 10) || movie.releaseYear } : {}),
+    ...(runtimeMinutes ? { runtimeMinutes } : {}),
+    ...(genres ? { genres } : {}),
+    ...(omdbStr(omdb.Plot) ? { summary: omdb.Plot } : {}),
+    ...(posterUrl ? { posterUrl } : {}),
+    metadata: {
+      ...movie.metadata,
+      ...(omdbStr(omdb.Rated) ? { rating: omdb.Rated } : {}),
+      ...(omdbStr(omdb.Director) ? { director: omdb.Director } : {}),
+      ...(omdbStr(omdb.Writer) ? { writers: omdb.Writer } : {}),
+      ...(omdbStr(omdb.Actors) ? { cast: omdb.Actors } : {}),
+      ...(omdbStr(omdb.imdbRating) ? { imdbRating: omdb.imdbRating } : {}),
+      ...(omdbStr(omdb.imdbVotes) ? { imdbVotes: omdb.imdbVotes } : {}),
+      ...(omdbStr(omdb.Metascore) ? { metascore: omdb.Metascore } : {}),
+      ...(omdbStr(omdb.Awards) ? { awards: omdb.Awards } : {}),
+      ...(omdbStr(omdb.Language) ? { originalLanguage: omdb.Language } : {}),
+      ...(productionCountries ? { productionCountries } : {}),
+      metadataProvider: "OMDb via IMDb ID",
+      ...(ratFacts.length > 0 ? { ratFacts } : {}),
+      ...(imdbReviews.length > 0 ? { imdbReviews } : {}),
+      ...(imdbRelated.length > 0 ? { imdbRelated } : {}),
+      ...(imdbMedia.videos.length > 0 ? { imdbVideos: imdbMedia.videos } : {}),
+      ...(imdbMedia.images.length > 0 ? { imdbImages: imdbMedia.images } : {}),
+    },
+  });
+
   revalidatePath(`/movies/${slug}`);
   revalidatePath("/moderation");
-  redirect(`/movies/${slug}`);
+
+  // Build a single comprehensive resync-complete toast with all outcome details.
+  const params = new URLSearchParams({ toast: "resync-complete" });
+  // Metadata was saved (omdb was present — we already redirected earlier if not)
+  params.set("meta", "1");
+  // Rat facts
+  if (ratFactsResult.status === "found") {
+    params.set("facts", String(ratFactsResult.facts.length));
+  } else if (ratFactsResult.status === "no-rat-facts") {
+    params.set("trivia", "none");
+  } else {
+    params.set("trivia", "error");
+  }
+  // Reviews
+  if (imdbReviews.length > 0) {
+    params.set("reviews", String(imdbReviews.length));
+    const ratReviewCount = imdbReviews.filter((r) => r.mentionsRat).length;
+    if (ratReviewCount > 0) params.set("ratreviews", String(ratReviewCount));
+  } else {
+    params.set("reviews", "0");
+  }
+  // Related titles + media
+  params.set("related", String(imdbRelated.length));
+  params.set("videos", String(imdbMedia.videos.length));
+  params.set("images", String(imdbMedia.images.length));
+  redirect(`/movies/${slug}?${params.toString()}`);
 }
 
 export async function deleteMovie(formData: FormData) {
@@ -110,7 +361,7 @@ export async function deleteMovie(formData: FormData) {
   revalidatePath("/");
   revalidatePath(`/movies/${slug}`);
   revalidatePath("/moderation");
-  redirect("/#catalog");
+  redirect("/?toast=deleted");
 }
 
 export async function updateSightingInfo(formData: FormData) {
@@ -208,7 +459,10 @@ export async function updateSightingInfo(formData: FormData) {
 
   revalidatePath(returnTo.split("?")[0] || `/movies/${slug}`);
   revalidatePath("/moderation");
-  redirect(returnTo);
+  const sightingSavedReturnTo = returnTo.includes("?")
+    ? `${returnTo}&toast=sighting-saved`
+    : `${returnTo}?toast=sighting-saved`;
+  redirect(sightingSavedReturnTo);
 }
 
 export async function deleteSighting(formData: FormData) {
@@ -233,5 +487,8 @@ export async function deleteSighting(formData: FormData) {
   }
   revalidatePath(returnTo.split("?")[0] || `/movies/${slug}`);
   revalidatePath("/moderation");
-  redirect(returnTo);
+  const returnToWithToast = returnTo.includes("?")
+    ? `${returnTo}&toast=deleted`
+    : `${returnTo}?toast=deleted`;
+  redirect(returnToWithToast);
 }

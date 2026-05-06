@@ -6,12 +6,50 @@ import { SightingMarkdown } from "@/components/sighting-markdown";
 import { MovieSearchField } from "./movie-search-field";
 import { SightingImageUpload } from "./sighting-image-upload";
 
+function SwarmSignal({ count }: { count: number }) {
+  const { label, sublabel, fill } = (() => {
+    if (count === 1) return { label: "Lone scout", sublabel: "A solitary rat. Brave.", fill: 1 };
+    if (count <= 3) return { label: "Small pack", sublabel: "A couple of friends.", fill: 2 };
+    if (count <= 7) return { label: "Growing colony", sublabel: "Things are getting ratty.", fill: 3 };
+    if (count <= 15) return { label: "Swarm forming", sublabel: "Someone call an exterminator.", fill: 4 };
+    if (count <= 40) return { label: "Full swarm", sublabel: "Absolute chaos.", fill: 5 };
+    return { label: "Rat apocalypse", sublabel: "We bow to our new overlords.", fill: 6 };
+  })();
+
+  const maxFill = 6;
+  const displayRats = Math.min(fill, maxFill);
+
+  return (
+    <div className="flex flex-1 items-center gap-3 rounded-lg border border-stone-900/8 bg-stone-50/80 px-3 py-2 dark:border-white/8 dark:bg-stone-900/40">
+      <div className="flex gap-0.5 text-base leading-none" aria-hidden>
+        {Array.from({ length: maxFill }).map((_, i) => (
+          <span key={i} className={`transition-all duration-200 ${i < displayRats ? "opacity-100" : "opacity-15 grayscale"}`}>
+            🐀
+          </span>
+        ))}
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-bold text-stone-700 dark:text-stone-200">{label}</p>
+        <p className="text-xs text-stone-500 dark:text-stone-400">{sublabel}</p>
+      </div>
+    </div>
+  );
+}
+
+type PreselectedMovie = {
+  title: string;
+  year: string;
+  imdbId: string;
+  posterUrl: string;
+};
+
 type SubmitFormProps = {
   canAutoApprove: boolean;
   moderatorName?: string;
   loggedInName?: string;
   loggedInEmail?: string;
   submitAction: (formData: FormData) => void | Promise<void>;
+  initialMovie?: PreselectedMovie;
 };
 
 export function SubmitForm({
@@ -20,11 +58,13 @@ export function SubmitForm({
   loggedInName,
   loggedInEmail,
   submitAction,
+  initialMovie,
 }: SubmitFormProps) {
   const lockedSubmitterFields = Boolean(loggedInName && loggedInEmail);
   const [errors, setErrors] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [sightingPercent, setSightingPercent] = useState(50);
+  const [ratCount, setRatCount] = useState(1);
   const [descriptionDraft, setDescriptionDraft] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const previewRegionId = useId();
@@ -121,7 +161,7 @@ export function SubmitForm({
       action={submitAction}
       noValidate
       onSubmit={onSubmit}
-      className="grid gap-9"
+      className="grid gap-6"
     >
       {errors.length > 0 ? (
         <div className="rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm font-medium text-red-900 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
@@ -135,7 +175,14 @@ export function SubmitForm({
       ) : null}
 
       <div className="grid gap-6">
-        <MovieSearchField fieldErrors={fieldErrors} />
+        <MovieSearchField
+          fieldErrors={fieldErrors}
+          initialMovie={
+            initialMovie
+              ? { ...initialMovie, runtime: undefined, genre: undefined, rating: undefined, plot: undefined, source: "Seed" }
+              : undefined
+          }
+        />
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
           Sighting title
           <input
@@ -155,48 +202,85 @@ export function SubmitForm({
       </div>
 
       <div className="flex flex-col gap-6">
-        <label className="flex w-full flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          Approx. point in movie
-          <div className="flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300">
-            <span>Opening</span>
-            <span className="tabular-nums">{sightingPercent}%</span>
-            <span>Ending</span>
+        <div className="flex w-full flex-col gap-2" data-field="timestamp">
+          <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Approx. point in film</p>
+          <div className="pt-1">
+            <div>
+              <span className="text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">{sightingPercent}%</span>
+              <span className="ml-2 text-sm font-medium text-stone-500 dark:text-stone-400">into the film</span>
+            </div>
+            <div className="relative mt-4">
+              <div className="h-5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700">
+                <div
+                  className="h-full rounded-full bg-amber-500 transition-all duration-100"
+                  style={{ width: `${sightingPercent}%` }}
+                />
+              </div>
+              {/* thumb indicator */}
+              <div
+                className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-7 w-7 rounded-full border-2 border-amber-600 bg-white shadow-md transition-all duration-100 dark:border-amber-400 dark:bg-stone-100 flex items-center justify-center gap-[3px]"
+                style={{ left: `${sightingPercent}%` }}
+              >
+                <span className="block h-3 w-px rounded-full bg-amber-500 dark:bg-amber-400" />
+                <span className="block h-3 w-px rounded-full bg-amber-500 dark:bg-amber-400" />
+                <span className="block h-3 w-px rounded-full bg-amber-500 dark:bg-amber-400" />
+              </div>
+              <input
+                name="timestamp"
+                required
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={sightingPercent}
+                onChange={(event) =>
+                  setSightingPercent(Number.parseInt(event.currentTarget.value, 10) || 0)
+                }
+                aria-invalid={Boolean(errorFor("timestamp"))}
+                aria-label="Approximate point in film"
+                className="absolute inset-0 h-full w-full cursor-grab active:cursor-grabbing opacity-0"
+              />
+            </div>
+            <div className="mt-2 flex justify-between text-sm font-semibold text-stone-500 dark:text-stone-400">
+              <span>Opening</span>
+              <span>Ending</span>
+            </div>
           </div>
-          <input
-            data-field="timestamp"
-            name="timestamp"
-            required
-            type="range"
-            min={0}
-            max={100}
-            step={1}
-            value={sightingPercent}
-            onChange={(event) =>
-              setSightingPercent(Number.parseInt(event.currentTarget.value, 10) || 0)
-            }
-            aria-invalid={Boolean(errorFor("timestamp"))}
-            className={`w-full ${errorFor("timestamp") ? "accent-red-700 dark:accent-red-400" : ""}`}
-          />
           {errorFor("timestamp") ? (
             <span className="text-xs font-semibold text-red-700 dark:text-red-300">
               {errorFor("timestamp")}
             </span>
           ) : null}
-          <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-            Estimate how far into the movie the sighting begins.
-          </p>
-        </label>
-        <label className="flex w-full max-w-xs flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          Approx. rats on screen
-          <input
-            name="approximateRatCount"
-            type="number"
-            min={1}
-            max={9999}
-            defaultValue={1}
-            className="wr-input tabular-nums"
-          />
-        </label>
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Approx. rats on screen</p>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center rounded-xl border-2 border-stone-900/12 bg-white dark:border-white/12 dark:bg-stone-900">
+              <button
+                type="button"
+                onClick={() => setRatCount((c) => Math.max(1, c - 1))}
+                className="flex h-10 w-10 items-center justify-center text-xl font-bold text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800 rounded-l-[10px] dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+                aria-label="Decrease rat count"
+              >−</button>
+              <input
+                name="approximateRatCount"
+                type="number"
+                min={1}
+                max={999}
+                value={ratCount}
+                onChange={(e) => setRatCount(Math.max(1, Number.parseInt(e.currentTarget.value, 10) || 1))}
+                className="w-12 border-x-2 border-stone-900/12 bg-transparent py-2 text-center text-base font-bold tabular-nums text-stone-900 outline-none dark:border-white/12 dark:text-stone-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              />
+              <button
+                type="button"
+                onClick={() => setRatCount((c) => Math.min(999, c + 1))}
+                className="flex h-10 w-10 items-center justify-center text-xl font-bold text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800 rounded-r-[10px] dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+                aria-label="Increase rat count"
+              >+</button>
+            </div>
+            <SwarmSignal count={ratCount} />
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -213,7 +297,7 @@ export function SubmitForm({
             aria-invalid={Boolean(errorFor("description"))}
             className={`wr-input ${errorFor("description") ? inputErrorClass : ""}`}
           />
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
             <p className="max-w-prose text-xs leading-relaxed text-stone-500 dark:text-stone-400">
               You can use{" "}
               <span className="font-semibold text-stone-600 dark:text-stone-300">
@@ -230,7 +314,7 @@ export function SubmitForm({
               aria-label={
                 previewOpen ? "Hide markdown preview" : "Show markdown preview"
               }
-              className="wr-btn-ghost shrink-0 self-start rounded-lg border border-stone-900/15 px-4 py-2 text-xs font-semibold text-stone-800 dark:border-white/18 dark:text-stone-100"
+              className="wr-btn-ghost shrink-0 self-start text-xs"
             >
               {previewOpen ? "Hide preview" : "Show preview"}
             </button>
@@ -259,7 +343,7 @@ export function SubmitForm({
         ) : null}
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+      <div className="grid gap-4">
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
           Your name
           {lockedSubmitterFields ? (
@@ -270,15 +354,14 @@ export function SubmitForm({
             name={lockedSubmitterFields ? "submitterNameDisplay" : "submitterName"}
             required
             autoComplete="name"
-            placeholder="How we’ll credit you on the sighting"
+            placeholder="e.g. Jane Smith"
             defaultValue={lockedSubmitterFields ? loggedInName : undefined}
             disabled={lockedSubmitterFields}
             readOnly={lockedSubmitterFields}
             aria-invalid={Boolean(errorFor("submitterName"))}
-            className={`wr-input ${
-              lockedSubmitterFields ? "opacity-80" : ""
-            } ${errorFor("submitterName") ? inputErrorClass : ""}`}
+            className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterName") ? inputErrorClass : ""}`}
           />
+          <p className="text-xs font-medium text-stone-500 dark:text-stone-400">You’ll be credited as the author of this sighting on the public listing.</p>
           {errorFor("submitterName") ? (
             <span className="text-xs font-semibold text-red-700 dark:text-red-300">
               {errorFor("submitterName")}
@@ -286,7 +369,7 @@ export function SubmitForm({
           ) : null}
         </label>
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          Email (optional)
+          <span className="flex items-baseline justify-between">Email <span className="text-xs font-medium text-stone-400 dark:text-stone-500">(optional)</span></span>
           {lockedSubmitterFields ? (
             <input name="submitterEmail" type="hidden" value={loggedInEmail} />
           ) : null}
@@ -296,15 +379,14 @@ export function SubmitForm({
             type="email"
             autoComplete="email"
             inputMode="email"
-            placeholder="you@domain.com · visible to moderators only"
+            placeholder="you@example.com"
             defaultValue={lockedSubmitterFields ? loggedInEmail : undefined}
             disabled={lockedSubmitterFields}
             readOnly={lockedSubmitterFields}
             aria-invalid={Boolean(errorFor("submitterEmail"))}
-            className={`wr-input ${
-              lockedSubmitterFields ? "opacity-80" : ""
-            } ${errorFor("submitterEmail") ? inputErrorClass : ""}`}
+            className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterEmail") ? inputErrorClass : ""}`}
           />
+          <p className="text-xs font-medium text-stone-500 dark:text-stone-400">Only used if a moderator needs to follow up — never shown publicly.</p>
           {errorFor("submitterEmail") ? (
             <span className="text-xs font-semibold text-red-700 dark:text-red-300">
               {errorFor("submitterEmail")}
@@ -313,37 +395,39 @@ export function SubmitForm({
         </label>
       </div>
 
-      <div className="pt-1">
-        <SightingImageUpload />
-      </div>
+      <SightingImageUpload />
 
-      <label className="flex items-center gap-3 rounded-xl border border-stone-950/85 bg-[color-mix(in_srgb,var(--wr-cheese)_35%,transparent)] p-4 text-sm font-semibold text-stone-800 dark:border-white/16 dark:bg-stone-900/65 dark:text-stone-100">
-        <input
-          name="spoiler"
-          type="checkbox"
-          className="h-5 w-5 rounded border-2 border-stone-950/90"
-        />
-        Contains plot spoilers.
-      </label>
-
-      {canAutoApprove ? (
-        <label className="flex items-start gap-3 rounded-xl border border-amber-800/35 bg-[color-mix(in_srgb,var(--wr-panel-warm-fg)_95%,transparent)] p-4 text-sm font-semibold text-amber-950">
-          <input
-            name="autoApprove"
-            type="checkbox"
-            className="mt-1 h-5 w-5 rounded border-2 border-amber-900/60"
-          />
-          <span>
-            <span className="block">Auto-approve this submission</span>
-            <span className="mt-1 block font-medium text-stone-700">
-              Signed in as {moderatorName}. This will skip the pending queue and
-              record you as the approving curator.
-            </span>
+      <div className="grid gap-2 rounded-xl border border-stone-900/12 bg-stone-50 p-1 dark:border-white/10 dark:bg-stone-900/50">
+        <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
+          <span>Contains plot spoilers</span>
+          <span className="relative inline-flex shrink-0 items-center">
+            <input name="spoiler" type="checkbox" className="peer sr-only" />
+            <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+            <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
           </span>
         </label>
-      ) : null}
 
-      <div className="pt-2">
+        {canAutoApprove ? (
+          <>
+            <div className="mx-3 border-t border-stone-900/8 dark:border-white/8" />
+            <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
+              <span>
+                <span className="block">Auto-approve this submission</span>
+                <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
+                  Signed in as {moderatorName} · skips the pending queue
+                </span>
+              </span>
+              <span className="relative inline-flex shrink-0 items-center">
+                <input name="autoApprove" type="checkbox" className="peer sr-only" />
+                <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+                <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+              </span>
+            </label>
+          </>
+        ) : null}
+      </div>
+
+      <div>
         <button type="submit" className="wr-btn-primary w-full sm:w-auto">
           Submit for review
         </button>

@@ -87,7 +87,6 @@ export function MovieSightingsPagingBar({
   );
 
   if (totalCount === 0) return null;
-
   const isBottom = placement === "bottom";
 
   const navLandmarkLabel = isBottom
@@ -136,48 +135,46 @@ export function MovieSightingsPagingBar({
           </>
         ) : null}
       </p>
-      {pageCount > 1 ? (
-        <div className="flex flex-wrap items-center gap-2">
-          {safePage > 1 ? (
-            <Link
-              prefetch={false}
-              href={buildMovieSightingsPath(slug, {
-                sort,
-                page: safePage - 1,
-              })}
-              className={`wr-btn px-4 py-2 text-xs font-black uppercase tracking-wide hover:brightness-[0.98] ${prevEnabledSkin}`}
-              scroll={false}
-            >
-              ← Previous
-            </Link>
-          ) : (
-            <span
-              className={`inline-flex rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wide ${disabledSkin}`}
-            >
-              ← Previous
-            </span>
-          )}
-          {safePage < pageCount ? (
-            <Link
-              prefetch={false}
-              href={buildMovieSightingsPath(slug, {
-                sort,
-                page: safePage + 1,
-              })}
-              className={`wr-btn px-4 py-2 text-xs font-black uppercase tracking-wide hover:brightness-[0.98] ${nextEnabledSkin}`}
-              scroll={false}
-            >
-              Next →
-            </Link>
-          ) : (
-            <span
-              className={`inline-flex rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wide ${disabledSkin}`}
-            >
-              Next →
-            </span>
-          )}
-        </div>
-      ) : null}
+      <div className="flex flex-wrap items-center gap-2">
+        {pageCount > 1 && safePage > 1 ? (
+          <Link
+            prefetch={false}
+            href={buildMovieSightingsPath(slug, {
+              sort,
+              page: safePage - 1,
+            })}
+            className={`wr-btn px-4 py-2 text-xs font-black uppercase tracking-wide hover:brightness-[0.98] ${prevEnabledSkin}`}
+            scroll={false}
+          >
+            ← Previous
+          </Link>
+        ) : (
+          <span
+            className={`inline-flex rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wide ${disabledSkin}`}
+          >
+            ← Previous
+          </span>
+        )}
+        {pageCount > 1 && safePage < pageCount ? (
+          <Link
+            prefetch={false}
+            href={buildMovieSightingsPath(slug, {
+              sort,
+              page: safePage + 1,
+            })}
+            className={`wr-btn px-4 py-2 text-xs font-black uppercase tracking-wide hover:brightness-[0.98] ${nextEnabledSkin}`}
+            scroll={false}
+          >
+            Next →
+          </Link>
+        ) : (
+          <span
+            className={`inline-flex rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wide ${disabledSkin}`}
+          >
+            Next →
+          </span>
+        )}
+      </div>
     </div>
   );
 }

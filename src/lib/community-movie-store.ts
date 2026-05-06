@@ -1,5 +1,6 @@
 import { normalizeImdbId, type Movie, type Submission } from "@/lib/whererat";
 import { getDbPool } from "@/lib/db";
+import { syncMovieFromImdb } from "@/lib/movie-imdb-sync";
 
 function slugifyTitle(title: string) {
   return title
@@ -283,5 +284,11 @@ export async function ensureCommunityMovieForSubmission(
       metadata,
     ],
   );
-  return rowToMovie(inserted.rows[0]);
+  const newMovie = rowToMovie(inserted.rows[0]);
+
+  // Fire-and-forget: enrich with OMDb metadata and IMDb rat facts.
+  // Errors are swallowed inside syncMovieFromImdb so approval is never blocked.
+  void syncMovieFromImdb(newMovie);
+
+  return newMovie;
 }

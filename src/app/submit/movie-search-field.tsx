@@ -19,6 +19,8 @@ type SearchResponse = {
   configured: boolean;
   error?: string;
   results: MovieResult[];
+  hasMore?: boolean;
+  page?: number;
 };
 
 function PosterFallback({ title }: { title: string }) {
@@ -66,15 +68,22 @@ function MoviePoster({
 
 export function MovieSearchField({
   fieldErrors = {},
+  initialMovie,
 }: {
   fieldErrors?: Record<string, string>;
+  initialMovie?: MovieResult;
 }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(
+    initialMovie ? `${initialMovie.title} (${initialMovie.year})` : "",
+  );
   const [results, setResults] = useState<MovieResult[]>([]);
-  const [selectedMovie, setSelectedMovie] = useState<MovieResult | undefined>();
+  const [selectedMovie, setSelectedMovie] = useState<MovieResult | undefined>(initialMovie);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
   const [error, setError] = useState<string | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const helperId = useId();
 
   const canSearch = query.trim().length >= 2;
@@ -101,6 +110,8 @@ export function MovieSearchField({
     const timeout = window.setTimeout(async () => {
       setIsLoading(true);
       setError(undefined);
+      setCurrentPage(1);
+      setHasMore(false);
 
       try {
         const response = await fetch(
@@ -112,6 +123,8 @@ export function MovieSearchField({
         setIsConfigured(payload.configured);
         setResults(payload.results);
         setError(payload.error);
+        setHasMore(payload.hasMore ?? false);
+        setCurrentPage(payload.page ?? 1);
       } catch {
         if (!controller.signal.aborted) {
           setError("Movie search is unavailable right now.");
@@ -129,6 +142,24 @@ export function MovieSearchField({
       controller.abort();
     };
   }, [canSearch, query, selectedMovie]);
+
+  async function loadMore() {
+    const nextPage = currentPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const response = await fetch(
+        `/api/movies/search?q=${encodeURIComponent(query)}&page=${nextPage}`,
+      );
+      const payload = (await response.json()) as SearchResponse;
+      setResults((prev) => [...prev, ...payload.results]);
+      setHasMore(payload.hasMore ?? false);
+      setCurrentPage(payload.page ?? nextPage);
+    } catch {
+      // silently fail — user can retry
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -248,6 +279,16 @@ export function MovieSearchField({
               </span>
             </button>
           ))}
+          {hasMore ? (
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={isLoadingMore}
+              className="wr-btn-ghost w-full py-2.5 text-sm font-semibold disabled:opacity-50"
+            >
+              {isLoadingMore ? "Loading…" : "Show more results"}
+            </button>
+          ) : null}
         </div>
       ) : null}
     </div>

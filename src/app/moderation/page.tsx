@@ -158,7 +158,7 @@ export default async function ModerationPage({
             <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
               Moderation queue
             </h1>
-            <p className="mt-5 leading-relaxed text-orange-950/75 dark:text-amber-50/82">
+            <p className="mt-5 leading-relaxed text-orange-950 dark:text-amber-50/90">
               Triage sightings with approve, tighten-up edits, or gentle rejections
               that explain why Netflix might not need another duplicate starting time.
             </p>
@@ -476,11 +476,12 @@ export default async function ModerationPage({
                     <div className="mt-2 text-sm text-stone-700 dark:text-stone-300">
                       <SightingMarkdown markdown={submission.description} />
                     </div>
-                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
-                      {historyTab === "approved" ? "Approved" : "Denied"} by{" "}
-                      {historyReviewerBySubmissionId.get(submission.id) ?? "Unknown"}
-                    </p>
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <div className="mt-4 border-t border-stone-900/10 pt-3 dark:border-white/10">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
+                        {historyTab === "approved" ? "Approved" : "Denied"} by{" "}
+                        {historyReviewerBySubmissionId.get(submission.id) ?? "Unknown"}
+                      </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
                       {historyTab === "approved" ? (
                         approvedViewHrefBySubmissionId.get(submission.id) ? (
                           <Link
@@ -530,6 +531,7 @@ export default async function ModerationPage({
                           Delete
                         </ConfirmSubmitButton>
                       </form>
+                    </div>
                     </div>
                   </article>
                 ))}
@@ -614,6 +616,18 @@ export default async function ModerationPage({
                 </p>
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Approx. rats
+                <input
+                  name="approximateRatCount"
+                  type="number"
+                  min={1}
+                  max={999}
+                  required
+                  defaultValue={editingSubmission.approximateRatCount}
+                  className="wr-input tabular-nums"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Description
                 <textarea
                   name="description"
@@ -637,18 +651,6 @@ export default async function ModerationPage({
                 />
               </label>
               <EditableSightingImagesField initialImages={editingAttachmentSlides} />
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. rats
-                <input
-                  name="approximateRatCount"
-                  type="number"
-                  min={1}
-                  max={9999}
-                  required
-                  defaultValue={editingSubmission.approximateRatCount}
-                  className="wr-input tabular-nums"
-                />
-              </label>
               <label className="flex items-center gap-3 rounded-2xl bg-amber-100 p-4 text-sm font-bold text-stone-700 dark:bg-amber-900/45 dark:text-amber-100">
                 <input
                   name="spoiler"
