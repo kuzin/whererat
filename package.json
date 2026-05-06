@@ -15,7 +15,9 @@
     "media:migrate:uploads-to-s3": "tsx scripts/migrate-local-uploads-to-s3.ts",
     "seed:generate:bulk-rats": "tsx scripts/generate-bulk-rat-seed.ts",
     "db:merge:bulk-rats": "NODE_ENV=production tsx scripts/merge-bulk-rat-seed-into-db.ts",
-    "db:merge:bulk-rats:dry-run": "NODE_ENV=production tsx scripts/merge-bulk-rat-seed-into-db.ts --dry-run"
+    "db:merge:bulk-rats:dry-run": "NODE_ENV=production tsx scripts/merge-bulk-rat-seed-into-db.ts --dry-run",
+    "db:revert:bulk-rats": "NODE_ENV=production tsx scripts/revert-bulk-rat-seed-from-db.ts",
+    "db:revert:bulk-rats:dry-run": "NODE_ENV=production tsx scripts/revert-bulk-rat-seed-from-db.ts --dry-run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1042.0",
