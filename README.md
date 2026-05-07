@@ -21,7 +21,9 @@ Next.js app for a **spoiler-aware** public catalog of rat cameos in films, with 
 ## Prerequisites
 
 - Node.js (LTS recommended)  
-- Postgres instance and a **`DATABASE_URL`**
+- Postgres instance and a Postgres URL ([`DATABASE_URL` and fallbacks](ENVIRONMENT.md))  
+
+Full layout of **`.env*`** files: **[`ENVIRONMENT.md`](ENVIRONMENT.md)**.
 
 If anything DB-backed fails with **`DATABASE_URL` is required** or returns **500** on `/api/v1/*`, the running build or server simply **does not have that env var**. After editing `.env.local`, **restart `npm run dev`**. On **Vercel**, set **`DATABASE_URL`** under **Project → Settings → Environment Variables** for **each** scope you need (**Production**, **Preview**, **Development**)—Preview deploys omit vars that aren’t explicitly enabled there—then **redeploy**.
 

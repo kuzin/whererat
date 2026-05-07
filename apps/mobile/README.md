@@ -11,11 +11,12 @@ Node **≥ 20.19.4** (Expo SDK 54 / RN 0.81 engine range). Xcode / Android SDK a
 
 ## Environment
 
-Copy `.env.example` to `.env` and point at production or local Next:
+Expo only reads env files **inside `apps/mobile/`** (`apps/mobile/.env`). The Next app reads **repo root** `.env.local` — they are separate; see repo-wide **[`ENVIRONMENT.md`](../../ENVIRONMENT.md)**.
+
+Copy the mobile template and point at production or local Next:
 
 ```bash
 cp .env.example .env
-# EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:3000   # LAN IP for device testing against dev server
 ```
 
 When unset, the app defaults to `https://whererat.com`.

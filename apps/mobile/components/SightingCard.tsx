@@ -1,11 +1,46 @@
 import { Image } from "expo-image";
+import { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { type ThemeColors, useTheme } from "../lib/theme";
 import type { SightingPublic } from "../lib/types";
 
-const cream = "#fef3c7";
-const stone = "#a8a29e";
-const wash = "#292524";
+function createSightingStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    card: {
+      borderRadius: 12,
+      overflow: "hidden",
+      backgroundColor: colors.panelMuted,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      marginBottom: 16,
+    },
+    image: {
+      width: "100%",
+      aspectRatio: 16 / 9,
+      backgroundColor: colors.headerBg,
+    },
+    placeholder: {
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    placeholderText: { color: colors.textMuted, fontSize: 14 },
+    body: { padding: 12, gap: 6 },
+    row: { flexDirection: "row", alignItems: "center", gap: 8 },
+    timestamp: { color: colors.textMuted, fontSize: 13 },
+    spoilerBadge: {
+      backgroundColor: colors.dangerBg,
+      paddingHorizontal: 8,
+      paddingVertical: 2,
+      borderRadius: 6,
+    },
+    spoilerText: { color: colors.dangerText, fontSize: 11, fontWeight: "600" },
+    title: { color: colors.text, fontSize: 18, fontWeight: "700" },
+    meta: { color: colors.textMuted, fontSize: 13 },
+    desc: { color: colors.textMuted, fontSize: 15, lineHeight: 22 },
+    submitter: { color: colors.textMuted, fontSize: 13, fontStyle: "italic", marginTop: 4 },
+  });
+}
 
 type Props = {
   sighting: SightingPublic;
@@ -24,6 +59,9 @@ function firstImageAlt(s: SightingPublic): string | undefined {
 }
 
 export function SightingCard({ sighting }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createSightingStyles(colors), [colors]);
+
   const img = firstImageUrl(sighting);
   const alt = firstImageAlt(sighting) ?? sighting.title ?? "Sighting still";
   const headline = sighting.title?.trim() || "Rat moment";
@@ -62,38 +100,3 @@ export function SightingCard({ sighting }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: "#1c1917",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#44403c",
-    marginBottom: 16,
-  },
-  image: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-    backgroundColor: wash,
-  },
-  placeholder: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  placeholderText: { color: stone, fontSize: 14 },
-  body: { padding: 12, gap: 6 },
-  row: { flexDirection: "row", alignItems: "center", gap: 8 },
-  timestamp: { color: stone, fontSize: 13 },
-  spoilerBadge: {
-    backgroundColor: "#7f1d1d",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  spoilerText: { color: cream, fontSize: 11, fontWeight: "600" },
-  title: { color: cream, fontSize: 18, fontWeight: "700" },
-  meta: { color: stone, fontSize: 13 },
-  desc: { color: "#d6d3d1", fontSize: 15, lineHeight: 22 },
-  submitter: { color: stone, fontSize: 13, fontStyle: "italic", marginTop: 4 },
-});

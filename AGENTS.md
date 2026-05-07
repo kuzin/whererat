@@ -6,3 +6,5 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Native mobile (`apps/mobile`): Expo Router + Expo SDK — read `.vscode/` tasks/launch configs and [`apps/mobile/README.md`](apps/mobile/README.md) before editing; root `tsconfig.json` excludes `apps/mobile`.
 
+Env split: **`ENVIRONMENT.md`** (root `.env.local` vs `apps/mobile/.env`).
+
