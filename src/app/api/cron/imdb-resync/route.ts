@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         error:
-          "Missing CRON_SECRET at runtime on this Lambda. Add it in Vercel → Settings → Environment Variables (Production), then redeploy. If it is already there, redeploy Production so the deployment picks up the value.",
+          "CRON_SECRET is empty on this deployment’s environment (e.g. Production vs Preview vs Development — each needs its own value). Open Vercel → Settings → Environment Variables, enable **Production**, save a non-empty secret, redeploy Production, then retry.",
       },
       503,
     );
