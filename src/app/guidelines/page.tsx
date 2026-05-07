@@ -76,6 +76,16 @@ export default function GuidelinesPage() {
               </article>
             ))}
 
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-stone-900/15 bg-amber-50/60 p-5 dark:border-white/12 dark:bg-amber-950/20">
+              <div>
+                <p className="font-bold text-stone-900 dark:text-stone-100">Ready to submit a sighting?</p>
+                <p className="mt-0.5 text-sm text-stone-600 dark:text-stone-400">You know the rules — go log that rat.</p>
+              </div>
+              <a href="/submit" className="wr-btn-primary shrink-0 px-5 py-2.5 text-sm font-bold">
+                Submit →
+              </a>
+            </div>
+
             <p className="select-none text-center text-[0.6rem] leading-loose tracking-widest text-stone-300 dark:text-stone-700" aria-hidden="true">
               * rats have seen more films than most critics and charge nothing for their opinions
               · they prefer the middle seat · their tiny claws make no noise during quiet scenes

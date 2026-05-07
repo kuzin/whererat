@@ -14,6 +14,8 @@ import {
   type SightingImageSlot,
 } from "@/lib/whererat";
 import { persistSightingFiles } from "@/lib/media-storage";
+import { getCatalogMovies } from "@/lib/movie-catalog";
+import { syncMovieFromImdb } from "@/lib/movie-imdb-sync";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 
@@ -176,6 +178,38 @@ export async function removeSubmission(formData: FormData) {
     ? `${returnTo}&toast=deleted`
     : `${returnTo}?toast=deleted`;
   redirect(returnToWithToast);
+}
+
+export async function resyncAllMovies() {
+  const session = await getModeratorOrRedirect();
+
+  if (session.role !== "owner") {
+    redirect("/moderation?toast=error");
+  }
+
+  const movies = await getCatalogMovies();
+  let synced = 0;
+  let errors = 0;
+
+  for (const movie of movies) {
+    try {
+      await syncMovieFromImdb(movie);
+      synced++;
+    } catch {
+      errors++;
+    }
+  }
+
+  revalidatePath("/");
+  revalidatePath("/movies/[slug]", "layout");
+  revalidatePath("/moderation");
+
+  const params = new URLSearchParams();
+  params.set("toast", "resync-all-complete");
+  params.set("synced", String(synced));
+  if (errors > 0) params.set("errors", String(errors));
+
+  redirect(`/moderation?${params.toString()}`);
 }
 
 export async function rereviewSubmission(formData: FormData) {

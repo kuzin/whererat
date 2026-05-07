@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export const catalogSortOptions = [
   "latest-added-title",
@@ -39,11 +39,12 @@ export function CatalogFilters({ availableGenres, defaultQuery, defaultGenre, de
   useEffect(() => { setSort(defaultSort); }, [defaultSort]);
 
   const navigate = (q: string, g: string, s: CatalogSortOption) => {
-    const params = new URLSearchParams();
-    if (q.trim()) params.set("q", q.trim());
-    if (g !== "all") params.set("genre", g);
-    if (s !== "latest-added-title") params.set("sort", s);
-    const search = params.toString();
+    const urlParams = new URLSearchParams();
+    if (q.trim()) urlParams.set("q", q.trim());
+    if (g !== "all") urlParams.set("genre", g);
+    if (s !== "latest-added-title") urlParams.set("sort", s);
+    // page is intentionally omitted — filter changes reset to page 1
+    const search = urlParams.toString();
     const href = search ? `/?${search}#catalog` : "/#catalog";
     startTransition(() => router.push(href, { scroll: false }));
   };
@@ -128,6 +129,66 @@ export function CatalogFilters({ availableGenres, defaultQuery, defaultGenre, de
         className="wr-btn-primary h-11 self-end whitespace-nowrap md:self-end"
       >
         Dig in
+      </button>
+    </div>
+  );
+}
+
+type PaginationProps = {
+  totalResults: number;
+  currentPage: number;
+  pageSize: number;
+};
+
+export function CatalogPagination({ totalResults, currentPage, pageSize }: PaginationProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
+  if (totalResults <= pageSize) return null;
+
+  const totalPages = Math.ceil(totalResults / pageSize);
+  const hasPrev = currentPage > 1;
+  const hasNext = currentPage < totalPages;
+  const rangeStart = (currentPage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(currentPage * pageSize, totalResults);
+
+  const navigatePage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(page));
+    }
+    const search = params.toString();
+    const href = search ? `/?${search}#catalog` : "/#catalog";
+    startTransition(() => router.push(href, { scroll: false }));
+  };
+
+  return (
+    <div className="mt-8 flex items-center justify-between gap-4 border-t-2 border-stone-950/10 pt-6 dark:border-white/10">
+      <button
+        type="button"
+        onClick={() => navigatePage(currentPage - 1)}
+        disabled={!hasPrev || isPending}
+        className="wr-btn-ghost px-5 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="Previous page"
+      >
+        ← Previous
+      </button>
+
+      <p className="text-center text-sm font-semibold tabular-nums text-stone-600 dark:text-stone-400">
+        Showing {rangeStart}–{rangeEnd} of {totalResults} movies
+      </p>
+
+      <button
+        type="button"
+        onClick={() => navigatePage(currentPage + 1)}
+        disabled={!hasNext || isPending}
+        className="wr-btn-ghost px-5 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="Next page"
+      >
+        Next →
       </button>
     </div>
   );

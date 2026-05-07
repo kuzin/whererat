@@ -73,7 +73,10 @@ export default async function SubmitPage({
           <div className="mb-6 border-b border-stone-900/8 pb-6 dark:border-white/8">
             <p className="text-lg font-bold text-stone-900 dark:text-stone-100">Spotted a rat? Tell us everything.</p>
             <p className="mt-1 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
-              Pick the movie, mark where it happens, and describe what you saw. Moderators review every submission before it goes live.
+              Pick the movie, mark where it happens, and describe what you saw. Moderators review every submission before it goes live.{" "}
+              <a href="/guidelines" className="font-semibold underline underline-offset-2 hover:text-stone-700 dark:hover:text-stone-300">
+                Read the guidelines →
+              </a>
             </p>
           </div>
           {status === "no-imdb" ? (

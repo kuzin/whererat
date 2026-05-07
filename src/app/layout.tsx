@@ -42,6 +42,18 @@ export const metadata: Metadata = {
     template: "%s | WhereRat",
   },
   description: "The catalog of rat appearances in film and TV.",
+  openGraph: {
+    siteName: "WhereRat",
+    title: "WhereRat",
+    description: "An obsessive guide to rats on film.",
+    images: [{ url: "/brand/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WhereRat",
+    description: "An obsessive guide to rats on film.",
+    images: ["/brand/og-image.png"],
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

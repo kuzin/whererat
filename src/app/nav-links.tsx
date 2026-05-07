@@ -23,7 +23,7 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
       return (
         <span
           aria-current="page"
-          className="rounded-lg border-2 border-transparent px-3 py-2 text-sm font-semibold cursor-default select-none opacity-40"
+          className="wr-btn-ghost cursor-default select-none opacity-50 shadow-none"
         >
           {label}
         </span>

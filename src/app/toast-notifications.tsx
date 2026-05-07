@@ -86,6 +86,11 @@ const toastMessages: Record<string, { title: string; body: string; tone: ToastTo
     body: "Refreshed from IMDb.",   // overridden dynamically below
     tone: "success",
   },
+  "resync-all-complete": {
+    title: "Bulk sync complete",
+    body: "Refreshed all movies from IMDb.", // overridden dynamically below
+    tone: "success",
+  },
   "resync-failed": {
     title: "Resync failed",
     body: "Could not reach OMDb. Check your API key or try again later.",
@@ -140,6 +145,17 @@ export function ToastNotifications() {
     if (!toastKey) return undefined;
     const base = toastMessages[toastKey];
     if (!base) return undefined;
+
+    if (toastKey === "resync-all-complete") {
+      const synced = Number(searchParams.get("synced") ?? 0);
+      const errors = Number(searchParams.get("errors") ?? 0);
+      const lines: string[] = [];
+      lines.push(`${synced} ${synced === 1 ? "movie" : "movies"} synced from IMDb`);
+      if (errors > 0) {
+        lines.push(`${errors} ${errors === 1 ? "movie" : "movies"} failed — check server logs`);
+      }
+      return { ...base, body: lines.join("\n") };
+    }
 
     if (toastKey === "resync-complete") {
       const lines: string[] = [];
@@ -223,6 +239,8 @@ export function ToastNotifications() {
       next.delete("related");
       next.delete("videos");
       next.delete("images");
+      next.delete("synced");
+      next.delete("errors");
       const query = next.toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     }, 4500);
@@ -264,6 +282,8 @@ export function ToastNotifications() {
               next.delete("related");
               next.delete("videos");
               next.delete("images");
+              next.delete("synced");
+              next.delete("errors");
               const query = next.toString();
               router.replace(query ? `${pathname}?${query}` : pathname, {
                 scroll: false,

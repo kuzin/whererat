@@ -10,7 +10,7 @@ import {
   getCatalogStatsWithCommunity,
 } from "@/lib/movie-catalog";
 import { getMergedSightingsForMovie } from "@/lib/moderation-store";
-import { CatalogFilters, type CatalogSortOption } from "./catalog-filters";
+import { CatalogFilters, CatalogPagination, type CatalogSortOption } from "./catalog-filters";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -35,10 +35,13 @@ export default async function Home({
 }: {
   searchParams?: SearchParams;
 }) {
+  const PAGE_SIZE = 12;
   const params = searchParams ? await searchParams : {};
   const query = single(params.q) ?? "";
   const genre = single(params.genre) ?? "all";
   const sort = parseCatalogSort(single(params.sort));
+  const rawPage = parseInt(single(params.page) ?? "1", 10);
+  const currentPage = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
   const deletedMovieIds = await getDeletedMovieIds();
   const catalogMovies = await getCatalogMovies();
   const movieIndexById = new Map(catalogMovies.map((movie, index) => [movie.id, index]));
@@ -82,9 +85,12 @@ export default async function Home({
     }
     return b.catalogIndex - a.catalogIndex;
   });
-  const results = sortedMetrics.map((item) => item.movie);
+  const totalResults = sortedMetrics.length;
+  const pageOffset = (currentPage - 1) * PAGE_SIZE;
+  const pagedMetrics = sortedMetrics.slice(pageOffset, pageOffset + PAGE_SIZE);
+  const results = pagedMetrics.map((item) => item.movie);
   const sightingCountByMovie = new Map(
-    sortedMetrics.map((item) => [item.movie.id, item.sightingCount]),
+    pagedMetrics.map((item) => [item.movie.id, item.sightingCount]),
   );
   const catalogFiltersActive =
     query.trim().length > 0 || genre !== "all";
@@ -162,7 +168,7 @@ export default async function Home({
             defaultSort={sort}
           />
 
-          {results.length > 0 ? (
+          {totalResults > 0 ? (
             <div className="mt-10 grid gap-5 lg:grid-cols-2">
               {results.map((movie) => {
                 const sightingCount = sightingCountByMovie.get(movie.id) ?? 0;
@@ -210,7 +216,17 @@ export default async function Home({
                 );
               })}
             </div>
-          ) : (
+          ) : null}
+
+          {totalResults > 0 && (
+            <CatalogPagination
+              totalResults={totalResults}
+              currentPage={currentPage}
+              pageSize={PAGE_SIZE}
+            />
+          )}
+
+          {totalResults === 0 ? (
             <div className="mt-6 rounded-2xl border-2 border-dashed border-stone-900/30 bg-orange-50/60 p-10 text-center dark:border-stone-600/50 dark:bg-orange-950/30">
               <p className="text-4xl">🧀</p>
               <h3 className="wr-display mt-4 text-2xl font-bold text-stone-950 dark:text-stone-100">
@@ -231,7 +247,7 @@ export default async function Home({
                 </div>
               ) : null}
             </div>
-          )}
+          ) : null}
         </div>
       </section>
       <div

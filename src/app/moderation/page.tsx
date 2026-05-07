@@ -18,14 +18,14 @@ import {
   MODERATOR_SESSION_COOKIE,
   parseModeratorSession,
 } from "@/lib/auth";
-import { moderateSubmission } from "./actions";
+import { moderateSubmission, removeSubmission, rereviewSubmission, resyncAllMovies } from "./actions";
 import { readModerationStore } from "@/lib/moderation-store";
 import {
   getCatalogMovieByImdbId,
   getCatalogMovieByTitleSearch,
   getCatalogStatsWithCommunity,
 } from "@/lib/movie-catalog";
-import { removeSubmission, rereviewSubmission } from "./actions";
+import { ResyncAllButton } from "./resync-all-button";
 import { readUserStore } from "@/lib/user-store";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -159,6 +159,56 @@ export default async function ModerationPage({
     .sort((a, b) => b.reviewCount - a.reviewCount || a.displayName.localeCompare(b.displayName));
   return (
     <main className="wr-page-shell py-10">
+      {session.role === "owner" ? (
+        <details className="group mb-8 overflow-hidden rounded-2xl border border-amber-500/50 bg-amber-50/70 dark:border-amber-500/25 dark:bg-amber-950/15">
+          <summary className="flex cursor-pointer select-none list-none items-center gap-3 p-5 sm:p-6">
+            <span aria-hidden className="text-xl">⚠</span>
+            <span className="font-black text-amber-900 dark:text-amber-200">Owner Controls</span>
+            <span className="ml-2 rounded-md border border-amber-400/60 bg-amber-100 px-2 py-0.5 text-xs font-bold uppercase tracking-[0.12em] text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-300">
+              Danger zone
+            </span>
+            <svg
+              className="ml-auto h-4 w-4 shrink-0 text-amber-700 transition-transform group-open:rotate-180 dark:text-amber-400"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              aria-hidden
+            >
+              <path d="M8 10.94 2.53 5.47l1.06-1.06L8 8.82l4.41-4.41 1.06 1.06L8 10.94Z" />
+            </svg>
+          </summary>
+
+          <div className="space-y-5 border-t border-amber-400/30 px-5 py-5 sm:px-6 dark:border-amber-500/20">
+            {/* Stats row */}
+            <div>
+              <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-amber-800 dark:text-amber-400">
+                Catalog stats
+              </h3>
+              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl border border-amber-300/60 bg-white px-4 py-3 dark:border-amber-600/30 dark:bg-stone-900/60">
+                  <dt className="text-xs font-bold uppercase tracking-[0.12em] text-amber-700 dark:text-amber-400">Movies</dt>
+                  <dd className="mt-1 text-2xl font-black text-stone-950 dark:text-stone-100">{stats.movies}</dd>
+                </div>
+                <div className="rounded-xl border border-amber-300/60 bg-white px-4 py-3 dark:border-amber-600/30 dark:bg-stone-900/60">
+                  <dt className="text-xs font-bold uppercase tracking-[0.12em] text-amber-700 dark:text-amber-400">Sightings approved</dt>
+                  <dd className="mt-1 text-2xl font-black text-stone-950 dark:text-stone-100">{stats.sightings}</dd>
+                </div>
+              </dl>
+            </div>
+
+            {/* Resync action */}
+            <div className="rounded-xl border border-amber-300/60 bg-white p-5 dark:border-amber-600/30 dark:bg-stone-900/60">
+              <h3 className="font-black text-stone-950 dark:text-stone-100">Resync All Movies from IMDb</h3>
+              <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
+                Pulls fresh metadata, ratings, poster URLs, and rat trivia from OMDb/IMDb for every movie in the catalog. Runs one API call per movie sequentially — may take a minute per movie.
+              </p>
+              <form action={resyncAllMovies} className="mt-4">
+                <ResyncAllButton />
+              </form>
+            </div>
+          </div>
+        </details>
+      ) : null}
+
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="space-y-6">
           <div className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
