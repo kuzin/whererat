@@ -65,15 +65,17 @@ const darkColors: ThemeColors = {
 
 const lightColors: ThemeColors = {
   mode: "light",
-  background: "#fafaf9",
-  headerBg: "#e7e5e4",
+  /** App canvas behind cards — warm cream aligned with web `--background`. */
+  background: "#fff9f1",
+  /** Nav / search stripe; close to masthead `--wr-header-bg` on web. */
+  headerBg: "#fff8ed",
   headerText: "#1c1917",
   text: "#1c1917",
   textMuted: "#57534e",
   accent: "#ea580c",
   border: "#d6d3d1",
   panel: "#ffffff",
-  panelMuted: "#f5f5f4",
+  panelMuted: "#ffffff",
   chipActive: "#ffedd5",
   dangerBg: "#fecaca",
   dangerText: "#450a0a",

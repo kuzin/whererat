@@ -14,6 +14,12 @@ export type CatalogMovieRow = {
   posterUrl: string;
   posterAlt: string;
   posterTone: string;
+  pagePalette?: {
+    wash: string;
+    columnWash: string;
+    accent: string;
+    heroBloom: string;
+  } | null;
   summary: string;
   sightingCount: number;
   rating?: string;
@@ -72,8 +78,15 @@ export type MovieDetailResponse = {
     genres: string[];
     posterTone: string;
     posterUrl: string;
+    headerBanner?: string;
     backdropUrl: string;
     posterAlt: string;
+    pagePalette?: {
+      wash: string;
+      columnWash: string;
+      accent: string;
+      heroBloom: string;
+    } | null;
     summary: string;
     externalIds: { tmdb?: string; imdb: string };
     metadata: Record<string, unknown>;

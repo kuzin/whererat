@@ -112,8 +112,6 @@ export function MovieTabsShell({
                         inactiveHoverBg,
                         inactiveHoverText,
                         inactiveActiveBg,
-                        "shadow-[inset_0_5px_10px_-2px_rgb(0_0_0/0.45)]",
-                        "hover:shadow-[inset_0_3px_7px_-2px_rgb(0_0_0/0.3)]",
                       ].join(" "),
                 ].join(" ")}
               >

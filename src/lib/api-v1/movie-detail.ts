@@ -11,6 +11,7 @@ import {
   parseMovieSightingsSortParam,
   prepareMovieSightingsView,
 } from "@/lib/whererat";
+import { getMoviePageVisuals } from "@/lib/movie-page-visuals";
 
 export function serializeSightingPublic(sighting: Sighting) {
   return {
@@ -78,7 +79,14 @@ export async function getV1MovieDetailJson(
     runtimeMinutes: movie.runtimeMinutes,
   });
 
-  const m = serializeMoviePublic(movie);
+  const visuals = await getMoviePageVisuals(movie);
+  const headerBanner = visuals.bannerUrl;
+
+  const m = {
+    ...serializeMoviePublic(movie),
+    headerBanner,
+    pagePalette: visuals.palette,
+  };
 
   return {
     version: 1 as const,

@@ -10,7 +10,7 @@ function createSightingStyles(colors: ThemeColors) {
     card: {
       borderRadius: 12,
       overflow: "hidden",
-      backgroundColor: colors.panelMuted,
+      backgroundColor: colors.panel,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.border,
       marginBottom: 16,
@@ -18,7 +18,7 @@ function createSightingStyles(colors: ThemeColors) {
     image: {
       width: "100%",
       aspectRatio: 16 / 9,
-      backgroundColor: colors.headerBg,
+      backgroundColor: colors.panel,
     },
     placeholder: {
       alignItems: "center",
@@ -73,7 +73,12 @@ export function SightingCard({ sighting }: Props) {
   return (
     <View style={styles.card}>
       {img ? (
-        <Image source={{ uri: img }} style={styles.image} accessibilityLabel={alt} />
+        <Image
+          source={{ uri: img }}
+          style={styles.image}
+          accessibilityLabel={alt}
+          recyclingKey={`${sighting.id}:${img}`}
+        />
       ) : (
         <View style={[styles.image, styles.placeholder]}>
           <Text style={styles.placeholderText}>No still</Text>

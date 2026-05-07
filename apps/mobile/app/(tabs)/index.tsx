@@ -165,7 +165,7 @@ function createCatalogStyles(colors: ThemeColors) {
       pointerEvents: "box-none",
     },
     sheetCard: {
-      backgroundColor: colors.headerBg,
+      backgroundColor: colors.panel,
       borderRadius: 14,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.border,
@@ -225,11 +225,11 @@ function createCatalogStyles(colors: ThemeColors) {
     posterTile: {
       borderRadius: 8,
       overflow: "hidden",
-      backgroundColor: colors.headerBg,
+      backgroundColor: colors.panel,
     },
     posterTileImg: {
       borderRadius: 8,
-      backgroundColor: colors.headerBg,
+      backgroundColor: colors.panel,
     },
     row: {
       flexDirection: "row",
@@ -388,6 +388,7 @@ function PosterTile({
         style={[styles.posterTileImg, { width: w, height: h }]}
         contentFit="cover"
         accessibilityLabel={item.posterAlt}
+        recyclingKey={`${item.id}:${item.posterUrl}`}
       />
     </Pressable>
   );
@@ -405,7 +406,12 @@ function MovieRow({
       style={styles.row}
       onPress={() => router.push(`/movie/${encodeURIComponent(item.slug)}`)}
     >
-      <Image source={{ uri: item.posterUrl }} style={styles.poster} accessibilityLabel={item.posterAlt} />
+      <Image
+        source={{ uri: item.posterUrl }}
+        style={styles.poster}
+        accessibilityLabel={item.posterAlt}
+        recyclingKey={`${item.id}:${item.posterUrl}`}
+      />
       <View style={styles.rowText}>
         <Text style={styles.rowTitle} numberOfLines={2}>
           {item.title}

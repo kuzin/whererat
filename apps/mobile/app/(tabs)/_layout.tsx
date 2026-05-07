@@ -117,7 +117,13 @@ function TabsTabBar(props: RoutedTabBarProps) {
 
   return (
     <View pointerEvents="box-none" style={[styles.tabBarWrap, { bottom }]}>
-      <View style={[styles.tabBarShell, { borderColor: colors.border }]}>
+      <View
+        style={[
+          styles.tabBarShell,
+          { borderColor: colors.border },
+          colors.mode === "light" && { backgroundColor: colors.panel },
+        ]}
+      >
         <TabBarBackdrop />
         <BottomTabBar
           {...props}
@@ -140,6 +146,7 @@ export default function TabsLayout() {
       headerShadowVisible: false,
       headerTitleAlign: "center" as const,
       headerTitle: () => <HeaderThemeWordmark />,
+      ...(Platform.OS === "ios" ? { headerBlurEffect: "none" as const } : {}),
       tabBarStyle: styles.tabBarTransparent,
       tabBarActiveTintColor: colors.headerText,
       tabBarInactiveTintColor: colors.tabInactive,

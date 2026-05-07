@@ -47,7 +47,8 @@ function parseHex(input: string): string | null {
   return m ? `#${m[1].toLowerCase()}` : null;
 }
 
-function relativeLuminance(hex: string): number {
+/** WCAG relative luminance for sRGB hex (`#rgb` optional `#`). Returns 0 if parse fails. */
+export function relativeLuminance(hex: string): number {
   const raw = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex.trim());
   if (!raw) return 0;
   const chan = (x: string) => {
@@ -58,6 +59,35 @@ function relativeLuminance(hex: string): number {
   const g = chan(raw[2]);
   const b = chan(raw[3]);
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function clampByte(n: number): number {
+  return Math.max(0, Math.min(255, Math.round(n)));
+}
+
+/** Linear mix toward `toward` (6-char hex) by `t` ∈ [0,1]. */
+export function mixTowardHex(hex: string, toward: string, t: number): string {
+  const parse = (h: string) => {
+    const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(h.trim());
+    if (!m) return null;
+    return [Number.parseInt(m[1], 16), Number.parseInt(m[2], 16), Number.parseInt(m[3], 16)] as const;
+  };
+  const a = parse(hex);
+  const b = parse(toward);
+  if (!a || !b) return hex;
+  const u = Math.max(0, Math.min(1, t));
+  const r = clampByte(a[0] + (b[0] - a[0]) * u);
+  const g = clampByte(a[1] + (b[1] - a[1]) * u);
+  const bl = clampByte(a[2] + (b[2] - a[2]) * u);
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${bl.toString(16).padStart(2, "0")}`;
+}
+
+/** Nudge extractor output so headers stay readable (not blown-out highlights / ink black). */
+export function softenChromeHex(hex: string): string {
+  const lum = relativeLuminance(hex);
+  if (lum > 0.62) return mixTowardHex(hex, "#1c1917", 0.38);
+  if (lum < 0.06) return mixTowardHex(hex, "#44403c", 0.22);
+  return hex;
 }
 
 /** Resolve API `posterTone` (Tailwind class or `#rrggbb`) to a solid hex. */

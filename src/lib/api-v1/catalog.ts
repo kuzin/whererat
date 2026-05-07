@@ -6,6 +6,7 @@ import {
 } from "@/lib/movie-catalog";
 import { getMergedSightingsForMovie } from "@/lib/moderation-store";
 import { estimateRatsForAppearance } from "@/lib/whererat";
+import { getMoviePageVisuals } from "@/lib/movie-page-visuals";
 
 export const V1_CATALOG_PAGE_DEFAULT = 12;
 export const V1_CATALOG_PAGE_MAX = 50;
@@ -61,6 +62,7 @@ export async function getV1CatalogJson(input: {
   const resultMetrics = await Promise.all(
     filteredResults.map(async (movie) => {
       const sightings = await getMergedSightingsForMovie(movie.id);
+      const visuals = await getMoviePageVisuals(movie);
       const latestSightingMs = sightings.reduce((latest, sighting) => {
         const ms = sighting.submissionReviewedAtISO
           ? Date.parse(sighting.submissionReviewedAtISO)
@@ -73,6 +75,7 @@ export async function getV1CatalogJson(input: {
       );
       return {
         movie,
+        pagePalette: visuals.palette,
         sightingCount: sightings.length,
         latestSightingMs,
         ratsLogged,
@@ -114,7 +117,7 @@ export async function getV1CatalogJson(input: {
     pageSize,
     total: totalResults,
     pageCount: Math.max(1, Math.ceil(totalResults / pageSize)),
-    movies: pagedMetrics.map(({ movie, sightingCount }) => ({
+    movies: pagedMetrics.map(({ movie, pagePalette, sightingCount }) => ({
       id: movie.id,
       slug: movie.slug,
       title: movie.title,
@@ -124,6 +127,7 @@ export async function getV1CatalogJson(input: {
       posterUrl: movie.posterUrl,
       posterAlt: movie.posterAlt,
       posterTone: movie.posterTone,
+      pagePalette,
       summary: movie.summary,
       sightingCount,
       rating: movie.metadata.rating,
