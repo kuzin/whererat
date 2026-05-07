@@ -1,3 +1,5 @@
+import Slider from "@react-native-community/slider";
+import { Image } from "expo-image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,10 +9,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
+import { AppTextInput } from "./AppTextInput";
 import {
   fetchImdbMovieSearch,
   type ImdbMovieSearchResult,
@@ -19,6 +21,8 @@ import {
 import { type ThemeColors, useTheme } from "../lib/theme";
 
 const INSET_X = 16;
+/** Wait for typing to settle before hitting OMDb (matches web submit field ~300ms, slightly longer for mobile). */
+const IMDB_SEARCH_DEBOUNCE_MS = 400;
 
 function firstReleaseYear(yearStr: string): number | undefined {
   const m = /^(\d{4})/.exec(yearStr.trim());
@@ -27,10 +31,229 @@ function firstReleaseYear(yearStr: string): number | undefined {
   return Number.isFinite(y) ? y : undefined;
 }
 
+function formatMovieAutocompleteMeta(hit: ImdbMovieSearchResult): string {
+  const runtime = hit.runtime?.trim() || "Runtime TBD";
+  const rating = hit.rating?.trim() || "Rating TBD";
+  return `${hit.year} · ${runtime} · ${rating}`;
+}
+
+const SEARCH_POSTER_W = 88;
+/** ~2:3 portrait, aligned with submit page row thumbnails. */
+const SEARCH_POSTER_H = Math.round((SEARCH_POSTER_W * 3) / 2);
+const SELECTED_POSTER_W = 110;
+const SELECTED_POSTER_H = Math.round((SELECTED_POSTER_W * 3) / 2);
+
+function PosterThumb({
+  uri,
+  title,
+  width,
+  height,
+  borderColor,
+  panelColor,
+  mutedTextColor,
+}: {
+  uri: string;
+  title: string;
+  width: number;
+  height: number;
+  borderColor: string;
+  panelColor: string;
+  mutedTextColor: string;
+}) {
+  const trimmed = uri.trim();
+  const [failed, setFailed] = useState(!trimmed);
+  if (failed || !trimmed) {
+    return (
+      <View
+        style={{
+          width,
+          height,
+          backgroundColor: panelColor,
+          borderRightWidth: StyleSheet.hairlineWidth,
+          borderRightColor: borderColor,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: 8,
+        }}
+      >
+        <Text
+          numberOfLines={4}
+          style={{
+            fontSize: 11,
+            fontWeight: "800",
+            letterSpacing: 0.16,
+            textTransform: "uppercase",
+            textAlign: "center",
+            color: mutedTextColor,
+          }}
+        >
+          {title}
+        </Text>
+      </View>
+    );
+  }
+  return (
+    <View
+      style={{
+        width,
+        height,
+        borderRightWidth: StyleSheet.hairlineWidth,
+        borderRightColor: borderColor,
+        backgroundColor: panelColor,
+        overflow: "hidden",
+      }}
+    >
+      <Image
+        source={{ uri }}
+        style={{ width: "100%", height: "100%" }}
+        contentFit="cover"
+        accessibilityIgnoresInvertColors
+        onError={() => setFailed(true)}
+      />
+    </View>
+  );
+}
+
+function ratSwarmTier(count: number): { label: string; sublabel: string; fill: number } {
+  if (count === 1) return { label: "Lone scout", sublabel: "A solitary rat. Brave.", fill: 1 };
+  if (count <= 3) return { label: "Small pack", sublabel: "A couple of friends.", fill: 2 };
+  if (count <= 7) return { label: "Growing colony", sublabel: "Things are getting ratty.", fill: 3 };
+  if (count <= 15) return { label: "Swarm forming", sublabel: "Someone call an exterminator.", fill: 4 };
+  if (count <= 40) return { label: "Full swarm", sublabel: "Absolute chaos.", fill: 5 };
+  return { label: "Rat apocalypse", sublabel: "We bow to our new overlords.", fill: 6 };
+}
+
+function RatSwarmSignal({
+  count,
+  styles,
+}: {
+  count: number;
+  styles: ReturnType<typeof createFormStyles>;
+}) {
+  const { label, sublabel, fill } = ratSwarmTier(count);
+  const maxFill = 6;
+  const displayRats = Math.min(fill, maxFill);
+  return (
+    <View
+      style={styles.ratMeterCard}
+      accessibilityLabel={`${label}. ${sublabel}`}
+    >
+      <View style={styles.ratEmojiRow} importantForAccessibility="no-hide-descendants">
+        {Array.from({ length: maxFill }).map((_, i) => (
+          <Text key={i} style={[styles.ratEmoji, i >= displayRats && styles.ratEmojiInactive]}>
+            🐀
+          </Text>
+        ))}
+      </View>
+      <View style={styles.ratMeterTextCol}>
+        <Text style={styles.ratMeterTitle}>{label}</Text>
+        <Text style={styles.ratMeterSub}>{sublabel}</Text>
+      </View>
+    </View>
+  );
+}
+
 function createFormStyles(colors: ThemeColors) {
-  const line = colors.mode === "light" ? "rgba(28,25,23,0.22)" : colors.border;
+  const line = colors.inputBorder;
   return StyleSheet.create({
     block: { gap: 8 },
+    sectionCard: {
+      gap: 14,
+      padding: 16,
+      borderRadius: 14,
+      backgroundColor: colors.panel,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: line,
+    },
+    filmPctBig: {
+      fontSize: 28,
+      fontWeight: "900",
+      color: colors.text,
+      fontVariant: ["tabular-nums"],
+    },
+    filmPctInto: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    filmSlider: {
+      width: "100%",
+      height: Platform.OS === "ios" ? 44 : 40,
+    },
+    sliderEndLabels: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: -2,
+    },
+    sliderEndLabel: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textMuted,
+    },
+    ratControlsRow: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      gap: 12,
+      flexWrap: "wrap",
+    },
+    ratStepperOuter: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      borderWidth: 2,
+      borderColor: line,
+      borderRadius: 12,
+      backgroundColor: colors.panel,
+      overflow: "hidden",
+      alignSelf: "flex-start",
+    },
+    ratStepperBtn: {
+      width: 44,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    ratStepperMid: {
+      minWidth: 52,
+      justifyContent: "center",
+      alignItems: "center",
+      borderLeftWidth: 2,
+      borderRightWidth: 2,
+      borderColor: line,
+    },
+    ratStepperVal: {
+      fontSize: 16,
+      fontWeight: "800",
+      color: colors.text,
+      fontVariant: ["tabular-nums"],
+    },
+    ratMeterCard: {
+      flex: 1,
+      flexGrow: 1,
+      minWidth: 160,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      borderRadius: 10,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: line,
+      backgroundColor:
+        colors.mode === "light" ? "rgba(250,250,249,0.92)" : "rgba(41,37,36,0.55)",
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+    },
+    ratEmojiRow: { flexDirection: "row", gap: 2 },
+    ratEmoji: { fontSize: 16, lineHeight: 18, opacity: 1 },
+    ratEmojiInactive: { opacity: 0.15 },
+    ratMeterTextCol: { flex: 1, minWidth: 0 },
+    ratMeterTitle: {
+      fontSize: 12,
+      fontWeight: "800",
+      color: colors.text,
+    },
+    ratMeterSub: {
+      fontSize: 12,
+      lineHeight: 16,
+      color: colors.textMuted,
+    },
     sectionLabel: {
       color: colors.textMuted,
       fontSize: 12,
@@ -40,46 +263,74 @@ function createFormStyles(colors: ThemeColors) {
     },
     fieldLabel: { color: colors.text, fontSize: 14, fontWeight: "700" },
     helper: { color: colors.textMuted, fontSize: 12, lineHeight: 17 },
-    input: {
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: line,
-      borderRadius: 10,
-      backgroundColor: colors.panel,
-      paddingHorizontal: 12,
-      paddingVertical: Platform.OS === "ios" ? 12 : 10,
-      fontSize: 16,
-      color: colors.text,
-    },
     textarea: { minHeight: 120, textAlignVertical: "top" },
-    searchResults: {
-      borderWidth: StyleSheet.hairlineWidth,
+    searchResultsWrap: {
+      gap: 12,
+    },
+    movieHitCard: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      borderRadius: 12,
+      borderWidth: StyleSheet.hairlineWidth * 2,
       borderColor: line,
-      borderRadius: 10,
       backgroundColor: colors.panel,
-      maxHeight: 220,
       overflow: "hidden",
     },
-    movieRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: line,
+    movieHitBody: {
+      flex: 1,
+      justifyContent: "center",
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      gap: 6,
+      minWidth: 0,
     },
-    movieTitle: { flex: 1, color: colors.text, fontSize: 14, fontWeight: "600" },
+    movieHitTitle: {
+      color: colors.text,
+      fontSize: 17,
+      fontWeight: "800",
+      lineHeight: 22,
+    },
+    movieHitMeta: { color: colors.textMuted, fontSize: 13, fontWeight: "600", lineHeight: 18 },
+    movieHitImdb: {
+      fontSize: 11,
+      fontWeight: "800",
+      letterSpacing: 0.9,
+      textTransform: "uppercase",
+      color: colors.mode === "light" ? "#b45309" : "#fbbf24",
+    },
+    selectedCard: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      borderRadius: 12,
+      borderWidth: StyleSheet.hairlineWidth * 2,
+      borderColor: colors.mode === "light" ? "rgba(217,119,6,0.45)" : "rgba(251,191,36,0.35)",
+      backgroundColor: colors.mode === "light" ? "rgba(254,243,199,0.35)" : "rgba(120,53,15,0.22)",
+      overflow: "hidden",
+    },
+    selectedBody: {
+      flex: 1,
+      padding: 16,
+      gap: 6,
+      justifyContent: "center",
+      minWidth: 0,
+    },
+    selectedKicker: {
+      fontSize: 11,
+      fontWeight: "800",
+      letterSpacing: 1.2,
+      textTransform: "uppercase",
+      color: colors.mode === "light" ? "rgba(120,53,15,0.85)" : "rgba(253,230,138,0.95)",
+    },
+    selectedTitle: { color: colors.text, fontSize: 20, fontWeight: "800", lineHeight: 26 },
+    selectedMeta: { color: colors.textMuted, fontSize: 14, fontWeight: "600", lineHeight: 20 },
+    selectedImdb: {
+      fontSize: 11,
+      fontWeight: "800",
+      letterSpacing: 0.9,
+      textTransform: "uppercase",
+      color: colors.mode === "light" ? "#b45309" : "#fbbf24",
+    },
     movieMeta: { color: colors.textMuted, fontSize: 12 },
-    selectedPill: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-      padding: 10,
-      borderRadius: 10,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: line,
-      backgroundColor: colors.panelMuted,
-    },
     stepper: {
       flexDirection: "row",
       alignItems: "center",
@@ -131,12 +382,31 @@ function createFormStyles(colors: ThemeColors) {
       fontSize: 13,
       fontWeight: "600",
     },
+    loadMoreBtn: {
+      marginTop: 4,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+      borderWidth: StyleSheet.hairlineWidth * 2,
+      borderColor: line,
+      backgroundColor: colors.panel,
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 48,
+    },
+    loadMoreBtnDisabled: { opacity: 0.55 },
+    loadMoreText: { color: colors.accent, fontSize: 15, fontWeight: "800" },
   });
 }
 
 export function LogSightingForm() {
   const { colors } = useTheme();
   const styles = useMemo(() => createFormStyles(colors), [colors]);
+  const cardDivider = colors.inputBorder;
+  /** Matches submit page film slider (amber fill vs neutral track). */
+  const filmTrackMin = "#f59e0b";
+  const filmTrackMax = colors.mode === "light" ? "#e7e5e4" : "#57534e";
+  const filmThumbTint = colors.mode === "light" ? "#fafaf9" : "#f5f5f4";
 
   const [movieQuery, setMovieQuery] = useState("");
   const [imdbId, setImdbId] = useState("");
@@ -145,8 +415,14 @@ export function LogSightingForm() {
   const [moviePosterUrl, setMoviePosterUrl] = useState("");
   const [searchHits, setSearchHits] = useState<ImdbMovieSearchResult[]>([]);
   const [searchBusy, setSearchBusy] = useState(false);
+  const [searchLoadMoreBusy, setSearchLoadMoreBusy] = useState(false);
   const [searchConfigured, setSearchConfigured] = useState(true);
   const [searchNotice, setSearchNotice] = useState<string | undefined>(undefined);
+  /** OMDb returns 10 titles per page; `hasMore` enables paging. */
+  const [searchHasMore, setSearchHasMore] = useState(false);
+  const [searchPage, setSearchPage] = useState(1);
+  /** Full hit for autocomplete + selected-card layout (poster, runtime, rating, source). */
+  const [selectedHit, setSelectedHit] = useState<ImdbMovieSearchResult | null>(null);
 
   const [sightingTitle, setSightingTitle] = useState("");
   const [filmPct, setFilmPct] = useState(50);
@@ -156,50 +432,105 @@ export function LogSightingForm() {
   const [submitterEmail, setSubmitterEmail] = useState("");
   const [spoiler, setSpoiler] = useState(false);
 
-  const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Invalidate in-flight IMDb search when a movie is picked so late responses can't repopulate the list. */
+  const imdbSearchSeqRef = useRef(0);
 
   const runImdbSearch = useCallback(async (q: string) => {
+    const seq = ++imdbSearchSeqRef.current;
     const trimmed = q.trim();
     if (trimmed.length < 2) {
       setSearchHits([]);
       setSearchNotice(undefined);
+      setSearchHasMore(false);
+      setSearchPage(1);
       return;
     }
     setSearchBusy(true);
     try {
-      const res = await fetchImdbMovieSearch({ q: trimmed });
+      const res = await fetchImdbMovieSearch({ q: trimmed, page: 1 });
+      if (imdbSearchSeqRef.current !== seq) return;
       setSearchConfigured(res.configured);
       setSearchNotice(res.error);
       setSearchHits(res.results);
+      setSearchHasMore(Boolean(res.hasMore));
+      setSearchPage(res.page ?? 1);
     } catch {
+      if (imdbSearchSeqRef.current !== seq) return;
       setSearchHits([]);
+      setSearchHasMore(false);
+      setSearchPage(1);
       setSearchNotice("Movie search is unavailable right now.");
     } finally {
       setSearchBusy(false);
     }
   }, []);
 
+  const loadMoreSearchResults = useCallback(async () => {
+    const trimmed = movieQuery.trim();
+    if (trimmed.length < 2 || !searchHasMore || searchBusy || searchLoadMoreBusy || submitting) {
+      return;
+    }
+    const seqAtStart = imdbSearchSeqRef.current;
+    const nextPage = searchPage + 1;
+    setSearchLoadMoreBusy(true);
+    try {
+      const res = await fetchImdbMovieSearch({ q: trimmed, page: nextPage });
+      if (imdbSearchSeqRef.current !== seqAtStart) return;
+      setSearchConfigured(res.configured);
+      setSearchHits((prev) => {
+        const seen = new Set(prev.map((h) => h.imdbId.toLowerCase()));
+        const merged = res.results.filter((h) => !seen.has(h.imdbId.toLowerCase()));
+        return merged.length ? [...prev, ...merged] : prev;
+      });
+      setSearchHasMore(Boolean(res.hasMore));
+      setSearchPage(res.page ?? nextPage);
+      if (res.error && res.results.length === 0) {
+        setSearchNotice(res.error);
+      }
+    } catch {
+      if (imdbSearchSeqRef.current !== seqAtStart) return;
+      setSearchNotice("Couldn’t load more results. Try again.");
+    } finally {
+      if (imdbSearchSeqRef.current === seqAtStart) {
+        setSearchLoadMoreBusy(false);
+      }
+    }
+  }, [
+    movieQuery,
+    searchHasMore,
+    searchBusy,
+    searchLoadMoreBusy,
+    submitting,
+    searchPage,
+  ]);
+
   useEffect(() => {
+    if (imdbId.trim()) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       void runImdbSearch(movieQuery);
-    }, 320);
+    }, IMDB_SEARCH_DEBOUNCE_MS);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [movieQuery, runImdbSearch]);
+  }, [movieQuery, imdbId, runImdbSearch]);
 
   const selectMovie = useCallback((hit: ImdbMovieSearchResult) => {
-    setMovieQuery(`${hit.title} (${hit.year})`);
+    imdbSearchSeqRef.current += 1;
+    setMovieQuery("");
     setSearchHits([]);
+    setSearchHasMore(false);
+    setSearchPage(1);
     setMovieTitleResolved(hit.title.trim());
     setMovieYear(firstReleaseYear(hit.year));
     const poster = hit.posterUrl?.trim();
     setMoviePosterUrl(poster ?? "");
     setImdbId(hit.imdbId.trim());
+    setSelectedHit(hit);
     setFormError(null);
     setSearchNotice(undefined);
   }, []);
@@ -210,8 +541,11 @@ export function LogSightingForm() {
     setMovieTitleResolved("");
     setMovieYear(undefined);
     setMoviePosterUrl("");
+    setSelectedHit(null);
     setSearchHits([]);
     setSearchNotice(undefined);
+    setSearchHasMore(false);
+    setSearchPage(1);
     setFormError(null);
   }, []);
 
@@ -300,166 +634,231 @@ export function LogSightingForm() {
         </View>
       ) : null}
 
-      <View style={styles.block}>
+      <View style={styles.sectionCard}>
         <Text style={styles.sectionLabel}>Movie</Text>
         <Text style={styles.helper}>
-          {searchConfigured
-            ? "Search is powered by OMDb on the server and resolves the canonical IMDb title id (same as the website)."
-            : "OMDb isn’t configured on the server yet — results are only from a small embedded seed catalog. Production uses full IMDb title search."}
+          {imdbId && selectedHit
+            ? "Clear the movie below if you meant a different title — then search IMDb again."
+            : searchConfigured
+              ? "Search is powered by OMDb on the server and resolves the canonical IMDb title id (same as the website)."
+              : "OMDb isn’t configured on the server yet — results are only from a small embedded seed catalog. Production uses full IMDb title search."}
         </Text>
-        {searchNotice && searchHits.length === 0 ? (
-          <Text style={[styles.movieMeta, { marginTop: 2 }]}>{searchNotice}</Text>
+        {!(imdbId && selectedHit) ? (
+          <>
+            {searchNotice && searchHits.length === 0 ? (
+              <Text style={[styles.movieMeta, { marginTop: 2 }]}>{searchNotice}</Text>
+            ) : null}
+            <AppTextInput
+              placeholder="Try The Departed, Ratatouille…"
+              value={movieQuery}
+              disabled={submitting}
+              onChangeText={(t) => {
+                setMovieQuery(t);
+                if (imdbId) {
+                  setImdbId("");
+                  setMovieTitleResolved("");
+                  setMovieYear(undefined);
+                  setMoviePosterUrl("");
+                  setSelectedHit(null);
+                }
+              }}
+              autoCorrect={false}
+              autoCapitalize="words"
+              accessibilityLabel="IMDb movie title search"
+            />
+            {searchBusy && (
+              <View style={{ alignItems: "center", paddingVertical: 8 }}>
+                <ActivityIndicator color={colors.accent} />
+              </View>
+            )}
+            {!searchBusy && searchHits.length > 0 ? (
+              <View style={styles.searchResultsWrap}>
+                {searchHits.map((m) => (
+                  <Pressable
+                    key={m.imdbId}
+                    style={({ pressed }) => [styles.movieHitCard, pressed && { opacity: 0.92 }]}
+                    onPress={() => selectMovie(m)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Select ${m.title}`}
+                  >
+                    <PosterThumb
+                      uri={m.posterUrl}
+                      title={m.title}
+                      width={SEARCH_POSTER_W}
+                      height={SEARCH_POSTER_H}
+                      borderColor={cardDivider}
+                      panelColor={colors.panelMuted}
+                      mutedTextColor={colors.textMuted}
+                    />
+                    <View style={styles.movieHitBody}>
+                      <Text style={styles.movieHitTitle} numberOfLines={3}>
+                        {m.title}
+                      </Text>
+                      <Text style={styles.movieHitMeta} numberOfLines={2}>
+                        {formatMovieAutocompleteMeta(m)}
+                      </Text>
+                      <Text style={styles.movieHitImdb}>
+                        IMDb {m.imdbId} · {m.source}
+                      </Text>
+                    </View>
+                  </Pressable>
+                ))}
+                {searchHasMore ? (
+                  <Pressable
+                    style={({ pressed }) => [
+                      styles.loadMoreBtn,
+                      (searchLoadMoreBusy || submitting) && styles.loadMoreBtnDisabled,
+                      pressed && !searchLoadMoreBusy && { opacity: 0.88 },
+                    ]}
+                    onPress={() => void loadMoreSearchResults()}
+                    disabled={searchLoadMoreBusy || submitting}
+                    accessibilityRole="button"
+                    accessibilityLabel="Show more movie search results"
+                  >
+                    {searchLoadMoreBusy ? (
+                      <ActivityIndicator color={colors.accent} />
+                    ) : (
+                      <Text style={styles.loadMoreText}>Show more results</Text>
+                    )}
+                  </Pressable>
+                ) : null}
+              </View>
+            ) : null}
+          </>
         ) : null}
-        <TextInput
-          placeholder="Try The Departed, Ratatouille…"
-          placeholderTextColor={colors.textMuted}
-          value={movieQuery}
-          onChangeText={(t) => {
-            setMovieQuery(t);
-            if (imdbId) {
-              setImdbId("");
-              setMovieTitleResolved("");
-              setMovieYear(undefined);
-              setMoviePosterUrl("");
-            }
-          }}
-          style={styles.input}
-          autoCorrect={false}
-          autoCapitalize="words"
-          accessibilityLabel="IMDb movie title search"
-        />
-        {searchBusy && (
-          <View style={{ alignItems: "center", paddingVertical: 8 }}>
-            <ActivityIndicator color={colors.accent} />
-          </View>
-        )}
-        {!searchBusy && searchHits.length > 0 ? (
-          <View style={styles.searchResults}>
-            {searchHits.map((m) => (
-              <Pressable
-                key={m.imdbId}
-                style={styles.movieRow}
-                onPress={() => selectMovie(m)}
-                accessibilityRole="button"
-                accessibilityLabel={`Select ${m.title}`}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.movieTitle}>{m.title}</Text>
-                  <Text style={styles.movieMeta}>
-                    {m.year}
-                    {m.source === "OMDb" ? " · OMDb" : " · seed"}
+        {imdbId && selectedHit ? (
+          <View style={styles.selectedCard}>
+            <PosterThumb
+              uri={selectedHit.posterUrl}
+              title={selectedHit.title}
+              width={SELECTED_POSTER_W}
+              height={SELECTED_POSTER_H}
+              borderColor={cardDivider}
+              panelColor={colors.panelMuted}
+              mutedTextColor={colors.textMuted}
+            />
+            <View style={styles.selectedBody}>
+              <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 10 }}>
+                <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
+                  <Text style={styles.selectedKicker}>Selected IMDb title</Text>
+                  <Text style={styles.selectedTitle} numberOfLines={4}>
+                    {selectedHit.title}
+                  </Text>
+                  <Text style={styles.selectedMeta} numberOfLines={2}>
+                    {formatMovieAutocompleteMeta(selectedHit)}
+                  </Text>
+                  <Text style={styles.selectedImdb}>
+                    IMDb {selectedHit.imdbId} · {selectedHit.source}
                   </Text>
                 </View>
-              </Pressable>
-            ))}
-          </View>
-        ) : null}
-        {imdbId ? (
-          <View style={[styles.selectedPill]}>
-            <View style={{ flex: 1, gap: 4 }}>
-              <Text style={[styles.movieTitle, { flex: 0 }]}>{movieTitleResolved}</Text>
-              <Text style={styles.movieMeta}>
-                {movieYear ?? "—"} · IMDb {imdbId}
-              </Text>
+                <Pressable
+                  onPress={clearMovie}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear movie"
+                  hitSlop={8}
+                >
+                  <Text style={{ color: colors.accent, fontWeight: "800", fontSize: 13 }}>Clear</Text>
+                </Pressable>
+              </View>
             </View>
-            <Pressable onPress={clearMovie} accessibilityRole="button" accessibilityLabel="Clear movie">
-              <Text style={{ color: colors.accent, fontWeight: "800", fontSize: 13 }}>Clear</Text>
-            </Pressable>
           </View>
         ) : null}
       </View>
 
-      <View style={styles.block}>
+      <View style={styles.sectionCard}>
         <Text style={styles.sectionLabel}>Sighting</Text>
         <Text style={styles.fieldLabel}>Title</Text>
-        <TextInput
+        <AppTextInput
           placeholder="Short headline for this appearance"
-          placeholderTextColor={colors.textMuted}
           value={sightingTitle}
+          disabled={submitting}
           onChangeText={setSightingTitle}
-          style={styles.input}
           accessibilityLabel="Sighting headline"
         />
-      </View>
 
-      <View style={styles.block}>
-        <Text style={styles.fieldLabel}>Approximate point in film</Text>
-        <Text style={[styles.movieMeta, { marginBottom: 4 }]}>{filmPct}% into the runtime</Text>
-        <View style={styles.stepper}>
-          <Pressable
-            style={styles.stepperBtn}
-            onPress={() => setFilmPct((n) => Math.max(0, n - 1))}
-            accessibilityRole="button"
-            accessibilityLabel="Decrease film position"
-          >
-            <Text style={styles.stepperBtnText}>−</Text>
-          </Pressable>
-          <Text style={styles.stepperVal}>{filmPct}</Text>
-          <Pressable
-            style={styles.stepperBtn}
-            onPress={() => setFilmPct((n) => Math.min(100, n + 1))}
-            accessibilityRole="button"
-            accessibilityLabel="Increase film position"
-          >
-            <Text style={styles.stepperBtnText}>+</Text>
-          </Pressable>
+        <Text style={[styles.fieldLabel, { marginTop: 2 }]}>Approximate point in film</Text>
+        <View style={{ flexDirection: "row", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+          <Text style={styles.filmPctBig}>{filmPct}%</Text>
+          <Text style={styles.filmPctInto}>into the film</Text>
         </View>
-      </View>
-
-      <View style={styles.block}>
-        <Text style={styles.fieldLabel}>Approximate rats on screen</Text>
-        <View style={[styles.stepper, { marginTop: 6 }]}>
-          <Pressable
-            style={styles.stepperBtn}
-            onPress={() => setRatCount((n) => Math.max(1, n - 1))}
-          >
-            <Text style={styles.stepperBtnText}>−</Text>
-          </Pressable>
-          <Text style={styles.stepperVal}>{ratCount}</Text>
-          <Pressable
-            style={styles.stepperBtn}
-            onPress={() => setRatCount((n) => Math.min(999, n + 1))}
-          >
-            <Text style={styles.stepperBtnText}>+</Text>
-          </Pressable>
+        <Slider
+          style={styles.filmSlider}
+          minimumValue={0}
+          maximumValue={100}
+          step={1}
+          value={filmPct}
+          onValueChange={(v) => setFilmPct(Math.round(v))}
+          minimumTrackTintColor={filmTrackMin}
+          maximumTrackTintColor={filmTrackMax}
+          thumbTintColor={filmThumbTint}
+          disabled={submitting}
+          accessibilityLabel="Approximate point in film"
+        />
+        <View style={styles.sliderEndLabels}>
+          <Text style={styles.sliderEndLabel}>Opening</Text>
+          <Text style={styles.sliderEndLabel}>Ending</Text>
         </View>
-      </View>
 
-      <View style={styles.block}>
-        <Text style={styles.fieldLabel}>Description</Text>
+        <Text style={[styles.fieldLabel, { marginTop: 6 }]}>Approximate rats on screen</Text>
+        <View style={styles.ratControlsRow}>
+          <View style={styles.ratStepperOuter}>
+            <Pressable
+              style={styles.ratStepperBtn}
+              onPress={() => setRatCount((n) => Math.max(1, n - 1))}
+              disabled={submitting}
+              accessibilityRole="button"
+              accessibilityLabel="Decrease rat count"
+            >
+              <Text style={styles.stepperBtnText}>−</Text>
+            </Pressable>
+            <View style={styles.ratStepperMid}>
+              <Text style={styles.ratStepperVal}>{ratCount}</Text>
+            </View>
+            <Pressable
+              style={styles.ratStepperBtn}
+              onPress={() => setRatCount((n) => Math.min(999, n + 1))}
+              disabled={submitting}
+              accessibilityRole="button"
+              accessibilityLabel="Increase rat count"
+            >
+              <Text style={styles.stepperBtnText}>+</Text>
+            </Pressable>
+          </View>
+          <RatSwarmSignal count={ratCount} styles={styles} />
+        </View>
+
+        <Text style={[styles.fieldLabel, { marginTop: 8 }]}>Description</Text>
         <Text style={[styles.helper, { marginBottom: 4 }]}>
           Markdown-friendly (bold, lists, links). Moderators review every submission before it ships.
         </Text>
-        <TextInput
+        <AppTextInput
           multiline
           placeholder="Where on screen? What happens? What does the rat do?"
-          placeholderTextColor={colors.textMuted}
           value={description}
+          disabled={submitting}
           onChangeText={setDescription}
-          style={[styles.input, styles.textarea]}
+          style={styles.textarea}
           accessibilityLabel="Sighting description"
         />
       </View>
 
-      <View style={styles.block}>
+      <View style={styles.sectionCard}>
         <Text style={styles.sectionLabel}>You</Text>
         <Text style={styles.fieldLabel}>Name</Text>
-        <TextInput
+        <AppTextInput
           placeholder="Displayed with the listing if accepted"
-          placeholderTextColor={colors.textMuted}
           value={submitterName}
+          disabled={submitting}
           onChangeText={setSubmitterName}
-          style={styles.input}
           autoComplete="name"
           accessibilityLabel="Your name"
         />
         <Text style={[styles.fieldLabel, { marginTop: 10 }]}>Email (optional)</Text>
-        <TextInput
+        <AppTextInput
           placeholder="moderators-only follow-up"
-          placeholderTextColor={colors.textMuted}
           value={submitterEmail}
+          disabled={submitting}
           onChangeText={setSubmitterEmail}
-          style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
@@ -467,7 +866,7 @@ export function LogSightingForm() {
         />
       </View>
 
-      <View style={styles.block}>
+      <View style={styles.sectionCard}>
         <View style={styles.toggleRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.fieldLabel}>Contains plot spoilers</Text>
@@ -504,7 +903,7 @@ export function LogSightingForm() {
         onPress={() => void onSubmit()}
         disabled={submitting}
         accessibilityRole="button"
-        accessibilityLabel="Submit sighting"
+        accessibilityLabel="Submit sighting for review"
       >
         {submitting ? (
           <ActivityIndicator color={colors.retryOnAccent} />

@@ -1,23 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useLocale } from "@react-navigation/native";
-import { Assets } from "@react-navigation/elements";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import type { StyleProp, ViewStyle } from "react-native";
+import { Platform, Pressable, StyleSheet } from "react-native";
+
 import {
-  Image,
-  type ImageSourcePropType,
-  Platform,
-  Pressable,
-  StyleSheet,
-} from "react-native";
-
-/** Mirrors `@react-navigation/elements` `Assets` order — entry 0 is the stack back PNG. */
-const NAV_BACK_GLYPH = Assets[0] as ImageSourcePropType;
-
-/** Tight circular control on iOS; hitSlop (below) restores ~44pt target without widening layout. */
-const IOS_OUTER = 30;
-/** Bar icon PNG; small translate in dp (~1–2 px on typical density) to sit visually centered in the circle. */
-const IOS_GLYPH_NUDGE = { x: 1, y: 0 } as const;
-const ANDROID_OUTER = 40;
+  HEADER_TOOLBAR_HIT_PX,
+  HEADER_TOOLBAR_ICON,
+  HEADER_TOOLBAR_ICON_PX,
+} from "./headerToolbarChrome";
+import { useTheme } from "./theme";
 
 type HeaderExtras = {
   accessibilityLabel?: string;
@@ -40,11 +32,14 @@ function RoundMinimalHeaderBack({
   extras?: HeaderExtras;
 }) {
   const { direction } = useLocale();
-  const tint = incoming.tintColor ?? "#000";
+  const { colors } = useTheme();
+  const tint =
+    colors.mode === "light"
+      ? colors.headerToolbarIcon
+      : incoming.tintColor ?? colors.headerToolbarIcon;
 
   const isIos = Platform.OS === "ios";
-  const outer = isIos ? IOS_OUTER : ANDROID_OUTER;
-  const glyph = Math.round(isIos ? outer * 0.53 : outer * 0.5);
+  const outer = HEADER_TOOLBAR_HIT_PX;
 
   return (
     <Pressable
@@ -52,7 +47,16 @@ function RoundMinimalHeaderBack({
       accessibilityRole="button"
       testID={extras?.testID}
       hitSlop={isIos ? { top: 12, bottom: 12, left: 12, right: 12 } : undefined}
-      android_ripple={androidRipple}
+      android_ripple={
+        Platform.OS === "android"
+          ? {
+              color:
+                colors.mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)",
+              borderless: true,
+              foreground: Platform.Version >= 23,
+            }
+          : undefined
+      }
       onPress={delegatedOnPress}
       style={({ pressed }) => [
         isIos ? layout.shadowReset : layout.shadowResetAndroid,
@@ -60,40 +64,28 @@ function RoundMinimalHeaderBack({
           width: outer,
           height: outer,
           borderRadius: outer / 2,
+          backgroundColor: colors.headerActionFill,
+          ...(colors.mode === "light"
+            ? {
+                borderWidth: StyleSheet.hairlineWidth,
+                borderColor: "rgba(28,25,23,0.14)",
+              }
+            : {}),
           ...(isIos ? { borderCurve: "continuous" as const } : {}),
         },
         extras?.style,
         isIos && pressed ? layout.pressedIos : null,
       ]}
     >
-      <Image
-        accessible={false}
-        source={NAV_BACK_GLYPH}
-        resizeMode="contain"
-        style={{
-          width: glyph,
-          height: glyph,
-          tintColor: tint,
-          transform: [
-            ...(direction === "rtl" ? ([{ scaleX: -1 }] as const) : []),
-            ...(isIos
-              ? ([
-                  { translateX: IOS_GLYPH_NUDGE.x * (direction === "rtl" ? -1 : 1) },
-                  { translateY: IOS_GLYPH_NUDGE.y },
-                ] as const)
-              : []),
-          ],
-        }}
+      <Ionicons
+        name={HEADER_TOOLBAR_ICON.back}
+        size={HEADER_TOOLBAR_ICON_PX}
+        color={tint}
+        style={direction === "rtl" ? { transform: [{ scaleX: -1 }] } : undefined}
       />
     </Pressable>
   );
 }
-
-const androidRipple = {
-  borderless: true,
-  foreground: Platform.OS === "android" && Platform.Version >= 23,
-  radius: ANDROID_OUTER / 2 + 8,
-};
 
 const layout = StyleSheet.create({
   shadowReset: {
@@ -108,14 +100,14 @@ const layout = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 0,
-    marginVertical: 4,
+    marginVertical: 0,
     marginHorizontal: Platform.OS === "android" ? 4 : 0,
     alignSelf: "center",
   },
   pressedIos: { opacity: 0.42 },
 });
 
-/** Same RN back control everywhere — compact circle on iOS + centered PNG. */
+/** Same RN back control everywhere — filled chevron, same hit size as other toolbar icons. */
 export function stackMinimalHeaderLeft(
   onPress: () => void,
   extras?: HeaderExtras,

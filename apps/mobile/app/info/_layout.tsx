@@ -29,7 +29,7 @@ export default function InfoLayout() {
         name="menu"
         options={{
           title: "Settings",
-          headerLeft: stackMinimalHeaderLeft(() => router.replace("/(tabs)"), {
+          headerLeft: stackMinimalHeaderLeft(() => router.replace("/"), {
             accessibilityLabel: "Back to catalog",
           }),
         }}

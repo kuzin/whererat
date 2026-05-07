@@ -8,10 +8,12 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "deploy": "npx expo export -p web && npx eas-cli@latest deploy"
+    "deploy": "npx expo export -p web && npx eas-cli@latest deploy",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/slider": "5.0.1",
     "expo": "^54.0.1",
     "expo-blur": "~15.0.8",
     "expo-constants": "~18.0.13",
@@ -34,6 +36,7 @@
   "private": true,
   "devDependencies": {
     "@types/react": "^19.2.14",
+    "patch-package": "^8.0.1",
     "typescript": "^5.9.3"
   }
 }

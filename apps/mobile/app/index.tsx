@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   Modal,
+  Platform,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -14,12 +15,13 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { EmptyStateCard } from "../../components/EmptyStateCard";
-import { fetchCatalogPage } from "../../lib/api";
-import { mixTowardHex } from "../../lib/posterTone";
-import { type ThemeColors, useTheme } from "../../lib/theme";
-import type { CatalogMovieRow, CatalogResponse, CatalogSort } from "../../lib/types";
+import { EmptyStateCard } from "../components/EmptyStateCard";
+import { fetchCatalogPage } from "../lib/api";
+import { mixTowardHex } from "../lib/posterTone";
+import { type ThemeColors, useTheme } from "../lib/theme";
+import type { CatalogMovieRow, CatalogResponse, CatalogSort } from "../lib/types";
 
 type CatalogLayoutMode = "list" | "card";
 
@@ -41,15 +43,15 @@ const CARD_GAP = SPACE_Y;
 const CATALOG_CONTENT_INSET_X = 20;
 /** Tighter horizontal inset for list rows than the card grid */
 const CATALOG_LIST_INSET_X = 14;
-/** Reserve space above floating tab bar + pager */
-const SCROLL_BOTTOM_PAD = 92;
+/** Extra inset below catalog scroll plus safe-area (pager sits above home indicator). */
+const SCROLL_BOTTOM_EXTRA = 28;
 const REFRESH_SPINNER_COLOR = "#f59e0b";
 
 function gridPosterWidthPx(screenWidth: number): number {
   return (screenWidth - CATALOG_CONTENT_INSET_X * 2 - CARD_GAP * (CARD_COLS - 1)) / CARD_COLS;
 }
 
-function createCatalogStyles(colors: ThemeColors) {
+function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
   const warmLine = colors.mode === "light" ? "rgba(28,25,23,0.32)" : colors.border;
   const warmLineSoft = colors.mode === "light" ? "rgba(28,25,23,0.22)" : colors.border;
   const warmPanel = "transparent";
@@ -87,9 +89,12 @@ function createCatalogStyles(colors: ThemeColors) {
       backgroundColor: colors.panel,
       borderRadius: 10,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: warmLineSoft,
+      borderColor: colors.inputBorder,
       overflow: "hidden",
       position: "relative",
+    },
+    searchFieldOuterFocused: {
+      borderColor: colors.inputBorderFocused,
     },
     /** Icon layered on leading edge; typing area starts behind it via padding */
     searchIconWrap: {
@@ -111,6 +116,20 @@ function createCatalogStyles(colors: ThemeColors) {
       color: colors.text,
       fontSize: 16,
       backgroundColor: "transparent",
+    },
+    /** Room for the trailing clear control when `queryInput` is non-empty. */
+    searchInputWithClear: {
+      paddingRight: 44,
+    },
+    searchClearWrap: {
+      position: "absolute",
+      right: 8,
+      top: 0,
+      bottom: 0,
+      width: 36,
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 2,
     },
     filterRow: {
       flexDirection: "row",
@@ -229,7 +248,7 @@ function createCatalogStyles(colors: ThemeColors) {
     },
     /** Shared scroll canvas; combine with list or card inset style */
     catalogScrollContentBase: {
-      paddingBottom: SCROLL_BOTTOM_PAD,
+      paddingBottom: scrollBottomPad,
       flexGrow: 1,
       backgroundColor: catalogCanvasBg,
     },
@@ -460,7 +479,9 @@ function MovieRow({
 
 export default function CatalogScreen() {
   const { colors } = useTheme();
-  const styles = useMemo(() => createCatalogStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
+  const scrollBottomPad = Math.max(insets.bottom, 14) + SCROLL_BOTTOM_EXTRA;
+  const styles = useMemo(() => createCatalogStyles(colors, scrollBottomPad), [colors, scrollBottomPad]);
 
   const { width: screenWidth } = useWindowDimensions();
   const posterWidth = useMemo(() => gridPosterWidthPx(screenWidth), [screenWidth]);
@@ -478,6 +499,7 @@ export default function CatalogScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [catalogSearchFocused, setCatalogSearchFocused] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setQueryApplied(queryInput.trim()), 380);
@@ -545,11 +567,15 @@ export default function CatalogScreen() {
   const genreLabel = genre === "all" ? "All genres" : genre;
   const sortLabel = SORT_OPTIONS.find((o) => o.value === sort)?.label ?? sort;
 
+  const catalogSearchHasText = queryInput.length > 0;
+
   return (
     <View style={styles.screen}>
       <View style={styles.catalogHeaderStripe}>
         <View style={styles.catalogTop}>
-          <View style={styles.searchFieldOuter}>
+          <View
+            style={[styles.searchFieldOuter, catalogSearchFocused && styles.searchFieldOuterFocused]}
+          >
             <View style={styles.searchIconWrap} pointerEvents="none">
               <Ionicons name="search" size={20} color={colors.iconMuted} />
             </View>
@@ -558,11 +584,26 @@ export default function CatalogScreen() {
               placeholderTextColor={colors.iconMuted}
               value={queryInput}
               onChangeText={setQueryInput}
-              style={styles.searchInput}
+              style={[styles.searchInput, catalogSearchHasText && styles.searchInputWithClear]}
               autoCapitalize="none"
               autoCorrect={false}
               accessibilityLabel="Search catalog"
+              selectionColor={colors.accent}
+              onFocus={() => setCatalogSearchFocused(true)}
+              onBlur={() => setCatalogSearchFocused(false)}
+              {...(Platform.OS === "android" ? { cursorColor: colors.accent } : {})}
             />
+            {catalogSearchHasText ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Clear search"
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                style={styles.searchClearWrap}
+                onPress={() => setQueryInput("")}
+              >
+                <Ionicons name="close-circle" size={22} color={colors.iconMuted} />
+              </Pressable>
+            ) : null}
           </View>
 
           <View style={styles.filterRow}>

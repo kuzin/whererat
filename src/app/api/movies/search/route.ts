@@ -135,6 +135,35 @@ function scoreTitleByQuery(title: string, query: string) {
   return score;
 }
 
+/** OMDb `s=` often misses prefix/typo queries (e.g. "Ratato") — try shorter strings in order. */
+const MAX_OMDB_SEARCH_ATTEMPTS = 14;
+
+function buildOmdbSearchCandidates(normalizedQuery: string): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const add = (s: string) => {
+    const t = s.trim().replace(/\s+/g, " ");
+    if (t.length < 2 || seen.has(t)) return;
+    seen.add(t);
+    out.push(t);
+  };
+
+  add(normalizedQuery);
+
+  const tokens = normalizedQuery.split(" ").filter(Boolean);
+  if (tokens.length > 1) {
+    for (let i = tokens.length - 1; i >= 1; i--) {
+      add(tokens.slice(0, i).join(" "));
+    }
+  }
+
+  for (let len = normalizedQuery.length - 1; len >= 2; len--) {
+    add(normalizedQuery.slice(0, len));
+  }
+
+  return out;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const rawQuery = searchParams.get("q") ?? "";
@@ -161,34 +190,34 @@ export async function GET(request: Request) {
     });
   }
 
-  const payload = await fetchOmdbSearch(normalizedQuery, apiKey, page);
-  if (!payload) {
+  const candidates = buildOmdbSearchCandidates(normalizedQuery);
+  let searchItems: OmdbSearchItem[] | undefined;
+  let searchError: string | undefined;
+  let gotNetworkResponse = false;
+
+  for (let i = 0; i < candidates.length && i < MAX_OMDB_SEARCH_ATTEMPTS; i++) {
+    const payload = await fetchOmdbSearch(candidates[i]!, apiKey, page);
+    if (!payload) continue;
+    gotNetworkResponse = true;
+    searchError = payload.Error ?? searchError;
+    if (payload.Response === "True" && payload.Search?.length) {
+      searchItems = payload.Search
+        .slice()
+        .sort(
+          (a, b) =>
+            scoreTitleByQuery(b.Title, normalizedQuery) -
+            scoreTitleByQuery(a.Title, normalizedQuery),
+        );
+      searchError = undefined;
+      break;
+    }
+  }
+
+  if (!gotNetworkResponse) {
     return NextResponse.json(
       { configured: true, error: "Movie search failed.", results: [] },
       { status: 502 },
     );
-  }
-
-  let searchItems = payload.Search;
-  let searchError = payload.Error;
-  if (payload.Response !== "True" || !searchItems) {
-    const tokens = normalizedQuery.split(" ").filter(Boolean);
-    const fallbackQuery =
-      tokens.length > 1 ? tokens.slice(0, -1).join(" ") : normalizedQuery.slice(0, -1);
-
-    if (fallbackQuery.length >= 2) {
-      const fallbackPayload = await fetchOmdbSearch(fallbackQuery, apiKey);
-      if (fallbackPayload?.Response === "True" && fallbackPayload.Search) {
-        searchItems = fallbackPayload.Search
-          .slice()
-          .sort(
-            (a, b) =>
-              scoreTitleByQuery(b.Title, normalizedQuery) -
-              scoreTitleByQuery(a.Title, normalizedQuery),
-          );
-        searchError = undefined;
-      }
-    }
   }
 
   if (!searchItems) {

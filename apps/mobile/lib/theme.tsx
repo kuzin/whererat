@@ -1,4 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { mixTowardHex } from "./posterTone";
 import {
   createContext,
   useCallback,
@@ -17,6 +19,10 @@ export type ThemeColors = {
   mode: ThemeMode;
   background: string;
   headerBg: string;
+  /** Circular fill behind nav bar icon buttons (light: darker shade of `headerBg`; dark: near-panel). */
+  headerActionFill: string;
+  /** Ionicons tint on those toolbar buttons — dark grey in light, accent in dark. */
+  headerToolbarIcon: string;
   headerText: string;
   text: string;
   textMuted: string;
@@ -34,6 +40,13 @@ export type ThemeColors = {
   dangerText: string;
   retryOnAccent: string;
   iconMuted: string;
+  /** Text field outline — inactive / resting state. */
+  inputBorder: string;
+  /** Outline when the field is focused (keyboard-active). */
+  inputBorderFocused: string;
+  inputBorderDisabled: string;
+  inputBackgroundDisabled: string;
+  /** ≥4.5∶1 vs typical tab bar backdrop / panel reads for inactive 11 pt labels */
   tabInactive: string;
   tabDivider: string;
   tabActiveFill: string;
@@ -47,6 +60,8 @@ const darkColors: ThemeColors = {
   mode: "dark",
   background: "#1c1917",
   headerBg: "#292524",
+  headerActionFill: "#1c1917",
+  headerToolbarIcon: "#f59e0b",
   headerText: "#fef3c7",
   text: "#fef3c7",
   textMuted: "#a8a29e",
@@ -60,7 +75,11 @@ const darkColors: ThemeColors = {
   dangerText: "#fef3c7",
   retryOnAccent: "#292524",
   iconMuted: "#78716c",
-  /** ≥4.5∶1 vs typical tab bar backdrop / panel reads for inactive 11 pt labels */
+  inputBorder: "rgba(254,243,199,0.18)",
+  /** Slightly deeper amber vs resting hairline so focus reads clearly at 2px stroke. */
+  inputBorderFocused: "#fbbf24",
+  inputBorderDisabled: "rgba(254,243,199,0.08)",
+  inputBackgroundDisabled: "#292524",
   tabInactive: "#a8a29e",
   tabDivider: "rgba(254,243,199,0.14)",
   tabActiveFill: "#ea580c",
@@ -76,6 +95,8 @@ const lightColors: ThemeColors = {
   background: "#fff9f1",
   /** Nav / search stripe; close to masthead `--wr-header-bg` on web. */
   headerBg: "#fff8ed",
+  headerActionFill: mixTowardHex("#fff8ed", "#1c1410", 0.13),
+  headerToolbarIcon: "#44403c",
   headerText: "#1c1410",
   text: "#1c1410",
   textMuted: "#57534e",
@@ -89,6 +110,10 @@ const lightColors: ThemeColors = {
   dangerText: "#450a0a",
   retryOnAccent: "#1c1410",
   iconMuted: "#57534e",
+  inputBorder: "rgba(28,25,23,0.22)",
+  inputBorderFocused: "#ea580c",
+  inputBorderDisabled: "rgba(28,25,23,0.12)",
+  inputBackgroundDisabled: "#fafaf9",
   tabInactive: "#57534e",
   tabDivider: "rgba(28,25,23,0.18)",
   tabActiveFill: "#fb923c",

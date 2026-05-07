@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { LogSightingForm } from "../../components/LogSightingForm";
-import { type ThemeColors, useTheme } from "../../lib/theme";
+import { LogSightingForm } from "../components/LogSightingForm";
+import { type ThemeColors, useTheme } from "../lib/theme";
 
 const INSET_X = 16;
 
@@ -35,8 +35,7 @@ function createSubmitStyles(colors: ThemeColors) {
   });
 }
 
-/** Submit tab — aligned with root `app/submit.tsx` (bottom submit only; toolbar chrome lives on catalog tab). */
-export default function SubmitTabScreen() {
+export default function SubmitScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createSubmitStyles(colors), [colors]);
 

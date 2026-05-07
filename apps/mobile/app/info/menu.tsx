@@ -36,7 +36,7 @@ export default function InfoSettingsMenuScreen() {
   const navigation = useNavigation();
 
   /**
-   * Popping the hub would surface the hidden `/info` gate — leave the flow for tabs instead.
+   * Popping the hub would surface the hidden `/info` gate — leave the stack flow for catalog instead.
    * Only when `index` sits under `menu` (normal entry from Catalog); deep links without the gate use the default pop.
    */
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function InfoSettingsMenuScreen() {
       if (prev?.name !== "index") return;
 
       e.preventDefault();
-      router.replace("/(tabs)");
+      router.replace("/");
     });
     return unsubscribe;
   }, [navigation]);
@@ -62,7 +62,7 @@ export default function InfoSettingsMenuScreen() {
   useFocusEffect(
     useCallback(() => {
       const sub = BackHandler.addEventListener("hardwareBackPress", () => {
-        router.replace("/(tabs)");
+        router.replace("/");
         return true;
       });
       return () => sub.remove();

@@ -1,4 +1,4 @@
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 
 import { useTheme } from "../lib/theme";
 import { WhereRatWordmark } from "./WhereRatWordmark";
@@ -12,6 +12,8 @@ type Props = {
 export function HeaderThemeWordmark({ wordmarkColor }: Props) {
   const { colors, toggleTheme, mode } = useTheme();
   const markColor = wordmarkColor ?? colors.headerText;
+  const ripple =
+    Platform.OS === "android" ? { color: colors.headerBg, borderless: true as const } : undefined;
 
   return (
     <Pressable
@@ -19,9 +21,9 @@ export function HeaderThemeWordmark({ wordmarkColor }: Props) {
       hitSlop={{ top: 12, bottom: 12, left: 16, right: 16 }}
       accessibilityRole="button"
       accessibilityLabel={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      android_ripple={ripple}
       style={{
-        marginTop: 4,
-        paddingVertical: 6,
+        height: 44,
         justifyContent: "center",
         alignItems: "center",
       }}

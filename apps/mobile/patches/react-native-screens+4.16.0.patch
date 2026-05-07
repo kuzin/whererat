@@ -1,0 +1,65 @@
+diff --git a/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm b/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm
+index 57ff861..4b0407d 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm
++++ b/node_modules/react-native-screens/ios/RNSScreenStackHeaderConfig.mm
+@@ -64,6 +64,22 @@ static constexpr auto DEFAULT_TITLE_LARGE_FONT_SIZE = @34;
+ 
+ @end
+ 
++#if !TARGET_OS_TV
++/** Suppress iOS 26+ shared “Liquid Glass” plate behind custom `headerLeft` / `headerRight` views. */
++static void rnscreens_applyPlainCustomBarButtonItemChrome(UIBarButtonItem *item)
++{
++  if (item == nil) {
++    return;
++  }
++  @try {
++    if ([item respondsToSelector:NSSelectorFromString(@"setHidesSharedBackground:")]) {
++      [item setValue:@YES forKey:@"hidesSharedBackground"];
++    }
++  } @catch (__unused NSException *e) {
++  }
++}
++#endif // !TARGET_OS_TV
++
+ #ifdef RCT_NEW_ARCH_ENABLED
+ @interface RNSScreenStackHeaderConfig () <RCTMountingTransactionObserving>
+ @end
+@@ -678,11 +694,17 @@ RNS_IGNORE_SUPER_CALL_END
+         navitem.leftItemsSupplementBackButton = config.backButtonInCustomView;
+ #endif
+         UIBarButtonItem *buttonItem = [[UIBarButtonItem alloc] initWithCustomView:subview];
++#if !TARGET_OS_TV
++        rnscreens_applyPlainCustomBarButtonItemChrome(buttonItem);
++#endif
+         navitem.leftBarButtonItem = buttonItem;
+         break;
+       }
+       case RNSScreenStackHeaderSubviewTypeRight: {
+         UIBarButtonItem *buttonItem = [[UIBarButtonItem alloc] initWithCustomView:subview];
++#if !TARGET_OS_TV
++        rnscreens_applyPlainCustomBarButtonItemChrome(buttonItem);
++#endif
+         navitem.rightBarButtonItem = buttonItem;
+         break;
+       }
+@@ -959,6 +981,9 @@ RNS_IGNORE_SUPER_CALL_END
+     switch (childComponentView.type) {
+       case RNSScreenStackHeaderSubviewTypeLeft:
+         navitem.leftBarButtonItem.customView = snapshot;
++#if !TARGET_OS_TV
++        rnscreens_applyPlainCustomBarButtonItemChrome(navitem.leftBarButtonItem);
++#endif
+         break;
+       case RNSScreenStackHeaderSubviewTypeCenter:
+       case RNSScreenStackHeaderSubviewTypeTitle:
+@@ -966,6 +991,9 @@ RNS_IGNORE_SUPER_CALL_END
+         break;
+       case RNSScreenStackHeaderSubviewTypeRight:
+         navitem.rightBarButtonItem.customView = snapshot;
++#if !TARGET_OS_TV
++        rnscreens_applyPlainCustomBarButtonItemChrome(navitem.rightBarButtonItem);
++#endif
+         break;
+       case RNSScreenStackHeaderSubviewTypeSearchBar:
+       case RNSScreenStackHeaderSubviewTypeBackButton:
