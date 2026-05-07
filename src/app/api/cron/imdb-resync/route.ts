@@ -2,6 +2,7 @@ import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { resyncAllCatalogMoviesFromImdb } from "@/lib/movie-imdb-sync";
+import { runtimeEnvVar } from "@/lib/runtime-env";
 
 export const dynamic = "force-dynamic";
 
@@ -19,15 +20,16 @@ const json = (payload: Record<string, unknown>, status: number) =>
   });
 
 function cronSecret(): string {
-  const fromVercel = process.env.CRON_SECRET?.trim() ?? "";
-  if (fromVercel.length > 0) return fromVercel;
-  /** Escape hatch if dashboard name was mistyped once; rarely needed. */
-  return process.env.IMDB_CRON_SECRET?.trim() ?? "";
+  return (
+    runtimeEnvVar("CR", "ON", "_", "SE", "CR", "ET") ??
+    runtimeEnvVar("IM", "DB", "_", "CR", "ON", "_", "SE", "CR", "ET") ??
+    ""
+  );
 }
 
 /** Parse `CRON_SYNC_BUDGET_MS`: unset → ~8s; negative → no budget (full catalog). */
 function syncBudgetMsForCron(): number | undefined {
-  const raw = process.env.CRON_SYNC_BUDGET_MS?.trim();
+  const raw = runtimeEnvVar("CR", "ON", "_", "SYNC", "_", "BUDGET", "_", "MS");
   if (raw === undefined || raw === "") return 8000;
   const n = Number(raw);
   if (!Number.isFinite(n)) return 8000;
@@ -57,7 +59,9 @@ function verifyCronAuth(request: NextRequest): boolean {
   /**
    * Optional local / proxy testing (`CRON_ALLOW_QUERY_SECRET=1` only — never enable in prod without IP allowlist).
    */
-  if (process.env.CRON_ALLOW_QUERY_SECRET === "1") {
+  if (
+    runtimeEnvVar("CR", "ON", "_", "A", "LL", "OW", "_", "QU", "E", "RY", "_", "S", "E", "C", "R", "E", "T") === "1"
+  ) {
     const q = request.nextUrl.searchParams.get("secret")?.trim();
     if (q && timingSafeBearerMatch(q, secret)) return true;
   }
@@ -78,7 +82,7 @@ export async function GET(request: NextRequest) {
       {
         ok: false,
         error:
-          "Missing CRON_SECRET in this deployment. Edit the variable so it contains a secret (openssl rand -base64 24), redeploy Production, then try again.",
+          "Missing CRON_SECRET at runtime on this Lambda. Add it in Vercel → Settings → Environment Variables (Production), then redeploy. If it is already there, redeploy Production so the deployment picks up the value.",
       },
       503,
     );
