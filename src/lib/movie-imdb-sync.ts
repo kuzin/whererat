@@ -438,16 +438,47 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
   });
 }
 
-/** Sequentially resync every catalog title from OMDb/IMDb (for owner action + cron). */
-export async function resyncAllCatalogMoviesFromImdb(): Promise<{
+export type ResyncAllCatalogMoviesOptions = {
+  /**
+   * Stop after roughly this duration. Use on Vercel Hobby (10s function cap) so cron
+   * still completes with partial progress; omit for a full synchronous run.
+   */
+  maxDurationMs?: number;
+  /** Rotate iteration order so each shortened run advances through the catalog. */
+  rotationSeed?: number;
+};
+
+/** Sequentially resync catalog titles from OMDb/IMDb (moderation owner action + cron). */
+export async function resyncAllCatalogMoviesFromImdb(
+  opts?: ResyncAllCatalogMoviesOptions,
+): Promise<{
   total: number;
   synced: number;
   errors: number;
+  truncated: boolean;
 }> {
   const movies = await getCatalogMovies();
+  const total = movies.length;
+  let order = movies;
+  const seed = opts?.rotationSeed;
+  if (typeof seed === "number" && Number.isFinite(seed) && movies.length > 0) {
+    const rot = ((Math.floor(seed) % movies.length) + movies.length) % movies.length;
+    order = [...movies.slice(rot), ...movies.slice(0, rot)];
+  }
   let synced = 0;
   let errors = 0;
-  for (const movie of movies) {
+  const deadlineMs = opts?.maxDurationMs;
+  const deadline =
+    typeof deadlineMs === "number" && Number.isFinite(deadlineMs) && deadlineMs > 0
+      ? Date.now() + deadlineMs
+      : null;
+  let truncated = false;
+
+  for (const movie of order) {
+    if (deadline != null && Date.now() >= deadline) {
+      truncated = true;
+      break;
+    }
     try {
       await syncMovieFromImdb(movie);
       synced++;
@@ -455,5 +486,6 @@ export async function resyncAllCatalogMoviesFromImdb(): Promise<{
       errors++;
     }
   }
-  return { total: movies.length, synced, errors };
+
+  return { total, synced, errors, truncated };
 }

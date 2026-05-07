@@ -199,9 +199,11 @@ export default async function ModerationPage({
             <div className="rounded-xl border border-amber-300/60 bg-white p-5 dark:border-amber-600/30 dark:bg-stone-900/60">
               <h3 className="font-black text-stone-950 dark:text-stone-100">Resync All Movies from IMDb</h3>
               <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
-                Pulls fresh metadata, ratings, poster URLs, and rat trivia from OMDb/IMDb for every movie in the catalog. Runs one API call per movie sequentially — may take a minute per movie. A nightly cron hits the same job automatically (requires{" "}
+                Pulls fresh metadata, ratings, poster URLs, and rat trivia from OMDb/IMDb for every movie in the catalog. Runs one movie at a time; full catalog may take minutes. Cron uses a short default time budget (~8s) plus daily rotation over the catalog (set{" "}
+                <span className="font-mono text-xs">CRON_SYNC_BUDGET_MS=-1</span>{" "}
+                on paid tiers for whole-catalog runs). Cron needs a non-empty{" "}
                 <span className="font-mono text-xs">CRON_SECRET</span>{" "}
-                on Vercel).
+                plus Production redeploy.
               </p>
               <form action={resyncAllMovies} className="mt-4">
                 <ResyncAllButton />
