@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { SEEDED_MODERATOR_AVATAR_URL } from "@/lib/auth";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -8,15 +7,15 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "The fun, spoiler-aware catalog of rat cameos in movies.",
     icons: [
       {
-        src: SEEDED_MODERATOR_AVATAR_URL,
-        sizes: "160x160",
-        type: "image/png",
+        src: "/brand/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
         purpose: "any",
       },
       {
-        src: SEEDED_MODERATOR_AVATAR_URL,
-        sizes: "160x160",
-        type: "image/png",
+        src: "/brand/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
         purpose: "maskable",
       },
     ],
