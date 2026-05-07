@@ -28,6 +28,7 @@ import { EmptyStateCard } from "../../components/EmptyStateCard";
 import { HeaderThemeWordmark } from "../../components/HeaderThemeWordmark";
 import { SightingCard } from "../../components/SightingCard";
 import { fetchMovieDetail } from "../../lib/api";
+import { stackMinimalHeaderLeft } from "../../lib/stackMinimalHeaderLeft";
 import { extractChromeFromPosterUri } from "../../lib/posterChromeFromImage";
 import {
   contrastingForeground,
@@ -119,6 +120,8 @@ function computeStillThumbHeight(
 
 function createMovieStyles(colors: ThemeColors) {
   const surface = colors.headerBg;
+  /** Label/icon on poster-tinted `chipActive` (selected sheet rows, media segment). */
+  const fgOnChip = contrastingForeground(colors.chipActive);
   /** Canvas behind sighting lists / meta only — sticky chrome stays `headerBg`. */
   const tabScrollCanvasBg = mixTowardHex(
     colors.headerBg,
@@ -376,7 +379,7 @@ function createMovieStyles(colors: ThemeColors) {
       flex: 1,
       minHeight: 36,
     },
-    /** Label + current value consume space up to chevron so ▼ stays right-aligned in the pill. */
+    /** Label + current value flex; chevron aligns trailing (matches catalog `chevron-down`). */
     filterSortBtnMain: {
       flex: 1,
       flexDirection: "row",
@@ -407,7 +410,7 @@ function createMovieStyles(colors: ThemeColors) {
       fontWeight: "600",
       flexShrink: 1,
     },
-    sortSelectChevron: { color: colors.textMuted, fontSize: 12, fontWeight: "700", flexShrink: 0 },
+    sortSelectChevron: { flexShrink: 0, marginLeft: 6 },
     loadingMoreWrap: {
       paddingVertical: 12,
       alignItems: "center",
@@ -452,8 +455,8 @@ function createMovieStyles(colors: ThemeColors) {
     },
     sheetRowOn: { backgroundColor: colors.chipActive },
     sheetRowText: { flex: 1, color: colors.textMuted, fontSize: 15, fontWeight: "500" },
-    sheetRowTextOn: { color: colors.text, fontWeight: "700" },
-    sheetCheck: { color: colors.accent, fontWeight: "800" },
+    sheetRowTextOn: { color: fgOnChip, fontWeight: "700" },
+    sheetCheck: { color: fgOnChip, fontWeight: "800" },
     factCard: {
       padding: 12,
       borderRadius: 10,
@@ -563,7 +566,7 @@ function createMovieStyles(colors: ThemeColors) {
     },
     mediaSegmentSlotOn: { backgroundColor: colors.chipActive },
     mediaSegmentSlotText: { fontSize: 14, fontWeight: "600", color: colors.textMuted },
-    mediaSegmentSlotTextOn: { fontWeight: "800", color: colors.accent },
+    mediaSegmentSlotTextOn: { fontWeight: "800", color: fgOnChip },
     mediaStillsColumn: {
       alignSelf: "stretch",
       gap: 12,
@@ -610,15 +613,24 @@ function createMovieStyles(colors: ThemeColors) {
       gap: 12,
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
-      paddingVertical: 8,
+      paddingTop: 10,
+      paddingBottom: 15,
     },
     metaLabel: { color: colors.textMuted, fontSize: 12.5, fontWeight: "600", width: 112 },
-    metaValue: { color: colors.text, fontSize: 13.5, fontWeight: "500", flex: 1, textAlign: "right" },
+    metaValue: {
+      color: colors.text,
+      fontSize: 13.5,
+      fontWeight: "500",
+      flex: 1,
+      textAlign: "right",
+      lineHeight: 19,
+    },
     metaLink: { color: colors.accent, fontSize: 14, fontWeight: "700" },
     metaSynopsisWrap: {
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
-      paddingVertical: 8,
+      paddingTop: 10,
+      paddingBottom: 15,
       gap: 6,
     },
     metaSynopsisBodyFull: {
@@ -640,7 +652,7 @@ function createMovieStyles(colors: ThemeColors) {
       borderColor: colors.border,
       backgroundColor: colors.panel,
       paddingHorizontal: 7,
-      paddingVertical: 3,
+      paddingVertical: 6,
     },
     metaPersonText: {
       color: colors.accent,
@@ -772,6 +784,7 @@ function FilterSortBar({
   secondaryValue,
   onPressSecondary,
   styles,
+  chevronMutedColor,
 }: {
   primaryLabel: string;
   primaryValue: string;
@@ -780,6 +793,7 @@ function FilterSortBar({
   secondaryValue?: string;
   onPressSecondary?: () => void;
   styles: MovieStyles;
+  chevronMutedColor: string;
 }) {
   const hasSecondary =
     typeof secondaryLabel === "string" &&
@@ -796,7 +810,12 @@ function FilterSortBar({
             {primaryValue}
           </Text>
         </View>
-        <Text style={styles.sortSelectChevron}>▼</Text>
+        <Ionicons
+          name="chevron-down"
+          size={18}
+          color={chevronMutedColor}
+          style={styles.sortSelectChevron}
+        />
       </Pressable>
       {hasSecondary ? (
         <Pressable style={styles.filterSortBtn} onPress={onPressSecondary}>
@@ -806,7 +825,12 @@ function FilterSortBar({
               {secondaryValue}
             </Text>
           </View>
-          <Text style={styles.sortSelectChevron}>▼</Text>
+          <Ionicons
+            name="chevron-down"
+            size={18}
+            color={chevronMutedColor}
+            style={styles.sortSelectChevron}
+          />
         </Pressable>
       ) : null}
     </View>
@@ -867,6 +891,7 @@ function SightingsStickyChrome({
   showSpoilers,
   setShowSpoilers,
   styles,
+  chevronMutedColor,
 }: {
   sightings: SightingPublic[];
   activeSort: MovieSightingsSort;
@@ -875,6 +900,7 @@ function SightingsStickyChrome({
   showSpoilers: boolean;
   setShowSpoilers: Dispatch<boolean>;
   styles: MovieStyles;
+  chevronMutedColor: string;
 }) {
   const activeSortLabel = sortOptions.find((opt) => opt.value === activeSort)?.label ?? "Newest";
   const spoilerCount = sightings.filter((s) => s.spoiler).length;
@@ -894,6 +920,7 @@ function SightingsStickyChrome({
         }
         onPressSecondary={spoilerCount > 0 ? () => setSpoilerModeOpen(true) : undefined}
         styles={styles}
+        chevronMutedColor={chevronMutedColor}
       />
       <SortOptionsSheet
         open={spoilerModeOpen}
@@ -918,6 +945,7 @@ function ReviewsStickyChrome({
   setReviewSortOpen,
   setReviewFilterOpen,
   styles,
+  chevronMutedColor,
 }: {
   reviews: NonNullable<MovieDetailResponse["tabs"]["reviews"]>;
   reviewSort: ReviewSortKey;
@@ -925,6 +953,7 @@ function ReviewsStickyChrome({
   setReviewSortOpen: Dispatch<boolean>;
   setReviewFilterOpen: Dispatch<boolean>;
   styles: MovieStyles;
+  chevronMutedColor: string;
 }) {
   const ratCount = reviews.filter((r) => r.mentionsRat).length;
   const reviewSortOptions = [
@@ -951,6 +980,7 @@ function ReviewsStickyChrome({
         }
         onPressSecondary={ratCount > 0 ? () => setReviewFilterOpen(true) : undefined}
         styles={styles}
+        chevronMutedColor={chevronMutedColor}
       />
     </View>
   );
@@ -1174,6 +1204,7 @@ export default function MovieScreen() {
       headerTintColor: fgChrome,
       headerShadowVisible: false,
       headerBackButtonDisplayMode: "minimal",
+      headerLeft: stackMinimalHeaderLeft(() => navigation.goBack()),
       contentStyle: { backgroundColor: sceneBgChrome },
       statusBarStyle: statusChrome,
     };
@@ -1409,6 +1440,7 @@ export default function MovieScreen() {
                 showSpoilers={showSpoilers}
                 setShowSpoilers={setShowSpoilers}
                 styles={styles}
+                chevronMutedColor={movieThemeColors.textMuted}
               />
             ) : stickyReviewsChrome ? (
               <ReviewsStickyChrome
@@ -1418,6 +1450,7 @@ export default function MovieScreen() {
                 setReviewSortOpen={setReviewSortOpen}
                 setReviewFilterOpen={setReviewFilterOpen}
                 styles={styles}
+                chevronMutedColor={movieThemeColors.textMuted}
               />
             ) : stickyMediaChrome ? (
               <MediaSegmentStickyChrome

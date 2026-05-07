@@ -11,6 +11,7 @@ import {
   type NativeSyntheticEvent,
 } from "react-native";
 
+import { contrastingForeground } from "../lib/posterTone";
 import { type ThemeColors, useTheme } from "../lib/theme";
 import type { SightingPublic } from "../lib/types";
 
@@ -264,7 +265,7 @@ export function SightingCard({ sighting, surfaceColor, showSpoilers = false }: P
         color: colors.text,
         backgroundColor: colors.chipActive,
       },
-      fence: { color: colors.text, backgroundColor: colors.chipActive },
+      fence: { color: contrastingForeground(colors.chipActive), backgroundColor: colors.chipActive },
       blockquote: {
         color: colors.textMuted,
         borderLeftColor: colors.border,

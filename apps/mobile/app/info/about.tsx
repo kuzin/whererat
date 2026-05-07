@@ -53,25 +53,6 @@ export default function AboutWhereRatScreen() {
         Submissions and sign-in may be available on the website before they ship in the app — check the site
         for the latest.
       </Text>
-
-      <View style={styles.siteFooter}>
-        <Text style={styles.siteFooterTagline}>
-          Spoiler-aware · Crowd-sourced · Obsessively maintained
-        </Text>
-        <Text style={styles.siteFooterDedication}>For Kaitlyn. ❤️</Text>
-        <Text style={styles.siteFooterCopyright}>
-          Copyright 2026. Design by{" "}
-          <Text
-            accessibilityRole="link"
-            accessibilityLabel="Kuz, opens website"
-            onPress={() => void openURL("https://kuzn.me")}
-            style={styles.siteFooterLink}
-          >
-            Kuz
-          </Text>
-          . All rights reserved.
-        </Text>
-      </View>
     </ScrollView>
   );
 }
@@ -112,38 +93,5 @@ function createStyles(colors: ThemeColors) {
     linkBtnPressed: { opacity: 0.9 },
     linkBtnText: { color: colors.accent, fontSize: 16, fontWeight: "800" },
     footerNote: { color: colors.textMuted, fontSize: 14, lineHeight: 21, marginTop: 24 },
-    siteFooter: {
-      marginTop: 32,
-      paddingTop: 22,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.border,
-      gap: 10,
-      paddingBottom: 8,
-    },
-    siteFooterTagline: {
-      color: colors.textMuted,
-      fontSize: 14,
-      lineHeight: 20,
-      fontWeight: "600",
-    },
-    siteFooterDedication: {
-      color: colors.textMuted,
-      fontSize: 14,
-      lineHeight: 20,
-      fontStyle: "italic",
-      opacity: 0.92,
-    },
-    siteFooterCopyright: {
-      color: colors.text,
-      fontSize: 14,
-      lineHeight: 22,
-      marginTop: 4,
-    },
-    siteFooterLink: {
-      color: colors.accent,
-      fontWeight: "700",
-      textDecorationLine: "underline",
-      textDecorationColor: colors.accent,
-    },
   });
 }

@@ -1,15 +1,22 @@
 import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { BottomTabBar, type BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
-import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
+import { useEffect, useMemo, useState, type ComponentProps } from "react";
 import {
   AccessibilityInfo,
-  Animated,
   Platform,
   Pressable,
   StyleSheet,
   View,
+  type ViewStyle,
 } from "react-native";
+import Animated, {
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HeaderThemeWordmark } from "../../components/HeaderThemeWordmark";
@@ -18,12 +25,56 @@ import { TabBarBackdrop } from "../../components/TabBarBackdrop";
 import { useTheme } from "../../lib/theme";
 
 const TAB_BAR_WIDTH = 240;
+/** Outer glass capsule rounding. */
+const TAB_BAR_CORNER_RADIUS = 28;
+/** Selected segment rounding — tighter than the shell so the bar edge stays visibly rounder. */
+const TAB_ITEM_CORNER_RADIUS = 20;
 
 type RoutedTabBarProps = ComponentProps<typeof BottomTabBar>;
 
-const REST_FOCUS = 1;
-const REST_IDLE = 0.986;
-const SPRING_PRESS = 0.989;
+const PRESS_SCALE = 0.96;
+
+const SPRING_SELECTION = { stiffness: 340, damping: 24, mass: 0.45 };
+const SPRING_PRESS = { stiffness: 480, damping: 28, mass: 0.38 };
+
+/** Matches catalog `layoutToggleBtnOn` (list/card toggle). */
+const SEGMENT_ACTIVE_BORDER_WIDTH = StyleSheet.hairlineWidth;
+
+/** Keep in sync with `(tabs)/index.tsx` `INSET_X` — catalog chrome / search trailing edge. */
+const CATALOG_EDGE_INSET_X = 16;
+/** Matches `InfoMenuHeaderButton` tap target width. */
+const TAB_HEADER_ACTION_W = 44;
+/**
+ * Trailing padding for the settings control. iOS navigation chrome already insets bar-button
+ * content — adding `INSET_X` again kept the cog visibly left of catalog search.
+ */
+const TAB_HEADER_COG_TRAILING_PAD =
+  Platform.select<number>({
+    ios: 0,
+    default: CATALOG_EDGE_INSET_X,
+  }) ?? CATALOG_EDGE_INSET_X;
+/** Same occupied width as trailing slot so Header’s flex doesn’t widen `end` vs empty `start`. */
+const TAB_HEADER_SIDE_MIRROR_W = TAB_HEADER_ACTION_W + TAB_HEADER_COG_TRAILING_PAD;
+
+function TabHeaderLeadingMirror() {
+  return (
+    <View
+      pointerEvents="none"
+      accessibilityElementsHidden
+      style={{ width: TAB_HEADER_SIDE_MIRROR_W, height: TAB_HEADER_ACTION_W }}
+    />
+  );
+}
+
+/** `interpolateColor` needs an rgba(…, 0) pair for transparent → fill transitions. */
+function hexToRgbStringAlpha(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return `rgba(245,158,11,${alpha})`;
+  const r = Number.parseInt(h.slice(0, 2), 16);
+  const g = Number.parseInt(h.slice(2, 4), 16);
+  const b = Number.parseInt(h.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 function useReduceMotionEnabled(): boolean {
   const [enabled, setEnabled] = useState(false);
@@ -56,6 +107,8 @@ function ChipTabButton(props: BottomTabBarButtonProps) {
     style,
     onPress,
     onLongPress,
+    onPressIn,
+    onPressOut,
     ...rawRest
   } = props;
   /** Ref types from `tabBarButton` overlap `LegacyRef` in Pressable typings; omit from spread. */
@@ -67,26 +120,54 @@ function ChipTabButton(props: BottomTabBarButtonProps) {
   const focused =
     Boolean(accessibilityState?.selected) || ariaSel === true || ariaSel === "true";
   const reduceMotion = useReduceMotionEnabled();
-  const resting = focused ? REST_FOCUS : REST_IDLE;
-  const scale = useRef(new Animated.Value(resting)).current;
+
+  const chipClear = useMemo(() => hexToRgbStringAlpha(colors.chipActive, 0), [colors.chipActive]);
+  const outlineClear = useMemo(
+    () => hexToRgbStringAlpha(colors.chipActiveOutline, 0),
+    [colors.chipActiveOutline],
+  );
+  const focusProgress = useSharedValue(focused ? 1 : 0);
+  const pressDepth = useSharedValue(0);
 
   useEffect(() => {
-    const next = focused ? REST_FOCUS : REST_IDLE;
     if (reduceMotion) {
-      scale.setValue(next);
+      focusProgress.value = focused ? 1 : 0;
       return;
     }
-    Animated.spring(scale, {
-      toValue: next,
-      useNativeDriver: true,
-      stiffness: 420,
-      damping: 28,
-      mass: 0.55,
-      overshootClamping: true,
-    }).start();
-  }, [focused, reduceMotion, scale]);
+    focusProgress.value = withSpring(focused ? 1 : 0, SPRING_SELECTION);
+  }, [focused, reduceMotion]);
 
-  const pressScale = reduceMotion ? 1 : SPRING_PRESS;
+  const pillStyle = useAnimatedStyle(
+    () => ({
+      backgroundColor: interpolateColor(focusProgress.value, [0, 1], [chipClear, colors.chipActive]),
+      borderWidth: interpolate(focusProgress.value, [0, 1], [0, SEGMENT_ACTIVE_BORDER_WIDTH]),
+      borderColor: interpolateColor(focusProgress.value, [0, 1], [outlineClear, colors.chipActiveOutline]),
+    }),
+    [chipClear, colors.chipActive, colors.chipActiveOutline, outlineClear],
+  );
+
+  /** Press squash only — selection motion lives in `pillStyle` tint spring. */
+  const innerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: interpolate(pressDepth.value, [0, 1], [1, PRESS_SCALE]) }],
+  }));
+
+  const handlePressIn = (e: Parameters<NonNullable<typeof onPressIn>>[0]) => {
+    onPressIn?.(e);
+    if (reduceMotion) {
+      pressDepth.value = 1;
+      return;
+    }
+    pressDepth.value = withSpring(1, SPRING_PRESS);
+  };
+
+  const handlePressOut = (e: Parameters<NonNullable<typeof onPressOut>>[0]) => {
+    onPressOut?.(e);
+    if (reduceMotion) {
+      pressDepth.value = 0;
+      return;
+    }
+    pressDepth.value = withSpring(0, SPRING_PRESS);
+  };
 
   return (
     <Pressable
@@ -97,35 +178,14 @@ function ChipTabButton(props: BottomTabBarButtonProps) {
       testID={testID}
       onPress={onPress}
       onLongPress={onLongPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       style={[style, styles.tabBarPressable]}
       android_ripple={{ color: "transparent" }}
     >
-      {({ pressed }) => (
-        <Animated.View
-          style={[
-            styles.tabButtonInner,
-            {
-              transform: [{ scale: pressed ? pressScale : scale }],
-            },
-          ]}
-        >
-          <View
-            style={[
-              styles.tabPill,
-              focused &&
-                (colors.mode === "light"
-                  ? {
-                      backgroundColor: colors.chipActive,
-                      borderWidth: StyleSheet.hairlineWidth,
-                      borderColor: colors.accent,
-                    }
-                  : { backgroundColor: colors.accent }),
-            ]}
-          >
-            {children}
-          </View>
-        </Animated.View>
-      )}
+      <Animated.View style={[styles.tabButtonInner, innerStyle]}>
+        <Animated.View style={[styles.tabPill, pillStyle]}>{children}</Animated.View>
+      </Animated.View>
     </Pressable>
   );
 }
@@ -137,23 +197,39 @@ function TabsTabBar(props: RoutedTabBarProps) {
 
   return (
     <View pointerEvents="box-none" style={[styles.tabBarWrap, { bottom }]}>
-      <View
-        style={[
-          styles.tabBarShell,
-          { borderColor: colors.border },
-          colors.mode === "light" && {
-            borderWidth: 1,
-            borderColor: "rgba(28,25,23,0.26)",
-          },
-          colors.mode === "light" && { backgroundColor: colors.panel },
-        ]}
-      >
-        <TabBarBackdrop />
-        <BottomTabBar
-          {...props}
-          insets={{ ...props.insets, bottom: 0 }}
-          style={[styles.tabBarTransparent, styles.tabBar, props.style]}
-        />
+      <View style={styles.tabBarShellShadow}>
+        <View
+          style={[
+            styles.tabBarShellInner,
+            Platform.OS === "ios"
+              ? {
+                  backgroundColor: "transparent",
+                  borderColor:
+                    colors.mode === "light"
+                      ? "rgba(28, 25, 23, 0.11)"
+                      : "rgba(254, 243, 199, 0.13)",
+                }
+              : [
+                  { borderColor: colors.border },
+                  ...(colors.mode === "light"
+                    ? ([
+                        {
+                          borderWidth: 1,
+                          borderColor: "rgba(28,25,23,0.26)",
+                          backgroundColor: colors.panel,
+                        },
+                      ] satisfies [ViewStyle])
+                    : []),
+                ],
+          ]}
+        >
+          <TabBarBackdrop />
+          <BottomTabBar
+            {...props}
+            insets={{ ...props.insets, bottom: 0 }}
+            style={[styles.tabBarTransparent, styles.tabBar, props.style]}
+          />
+        </View>
       </View>
     </View>
   );
@@ -170,9 +246,46 @@ export default function TabsLayout() {
       headerShadowVisible: false,
       headerTitleAlign: "center" as const,
       headerTitle: () => <HeaderThemeWordmark />,
+      /**
+       * Mirrors trailing control width (`TabHeaderLeadingMirror`) so `start` / `end` min widths
+       * match and the wordmark stays visually centered (`@react-navigation/elements` Header).
+       */
+      headerLeft: () => <TabHeaderLeadingMirror />,
+      /**
+       * Tab root has no back button — keep `minimal` so centered `maxWidth` math doesn’t assume
+       * a full default back chevron (80pt) for the leading slot.
+       */
+      headerBackButtonDisplayMode: "minimal" as const,
+      headerTitleContainerStyle: {
+        /**
+         * True screen-center: removed from header row flex (`position: absolute`) so asymmetric
+         * `start` / `end` min widths cannot shift the title (gear slot stays unchanged).
+         */
+        position: "absolute",
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: "center",
+        justifyContent: "center",
+        /** Default Header title uses `marginHorizontal: 16`; override + beat its `maxWidth` cap. */
+        marginHorizontal: 0,
+        maxWidth: "100%",
+        pointerEvents: "box-none",
+      } satisfies ViewStyle,
+      /**
+       * Do not set `flexGrow: 0` / fixed width — must keep Header’s `styles.expand` so flex
+       * balances around the title; use `paddingRight` + matching `headerLeft` width for alignment.
+       */
+      headerRightContainerStyle: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        paddingRight: TAB_HEADER_COG_TRAILING_PAD,
+      } satisfies ViewStyle,
       ...(Platform.OS === "ios" ? { headerBlurEffect: "none" as const } : {}),
       tabBarStyle: styles.tabBarTransparent,
-      tabBarActiveTintColor: colors.headerText,
+      tabBarActiveTintColor: colors.text,
       tabBarInactiveTintColor: colors.tabInactive,
       tabBarLabelStyle: styles.tabBarLabel,
       tabBarItemStyle: styles.tabBarItem,
@@ -190,12 +303,8 @@ export default function TabsLayout() {
         options={{
           title: "Catalog",
           tabBarLabel: "Catalog",
-          tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons
-              name={focused ? "film" : "film-outline"}
-              size={focused ? size + 1 : size}
-              color={color}
-            />
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="rodent" size={size} color={color} />
           ),
         }}
       />
@@ -207,7 +316,7 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "add-circle" : "add-circle-outline"}
-              size={focused ? size + 1 : size}
+              size={size}
               color={color}
             />
           ),
@@ -224,26 +333,26 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
   },
-  tabBarShell: {
+  /** Outer shell only — shadows are clipped if `overflow: hidden` sits on this view (iOS). */
+  tabBarShellShadow: {
     width: TAB_BAR_WIDTH,
-    borderRadius: 22,
-    overflow: "hidden",
-    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: TAB_BAR_CORNER_RADIUS,
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOpacity: 0.28,
-        shadowRadius: 16,
-        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.16,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 5 },
       },
       default: {
-        elevation: 12,
-        shadowColor: "#000",
-        shadowOpacity: 0.32,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
+        elevation: 8,
       },
     }),
+  },
+  tabBarShellInner: {
+    borderRadius: TAB_BAR_CORNER_RADIUS,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
   },
   tabBarTransparent: {
     backgroundColor: "transparent",
@@ -257,15 +366,14 @@ const styles = StyleSheet.create({
     width: TAB_BAR_WIDTH,
     borderRadius: 0,
     height: 72,
-    paddingTop: 4,
-    paddingBottom: 4,
-    paddingHorizontal: 6,
+    /** Inset from the glass shell (outer “air” around both tabs). */
+    padding: 8,
   },
   tabBarLabel: {
     fontWeight: "700",
     fontSize: 11,
     letterSpacing: 0.35,
-    marginTop: 3,
+    marginTop: 1,
   },
   tabBarItem: {
     flex: 1,
@@ -276,6 +384,7 @@ const styles = StyleSheet.create({
   },
   tabBarIcon: {
     marginBottom: 0,
+    marginTop: -1,
   },
   tabBarPressable: {
     flex: 1,
@@ -288,16 +397,20 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 2,
-    paddingHorizontal: 2,
+    padding: 4,
   },
-  /** Hug icon + label; active pill uses catalog-toggle colors in `ChipTabButton`. */
+  /** Active fill radius is smaller than the outer shell for a nested “inset chip” silhouette. */
   tabPill: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 8,
-    paddingHorizontal: 18,
-    borderRadius: 999,
+    paddingHorizontal: 16,
+    borderRadius: TAB_ITEM_CORNER_RADIUS,
     backgroundColor: "transparent",
+    alignSelf: "stretch",
+    maxWidth: "100%",
+    /** No side margin — tabs meet in the middle for a tighter pair. */
+    marginHorizontal: 0,
+    overflow: "hidden",
   },
 });

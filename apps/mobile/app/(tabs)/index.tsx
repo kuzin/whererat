@@ -145,7 +145,7 @@ function createCatalogStyles(colors: ThemeColors) {
     layoutToggleBtnOn: {
       backgroundColor: colors.chipActive,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.accent,
+      borderColor: colors.chipActiveOutline,
     },
     select: {
       flexDirection: "row",

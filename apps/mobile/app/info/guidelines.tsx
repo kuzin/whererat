@@ -13,10 +13,6 @@ export default function GuidelinesScreen() {
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
     >
-      <Text style={styles.intro}>
-        Standards for submissions, spoilers, moderation, inclusivity, and accessibility — so the catalog
-        stays accurate, welcoming, and easy to trust.
-      </Text>
       {GUIDELINES_SECTIONS.map((item) => (
         <View key={item.title} style={styles.card}>
           <Text style={styles.cardTitle}>
@@ -38,12 +34,6 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     scroll: { flex: 1 },
     scrollContent: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40, gap: 12 },
-    intro: {
-      color: colors.textMuted,
-      fontSize: 15,
-      lineHeight: 22,
-      marginBottom: 4,
-    },
     card: {
       borderRadius: 12,
       borderWidth: StyleSheet.hairlineWidth,

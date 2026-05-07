@@ -1,3 +1,4 @@
+import { openURL } from "expo-linking";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect, useNavigation } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
@@ -23,8 +24,8 @@ const ROWS: Row[] = [
     href: "/info/guidelines",
   },
   {
-    title: "Privacy",
-    subtitle: "How data works in the native app (v1)",
+    title: "Privacy policy",
+    subtitle: "How we handle data in the native app (v1)",
     href: "/info/privacy",
   },
 ];
@@ -73,9 +74,6 @@ export default function InfoSettingsMenuScreen() {
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
     >
-      <Text style={styles.lead}>
-        Catalog info and policies — same spirit as whererat.com, formatted for the app.
-      </Text>
       <View style={styles.list}>
         {ROWS.map((row, index) => (
           <Pressable
@@ -97,6 +95,25 @@ export default function InfoSettingsMenuScreen() {
           </Pressable>
         ))}
       </View>
+
+      <View style={styles.hubFooter}>
+        <Text style={styles.footerTagline}>
+          Spoiler-aware · Crowd-sourced · Obsessively maintained
+        </Text>
+        <Text style={styles.footerDedication}>For Kaitlyn. ❤️</Text>
+        <Text style={styles.copyrightLine}>
+          Copyright 2026. Design by{" "}
+          <Text
+            accessibilityRole="link"
+            accessibilityLabel="Kuz, opens website"
+            onPress={() => void openURL("https://kuzn.me")}
+            style={styles.copyrightLink}
+          >
+            Kuz
+          </Text>
+          . All rights reserved.
+        </Text>
+      </View>
     </ScrollView>
   );
 }
@@ -105,12 +122,48 @@ function createStyles(colors: ThemeColors) {
   const border = colors.border;
   return StyleSheet.create({
     scroll: { flex: 1 },
-    scrollContent: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 36 },
-    lead: {
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingTop: 16,
+      paddingBottom: 40,
+    },
+    hubFooter: {
+      alignItems: "center",
+      gap: 10,
+      marginTop: 24,
+      paddingTop: 22,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: border,
+      paddingBottom: 8,
+    },
+    footerTagline: {
       color: colors.textMuted,
-      fontSize: 15,
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: "600",
+      textAlign: "center",
+    },
+    footerDedication: {
+      color: colors.textMuted,
+      fontSize: 14,
+      lineHeight: 20,
+      fontStyle: "italic",
+      opacity: 0.92,
+      textAlign: "center",
+    },
+    copyrightLine: {
+      color: colors.text,
+      fontSize: 14,
       lineHeight: 22,
-      marginBottom: 20,
+      textAlign: "center",
+      maxWidth: 420,
+      alignSelf: "center",
+    },
+    copyrightLink: {
+      color: colors.accent,
+      fontWeight: "700",
+      textDecorationLine: "underline",
+      textDecorationColor: colors.accent,
     },
     list: {
       borderRadius: 12,

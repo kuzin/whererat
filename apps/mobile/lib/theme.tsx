@@ -25,6 +25,11 @@ export type ThemeColors = {
   panel: string;
   panelMuted: string;
   chipActive: string;
+  /**
+   * Border on surfaces using `chipActive` (tab pill, catalog layout toggle).
+   * Light mode: saturation kept but darkened vs `accent` so stroke + label meet WCAG AA on cream chips.
+   */
+  chipActiveOutline: string;
   dangerBg: string;
   dangerText: string;
   retryOnAccent: string;
@@ -50,11 +55,13 @@ const darkColors: ThemeColors = {
   panel: "#0c0a09",
   panelMuted: "#1c1917",
   chipActive: "#422006",
+  chipActiveOutline: "#f59e0b",
   dangerBg: "#431407",
   dangerText: "#fef3c7",
   retryOnAccent: "#292524",
   iconMuted: "#78716c",
-  tabInactive: "#78716c",
+  /** ≥4.5∶1 vs typical tab bar backdrop / panel reads for inactive 11 pt labels */
+  tabInactive: "#a8a29e",
   tabDivider: "rgba(254,243,199,0.14)",
   tabActiveFill: "#ea580c",
   statusBarStyle: "light",
@@ -77,6 +84,7 @@ const lightColors: ThemeColors = {
   panel: "#ffffff",
   panelMuted: "#fffdf8",
   chipActive: "#fef3c7",
+  chipActiveOutline: "#b45309",
   dangerBg: "#fecaca",
   dangerText: "#450a0a",
   retryOnAccent: "#1c1410",

@@ -99,9 +99,34 @@ export function posterToneToHex(tone: string | undefined, fallback: string): str
   return mapped ?? fallback;
 }
 
-/** Readable primary text/icon color on top of `bgHex`. */
+/** WCAG contrast ratio (≥1) for two sRGB `#rrggbb` surfaces. */
+function wcagContrastRatio(fgHex: string, bgHex: string): number {
+  const Lf = relativeLuminance(fgHex);
+  const Lb = relativeLuminance(bgHex);
+  const lighter = Math.max(Lf, Lb);
+  const darker = Math.min(Lf, Lb);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/** Dark / light inks tuned for fills (chips), not `#1c1410` (slightly softer than pure black). */
+const FG_ON_LIGHT_BG = "#0c0a09";
+const FG_ON_DARK_BG = "#fafaf9";
+
+/**
+ * Readable text/icon fill on top of `bgHex`. Prefers whichever of dark vs light foreground
+ * first meets WCAG AA (4.5∶1) for normal-sized copy; ties fall back to luminance midpoint.
+ */
 export function contrastingForeground(bgHex: string): string {
-  return relativeLuminance(bgHex) > 0.45 ? "#1c1917" : "#fafaf9";
+  const rd = wcagContrastRatio(FG_ON_LIGHT_BG, bgHex);
+  const rl = wcagContrastRatio(FG_ON_DARK_BG, bgHex);
+  const aa = 4.5;
+
+  if (rd >= aa && rl >= aa) {
+    return relativeLuminance(bgHex) > 0.45 ? FG_ON_LIGHT_BG : FG_ON_DARK_BG;
+  }
+  if (rd >= aa) return FG_ON_LIGHT_BG;
+  if (rl >= aa) return FG_ON_DARK_BG;
+  return rd >= rl ? FG_ON_LIGHT_BG : FG_ON_DARK_BG;
 }
 
 /** Expo / native-stack status bar style for text/icons over `bgHex`. */
