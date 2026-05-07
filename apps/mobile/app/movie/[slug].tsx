@@ -1,5 +1,6 @@
 import { openURL } from "expo-linking";
 import { Image } from "expo-image";
+import { BlurView } from "expo-blur";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
 import {
@@ -45,31 +46,30 @@ const TAB_DEFS: { key: TabKey; label: string }[] = [
   { key: "images", label: "Stills" },
 ];
 
-function hasNativeViewManager(name: string): boolean {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const UIManager = require("react-native").UIManager as { getViewManagerConfig?: (n: string) => unknown };
-    return Boolean(UIManager?.getViewManagerConfig?.(name));
-  } catch {
-    return false;
-  }
+function resolveHeaderBannerUrl(movie: NonNullable<MovieDetailResponse["movie"]>): string {
+  return movie.headerBanner?.trim() || movie.posterUrl;
 }
 
-function createMovieStyles(colors: ThemeColors, movieSurface?: string) {
-  const topZoneChrome = movieSurface ?? colors.headerBg;
-  /** Pull-down canvas should match top/header chrome in light; dark keeps poster-tinted surface. */
-  const surface = colors.mode === "light" ? topZoneChrome : (movieSurface ?? colors.background);
+function createMovieStyles(colors: ThemeColors) {
+  const surface = colors.headerBg;
+  const heroTopInset = Platform.OS === "ios" ? 116 : 20;
 
   return StyleSheet.create({
+    screen: { flex: 1, backgroundColor: surface },
+    fixedBackdrop: {
+      ...StyleSheet.absoluteFillObject,
+      opacity: 0.54,
+    },
     /** Canvas: visible when overscrolling / pulling from top; not between white section cards. */
-    scroll: { flex: 1, backgroundColor: surface },
-    scrollContent: { paddingBottom: 40, flexGrow: 1 },
+    scroll: { flex: 1, backgroundColor: "transparent" },
+    scrollContent: { paddingBottom: 40, flexGrow: 1, position: "relative" },
     /** White body zone for all content sections below the top zone. */
     scrollBodyPanel: {
       flexGrow: 1,
-      backgroundColor: colors.panel,
+      backgroundColor: colors.headerBg,
       gap: 12,
       paddingTop: 16,
+      overflow: "hidden",
     },
     center: {
       flex: 1,
@@ -92,29 +92,22 @@ function createMovieStyles(colors: ThemeColors, movieSurface?: string) {
       marginBottom: 0,
       overflow: "hidden",
       backgroundColor: "transparent",
-      minHeight: 200,
+      minHeight: 170,
     },
-    backdropImg: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      top: 0,
-      height: 220,
-      opacity: 0.95,
-    },
-    backdropMask: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      top: 0,
-      height: 220,
-    },
-    backdropAlphaMask: { flex: 1 },
     heroRow: {
       flexDirection: "row",
       gap: 16,
       padding: 16,
+      paddingTop: heroTopInset,
       alignItems: "flex-end",
+    },
+    heroTitleBarBlur: {
+      margin: 10,
+      borderRadius: 12,
+      overflow: "hidden",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: "rgba(255,255,255,0.08)",
     },
     poster: {
       width: 112,
@@ -148,7 +141,7 @@ function createMovieStyles(colors: ThemeColors, movieSurface?: string) {
       paddingHorizontal: 10,
       paddingTop: 10,
       paddingBottom: 12,
-      backgroundColor: colors.panel,
+      backgroundColor: colors.headerBg,
     },
     heroTabsRow: {
       gap: 4,
@@ -303,77 +296,42 @@ function HeroBlock({
   imdbTitleUrl,
   tab,
   setTab,
+  blurTint,
   styles,
 }: {
   movie: NonNullable<MovieDetailResponse["movie"]>;
   imdbTitleUrl: string | undefined;
   tab: TabKey;
   setTab: (next: TabKey) => void;
+  blurTint: "light" | "dark";
   styles: MovieStyles;
 }) {
-  const headerBannerFromMeta =
-    typeof movie.metadata?.headerBanner === "string" ? movie.metadata.headerBanner.trim() : "";
-  const headerBannerUrl = movie.headerBanner?.trim() || headerBannerFromMeta || movie.backdropUrl;
-  const hasMaskedView = hasNativeViewManager("RNCMaskedView");
-  const hasGradientView = hasNativeViewManager("ExpoLinearGradient");
-  if (!hasMaskedView || !hasGradientView) {
-    throw new Error(
-      "Native gradient hero fade requires RNCMaskedView and ExpoLinearGradient. Rebuild iOS app via `npx expo run:ios`.",
-    );
-  }
-
   return (
     <View style={styles.hero}>
-      {headerBannerUrl ? (
-        (() => {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const MaskedView = require("@react-native-masked-view/masked-view").default as typeof import("@react-native-masked-view/masked-view").default;
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const { LinearGradient } = require("expo-linear-gradient") as typeof import("expo-linear-gradient");
-          return (
-            <MaskedView
-              style={styles.backdropMask}
-              maskElement={
-                <LinearGradient
-                  colors={["transparent", "#000000", "#000000"]}
-                  locations={[0, 0.5, 1]}
-                  style={styles.backdropAlphaMask}
-                />
-              }
-            >
-              <Image
-                source={{ uri: headerBannerUrl }}
-                style={styles.backdropImg}
-                contentFit="cover"
-                blurRadius={6}
-                recyclingKey={`${movie.id}:banner:${headerBannerUrl}:mask`}
-              />
-            </MaskedView>
-          );
-        })()
-      ) : null}
-      <View style={styles.heroRow}>
-        <Image
-          style={styles.poster}
-          source={{ uri: movie.posterUrl }}
-          accessibilityLabel={movie.posterAlt}
-          recyclingKey={`${movie.id}:${movie.posterUrl}`}
-        />
-        <View style={styles.heroText}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.meta}>
-            {movie.releaseYear} · {movie.runtimeMinutes} min
-          </Text>
-          <Text style={styles.genres} numberOfLines={2}>
-            {movie.genres.join(" · ")}
-          </Text>
-          {imdbTitleUrl ? (
-            <Pressable style={styles.imdbBtn} onPress={() => void openURL(imdbTitleUrl)}>
-              <Text style={styles.imdbBtnText}>Open on IMDb</Text>
-            </Pressable>
-          ) : null}
+      <BlurView intensity={36} tint={blurTint} style={styles.heroTitleBarBlur}>
+        <View style={styles.heroRow}>
+          <Image
+            style={styles.poster}
+            source={{ uri: movie.posterUrl }}
+            accessibilityLabel={movie.posterAlt}
+            recyclingKey={`${movie.id}:${movie.posterUrl}`}
+          />
+          <View style={styles.heroText}>
+            <Text style={styles.title}>{movie.title}</Text>
+            <Text style={styles.meta}>
+              {movie.releaseYear} · {movie.runtimeMinutes} min
+            </Text>
+            <Text style={styles.genres} numberOfLines={2}>
+              {movie.genres.join(" · ")}
+            </Text>
+            {imdbTitleUrl ? (
+              <Pressable style={styles.imdbBtn} onPress={() => void openURL(imdbTitleUrl)}>
+                <Text style={styles.imdbBtnText}>Open on IMDb</Text>
+              </Pressable>
+            ) : null}
+          </View>
         </View>
-      </View>
+      </BlurView>
     </View>
   );
 }
@@ -549,16 +507,15 @@ export default function MovieScreen() {
 
   /** Native stack merges options oddly with iOS 26 scroll chrome; set here so poster headers update reliably. */
   useLayoutEffect(() => {
-    const headerBgChrome = movieBar?.bg ?? colors.headerBg;
-    const sceneBgChrome =
-      colors.mode === "light" ? colors.background : (movieBar?.bg ?? colors.background);
+    const sceneBgChrome = colors.headerBg;
     const fgChrome = movieBar?.fg ?? colors.accent;
     const statusChrome = movieBar?.status ?? colors.statusBarStyle;
     const next: NativeStackNavigationOptions = {
       title: movie?.title ?? "Movie",
       headerTitleAlign: "center",
       headerTitle: () => <HeaderThemeWordmark wordmarkColor={movieBar?.fg} />,
-      headerStyle: { backgroundColor: headerBgChrome },
+      headerStyle: { backgroundColor: "transparent" },
+      headerTransparent: Platform.OS === "ios",
       headerTintColor: fgChrome,
       headerShadowVisible: false,
       headerBackButtonDisplayMode: "minimal",
@@ -567,7 +524,6 @@ export default function MovieScreen() {
     };
     if (Platform.OS === "ios") {
       next.headerBlurEffect = "none";
-      /** Default `automatic` materials fight custom `headerStyle` on newer iOS. */
       next.scrollEdgeEffects = {
         top: "hidden",
         bottom: "hidden",
@@ -581,16 +537,11 @@ export default function MovieScreen() {
     movie?.title,
     movieBar,
     colors.headerBg,
-    colors.background,
     colors.accent,
     colors.statusBarStyle,
-    colors.mode,
   ]);
 
-  const styles = useMemo(
-    () => createMovieStyles(colors, movieBar?.bg),
-    [colors, movieBar?.bg],
-  );
+  const styles = useMemo(() => createMovieStyles(colors), [colors]);
 
   const load = useCallback(async () => {
     if (!slug) return;
@@ -667,6 +618,7 @@ export default function MovieScreen() {
 
   const featured = data?.featuredRats;
   const tabs = data?.tabs;
+  const heroBannerUrl = movie ? resolveHeaderBannerUrl(movie) : "";
 
   const sortOptions = useMemo(() => {
     if (!featured) return [] as { value: MovieSightingsSort; label: string }[];
@@ -742,26 +694,36 @@ export default function MovieScreen() {
       ) : null}
 
       {movie && tabs ? (
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
-          }
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          onScroll={onMainScroll}
-          scrollEventThrottle={16}
-          stickyHeaderIndices={[1]}
-        >
-          <HeroBlock
-            movie={movie}
-            imdbTitleUrl={data.links.imdbTitle}
-            tab={tab}
-            setTab={setTab}
-            styles={styles}
+        <View style={styles.screen}>
+          <Image
+            source={{ uri: heroBannerUrl }}
+            style={styles.fixedBackdrop}
+            contentFit="cover"
+            blurRadius={6}
+            recyclingKey={`${movie.id}:fixed-bg:${heroBannerUrl}`}
+            pointerEvents="none"
           />
-          <MovieTabsBar tab={tab} setTab={setTab} styles={styles} />
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+            }
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            onScroll={onMainScroll}
+            scrollEventThrottle={16}
+            stickyHeaderIndices={[0, 1]}
+          >
+            <HeroBlock
+              movie={movie}
+              imdbTitleUrl={data.links.imdbTitle}
+              tab={tab}
+              setTab={setTab}
+              blurTint={colors.blurTint}
+              styles={styles}
+            />
+            <MovieTabsBar tab={tab} setTab={setTab} styles={styles} />
 
-          <View style={styles.scrollBodyPanel}>
+            <View style={styles.scrollBodyPanel}>
             {error ? (
               <View style={styles.softBanner}>
                 <Text style={styles.softBannerText}>{error}</Text>
@@ -905,8 +867,9 @@ export default function MovieScreen() {
                 )}
               </View>
             ) : null}
-          </View>
-        </ScrollView>
+            </View>
+          </ScrollView>
+        </View>
       ) : null}
     </>
   );

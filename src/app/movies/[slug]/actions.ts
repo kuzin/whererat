@@ -23,8 +23,17 @@ import { reviewSubmission } from "@/lib/moderation-store";
 import { deleteSightingById, updateSightingOverride } from "@/lib/sighting-edit-store";
 import { getCatalogMovieBySlug } from "@/lib/movie-catalog";
 import { persistSightingFiles } from "@/lib/media-storage";
+import { getSyncedMoviePageVisuals } from "@/lib/movie-page-visuals";
+import { getTmdbBackdropUrl } from "@/lib/tmdb-banner";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
+const HEX_COLOR_RE = /^#?[0-9a-fA-F]{6}$/;
+
+function normalizeHexColor(input: FormDataEntryValue | null): string | undefined {
+  const value = String(input ?? "").trim();
+  if (!value || !HEX_COLOR_RE.test(value)) return undefined;
+  return value.startsWith("#") ? value.toLowerCase() : `#${value.toLowerCase()}`;
+}
 
 async function requireModerator() {
   const cookieStore = await cookies();
@@ -54,6 +63,13 @@ export async function updateMovieInfo(formData: FormData) {
 
   const genresRaw = String(formData.get("genres") ?? "").trim();
   const countriesRaw = String(formData.get("countries") ?? "").trim();
+  const wash = normalizeHexColor(formData.get("paletteWash"));
+  const columnWash = normalizeHexColor(formData.get("paletteColumnWash"));
+  const accent = normalizeHexColor(formData.get("paletteAccent"));
+  const heroBloom = normalizeHexColor(formData.get("paletteHeroBloom"));
+  const pagePalette = wash && columnWash && accent && heroBloom
+    ? { wash, columnWash, accent, heroBloom }
+    : undefined;
 
   await updateMovieOverride(movie.id, {
     title: String(formData.get("title") ?? "").trim() || movie.title,
@@ -61,7 +77,6 @@ export async function updateMovieInfo(formData: FormData) {
     runtimeMinutes: Number(formData.get("runtimeMinutes") ?? movie.runtimeMinutes),
     summary: String(formData.get("summary") ?? "").trim() || movie.summary,
     posterUrl: String(formData.get("posterUrl") ?? "").trim() || movie.posterUrl,
-    backdropUrl: String(formData.get("backdropUrl") ?? "").trim() || movie.backdropUrl,
     genres: genresRaw
       ? genresRaw.split(",").map((item) => item.trim()).filter(Boolean)
       : movie.genres,
@@ -80,6 +95,7 @@ export async function updateMovieInfo(formData: FormData) {
       productionCountries: countriesRaw
         ? countriesRaw.split(",").map((item) => item.trim()).filter(Boolean)
         : movie.metadata.productionCountries,
+      ...(pagePalette ? { pagePalette } : { pagePalette: undefined }),
     },
   });
 
@@ -290,6 +306,80 @@ export async function resyncMovieFromImdb(formData: FormData) {
     fetchImdbMedia(imdbId),
   ]);
   const ratFacts = ratFactsResult.status === "found" ? ratFactsResult.facts : [];
+  const tmdbBackdrop = await getTmdbBackdropUrl({
+    tmdbId: movie.externalIds.tmdb,
+    imdbId,
+  });
+  const hasTmdbToken = Boolean(
+    process.env.TMDB_READ_ACCESS_TOKEN?.trim() ||
+      process.env.TMDB_API_READ_ACCESS_TOKEN?.trim() ||
+      process.env.TMDB_BEARER_TOKEN?.trim(),
+  );
+  const tmdbBannerStatus = tmdbBackdrop ? "ok" : hasTmdbToken ? "failed" : "not-configured";
+  const syncedVisuals = await getSyncedMoviePageVisuals({
+    ...movie,
+    ...(posterUrl ? { posterUrl } : {}),
+  });
+  const nextSyncSnapshot: Record<string, unknown> = {
+    title: omdb.Title,
+    releaseYear: omdb.Year,
+    runtimeMinutes: runtimeMinutes ?? movie.runtimeMinutes,
+    genres: genres ?? movie.genres,
+    summary: omdb.Plot,
+    posterUrl: posterUrl ?? movie.posterUrl,
+    rating: omdb.Rated ?? "",
+    director: omdb.Director ?? "",
+    writers: omdb.Writer ?? "",
+    cast: omdb.Actors ?? "",
+    imdbRating: omdb.imdbRating ?? "",
+    imdbVotes: omdb.imdbVotes ?? "",
+    metascore: omdb.Metascore ?? "",
+    awards: omdb.Awards ?? "",
+    originalLanguage: omdb.Language ?? "",
+    productionCountries: productionCountries ?? movie.metadata.productionCountries,
+    ratFactsCount: ratFacts.length,
+    imdbReviewsCount: imdbReviews.length,
+    imdbRelatedCount: imdbRelated.length,
+    imdbVideosCount: imdbMedia.videos.length,
+    imdbImagesCount: imdbMedia.images.length,
+    syncedHeaderBannerUrl: syncedVisuals.bannerUrl,
+    syncedPagePalette: syncedVisuals.palette,
+  };
+  const prevSyncSnapshot =
+    movie.metadata.syncSnapshot && typeof movie.metadata.syncSnapshot === "object"
+      ? movie.metadata.syncSnapshot
+      : {};
+  const changedLabels: string[] = [];
+  const syncFieldLabels: Record<string, string> = {
+    title: "Title",
+    releaseYear: "Release year",
+    runtimeMinutes: "Runtime",
+    genres: "Genres",
+    summary: "Summary",
+    posterUrl: "Poster URL",
+    rating: "Certificate",
+    director: "Director",
+    writers: "Writers",
+    cast: "Cast",
+    imdbRating: "IMDb score",
+    imdbVotes: "IMDb votes",
+    metascore: "Metascore",
+    awards: "Awards",
+    originalLanguage: "Language",
+    productionCountries: "Countries",
+    ratFactsCount: "Rat facts",
+    imdbReviewsCount: "Reviews",
+    imdbRelatedCount: "Related titles",
+    imdbVideosCount: "Videos",
+    imdbImagesCount: "Images",
+    syncedHeaderBannerUrl: "Header banner URL",
+    syncedPagePalette: "Synced color palette",
+  };
+  for (const key of Object.keys(nextSyncSnapshot)) {
+    if (JSON.stringify(prevSyncSnapshot[key]) !== JSON.stringify(nextSyncSnapshot[key])) {
+      changedLabels.push(syncFieldLabels[key] ?? key);
+    }
+  }
 
   await updateMovieOverride(movie.id, {
     ...(omdbStr(omdb.Title) ? { title: omdb.Title } : {}),
@@ -298,6 +388,7 @@ export async function resyncMovieFromImdb(formData: FormData) {
     ...(genres ? { genres } : {}),
     ...(omdbStr(omdb.Plot) ? { summary: omdb.Plot } : {}),
     ...(posterUrl ? { posterUrl } : {}),
+    ...(tmdbBackdrop ? { backdropUrl: tmdbBackdrop } : {}),
     metadata: {
       ...movie.metadata,
       ...(omdbStr(omdb.Rated) ? { rating: omdb.Rated } : {}),
@@ -311,6 +402,10 @@ export async function resyncMovieFromImdb(formData: FormData) {
       ...(omdbStr(omdb.Language) ? { originalLanguage: omdb.Language } : {}),
       ...(productionCountries ? { productionCountries } : {}),
       metadataProvider: "OMDb via IMDb ID",
+      lastSyncedAt: new Date().toISOString().slice(0, 10),
+      syncedHeaderBannerUrl: syncedVisuals.bannerUrl,
+      syncSnapshot: nextSyncSnapshot,
+      lastSyncChangedFields: changedLabels,
       ...(ratFacts.length > 0 ? { ratFacts } : {}),
       ...(imdbReviews.length > 0 ? { imdbReviews } : {}),
       ...(imdbRelated.length > 0 ? { imdbRelated } : {}),
@@ -346,6 +441,8 @@ export async function resyncMovieFromImdb(formData: FormData) {
   params.set("related", String(imdbRelated.length));
   params.set("videos", String(imdbMedia.videos.length));
   params.set("images", String(imdbMedia.images.length));
+  params.set("changed", String(changedLabels.length));
+  params.set("tmdbbanner", tmdbBannerStatus);
   redirect(`/movies/${slug}?${params.toString()}`);
 }
 

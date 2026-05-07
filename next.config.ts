@@ -41,6 +41,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "external-preview.redd.it",
       },
+      {
+        protocol: "https",
+        hostname: "where-rat.s3.us-east-1.amazonaws.com",
+      },
       ...(s3PublicHostname
         ? [
             {

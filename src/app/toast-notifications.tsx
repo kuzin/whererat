@@ -210,8 +210,22 @@ export function ToastNotifications() {
           lines.push("No media found on IMDb");
         }
       }
-
-      return { ...base, body: lines.join("\n") };
+      const tmdbBannerStatus = searchParams.get("tmdbbanner");
+      let tmdbWarning = false;
+      if (tmdbBannerStatus === "ok") {
+        lines.push("TMDB banner synced");
+      } else if (tmdbBannerStatus === "failed") {
+        tmdbWarning = true;
+        lines.push("TMDB banner not found. Fallback image will be used.");
+      } else if (tmdbBannerStatus === "not-configured") {
+        tmdbWarning = true;
+        lines.push("TMDB banner lookup not configured. Fallback image will be used.");
+      }
+      return {
+        ...base,
+        tone: tmdbWarning ? "info" : base.tone,
+        body: lines.join("\n"),
+      };
     }
 
     return base;
@@ -241,6 +255,7 @@ export function ToastNotifications() {
       next.delete("images");
       next.delete("synced");
       next.delete("errors");
+      next.delete("tmdbbanner");
       const query = next.toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     }, 4500);
@@ -284,6 +299,7 @@ export function ToastNotifications() {
               next.delete("images");
               next.delete("synced");
               next.delete("errors");
+              next.delete("tmdbbanner");
               const query = next.toString();
               router.replace(query ? `${pathname}?${query}` : pathname, {
                 scroll: false,

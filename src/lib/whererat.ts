@@ -96,6 +96,19 @@ export type Movie = {
       | "Licensed IMDb data"
       | "TMDB keyword seed";
     lastSyncedAt: string;
+    /** Last banner URL resolved during sync (used as stable default hero source). */
+    syncedHeaderBannerUrl?: string;
+    /** Optional manual page color overrides used by the movie page. */
+    pagePalette?: {
+      wash: string;
+      columnWash: string;
+      accent: string;
+      heroBloom: string;
+    };
+    /** Raw snapshot of fields pulled from the most recent sync run. */
+    syncSnapshot?: Record<string, unknown>;
+    /** Human-readable field labels that changed in the latest sync. */
+    lastSyncChangedFields?: string[];
     /** Screenplay / story credits (IMDb-style line). */
     writers?: string;
     /** Principal cast, comma-separated. */

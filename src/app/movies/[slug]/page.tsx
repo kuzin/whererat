@@ -204,6 +204,7 @@ export default async function MoviePage({
   const visuals = await getMoviePageVisuals(movie);
   const palette = visuals.palette;
   const heroMetaLine = movieHeroMetaLine(movie);
+  const manualPalette = movie.metadata.pagePalette;
 
   const rootStyle: CSSProperties | undefined = palette
     ? ({
@@ -367,7 +368,7 @@ export default async function MoviePage({
               ) : null}
               <dl className="flex flex-wrap gap-3">
                 <div
-                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
+                  className={`border px-4 py-2.5 backdrop-blur-md ${
                     palette
                       ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
                       : "border-white/22 bg-black/42"
@@ -393,7 +394,7 @@ export default async function MoviePage({
                   </dd>
                 </div>
                 <div
-                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
+                  className={`border px-4 py-2.5 backdrop-blur-md ${
                     palette
                       ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
                       : "border-white/22 bg-black/42"
@@ -420,7 +421,7 @@ export default async function MoviePage({
                 </div>
                 {imdbRating ? (
                   <div
-                    className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
+                    className={`border px-4 py-2.5 backdrop-blur-md ${
                       palette
                         ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
                         : "border-white/22 bg-black/42"
@@ -789,14 +790,72 @@ export default async function MoviePage({
                 Summary
                 <textarea name="summary" rows={4} defaultValue={movie.summary} className="wr-input" />
               </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Poster image URL
+                <input name="posterUrl" defaultValue={movie.posterUrl} className="wr-input" />
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Current hero banner URL
+                <input value={visuals.bannerUrl} readOnly className="wr-input opacity-80" />
+              </label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Poster image URL
-                  <input name="posterUrl" defaultValue={movie.posterUrl} className="wr-input" />
+                  Palette wash
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteWash"
+                      type="color"
+                      defaultValue={manualPalette?.wash ?? visuals.syncedPalette?.wash ?? "#fffbeb"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPalette?.wash ?? visuals.syncedPalette?.wash ?? "#fffbeb"}
+                    </span>
+                  </div>
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Backdrop image URL
-                  <input name="backdropUrl" defaultValue={movie.backdropUrl} className="wr-input" />
+                  Palette column wash
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteColumnWash"
+                      type="color"
+                      defaultValue={manualPalette?.columnWash ?? visuals.syncedPalette?.columnWash ?? "#fffdf6"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPalette?.columnWash ?? visuals.syncedPalette?.columnWash ?? "#fffdf6"}
+                    </span>
+                  </div>
+                </label>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                  Palette accent
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteAccent"
+                      type="color"
+                      defaultValue={manualPalette?.accent ?? visuals.syncedPalette?.accent ?? "#b45309"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPalette?.accent ?? visuals.syncedPalette?.accent ?? "#b45309"}
+                    </span>
+                  </div>
+                </label>
+                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                  Palette hero bloom
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteHeroBloom"
+                      type="color"
+                      defaultValue={manualPalette?.heroBloom ?? visuals.syncedPalette?.heroBloom ?? "#2b2118"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPalette?.heroBloom ?? visuals.syncedPalette?.heroBloom ?? "#2b2118"}
+                    </span>
+                  </div>
                 </label>
               </div>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
