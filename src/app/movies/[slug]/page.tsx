@@ -205,6 +205,7 @@ export default async function MoviePage({
   const palette = visuals.palette;
   const heroMetaLine = movieHeroMetaLine(movie);
   const manualPalette = movie.metadata.pagePalette;
+  const manualPaletteDark = movie.metadata.pagePaletteDark;
 
   const rootStyle: CSSProperties | undefined = palette
     ? ({
@@ -212,6 +213,12 @@ export default async function MoviePage({
         "--movie-column-wash": palette.columnWash,
         "--movie-accent": palette.accent,
         "--movie-hero-bloom": palette.heroBloom,
+        "--movie-wash-dark": (manualPaletteDark ?? visuals.paletteDark)?.wash ?? palette.wash,
+        "--movie-column-wash-dark":
+          (manualPaletteDark ?? visuals.paletteDark)?.columnWash ?? palette.columnWash,
+        "--movie-accent-dark": (manualPaletteDark ?? visuals.paletteDark)?.accent ?? palette.accent,
+        "--movie-hero-bloom-dark":
+          (manualPaletteDark ?? visuals.paletteDark)?.heroBloom ?? palette.heroBloom,
       } as CSSProperties)
     : undefined;
 
@@ -780,6 +787,66 @@ export default async function MoviePage({
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   Runtime (minutes)
                   <input name="runtimeMinutes" type="number" defaultValue={movie.runtimeMinutes} className="wr-input" />
+                </label>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                  Dark wash
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteWashDark"
+                      type="color"
+                      defaultValue={manualPaletteDark?.wash ?? visuals.syncedPaletteDark?.wash ?? "#110e0c"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPaletteDark?.wash ?? visuals.syncedPaletteDark?.wash ?? "#110e0c"}
+                    </span>
+                  </div>
+                </label>
+                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                  Dark column wash
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteColumnWashDark"
+                      type="color"
+                      defaultValue={manualPaletteDark?.columnWash ?? visuals.syncedPaletteDark?.columnWash ?? "#0c0a09"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPaletteDark?.columnWash ?? visuals.syncedPaletteDark?.columnWash ?? "#0c0a09"}
+                    </span>
+                  </div>
+                </label>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                  Dark accent
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteAccentDark"
+                      type="color"
+                      defaultValue={manualPaletteDark?.accent ?? visuals.syncedPaletteDark?.accent ?? "#a16207"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPaletteDark?.accent ?? visuals.syncedPaletteDark?.accent ?? "#a16207"}
+                    </span>
+                  </div>
+                </label>
+                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                  Dark hero bloom
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="paletteHeroBloomDark"
+                      type="color"
+                      defaultValue={manualPaletteDark?.heroBloom ?? visuals.syncedPaletteDark?.heroBloom ?? "#080706"}
+                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
+                    />
+                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+                      {manualPaletteDark?.heroBloom ?? visuals.syncedPaletteDark?.heroBloom ?? "#080706"}
+                    </span>
+                  </div>
                 </label>
               </div>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">

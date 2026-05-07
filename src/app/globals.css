@@ -190,13 +190,17 @@ body {
   background:
     radial-gradient(
       ellipse 92% 52% at 14% 0%,
-      color-mix(in srgb, var(--movie-accent) 16%, transparent) 0%,
+      color-mix(in srgb, var(--movie-accent-dark, var(--movie-accent)) 16%, transparent) 0%,
       transparent 56%
     ),
     linear-gradient(
       168deg,
-      rgb(17 14 12) 0%,
-      color-mix(in srgb, var(--movie-accent) 9%, rgb(22 18 15)) 42%,
+      var(--movie-wash-dark, rgb(17 14 12)) 0%,
+      color-mix(
+        in srgb,
+        var(--movie-accent-dark, var(--movie-accent)) 9%,
+        var(--movie-column-wash-dark, rgb(22 18 15))
+      ) 42%,
       var(--movie-skin-end) 100%
     );
 }

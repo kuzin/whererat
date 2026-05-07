@@ -7,6 +7,7 @@ import {
 import { getCatalogMovieBySlug } from "@/lib/movie-catalog";
 import type { Movie, Sighting } from "@/lib/whererat";
 import {
+  estimateRatsForAppearance,
   parseMovieSightingsPageParam,
   parseMovieSightingsSortParam,
   prepareMovieSightingsView,
@@ -86,6 +87,9 @@ export async function getV1MovieDetailJson(
     ...serializeMoviePublic(movie),
     headerBanner,
     pagePalette: visuals.palette,
+    pagePaletteDark: visuals.paletteDark,
+    sightingCount: sightings.length,
+    approxRatsOnScreen: sightings.reduce((sum, s) => sum + estimateRatsForAppearance(s), 0),
   };
 
   return {

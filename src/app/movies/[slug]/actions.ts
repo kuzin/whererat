@@ -67,8 +67,15 @@ export async function updateMovieInfo(formData: FormData) {
   const columnWash = normalizeHexColor(formData.get("paletteColumnWash"));
   const accent = normalizeHexColor(formData.get("paletteAccent"));
   const heroBloom = normalizeHexColor(formData.get("paletteHeroBloom"));
+  const washDark = normalizeHexColor(formData.get("paletteWashDark"));
+  const columnWashDark = normalizeHexColor(formData.get("paletteColumnWashDark"));
+  const accentDark = normalizeHexColor(formData.get("paletteAccentDark"));
+  const heroBloomDark = normalizeHexColor(formData.get("paletteHeroBloomDark"));
   const pagePalette = wash && columnWash && accent && heroBloom
     ? { wash, columnWash, accent, heroBloom }
+    : undefined;
+  const pagePaletteDark = washDark && columnWashDark && accentDark && heroBloomDark
+    ? { wash: washDark, columnWash: columnWashDark, accent: accentDark, heroBloom: heroBloomDark }
     : undefined;
 
   await updateMovieOverride(movie.id, {
@@ -96,6 +103,7 @@ export async function updateMovieInfo(formData: FormData) {
         ? countriesRaw.split(",").map((item) => item.trim()).filter(Boolean)
         : movie.metadata.productionCountries,
       ...(pagePalette ? { pagePalette } : { pagePalette: undefined }),
+      ...(pagePaletteDark ? { pagePaletteDark } : { pagePaletteDark: undefined }),
     },
   });
 

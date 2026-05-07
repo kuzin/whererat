@@ -121,6 +121,10 @@ function TabsTabBar(props: RoutedTabBarProps) {
         style={[
           styles.tabBarShell,
           { borderColor: colors.border },
+          colors.mode === "light" && {
+            borderWidth: 1,
+            borderColor: "rgba(28,25,23,0.26)",
+          },
           colors.mode === "light" && { backgroundColor: colors.panel },
         ]}
       >

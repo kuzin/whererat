@@ -113,6 +113,12 @@ export default async function RootLayout({
                     >
                       Guidelines →
                     </Link>
+                    <Link
+                      className="inline-flex w-fit items-center rounded-lg border-2 border-amber-200/35 bg-white/10 px-4 py-2 text-sm font-bold text-amber-50 outline-none ring-offset-2 transition hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-amber-300 dark:border-white/25 dark:bg-white/10 dark:text-amber-100 dark:ring-offset-stone-900 dark:hover:bg-white/15"
+                      href="/privacy"
+                    >
+                      Privacy →
+                    </Link>
                     {session ? (
                       <form action={logoutModerator}>
                         <button

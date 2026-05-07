@@ -349,6 +349,7 @@
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = WhereRat/Info.plist;
+				INFOPLIST_KEY_UIViewControllerBasedStatusBarAppearance = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -381,6 +382,7 @@
 				CODE_SIGN_ENTITLEMENTS = WhereRat/WhereRat.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = WhereRat/Info.plist;
+				INFOPLIST_KEY_UIViewControllerBasedStatusBarAppearance = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

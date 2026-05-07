@@ -20,6 +20,14 @@ export function getApiOrigin(): string {
   return baseUrl();
 }
 
+function absolutizeMediaUrl(url: string | undefined): string | undefined {
+  const raw = url?.trim();
+  if (!raw) return undefined;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("/")) return `${baseUrl()}${raw}`;
+  return `${baseUrl()}/${raw}`;
+}
+
 export function fetchCatalogPage(params: {
   q: string;
   genre: string;
@@ -46,5 +54,21 @@ export function fetchMovieDetail(params: {
   if (params.page && params.page > 1) sp.set("page", String(params.page));
   const q = sp.toString();
   const path = `/api/v1/movies/${encodeURIComponent(params.slug)}${q ? `?${q}` : ""}`;
-  return getJson<MovieDetailResponse>(path);
+  return getJson<MovieDetailResponse>(path).then((payload) => {
+    const normalizedSightings = payload.featuredRats.sightings.map((sighting) => ({
+      ...sighting,
+      imageUrl: absolutizeMediaUrl(sighting.imageUrl),
+      images: sighting.images?.map((img) => ({
+        ...img,
+        url: absolutizeMediaUrl(img.url) ?? img.url,
+      })),
+    }));
+    return {
+      ...payload,
+      featuredRats: {
+        ...payload.featuredRats,
+        sightings: normalizedSightings,
+      },
+    };
+  });
 }

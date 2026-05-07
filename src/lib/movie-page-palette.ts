@@ -11,6 +11,24 @@ export type MoviePagePalette = {
   heroBloom: string;
 };
 
+export function deriveDarkMoviePagePalette(light: MoviePagePalette): MoviePagePalette {
+  const parseHex = (h: string): [number, number, number] | null => {
+    const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(h.trim());
+    if (!m) return null;
+    return [Number.parseInt(m[1], 16), Number.parseInt(m[2], 16), Number.parseInt(m[3], 16)];
+  };
+  const washRgb = parseHex(light.wash) ?? [28, 24, 21];
+  const colRgb = parseHex(light.columnWash) ?? [34, 29, 25];
+  const accRgb = parseHex(light.accent) ?? [180, 83, 9];
+  const bloomRgb = parseHex(light.heroBloom) ?? [20, 16, 13];
+  return {
+    wash: mixToward(washRgb, [17, 14, 12], 0.72),
+    columnWash: mixToward(colRgb, [12, 10, 9], 0.78),
+    accent: mixToward(accRgb, [214, 158, 46], 0.28),
+    heroBloom: mixToward(bloomRgb, [8, 7, 6], 0.62),
+  };
+}
+
 function clampByte(n: number) {
   return Math.max(0, Math.min(255, Math.round(n)));
 }

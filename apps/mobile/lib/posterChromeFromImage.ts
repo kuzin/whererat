@@ -1,5 +1,3 @@
-import { getColors, type ImageColorsResult } from "react-native-image-colors";
-
 import { softenChromeHex } from "./posterTone";
 
 function normalizeToHex(raw: string | undefined | null): string | null {
@@ -9,7 +7,40 @@ function normalizeToHex(raw: string | undefined | null): string | null {
   return m ? `#${m[1].toLowerCase()}` : null;
 }
 
-function pickRawFromResult(result: ImageColorsResult): string | undefined {
+type ImageColorsLikeResult = {
+  platform?: "ios" | "android" | "web" | string;
+  background?: string;
+  primary?: string;
+  secondary?: string;
+  darkMuted?: string;
+  muted?: string;
+  darkVibrant?: string;
+  vibrant?: string;
+  dominant?: string;
+};
+
+type GetColorsFn = (
+  uri: string,
+  options: { fallback: string; cache: boolean; key: string; quality: "low" | "high" },
+) => Promise<ImageColorsLikeResult>;
+
+let cachedGetColors: GetColorsFn | null | false = null;
+
+function resolveGetColors(): GetColorsFn | false {
+  if (cachedGetColors !== null) return cachedGetColors;
+  try {
+    // Lazy require prevents module initialization during file evaluation in Expo Go.
+    // eslint-disable-next-line no-new-func
+    const req = Function("return require")() as NodeRequire;
+    const mod = req("react-native-image-colors") as { getColors?: GetColorsFn };
+    cachedGetColors = typeof mod.getColors === "function" ? mod.getColors : false;
+  } catch {
+    cachedGetColors = false;
+  }
+  return cachedGetColors;
+}
+
+function pickRawFromResult(result: ImageColorsLikeResult): string | undefined {
   switch (result.platform) {
     case "ios":
       return result.background || result.primary || result.secondary;
@@ -38,6 +69,8 @@ export async function extractChromeFromPosterUri(
   if (!trimmed) return null;
 
   try {
+    const getColors = resolveGetColors();
+    if (!getColors) return null;
     const result = await getColors(trimmed, {
       fallback,
       cache: true,

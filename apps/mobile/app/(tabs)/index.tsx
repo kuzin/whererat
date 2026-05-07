@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 
+import { EmptyStateCard } from "../../components/EmptyStateCard";
 import { fetchCatalogPage } from "../../lib/api";
 import { type ThemeColors, useTheme } from "../../lib/theme";
 import type { CatalogMovieRow, CatalogResponse, CatalogSort } from "../../lib/types";
@@ -36,14 +37,20 @@ const SPACE_Y = 12;
 /** Slightly tighter gap between search field and filter row */
 const CATALOG_SEARCH_TO_FILTERS_GAP = 8;
 const CARD_GAP = SPACE_Y;
+const CATALOG_CONTENT_INSET_X = 20;
 /** Reserve space above floating tab bar + pager */
-const SCROLL_BOTTOM_PAD = 32;
+const SCROLL_BOTTOM_PAD = 92;
+const REFRESH_SPINNER_COLOR = "#f59e0b";
 
 function gridPosterWidthPx(screenWidth: number): number {
-  return (screenWidth - INSET_X * 2 - CARD_GAP * (CARD_COLS - 1)) / CARD_COLS;
+  return (screenWidth - CATALOG_CONTENT_INSET_X * 2 - CARD_GAP * (CARD_COLS - 1)) / CARD_COLS;
 }
 
 function createCatalogStyles(colors: ThemeColors) {
+  const warmLine = colors.mode === "light" ? "rgba(28,25,23,0.32)" : colors.border;
+  const warmLineSoft = colors.mode === "light" ? "rgba(28,25,23,0.22)" : colors.border;
+  const warmPanel = "transparent";
+
   return StyleSheet.create({
     screen: {
       flex: 1,
@@ -57,7 +64,7 @@ function createCatalogStyles(colors: ThemeColors) {
       backgroundColor: colors.headerBg,
       paddingVertical: SPACE_Y,
       borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
+      borderBottomColor: warmLine,
     },
     /** Inset content inside the stripe */
     catalogTop: {
@@ -70,7 +77,7 @@ function createCatalogStyles(colors: ThemeColors) {
       backgroundColor: colors.panel,
       borderRadius: 10,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderColor: warmLineSoft,
       overflow: "hidden",
       position: "relative",
     },
@@ -112,7 +119,7 @@ function createCatalogStyles(colors: ThemeColors) {
       backgroundColor: colors.panel,
       borderRadius: 10,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderColor: warmLineSoft,
       padding: 3,
       flexShrink: 0,
       gap: 3,
@@ -138,7 +145,7 @@ function createCatalogStyles(colors: ThemeColors) {
       backgroundColor: colors.panel,
       borderRadius: 10,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderColor: warmLineSoft,
       paddingHorizontal: 11,
       paddingVertical: 0,
       justifyContent: "center",
@@ -168,7 +175,7 @@ function createCatalogStyles(colors: ThemeColors) {
       backgroundColor: colors.panel,
       borderRadius: 14,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderColor: warmLineSoft,
       paddingTop: SPACE_Y,
       paddingBottom: SPACE_Y,
       maxHeight: 420,
@@ -186,7 +193,7 @@ function createCatalogStyles(colors: ThemeColors) {
       paddingHorizontal: INSET_X,
       paddingBottom: SPACE_Y,
       borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
+      borderBottomColor: warmLineSoft,
       marginBottom: 2,
     },
     sheetRow: {
@@ -212,20 +219,26 @@ function createCatalogStyles(colors: ThemeColors) {
     },
     /** Same horizontal inset as `catalogTop`; list + card grids share this */
     catalogScrollContent: {
-      paddingHorizontal: INSET_X,
-      paddingTop: 0,
+      paddingHorizontal: CATALOG_CONTENT_INSET_X,
+      paddingTop: SPACE_Y + 4,
       paddingBottom: SCROLL_BOTTOM_PAD,
       flexGrow: 1,
     },
     cardGridRow: {
       gap: CARD_GAP,
-      marginBottom: CARD_GAP,
+      marginBottom: CARD_GAP + 4,
       justifyContent: "flex-start",
     },
     posterTile: {
       borderRadius: 8,
       overflow: "hidden",
       backgroundColor: colors.panel,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: warmLineSoft,
+      shadowColor: "#1c1917",
+      shadowOpacity: colors.mode === "light" ? 0.08 : 0,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 2 },
     },
     posterTileImg: {
       borderRadius: 8,
@@ -234,10 +247,13 @@ function createCatalogStyles(colors: ThemeColors) {
     row: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 11,
-      gap: SPACE_Y,
+      paddingVertical: 13,
+      gap: SPACE_Y + 4,
       borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
+      borderBottomColor: warmLine,
+      backgroundColor: warmPanel,
+      borderRadius: 8,
+      paddingHorizontal: 8,
     },
     poster: {
       width: 52,
@@ -249,15 +265,10 @@ function createCatalogStyles(colors: ThemeColors) {
     rowTitle: { color: colors.text, fontSize: 17, fontWeight: "700" },
     rowMeta: { color: colors.textMuted, fontSize: 14 },
     rowRating: { color: colors.accent, fontSize: 13 },
+    rowRatingRow: { flexDirection: "row", alignItems: "center", gap: 4 },
+    rowRatingIcon: { color: colors.accent },
     chevron: { color: colors.textMuted, fontSize: 28, fontWeight: "200" },
     center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 40 },
-    empty: {
-      color: colors.textMuted,
-      textAlign: "center",
-      marginTop: SPACE_Y * 3,
-      paddingHorizontal: INSET_X,
-      fontSize: 16,
-    },
     banner: {
       marginHorizontal: INSET_X,
       marginBottom: SPACE_Y,
@@ -420,7 +431,10 @@ function MovieRow({
           {item.releaseYear} · {item.sightingCount} sighting{item.sightingCount === 1 ? "" : "s"}
         </Text>
         {item.imdbRating ? (
-          <Text style={styles.rowRating}>IMDb {item.imdbRating}</Text>
+          <View style={styles.rowRatingRow}>
+            <Ionicons name="star" size={12} style={styles.rowRatingIcon} />
+            <Text style={styles.rowRating}>IMDb {item.imdbRating}</Text>
+          </View>
         ) : null}
       </View>
       <Text style={styles.chevron}>›</Text>
@@ -609,7 +623,14 @@ export default function CatalogScreen() {
         numColumns={layoutMode === "card" ? CARD_COLS : 1}
         columnWrapperStyle={layoutMode === "card" ? styles.cardGridRow : undefined}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={REFRESH_SPINNER_COLOR}
+            colors={[REFRESH_SPINNER_COLOR]}
+            progressBackgroundColor={colors.panel}
+            titleColor={REFRESH_SPINNER_COLOR}
+          />
         }
         renderItem={({ item }) =>
           layoutMode === "list" ? (
@@ -619,7 +640,15 @@ export default function CatalogScreen() {
           )
         }
         ListEmptyComponent={
-          !loading ? <Text style={styles.empty}>No titles match these filters.</Text> : null
+          !loading ? (
+            <View style={{ paddingTop: SPACE_Y * 2, paddingBottom: SPACE_Y }}>
+              <EmptyStateCard
+                colors={colors}
+                title="No rats in this hole."
+                body="Widen those filters—or check back once more titles land in the catalog."
+              />
+            </View>
+          ) : null
         }
         contentContainerStyle={styles.catalogScrollContent}
       />

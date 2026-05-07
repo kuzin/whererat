@@ -105,6 +105,12 @@ export type Movie = {
       accent: string;
       heroBloom: string;
     };
+    pagePaletteDark?: {
+      wash: string;
+      columnWash: string;
+      accent: string;
+      heroBloom: string;
+    };
     /** Raw snapshot of fields pulled from the most recent sync run. */
     syncSnapshot?: Record<string, unknown>;
     /** Human-readable field labels that changed in the latest sync. */

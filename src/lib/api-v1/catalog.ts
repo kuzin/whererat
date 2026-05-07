@@ -76,6 +76,7 @@ export async function getV1CatalogJson(input: {
       return {
         movie,
         pagePalette: visuals.palette,
+        pagePaletteDark: visuals.paletteDark,
         sightingCount: sightings.length,
         latestSightingMs,
         ratsLogged,
@@ -117,7 +118,7 @@ export async function getV1CatalogJson(input: {
     pageSize,
     total: totalResults,
     pageCount: Math.max(1, Math.ceil(totalResults / pageSize)),
-    movies: pagedMetrics.map(({ movie, pagePalette, sightingCount }) => ({
+    movies: pagedMetrics.map(({ movie, pagePalette, pagePaletteDark, sightingCount }) => ({
       id: movie.id,
       slug: movie.slug,
       title: movie.title,
@@ -128,6 +129,7 @@ export async function getV1CatalogJson(input: {
       posterAlt: movie.posterAlt,
       posterTone: movie.posterTone,
       pagePalette,
+      pagePaletteDark,
       summary: movie.summary,
       sightingCount,
       rating: movie.metadata.rating,

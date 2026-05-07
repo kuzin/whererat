@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   estimateRatsForAppearance,
   formatApproximateRatLine,
@@ -16,6 +16,205 @@ import { SightingRatPresenceVisual } from "./rat-presence-visual";
 
 function trimNote(value: string | undefined): string {
   return value?.trim() ?? "";
+}
+
+/** Strip markdown-ish syntax for length / wrap simulation only. */
+function spoilerPlainBodyForMeasure(markdown: string): string {
+  return (
+    markdown
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/`[^`]+`/g, " ")
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+      .replace(/[#>*_~|`-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
+}
+
+const MAX_HEADLINE_PLACEHOLDER_LINES = 14;
+const MAX_BODY_PLACEHOLDER_LINES = 28;
+
+function capLineWidths(widths: number[], maxLines: number, maxWidth: number): number[] {
+  const capped = widths.slice(0, maxLines);
+  return capped.map((w) => Math.min(Math.max(16, w), maxWidth));
+}
+
+/** Word-wrap to match how text would break for a given max width and canvas font. */
+function canvasWrapLineWidths(text: string, font: string, maxWidthPx: number): number[] {
+  if (typeof document === "undefined" || maxWidthPx < 8) return [];
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return [];
+  ctx.font = font;
+
+  const widths: number[] = [];
+
+  const pushLine = (line: string) => {
+    const t = line.trim();
+    if (t.length > 0) widths.push(ctx.measureText(t).width);
+  };
+
+  const breakLongToken = (token: string): string[] => {
+    const parts: string[] = [];
+    let chunk = "";
+    for (const ch of token) {
+      const next = chunk + ch;
+      if (ctx.measureText(next).width <= maxWidthPx) {
+        chunk = next;
+      } else {
+        if (chunk) parts.push(chunk);
+        chunk = ch;
+      }
+    }
+    if (chunk) parts.push(chunk);
+    return parts;
+  };
+
+  const words = text.split(/\s+/).filter(Boolean);
+  let line = "";
+
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (ctx.measureText(candidate).width <= maxWidthPx) {
+      line = candidate;
+      continue;
+    }
+    if (line) pushLine(line);
+    line = "";
+    if (ctx.measureText(word).width <= maxWidthPx) {
+      line = word;
+    } else {
+      const pieces = breakLongToken(word);
+      for (let i = 0; i < pieces.length; i++) {
+        const p = pieces[i]!;
+        if (i < pieces.length - 1) pushLine(p);
+        else line = p;
+      }
+    }
+  }
+  if (line) pushLine(line);
+  return widths;
+}
+
+const bodyLineClass =
+  "h-[0.55em] min-h-[11px] max-h-[17px] shrink-0 rounded-full bg-[color-mix(in_srgb,rgb(147_143_139)_52%,transparent)] dark:bg-[color-mix(in_srgb,rgb(168_162_158)_48%,rgb(53_46_41))]";
+const headlineRowClass =
+  "h-[0.76em] min-h-[1.0625rem] max-h-[1.5rem] shrink-0 rounded-full bg-[color-mix(in_srgb,rgb(147_143_139)_56%,transparent)] dark:bg-[color-mix(in_srgb,rgb(166_159_154)_52%,rgb(48_41_37))]";
+
+/** Solid pill bars sized to approximate real headline + description line lengths. */
+function SpoilerPlaceholderCopy({
+  headline,
+  descriptionMarkdown,
+}: {
+  headline: string;
+  descriptionMarkdown: string;
+}) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const headFontProbeRef = useRef<HTMLSpanElement>(null);
+  const bodyFontProbeRef = useRef<HTMLSpanElement>(null);
+  const [lineWidths, setLineWidths] = useState<{
+    headline: number[];
+    body: number[];
+  } | null>(null);
+
+  const plainBody = useMemo(
+    () => spoilerPlainBodyForMeasure(descriptionMarkdown),
+    [descriptionMarkdown],
+  );
+
+  const measure = useCallback(() => {
+    const wrap = wrapRef.current;
+    const headProbe = headFontProbeRef.current;
+    const bodyProbe = bodyFontProbeRef.current;
+    if (!wrap || !headProbe || !bodyProbe) return;
+    const cw = wrap.clientWidth;
+    if (cw < 8) return;
+    const headFont = getComputedStyle(headProbe).font;
+    const bodyFont = getComputedStyle(bodyProbe).font;
+    const headText = headline.trim() || "—";
+    const h = capLineWidths(
+      canvasWrapLineWidths(headText, headFont, cw),
+      MAX_HEADLINE_PLACEHOLDER_LINES,
+      cw,
+    );
+    const bPlain = plainBody.trim();
+    const b = bPlain
+      ? capLineWidths(canvasWrapLineWidths(bPlain, bodyFont, cw), MAX_BODY_PLACEHOLDER_LINES, cw)
+      : [];
+    setLineWidths({ headline: h.length > 0 ? h : [Math.min(cw, 120)], body: b });
+  }, [headline, plainBody]);
+
+  useLayoutEffect(() => {
+    measure();
+    const wrap = wrapRef.current;
+    if (!wrap || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(wrap);
+    return () => ro.disconnect();
+  }, [measure]);
+
+  const fallbackHeadCh = Math.min(46, Math.max(8, Math.round(headline.trim().length * 0.58)));
+  const fallbackBodyCh = Math.min(58, Math.max(18, Math.round(plainBody.trim().length * 0.42)));
+
+  const headW = lineWidths?.headline;
+  const bodyW = lineWidths?.body;
+
+  return (
+    <div ref={wrapRef} className="relative w-full min-w-0 select-none" aria-hidden>
+      <span
+        ref={headFontProbeRef}
+        className="wr-display pointer-events-none absolute top-0 left-0 -z-10 text-2xl font-bold leading-snug opacity-0 md:text-3xl md:leading-[1.18]"
+        aria-hidden
+      >
+        Hg
+      </span>
+      <span
+        ref={bodyFontProbeRef}
+        className="pointer-events-none absolute top-0 left-0 -z-10 text-base leading-relaxed text-stone-700 opacity-0 dark:text-stone-300"
+        aria-hidden
+      >
+        Hg
+      </span>
+
+      <div className="w-full space-y-[0.5em]">
+        <div className="flex w-full min-w-0 flex-col gap-[0.35em]">
+          {(headW ?? [null]).map((w, i) => (
+            <div
+              key={`h-${i}`}
+              className={headlineRowClass}
+              style={
+                w != null
+                  ? { width: `${Math.round(w)}px`, maxWidth: "100%" }
+                  : { width: `${fallbackHeadCh}ch`, maxWidth: "100%" }
+              }
+            />
+          ))}
+        </div>
+
+        {plainBody.trim().length > 0 ? (
+          <div className="flex w-full min-w-0 flex-col gap-1.5 pt-0.5">
+            {(bodyW ?? [null, null, null]).map((w, i) => (
+              <div
+                key={`b-${i}`}
+                className={bodyLineClass}
+                style={
+                  w != null
+                    ? { width: `${Math.round(w)}px`, maxWidth: "100%" }
+                    : {
+                        width:
+                          i === 2
+                            ? `min(100%, ${Math.max(14, Math.round(fallbackBodyCh * 0.62))}ch)`
+                            : `min(100%, ${fallbackBodyCh}ch)`,
+                        maxWidth: "100%",
+                      }
+                }
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
 }
 
 export function MovieSightingsCards({
@@ -40,12 +239,6 @@ export function MovieSightingsCards({
   const panelSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_12%,rgb(41_37_36))] bg-[color-mix(in_srgb,var(--movie-column-wash)_48%,rgb(253_251_246))]"
     : "border-stone-950/90 bg-[var(--wr-surface-cream-soft)]";
-
-  const spoilerRedactTitle =
-    "select-none text-transparent [text-shadow:0_0_12px_rgb(120_113_108/0.75)] dark:[text-shadow:0_0_12px_rgb(168_162_158/0.6)]";
-
-  const spoilerRedactDescWrapper =
-    "select-none pointer-events-none [&_*]:text-transparent [&_*]:[text-shadow:0_0_9px_rgb(120_113_108/0.65)] dark:[&_*]:[text-shadow:0_0_9px_rgb(168_162_158/0.5)]";
 
   const toggleSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
@@ -159,23 +352,35 @@ export function MovieSightingsCards({
                 <div className="flex flex-col gap-4">
                   {/* Content */}
                   <div className="flex flex-col gap-2 md:gap-2.5">
-                    <h3
-                      aria-hidden={blackoutSpoiler}
-                      className={`wr-display w-full max-w-none text-2xl font-bold leading-snug md:text-3xl md:leading-[1.18] ${blackoutSpoiler ? spoilerRedactTitle : "text-stone-950 dark:text-stone-50"}`}
-                    >
-                      {headlineText}
-                    </h3>
-                    {blackoutSpoiler ? <span className="sr-only">Sighting title hidden: spoiler toggle is off.</span> : null}
-                    <div
-                      aria-hidden={blackoutSpoiler}
-                      className={blackoutSpoiler ? spoilerRedactDescWrapper : undefined}
-                    >
-                      <SightingMarkdown
-                        markdown={sighting.description}
-                        className="w-full min-w-0 max-w-none text-stone-700 dark:text-stone-300"
-                      />
-                    </div>
-                    {blackoutSpoiler ? <span className="sr-only">Description hidden: turn on spoiler display to read it.</span> : null}
+                    {blackoutSpoiler ? (
+                      <>
+                        <div
+                          role="heading"
+                          aria-level={3}
+                          className="wr-display w-full max-w-none text-2xl leading-snug md:text-3xl md:leading-[1.18]"
+                          aria-label="Sighting title hidden until spoilers are shown"
+                        >
+                          <SpoilerPlaceholderCopy
+                            headline={headlineText}
+                            descriptionMarkdown={sighting.description}
+                          />
+                        </div>
+                        <span className="sr-only">
+                          Sighting title and description hidden: turn on “Show spoilers”
+                          above to read them.
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="wr-display w-full max-w-none text-2xl font-bold leading-snug text-stone-950 md:text-3xl md:leading-[1.18] dark:text-stone-50">
+                          {headlineText}
+                        </h3>
+                        <SightingMarkdown
+                          markdown={sighting.description}
+                          className="w-full min-w-0 max-w-none text-stone-700 dark:text-stone-300"
+                        />
+                      </>
+                    )}
                     {submittedByLine}
                   </div>
                   {curatorNote ? (

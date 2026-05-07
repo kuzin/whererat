@@ -35,7 +35,6 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
   const links = (
     <>
       {ghostLink("/", "Browse the catalog")}
-      {ghostLink("/privacy", "Privacy")}
       {session ? ghostLink("/moderation", "Moderate") : null}
       {currentPage("/submit") ? (
         <span

@@ -20,6 +20,12 @@ export type CatalogMovieRow = {
     accent: string;
     heroBloom: string;
   } | null;
+  pagePaletteDark?: {
+    wash: string;
+    columnWash: string;
+    accent: string;
+    heroBloom: string;
+  } | null;
   summary: string;
   sightingCount: number;
   rating?: string;
@@ -87,6 +93,14 @@ export type MovieDetailResponse = {
       accent: string;
       heroBloom: string;
     } | null;
+    pagePaletteDark?: {
+      wash: string;
+      columnWash: string;
+      accent: string;
+      heroBloom: string;
+    } | null;
+    sightingCount?: number;
+    approxRatsOnScreen?: number;
     summary: string;
     externalIds: { tmdb?: string; imdb: string };
     metadata: Record<string, unknown>;

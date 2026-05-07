@@ -1,6 +1,6 @@
 import { openURL } from "expo-linking";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { BlurView } from "expo-blur";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
 import {
@@ -20,39 +20,112 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 
+import { EmptyStateCard } from "../../components/EmptyStateCard";
 import { HeaderThemeWordmark } from "../../components/HeaderThemeWordmark";
 import { SightingCard } from "../../components/SightingCard";
 import { fetchMovieDetail } from "../../lib/api";
 import { extractChromeFromPosterUri } from "../../lib/posterChromeFromImage";
 import {
   contrastingForeground,
+  mixTowardHex,
   posterToneToHex,
   statusBarStyleForBackground,
 } from "../../lib/posterTone";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { type ThemeColors, useTheme } from "../../lib/theme";
 import type { MovieDetailResponse, MovieSightingsSort, SightingPublic } from "../../lib/types";
 
-type TabKey = "sightings" | "facts" | "reviews" | "related" | "videos" | "images";
+type TabKey = "sightings" | "facts" | "reviews" | "related" | "media" | "meta";
+type ReviewSortKey = "latest" | "highest" | "lowest";
 
 const TAB_DEFS: { key: TabKey; label: string }[] = [
   { key: "sightings", label: "Featured Rats" },
-  { key: "facts", label: "Facts" },
+  { key: "facts", label: "Rat Facts" },
   { key: "reviews", label: "Reviews" },
   { key: "related", label: "Related" },
-  { key: "videos", label: "Video" },
-  { key: "images", label: "Stills" },
+  { key: "media", label: "Media" },
+  { key: "meta", label: "Meta" },
 ];
+const REFRESH_SPINNER_COLOR = "#f59e0b";
 
 function resolveHeaderBannerUrl(movie: NonNullable<MovieDetailResponse["movie"]>): string {
   return movie.headerBanner?.trim() || movie.posterUrl;
 }
 
+function trimMetaValue(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function formatReviewDate(value: string): string {
+  try {
+    return new Date(value).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+  } catch {
+    return value;
+  }
+}
+
+function sortReviews(
+  reviews: NonNullable<MovieDetailResponse["tabs"]>["reviews"],
+  sort: ReviewSortKey,
+) {
+  const copy = [...reviews];
+  if (sort === "latest") {
+    return copy.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+  }
+  if (sort === "highest") {
+    return copy.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+  }
+  return copy.sort((a, b) => (a.rating ?? 11) - (b.rating ?? 11));
+}
+
+function splitCreditNames(line: string): string[] {
+  return line
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function getImdbNameSearchUrl(name: string): string {
+  const stripped = name.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  const q = stripped.length > 0 ? stripped : name.trim();
+  return `https://www.imdb.com/find/?q=${encodeURIComponent(q)}&s=nm`;
+}
+
+function getImdbRecommendationsUrl(imdbTitleUrl: string): string {
+  const trimmed = imdbTitleUrl.trim();
+  const base = trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
+  return `${base}/recommendations/`;
+}
+
+/** List thumbnail: scales to meta section width, caps height. */
+function computeStillThumbHeight(
+  screenWidth: number,
+  im?: { width?: number; height?: number },
+  horizontalInsetPx = 28,
+): number {
+  const contentW = Math.max(1, screenWidth - horizontalInsetPx);
+  const maxH = 280;
+  const w = im?.width;
+  const h = im?.height;
+  if (typeof w === "number" && typeof h === "number" && w > 0 && h > 0) {
+    const scaled = contentW * (h / w);
+    return Math.min(maxH, Math.max(140, Math.round(scaled)));
+  }
+  return Math.min(maxH, Math.round(contentW * (9 / 16)));
+}
+
 function createMovieStyles(colors: ThemeColors) {
   const surface = colors.headerBg;
-  const heroTopInset = Platform.OS === "ios" ? 116 : 20;
+  const heroTopInset = Platform.OS === "ios" ? 136 : 28;
 
   return StyleSheet.create({
     screen: { flex: 1, backgroundColor: surface },
@@ -60,8 +133,12 @@ function createMovieStyles(colors: ThemeColors) {
       ...StyleSheet.absoluteFillObject,
       opacity: 0.54,
     },
+    fixedBackdropTint: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(12,10,9,0.38)",
+    },
     /** Canvas: visible when overscrolling / pulling from top; not between white section cards. */
-    scroll: { flex: 1, backgroundColor: "transparent" },
+    scroll: { flex: 1, backgroundColor: colors.headerBg },
     scrollContent: { paddingBottom: 40, flexGrow: 1, position: "relative" },
     /** White body zone for all content sections below the top zone. */
     scrollBodyPanel: {
@@ -89,64 +166,109 @@ function createMovieStyles(colors: ThemeColors) {
     primaryBtnText: { color: colors.retryOnAccent, fontWeight: "700" },
     hero: {
       position: "relative",
-      marginBottom: 0,
+      marginBottom: 12,
       overflow: "hidden",
       backgroundColor: "transparent",
       minHeight: 170,
     },
     heroRow: {
       flexDirection: "row",
-      gap: 16,
-      padding: 16,
+      gap: 24,
+      paddingHorizontal: 16,
       paddingTop: heroTopInset,
-      alignItems: "flex-end",
-    },
-    heroTitleBarBlur: {
-      margin: 10,
-      borderRadius: 12,
-      overflow: "hidden",
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
-      backgroundColor: "rgba(255,255,255,0.08)",
+      paddingBottom: 14,
+      alignItems: "center",
     },
     poster: {
-      width: 112,
-      height: 168,
+      width: 96,
+      height: 144,
       borderRadius: 8,
       backgroundColor: colors.panel,
+      shadowColor: "#000",
+      shadowOpacity: 0.26,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 7,
     },
-    heroText: { flex: 1, gap: 6 },
+    heroText: { flex: 1, alignItems: "flex-start", gap: 5 },
     title: {
       color: colors.text,
       fontSize: 22,
       fontWeight: "800",
       lineHeight: 28,
+      textShadowColor: "rgba(0,0,0,0.35)",
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
     },
-    meta: { color: colors.accent, fontWeight: "600" },
-    genres: { color: colors.textMuted },
+    meta: {
+      color: colors.accent,
+      fontWeight: "700",
+      textShadowColor: "rgba(0,0,0,0.25)",
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
+    },
+    genres: { color: colors.textMuted, opacity: 1 },
+    heroStatsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "flex-start",
+      gap: 4,
+      marginTop: 6,
+    },
+    heroStatChip: {
+      backgroundColor: "rgba(12,10,9,0.62)",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: "rgba(254,243,199,0.42)",
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+    },
+    heroStatChipText: {
+      color: "#fef3c7",
+      fontSize: 11.5,
+      fontWeight: "600",
+      lineHeight: 14,
+    },
+    heroStatChipRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    heroStatChipIcon: {
+      color: "#fbbf24",
+    },
     imdbBtn: {
       alignSelf: "flex-start",
-      marginTop: 8,
-      backgroundColor: colors.chipActive,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
+      marginTop: 6,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
       borderRadius: 8,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.accent,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
     },
     imdbBtnText: { color: colors.text, fontWeight: "700" },
+    imdbBtnIcon: { color: colors.text },
     heroTabsStrip: {
       borderTopWidth: StyleSheet.hairlineWidth,
       borderTopColor: colors.border,
-      paddingHorizontal: 10,
-      paddingTop: 10,
-      paddingBottom: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+      paddingHorizontal: 0,
+      paddingTop: 6,
+      paddingBottom: 0,
       backgroundColor: colors.headerBg,
+      borderTopLeftRadius: 18,
+      borderTopRightRadius: 18,
+      overflow: "hidden",
     },
     heroTabsRow: {
-      gap: 4,
+      gap: 0,
       flexDirection: "row",
-      paddingHorizontal: 2,
+      paddingHorizontal: 10,
     },
     softBanner: {
       marginHorizontal: 16,
@@ -162,12 +284,16 @@ function createMovieStyles(colors: ThemeColors) {
       paddingVertical: 14,
       backgroundColor: "transparent",
       borderWidth: 0,
-      borderBottomWidth: 2,
+      borderBottomWidth: 3,
       borderBottomColor: "transparent",
+      minHeight: 50,
+      justifyContent: "center",
+      alignItems: "center",
+      flexShrink: 0,
     },
     tabChipOn: { borderBottomColor: colors.accent },
-    tabChipText: { color: colors.textMuted, fontWeight: "600", fontSize: 14 },
-    tabChipTextOn: { color: colors.text, fontWeight: "700" },
+    tabChipText: { color: colors.text, opacity: 0.78, fontWeight: "600", fontSize: 14 },
+    tabChipTextOn: { color: colors.text, fontWeight: "800" },
     section: {
       paddingHorizontal: 16,
       paddingVertical: 12,
@@ -178,7 +304,21 @@ function createMovieStyles(colors: ThemeColors) {
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.border,
     },
-    sectionTitle: { color: colors.text, fontSize: 16, fontWeight: "700" },
+    sightingsSection: {
+      paddingHorizontal: 14,
+      paddingTop: 12,
+      paddingBottom: 14,
+      gap: 10,
+    },
+    metaSection: {
+      paddingHorizontal: 14,
+      paddingTop: 6,
+      paddingBottom: 12,
+      gap: 8,
+    },
+    sightingsList: {
+      gap: 12,
+    },
     sortRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -186,6 +326,33 @@ function createMovieStyles(colors: ThemeColors) {
       gap: 10,
       marginBottom: 4,
     },
+    filterBar: {
+      marginTop: 4,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    tabSectionDivider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.border,
+      alignSelf: "stretch",
+    },
+    filterSortBtn: {
+      borderRadius: 9,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      flex: 1,
+      minHeight: 36,
+    },
+    filterSortBtnFull: { width: "100%" },
+    filterSortBtnLabel: { color: colors.textMuted, fontSize: 12, fontWeight: "700" },
+    filterSortBtnText: { color: colors.text, fontSize: 12.5, fontWeight: "700", flexShrink: 1 },
     sortSelect: {
       flexDirection: "row",
       alignItems: "center",
@@ -207,7 +374,6 @@ function createMovieStyles(colors: ThemeColors) {
       flexShrink: 1,
     },
     sortSelectChevron: { color: colors.textMuted, fontSize: 12, fontWeight: "700" },
-    pagingNote: { color: colors.textMuted, fontSize: 14, marginBottom: 8 },
     loadingMoreWrap: { paddingVertical: 12, alignItems: "center", justifyContent: "center" },
     sheetBackdrop: {
       ...StyleSheet.absoluteFillObject,
@@ -250,11 +416,8 @@ function createMovieStyles(colors: ThemeColors) {
     sheetRowText: { flex: 1, color: colors.textMuted, fontSize: 15, fontWeight: "500" },
     sheetRowTextOn: { color: colors.text, fontWeight: "700" },
     sheetCheck: { color: colors.accent, fontWeight: "800" },
-    factBlock: { flexDirection: "row", gap: 8, marginBottom: 12 },
-    factIndex: { color: colors.accent, fontWeight: "700", width: 28 },
-    factText: { flex: 1, color: colors.textMuted, fontSize: 15, lineHeight: 22 },
-    reviewCard: {
-      marginBottom: 16,
+    factCard: {
+      marginBottom: 8,
       padding: 12,
       borderRadius: 10,
       backgroundColor: colors.panel,
@@ -262,20 +425,71 @@ function createMovieStyles(colors: ThemeColors) {
       borderColor: colors.border,
       gap: 6,
     },
-    reviewAuthor: { color: colors.text, fontWeight: "700" },
-    reviewDate: { color: colors.textMuted, fontSize: 13 },
-    reviewSummary: { color: colors.accent, fontStyle: "italic" },
-    reviewBody: { color: colors.textMuted, lineHeight: 22 },
-    relatedRow: {
-      flexDirection: "row",
-      gap: 12,
-      alignItems: "center",
-      marginBottom: 12,
-      paddingVertical: 4,
+    factCardTitle: {
+      color: colors.accent,
+      fontSize: 12,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 0.3,
     },
-    relatedPoster: { width: 48, height: 72, borderRadius: 6, backgroundColor: colors.panel },
+    factText: { color: colors.textMuted, fontSize: 15, lineHeight: 22 },
+    reviewCard: {
+      marginBottom: 8,
+      padding: 12,
+      borderRadius: 10,
+      backgroundColor: colors.panel,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      gap: 7,
+    },
+    reviewCardTopRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    reviewTitleStack: {
+      flex: 1,
+      minWidth: 0,
+      gap: 6,
+    },
+    reviewRatCorner: { fontSize: 20, lineHeight: 22, paddingTop: 1 },
+    reviewStars: { flexDirection: "row", alignItems: "center", gap: 3, flexWrap: "wrap" },
+    reviewStarOn: { color: "#fbbf24", fontSize: 15 },
+    reviewStarOff: { color: colors.border, fontSize: 15 },
+    reviewRatingText: { color: colors.textMuted, fontSize: 13, fontWeight: "700", marginLeft: 5 },
+    readMoreBtn: { alignSelf: "flex-start", marginTop: 2 },
+    readMoreText: { color: colors.accent, fontSize: 12, fontWeight: "700" },
+    reviewAuthor: { color: colors.text, fontSize: 13, fontWeight: "700" },
+    reviewDate: { color: colors.textMuted, fontSize: 12.5 },
+    reviewSummary: { color: colors.text, fontSize: 16, lineHeight: 22, fontWeight: "800" },
+    reviewMetaRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      flexWrap: "wrap",
+      gap: 8,
+      marginTop: 2,
+    },
+    reviewBody: { color: colors.textMuted, lineHeight: 22 },
+    relatedListRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+      paddingVertical: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+    },
+    relatedListPoster: { width: 52, height: 78, borderRadius: 6, backgroundColor: colors.panel },
     relatedPosterPh: { alignItems: "center", justifyContent: "center" },
     relatedPosterPhText: { color: colors.textMuted, fontSize: 18 },
+    relatedListTextCol: { flex: 1, minWidth: 0, gap: 4 },
+    relatedListTitle: { color: colors.text, fontSize: 17, fontWeight: "700", lineHeight: 22 },
+    relatedListMeta: { color: colors.textMuted, fontSize: 14 },
+    relatedListRatingRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+    relatedListRatingIcon: { color: colors.accent },
+    relatedListRatingText: { color: colors.accent, fontSize: 13, fontWeight: "600" },
+    relatedListChevron: { color: colors.textMuted, fontSize: 28, fontWeight: "200" },
+    relatedListWrap: { alignSelf: "stretch" },
     relatedTitle: { color: colors.text, fontWeight: "700", fontSize: 16 },
     videoRow: {
       flexDirection: "row",
@@ -284,8 +498,109 @@ function createMovieStyles(colors: ThemeColors) {
       marginBottom: 14,
     },
     videoThumb: { width: 120, height: 68, borderRadius: 6, backgroundColor: colors.panel },
-    stillBlock: { marginBottom: 20, gap: 8 },
-    stillImg: { width: "100%", aspectRatio: 16 / 9, borderRadius: 8, backgroundColor: colors.panel },
+    mediaSegmentBar: {
+      flexDirection: "row",
+      borderRadius: 10,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      overflow: "hidden",
+      marginBottom: 6,
+      alignSelf: "stretch",
+    },
+    mediaSegmentSlot: {
+      flex: 1,
+      paddingVertical: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.panelMuted,
+    },
+    mediaSegmentSlotOn: { backgroundColor: colors.chipActive },
+    mediaSegmentSlotText: { fontSize: 14, fontWeight: "600", color: colors.textMuted },
+    mediaSegmentSlotTextOn: { fontWeight: "800", color: colors.text },
+    mediaStillsColumn: {
+      alignSelf: "stretch",
+      gap: 10,
+      marginTop: 2,
+    },
+    mediaStillCard: {
+      borderRadius: 8,
+      overflow: "hidden",
+      backgroundColor: colors.panel,
+      alignSelf: "stretch",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+    },
+    mediaStillImage: { width: "100%", height: "100%" },
+    mediaLightboxRoot: { flex: 1, backgroundColor: "#000" },
+    mediaLightboxClose: {
+      position: "absolute",
+      right: 12,
+      zIndex: 2,
+      padding: 10,
+    },
+    mediaLightboxImageSlot: {
+      flex: 1,
+      minHeight: 0,
+      justifyContent: "center",
+      paddingHorizontal: 8,
+    },
+    mediaLightboxCaptionWrap: {
+      paddingHorizontal: 16,
+      paddingTop: 8,
+      backgroundColor: "rgba(0,0,0,0.94)",
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: "rgba(255,255,255,0.12)",
+    },
+    mediaLightboxCaption: {
+      color: "#e7e5e4",
+      fontSize: 14,
+      lineHeight: 21,
+      textAlign: "center",
+    },
+    metaRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 12,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+      paddingVertical: 8,
+    },
+    metaLabel: { color: colors.textMuted, fontSize: 12.5, fontWeight: "600", width: 112 },
+    metaValue: { color: colors.text, fontSize: 13.5, fontWeight: "500", flex: 1, textAlign: "right" },
+    metaLink: { color: colors.accent, fontSize: 14, fontWeight: "700" },
+    metaSynopsisWrap: {
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+      paddingVertical: 8,
+      gap: 6,
+    },
+    metaSynopsisBodyFull: {
+      color: colors.text,
+      fontSize: 13.5,
+      fontWeight: "500",
+      lineHeight: 20,
+    },
+    metaLinksWrap: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "flex-end",
+      gap: 5,
+      flex: 1,
+    },
+    metaPersonChip: {
+      borderRadius: 999,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 7,
+      paddingVertical: 3,
+    },
+    metaPersonText: {
+      color: colors.accent,
+      fontSize: 11.5,
+      fontWeight: "600",
+    },
   });
 }
 
@@ -294,44 +609,86 @@ type MovieStyles = ReturnType<typeof createMovieStyles>;
 function HeroBlock({
   movie,
   imdbTitleUrl,
-  tab,
-  setTab,
-  blurTint,
+  heroFg,
+  heroAccent,
   styles,
 }: {
   movie: NonNullable<MovieDetailResponse["movie"]>;
   imdbTitleUrl: string | undefined;
-  tab: TabKey;
-  setTab: (next: TabKey) => void;
-  blurTint: "light" | "dark";
+  heroFg: string;
+  heroAccent: string;
   styles: MovieStyles;
 }) {
+  const contentRating =
+    typeof movie.metadata?.rating === "string" ? movie.metadata.rating.trim() : "";
+  const imdbStarRating =
+    typeof movie.metadata?.imdbRating === "string" ? movie.metadata.imdbRating.trim() : "";
+  const metaLine = [String(movie.releaseYear), `${movie.runtimeMinutes} min`, contentRating]
+    .filter(Boolean)
+    .join(" · ");
+  const statsBits: { key: string; label: string; imdb?: boolean }[] = [
+    typeof movie.sightingCount === "number"
+      ? {
+          key: "sightings",
+          label: `${movie.sightingCount} sighting${movie.sightingCount === 1 ? "" : "s"}`,
+        }
+      : null,
+    typeof movie.approxRatsOnScreen === "number"
+      ? {
+          key: "rats-on-screen",
+          label: `${movie.approxRatsOnScreen} rat${movie.approxRatsOnScreen === 1 ? "" : "s"} on screen`,
+        }
+      : null,
+    imdbStarRating
+      ? {
+          key: "imdb",
+          label: `IMDb ${imdbStarRating}`,
+          imdb: true,
+        }
+      : null,
+  ].filter((bit): bit is { key: string; label: string; imdb?: boolean } => Boolean(bit));
+  const heroSubtitle = heroFg === "#1c1917" ? "#57534e" : "#f5f5f4";
+  const heroMuted = heroFg === "#1c1917" ? "#6b7280" : "#e7e5e4";
+
   return (
     <View style={styles.hero}>
-      <BlurView intensity={36} tint={blurTint} style={styles.heroTitleBarBlur}>
-        <View style={styles.heroRow}>
-          <Image
-            style={styles.poster}
-            source={{ uri: movie.posterUrl }}
-            accessibilityLabel={movie.posterAlt}
-            recyclingKey={`${movie.id}:${movie.posterUrl}`}
-          />
-          <View style={styles.heroText}>
-            <Text style={styles.title}>{movie.title}</Text>
-            <Text style={styles.meta}>
-              {movie.releaseYear} · {movie.runtimeMinutes} min
-            </Text>
-            <Text style={styles.genres} numberOfLines={2}>
-              {movie.genres.join(" · ")}
-            </Text>
-            {imdbTitleUrl ? (
-              <Pressable style={styles.imdbBtn} onPress={() => void openURL(imdbTitleUrl)}>
-                <Text style={styles.imdbBtnText}>Open on IMDb</Text>
-              </Pressable>
-            ) : null}
-          </View>
+      <View style={styles.heroRow}>
+        <View style={styles.heroText}>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: heroFg,
+                textShadowColor: heroFg === "#1c1917" ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)",
+              },
+            ]}
+          >
+            {movie.title}
+          </Text>
+          <Text style={[styles.meta, { color: heroSubtitle }]}>{metaLine}</Text>
+          <Text style={[styles.genres, { color: heroMuted, opacity: 1 }]} numberOfLines={2}>
+            {movie.genres.join(" · ")}
+          </Text>
+          {statsBits.length ? (
+            <View style={styles.heroStatsRow}>
+              {statsBits.map((bit) => (
+                <View key={bit.key} style={styles.heroStatChip}>
+                  <View style={styles.heroStatChipRow}>
+                    {bit.imdb ? <Ionicons name="star" size={12} style={styles.heroStatChipIcon} /> : null}
+                    <Text style={styles.heroStatChipText}>{bit.label}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : null}
         </View>
-      </BlurView>
+        <Image
+          style={styles.poster}
+          source={{ uri: movie.posterUrl }}
+          accessibilityLabel={movie.posterAlt}
+          recyclingKey={`${movie.id}:${movie.posterUrl}`}
+        />
+      </View>
     </View>
   );
 }
@@ -361,81 +718,189 @@ function MovieTabsBar({
   );
 }
 
+function FilterSortBar({
+  primaryLabel,
+  primaryValue,
+  onPressPrimary,
+  secondaryLabel,
+  secondaryValue,
+  onPressSecondary,
+  styles,
+}: {
+  primaryLabel: string;
+  primaryValue: string;
+  onPressPrimary: () => void;
+  secondaryLabel?: string;
+  secondaryValue?: string;
+  onPressSecondary?: () => void;
+  styles: MovieStyles;
+}) {
+  const hasSecondary =
+    typeof secondaryLabel === "string" &&
+    secondaryLabel.length > 0 &&
+    typeof secondaryValue === "string" &&
+    secondaryValue.length > 0 &&
+    typeof onPressSecondary === "function";
+  return (
+    <View style={styles.filterBar}>
+      <Pressable style={[styles.filterSortBtn, !hasSecondary && styles.filterSortBtnFull]} onPress={onPressPrimary}>
+        <Text style={styles.filterSortBtnLabel}>{primaryLabel}</Text>
+        <Text style={styles.filterSortBtnText} numberOfLines={1}>
+          {primaryValue}
+        </Text>
+        <Text style={styles.sortSelectChevron}>▼</Text>
+      </Pressable>
+      {hasSecondary ? (
+        <Pressable style={styles.filterSortBtn} onPress={onPressSecondary}>
+          <Text style={styles.filterSortBtnLabel}>{secondaryLabel}</Text>
+          <Text style={styles.filterSortBtnText} numberOfLines={1}>
+            {secondaryValue}
+          </Text>
+          <Text style={styles.sortSelectChevron}>▼</Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
+function SortOptionsSheet<T extends string>({
+  open,
+  setOpen,
+  title,
+  options,
+  activeValue,
+  onSelect,
+  styles,
+}: {
+  open: boolean;
+  setOpen: Dispatch<boolean>;
+  title: string;
+  options: { value: T; label: string }[];
+  activeValue: T;
+  onSelect: (value: T) => void;
+  styles: MovieStyles;
+}) {
+  return (
+    <Modal transparent visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
+      <View style={styles.sheetBackdrop} />
+      <View style={styles.sheetCenterOuter}>
+        <View style={styles.sheetCard}>
+          <Text style={styles.sheetTitle}>{title}</Text>
+          {options.map((opt) => {
+            const on = activeValue === opt.value;
+            return (
+              <Pressable
+                key={opt.value}
+                onPress={() => {
+                  setOpen(false);
+                  onSelect(opt.value);
+                }}
+                style={[styles.sheetRow, on && styles.sheetRowOn]}
+              >
+                <Text style={[styles.sheetRowText, on && styles.sheetRowTextOn]}>{opt.label}</Text>
+                {on ? <Text style={styles.sheetCheck}>✓</Text> : null}
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 function SightingsSection({
   sightings,
   totalCount,
-  currentPage,
-  pageCount,
   loadingMore,
   sortOptions,
   activeSort,
   setSightSort,
   isSortOpen,
   setSortOpen,
+  showSpoilers,
+  setShowSpoilers,
+  sightingCardSurface,
+  themeColors,
   styles,
 }: {
   sightings: SightingPublic[];
   totalCount: number;
-  currentPage: number;
-  pageCount: number;
   loadingMore: boolean;
   sortOptions: { value: MovieSightingsSort; label: string }[];
   activeSort: MovieSightingsSort;
   setSightSort: (s: MovieSightingsSort) => void;
   isSortOpen: boolean;
   setSortOpen: Dispatch<boolean>;
+  showSpoilers: boolean;
+  setShowSpoilers: Dispatch<boolean>;
+  sightingCardSurface?: string;
+  themeColors: ThemeColors;
   styles: MovieStyles;
 }) {
   const activeSortLabel = sortOptions.find((opt) => opt.value === activeSort)?.label ?? "Newest";
+  const spoilerCount = sightings.filter((s) => s.spoiler).length;
+  const [spoilerModeOpen, setSpoilerModeOpen] = useState(false);
+  const spoilerMode = showSpoilers ? "shown" : "hidden";
   return (
-    <View style={styles.section}>
-      <View style={styles.sortRow}>
-        <Text style={styles.sectionTitle}>Featured Rats</Text>
-        <Pressable style={styles.sortSelect} onPress={() => setSortOpen(true)}>
-          <Text style={styles.sortLabel}>Sort</Text>
-          <Text numberOfLines={1} style={styles.sortSelectText}>
-            {activeSortLabel}
-          </Text>
-          <Text style={styles.sortSelectChevron}>▼</Text>
-        </Pressable>
-      </View>
-      <Text style={styles.pagingNote}>
-        {totalCount} sighting{totalCount === 1 ? "" : "s"} · loaded page {currentPage} of {pageCount}
-      </Text>
+    <View style={styles.sightingsSection}>
+      <FilterSortBar
+        primaryLabel="Sort"
+        primaryValue={activeSortLabel}
+        onPressPrimary={() => setSortOpen(true)}
+        secondaryLabel={spoilerCount > 0 ? "Spoilers" : undefined}
+        secondaryValue={
+          spoilerCount > 0
+            ? `${showSpoilers ? "Show all" : "Hide spoiler text"} (${spoilerCount})`
+            : undefined
+        }
+        onPressSecondary={spoilerCount > 0 ? () => setSpoilerModeOpen(true) : undefined}
+        styles={styles}
+      />
+      <View style={styles.tabSectionDivider} />
       {sightings.length === 0 ? (
-        <Text style={styles.muted}>No catalog sightings yet for this title.</Text>
+        <EmptyStateCard
+          colors={themeColors}
+          title="No sightings yet for this title."
+          body="Catalog curators haven't published rat cameos here yet. Check back after the queue catches up."
+        />
       ) : (
-        sightings.map((s) => <SightingCard key={s.id} sighting={s} />)
+        <View style={styles.sightingsList}>
+          {sightings.map((s) => (
+            <SightingCard
+              key={s.id}
+              sighting={s}
+              surfaceColor={sightingCardSurface}
+              showSpoilers={showSpoilers}
+            />
+          ))}
+        </View>
       )}
       {loadingMore ? (
         <View style={styles.loadingMoreWrap}>
           <ActivityIndicator size="small" />
         </View>
       ) : null}
-      <Modal transparent visible={isSortOpen} animationType="fade" onRequestClose={() => setSortOpen(false)}>
-        <View style={styles.sheetBackdrop} />
-        <View style={styles.sheetCenterOuter}>
-          <View style={styles.sheetCard}>
-            <Text style={styles.sheetTitle}>Sort featured rats</Text>
-            {sortOptions.map((opt) => {
-              const on = activeSort === opt.value;
-              return (
-                <Pressable
-                  key={opt.value}
-                  onPress={() => {
-                    setSortOpen(false);
-                    setSightSort(opt.value);
-                  }}
-                  style={[styles.sheetRow, on && styles.sheetRowOn]}
-                >
-                  <Text style={[styles.sheetRowText, on && styles.sheetRowTextOn]}>{opt.label}</Text>
-                  {on ? <Text style={styles.sheetCheck}>✓</Text> : null}
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-      </Modal>
+      <SortOptionsSheet
+        open={isSortOpen}
+        setOpen={setSortOpen}
+        title="Sort featured rats"
+        options={sortOptions}
+        activeValue={activeSort}
+        onSelect={setSightSort}
+        styles={styles}
+      />
+      <SortOptionsSheet
+        open={spoilerModeOpen}
+        setOpen={setSpoilerModeOpen}
+        title="Spoiler mode"
+        options={[
+          { value: "hidden", label: "Hide spoiler text" },
+          { value: "shown", label: "Show all spoilers" },
+        ]}
+        activeValue={spoilerMode}
+        onSelect={(value) => setShowSpoilers(value === "shown")}
+        styles={styles}
+      />
     </View>
   );
 }
@@ -453,6 +918,12 @@ export default function MovieScreen() {
   const [tab, setTab] = useState<TabKey>("sightings");
   const [sightSort, setSightSort] = useState<MovieSightingsSort>("newest");
   const [isSortOpen, setSortOpen] = useState(false);
+  const [reviewSort, setReviewSort] = useState<ReviewSortKey>("latest");
+  const [reviewSortOpen, setReviewSortOpen] = useState(false);
+  const [reviewFilterOpen, setReviewFilterOpen] = useState(false);
+  const [reviewsRatOnly, setReviewsRatOnly] = useState(false);
+  const [expandedReviews, setExpandedReviews] = useState<Record<string, boolean>>({});
+  const [showSpoilers, setShowSpoilers] = useState(false);
   const [sightings, setSightings] = useState<SightingPublic[]>([]);
   const [sightPageMeta, setSightPageMeta] = useState({ page: 1, pageCount: 1, totalCount: 0 });
   const [loadingMoreSightings, setLoadingMoreSightings] = useState(false);
@@ -464,13 +935,19 @@ export default function MovieScreen() {
 
   const movie = data?.movie;
 
+  const { width: windowWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const [mediaSegment, setMediaSegment] = useState<"stills" | "videos">("stills");
+  const [mediaLightbox, setMediaLightbox] = useState<{ url: string; caption?: string } | null>(null);
+
   const apiChromeFallback = useMemo(() => {
     if (!movie) return colors.headerBg;
+    const paletteForMode = colors.mode === "dark" ? movie.pagePaletteDark : movie.pagePalette;
     const apiPaletteChrome =
-      typeof movie.pagePalette?.heroBloom === "string" ? movie.pagePalette.heroBloom.trim() : "";
+      typeof paletteForMode?.heroBloom === "string" ? paletteForMode.heroBloom.trim() : "";
     if (apiPaletteChrome) return apiPaletteChrome;
     return posterToneToHex(movie.posterTone, colors.headerBg);
-  }, [movie, colors.headerBg]);
+  }, [movie, colors.headerBg, colors.mode]);
 
   /** From poster bitmap via `react-native-image-colors`; null until extracted or skip. */
   const [posterChromeHex, setPosterChromeHex] = useState<string | null>(null);
@@ -505,11 +982,20 @@ export default function MovieScreen() {
     };
   }, [movie, posterChromeHex, apiChromeFallback]);
 
+  const movieThemeColors = useMemo(() => {
+    const p = colors.mode === "dark" ? movie?.pagePaletteDark : movie?.pagePalette;
+    if (!p) return colors;
+    return {
+      ...colors,
+      accent: p.accent,
+    };
+  }, [colors, movie?.pagePalette, movie?.pagePaletteDark, colors.mode]);
+
   /** Native stack merges options oddly with iOS 26 scroll chrome; set here so poster headers update reliably. */
   useLayoutEffect(() => {
-    const sceneBgChrome = colors.headerBg;
-    const fgChrome = movieBar?.fg ?? colors.accent;
-    const statusChrome = movieBar?.status ?? colors.statusBarStyle;
+    const sceneBgChrome = movieThemeColors.headerBg;
+    const fgChrome = movieBar?.fg ?? movieThemeColors.accent;
+    const statusChrome = movieBar?.status ?? movieThemeColors.statusBarStyle;
     const next: NativeStackNavigationOptions = {
       title: movie?.title ?? "Movie",
       headerTitleAlign: "center",
@@ -536,12 +1022,16 @@ export default function MovieScreen() {
     navigation,
     movie?.title,
     movieBar,
-    colors.headerBg,
-    colors.accent,
-    colors.statusBarStyle,
+    movieThemeColors.headerBg,
+    movieThemeColors.accent,
+    movieThemeColors.statusBarStyle,
   ]);
 
-  const styles = useMemo(() => createMovieStyles(colors), [colors]);
+  const styles = useMemo(() => createMovieStyles(movieThemeColors), [movieThemeColors]);
+  const sightingCardSurface = useMemo(() => {
+    if (movieThemeColors.mode !== "dark") return undefined;
+    return mixTowardHex(movieThemeColors.headerBg, "#0c0a09", 0.42);
+  }, [movieThemeColors.mode, movieThemeColors.headerBg]);
 
   const load = useCallback(async () => {
     if (!slug) return;
@@ -666,10 +1156,30 @@ export default function MovieScreen() {
     [tab, loadMoreSightings],
   );
 
+  useEffect(() => {
+    setMediaLightbox(null);
+  }, [slug]);
+
+  useEffect(() => {
+    if (tab !== "media") setMediaLightbox(null);
+  }, [tab]);
+
+  useEffect(() => {
+    const im = tabs?.images?.length ?? 0;
+    const vi = tabs?.videos?.length ?? 0;
+    if (!movie?.slug) return;
+    if (im === 0 && vi > 0) setMediaSegment("videos");
+    else setMediaSegment("stills");
+  }, [movie?.slug, tabs?.images?.length, tabs?.videos?.length]);
+
   if (!slug) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.muted}>Missing movie slug.</Text>
+      <View style={[styles.center, { paddingHorizontal: 20 }]}>
+        <EmptyStateCard
+          colors={colors}
+          title="That link looks a little gnawed."
+          body="Missing movie slug — go back and pick a title from the catalog."
+        />
       </View>
     );
   }
@@ -680,7 +1190,7 @@ export default function MovieScreen() {
       <Stack.Screen options={{ headerShown: true }} />
       {loading && !data ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={colors.accent} />
+          <ActivityIndicator size="large" color={movieThemeColors.accent} />
         </View>
       ) : null}
 
@@ -699,178 +1209,524 @@ export default function MovieScreen() {
             source={{ uri: heroBannerUrl }}
             style={styles.fixedBackdrop}
             contentFit="cover"
-            blurRadius={6}
+            blurRadius={10}
             recyclingKey={`${movie.id}:fixed-bg:${heroBannerUrl}`}
             pointerEvents="none"
           />
+          <View style={styles.fixedBackdropTint} pointerEvents="none" />
+          <HeroBlock
+            movie={movie}
+            imdbTitleUrl={data.links.imdbTitle}
+              heroFg={movieBar?.fg ?? "#fef3c7"}
+              heroAccent={movieThemeColors.accent}
+            styles={styles}
+          />
+          <MovieTabsBar tab={tab} setTab={setTab} styles={styles} />
+
           <ScrollView
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={movieThemeColors.accent}
+                colors={[movieThemeColors.accent]}
+                progressBackgroundColor={movieThemeColors.panel}
+                titleColor={movieThemeColors.accent}
+              />
             }
             style={styles.scroll}
             contentContainerStyle={styles.scrollContent}
             onScroll={onMainScroll}
             scrollEventThrottle={16}
-            stickyHeaderIndices={[0, 1]}
+            bounces
+            alwaysBounceVertical
           >
-            <HeroBlock
-              movie={movie}
-              imdbTitleUrl={data.links.imdbTitle}
-              tab={tab}
-              setTab={setTab}
-              blurTint={colors.blurTint}
-              styles={styles}
-            />
-            <MovieTabsBar tab={tab} setTab={setTab} styles={styles} />
-
             <View style={styles.scrollBodyPanel}>
-            {error ? (
-              <View style={styles.softBanner}>
-                <Text style={styles.softBannerText}>{error}</Text>
-              </View>
-            ) : null}
+              {error ? (
+                <View style={styles.softBanner}>
+                  <Text style={styles.softBannerText}>{error}</Text>
+                </View>
+              ) : null}
 
-            {tab === "sightings" && featured ? (
-              <SightingsSection
-                sightings={sightings}
-                totalCount={sightPageMeta.totalCount}
-                currentPage={sightPageMeta.page}
-                pageCount={sightPageMeta.pageCount}
-                loadingMore={loadingMoreSightings}
-                sortOptions={sortOptions}
-                activeSort={sightSort}
-                setSightSort={setSightSort}
-                isSortOpen={isSortOpen}
-                setSortOpen={setSortOpen}
-                styles={styles}
-              />
-            ) : null}
+              {tab === "sightings" && featured ? (
+                <SightingsSection
+                  sightings={sightings}
+                  totalCount={sightPageMeta.totalCount}
+                  loadingMore={loadingMoreSightings}
+                  sortOptions={sortOptions}
+                  activeSort={sightSort}
+                  setSightSort={setSightSort}
+                  isSortOpen={isSortOpen}
+                  setSortOpen={setSortOpen}
+                  showSpoilers={showSpoilers}
+                  setShowSpoilers={setShowSpoilers}
+                  sightingCardSurface={sightingCardSurface}
+                  themeColors={movieThemeColors}
+                  styles={styles}
+                />
+              ) : null}
 
-            {tab === "facts" ? (
-              <View style={styles.section}>
-                {(tabs.facts?.length ?? 0) === 0 ? (
-                  <Text style={styles.muted}>No rat-related trivia synced yet.</Text>
-                ) : (
-                  tabs.facts!.map((line, i) => (
-                    <View key={`${i}`} style={styles.factBlock}>
-                      <Text style={styles.factIndex}>{i + 1}.</Text>
-                      <Text style={styles.factText}>{line}</Text>
+              {tab === "facts" ? (
+                <View style={styles.metaSection}>
+                  <MovieTabSectionHeader
+                    title="Rat Facts"
+                    accentColor={movieThemeColors.accent}
+                    colors={movieThemeColors}
+                    actionLabel="View trivia on IMDb"
+                    onActionPress={() =>
+                      void openURL(
+                        `${data.links.imdbTitle.endsWith("/") ? data.links.imdbTitle : `${data.links.imdbTitle}/`}trivia/`,
+                      )
+                    }
+                  />
+                  <View style={styles.tabSectionDivider} />
+                  {(tabs.facts?.length ?? 0) === 0 ? (
+                    <EmptyStateCard
+                      colors={movieThemeColors}
+                      title="No rat facts yet"
+                      body="IMDb trivia hasn't been synced for this title, or nothing rat-related turned up. Try again after a resync."
+                    />
+                  ) : (
+                    tabs.facts!.map((line, i) => (
+                      <View key={`${i}`} style={styles.factCard}>
+                        <Text style={styles.factCardTitle}>Rat Fact #{i + 1}</Text>
+                        <Text style={styles.factText}>{line}</Text>
+                      </View>
+                    ))
+                  )}
+                </View>
+              ) : null}
+
+              {tab === "meta" ? (
+                <View style={styles.metaSection}>
+                  <MovieTabSectionHeader
+                    title="Meta information"
+                    accentColor={movieThemeColors.accent}
+                    colors={movieThemeColors}
+                    actionLabel="View on IMDb"
+                    onActionPress={() => void openURL(data.links.imdbTitle)}
+                  />
+                  <View style={styles.tabSectionDivider} />
+                  {movie.summary.trim() ? (
+                    <View style={styles.metaSynopsisWrap}>
+                      <Text style={styles.metaLabel}>Synopsis</Text>
+                      <Text style={styles.metaSynopsisBodyFull}>{movie.summary.trim()}</Text>
                     </View>
-                  ))
-                )}
-              </View>
-            ) : null}
+                  ) : null}
+                  {[
+                    ["Runtime", `${movie.runtimeMinutes} min`],
+                    ["Rating", trimMetaValue(movie.metadata?.rating)],
+                    ["IMDb", trimMetaValue(movie.metadata?.imdbRating)],
+                    ["IMDb votes", trimMetaValue(movie.metadata?.imdbVotes)],
+                    ["Metascore", trimMetaValue(movie.metadata?.metascore)],
+                    ["Language", trimMetaValue(movie.metadata?.originalLanguage)],
+                    [
+                      "Countries",
+                      Array.isArray(movie.metadata?.productionCountries)
+                        ? movie.metadata.productionCountries
+                            .map((c) => (typeof c === "string" ? c.trim() : ""))
+                            .filter(Boolean)
+                            .join(", ")
+                        : "",
+                    ],
+                    ["Awards", trimMetaValue(movie.metadata?.awards)],
+                  ]
+                    .filter(([, value]) => Boolean(value))
+                    .map(([label, value]) => (
+                      <View key={label} style={styles.metaRow}>
+                        <Text style={styles.metaLabel}>{label}</Text>
+                        <Text style={styles.metaValue}>{value}</Text>
+                      </View>
+                    ))}
+                  {(
+                    [
+                      { label: "Director", names: splitCreditNames(trimMetaValue(movie.metadata?.director)) },
+                      { label: "Writers", names: splitCreditNames(trimMetaValue(movie.metadata?.writers)) },
+                      { label: "Cast", names: splitCreditNames(trimMetaValue(movie.metadata?.cast)) },
+                    ] as { label: string; names: string[] }[]
+                  )
+                    .filter((row) => row.names.length > 0)
+                    .map((row) => (
+                      <View key={row.label} style={styles.metaRow}>
+                        <Text style={styles.metaLabel}>{row.label}</Text>
+                        <View style={styles.metaLinksWrap}>
+                          {row.names.map((name) => (
+                            <Pressable
+                              key={`${row.label}:${name}`}
+                              style={styles.metaPersonChip}
+                              onPress={() => void openURL(getImdbNameSearchUrl(name))}
+                            >
+                              <Text style={styles.metaPersonText}>{name}</Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                      </View>
+                    ))}
+                </View>
+              ) : null}
 
             {tab === "reviews" ? (
-              <View style={styles.section}>
+              <View style={styles.metaSection}>
+                <MovieTabSectionHeader
+                  title="Reviews"
+                  accentColor={movieThemeColors.accent}
+                  colors={movieThemeColors}
+                  actionLabel="View reviews on IMDb"
+                  onActionPress={() =>
+                    void openURL(
+                      `${data.links.imdbTitle.endsWith("/") ? data.links.imdbTitle : `${data.links.imdbTitle}/`}reviews/`,
+                    )
+                  }
+                />
                 {(tabs.reviews?.length ?? 0) === 0 ? (
-                  <Text style={styles.muted}>No IMDb user reviews synced yet.</Text>
+                  <>
+                    <View style={styles.tabSectionDivider} />
+                    <EmptyStateCard
+                      colors={movieThemeColors}
+                      title="No reviews yet"
+                      body="IMDb user reviews haven't been synced for this title yet. Pull to refresh, or browse reviews on IMDb."
+                    />
+                  </>
                 ) : (
-                  tabs.reviews!.map((r) => (
+                  (() => {
+                    const all = tabs.reviews!;
+                    const ratCount = all.filter((r) => r.mentionsRat).length;
+                    const ordered = sortReviews(all, reviewSort);
+                    const visible = reviewsRatOnly ? ordered.filter((r) => r.mentionsRat) : ordered;
+                    const reviewSortOptions = [
+                      { value: "latest" as const, label: "Latest" },
+                      { value: "highest" as const, label: "Highest rated" },
+                      { value: "lowest" as const, label: "Lowest rated" },
+                    ];
+                    const activeReviewSortLabel =
+                      reviewSortOptions.find((opt) => opt.value === reviewSort)?.label ?? "Latest";
+                    return (
+                      <>
+                        <FilterSortBar
+                          primaryLabel="Sort"
+                          primaryValue={activeReviewSortLabel}
+                          onPressPrimary={() => setReviewSortOpen(true)}
+                          secondaryLabel={ratCount > 0 ? "Filter" : undefined}
+                          secondaryValue={
+                            ratCount > 0
+                              ? reviewsRatOnly
+                                ? `Rat-only (${ratCount})`
+                                : `All reviews (${all.length})`
+                              : undefined
+                          }
+                          onPressSecondary={ratCount > 0 ? () => setReviewFilterOpen(true) : undefined}
+                          styles={styles}
+                        />
+                        <View style={styles.tabSectionDivider} />
+                        {ratCount > 0 && reviewsRatOnly && visible.length === 0 ? (
+                          <EmptyStateCard
+                            colors={movieThemeColors}
+                            title="No rat-tagged reviews"
+                            body="Switch the filter to All reviews to see everything in the list."
+                          />
+                        ) : null}
+                        {visible.map((r) => {
+                          const isLong = (r.text?.length ?? 0) > 400;
+                          const expanded = Boolean(expandedReviews[r.id]);
+                          const bodyText = !isLong || expanded ? r.text : `${r.text.slice(0, 280).trimEnd()}...`;
+                          const rating = typeof r.rating === "number" ? Math.max(0, Math.min(10, r.rating)) : null;
+                          const filledStars =
+                            rating === null ? 0 : Math.max(0, Math.min(5, Math.round(rating / 2)));
+                          return (
                     <View key={r.id} style={styles.reviewCard}>
-                      <Text style={styles.reviewAuthor}>
-                        {r.author}
-                        {typeof r.rating === "number" ? ` · ${r.rating}/10` : ""}
-                      </Text>
-                      <Text style={styles.reviewDate}>{r.date}</Text>
-                      <Text style={styles.reviewSummary}>{r.summary}</Text>
-                      <Text style={styles.reviewBody}>{r.text}</Text>
+                              <View style={styles.reviewCardTopRow}>
+                                <View style={styles.reviewTitleStack}>
+                                  <Text style={styles.reviewSummary}>{r.summary}</Text>
+                                  <View style={styles.reviewStars}>
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                      <Ionicons
+                                        key={i}
+                                        name="star"
+                                        style={i < filledStars ? styles.reviewStarOn : styles.reviewStarOff}
+                                      />
+                                    ))}
+                                    {rating !== null ? (
+                                      <Text style={styles.reviewRatingText}>{rating}/10</Text>
+                                    ) : null}
+                                  </View>
+                                </View>
+                                {r.mentionsRat ? (
+                                  <Text
+                                    style={styles.reviewRatCorner}
+                                    accessibilityRole="image"
+                                    accessibilityLabel="Review mentions rats"
+                                  >
+                                    🐀
+                                  </Text>
+                                ) : null}
+                              </View>
+                              <View style={styles.reviewMetaRow}>
+                                <Text style={styles.reviewAuthor}>{r.author}</Text>
+                                <Text style={styles.reviewDate}>{formatReviewDate(r.date)}</Text>
+                              </View>
+                              <Text style={styles.reviewBody}>{bodyText}</Text>
+                              {isLong ? (
+                                <Pressable
+                                  style={styles.readMoreBtn}
+                                  onPress={() =>
+                                    setExpandedReviews((prev) => ({
+                                      ...prev,
+                                      [r.id]: !prev[r.id],
+                                    }))
+                                  }
+                                >
+                                  <Text style={styles.readMoreText}>
+                                    {expanded ? "Show less ↑" : "Read more ↓"}
+                                  </Text>
+                                </Pressable>
+                              ) : null}
                     </View>
-                  ))
+                          );
+                        })}
+                        <SortOptionsSheet
+                          open={reviewSortOpen}
+                          setOpen={setReviewSortOpen}
+                          title="Sort reviews"
+                          options={reviewSortOptions}
+                          activeValue={reviewSort}
+                          onSelect={setReviewSort}
+                          styles={styles}
+                        />
+                        <SortOptionsSheet
+                          open={reviewFilterOpen}
+                          setOpen={setReviewFilterOpen}
+                          title="Review filter"
+                          options={[
+                            { value: "all", label: `All reviews (${all.length})` },
+                            { value: "rat", label: `Rat-only (${ratCount})` },
+                          ]}
+                          activeValue={reviewsRatOnly ? "rat" : "all"}
+                          onSelect={(value) => setReviewsRatOnly(value === "rat")}
+                          styles={styles}
+                        />
+                      </>
+                    );
+                  })()
                 )}
               </View>
             ) : null}
 
             {tab === "related" ? (
-              <View style={styles.section}>
+              <View style={styles.metaSection}>
+                <MovieTabSectionHeader
+                  title="Related"
+                  accentColor={movieThemeColors.accent}
+                  colors={movieThemeColors}
+                  actionLabel="View related on IMDb"
+                  onActionPress={() => void openURL(getImdbRecommendationsUrl(data.links.imdbTitle))}
+                />
+                <View style={styles.tabSectionDivider} />
                 {(tabs.related?.length ?? 0) === 0 ? (
-                  <Text style={styles.muted}>No related titles from IMDb yet.</Text>
+                  <EmptyStateCard
+                    colors={movieThemeColors}
+                    title="No related titles yet"
+                    body="IMDb hasn't returned related titles for this movie yet. Check back after a catalog refresh."
+                  />
                 ) : (
-                  tabs.related!.map((r) => (
-                    <Pressable
-                      key={r.id}
-                      style={styles.relatedRow}
-                      onPress={() => void openURL(`https://www.imdb.com/title/${r.id}/`)}
-                    >
-                      {r.posterUrl ? (
-                        <Image
-                          source={{ uri: r.posterUrl }}
-                          style={styles.relatedPoster}
-                          recyclingKey={`${movie.id}:related:${r.id}:${r.posterUrl}`}
-                        />
-                      ) : (
-                        <View style={[styles.relatedPoster, styles.relatedPosterPh]}>
-                          <Text style={styles.relatedPosterPhText}>—</Text>
+                  <View style={styles.relatedListWrap}>
+                    {tabs.related!.map((r) => (
+                      <Pressable
+                        key={r.id}
+                        style={styles.relatedListRow}
+                        onPress={() => void openURL(`https://www.imdb.com/title/${r.id}/`)}
+                        accessibilityRole="link"
+                        accessibilityLabel={`${r.title}${typeof r.year === "number" ? ` (${r.year})` : ""} on IMDb`}
+                      >
+                        {r.posterUrl ? (
+                          <Image
+                            source={{ uri: r.posterUrl }}
+                            style={styles.relatedListPoster}
+                            recyclingKey={`${movie.id}:related:${r.id}:${r.posterUrl}`}
+                          />
+                        ) : (
+                          <View style={[styles.relatedListPoster, styles.relatedPosterPh]}>
+                            <Text style={styles.relatedPosterPhText}>—</Text>
+                          </View>
+                        )}
+                        <View style={styles.relatedListTextCol}>
+                          <Text style={styles.relatedListTitle} numberOfLines={2}>
+                            {r.title}
+                          </Text>
+                          {typeof r.year === "number" ? (
+                            <Text style={styles.relatedListMeta}>{r.year}</Text>
+                          ) : null}
+                          {typeof r.rating === "number" ? (
+                            <View style={styles.relatedListRatingRow}>
+                              <Ionicons name="star" size={12} style={styles.relatedListRatingIcon} />
+                              <Text style={styles.relatedListRatingText}>IMDb {r.rating}</Text>
+                            </View>
+                          ) : null}
                         </View>
-                      )}
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.relatedTitle}>{r.title}</Text>
-                        <Text style={styles.muted}>
-                          {typeof r.year === "number" ? `${r.year} · ` : ""}
-                          {typeof r.rating === "number" ? `IMDb ${r.rating}` : "IMDb"}
-                        </Text>
-                      </View>
-                    </Pressable>
-                  ))
+                        <Text style={styles.relatedListChevron}>›</Text>
+                      </Pressable>
+                    ))}
+                  </View>
                 )}
               </View>
             ) : null}
 
-            {tab === "videos" ? (
-              <View style={styles.section}>
-                {(tabs.videos?.length ?? 0) === 0 ? (
-                  <Text style={styles.muted}>No IMDb videos synced yet.</Text>
-                ) : (
-                  tabs.videos!.map((v) => (
-                    <Pressable
-                      key={v.id}
-                      style={styles.videoRow}
-                      onPress={() => void openURL(`https://www.imdb.com/video/${v.id}/`)}
-                    >
-                      {v.thumbnailUrl ? (
-                        <Image
-                          source={{ uri: v.thumbnailUrl }}
-                          style={styles.videoThumb}
-                          recyclingKey={`${movie.id}:vid:${v.id}:${v.thumbnailUrl}`}
-                        />
-                      ) : (
-                        <View style={[styles.videoThumb, styles.relatedPosterPh]}>
-                          <Text style={styles.relatedPosterPhText}>▶</Text>
-                        </View>
-                      )}
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.relatedTitle}>{v.name}</Text>
-                        <Text style={styles.muted}>{v.contentType ?? "Video"}</Text>
-                      </View>
-                    </Pressable>
-                  ))
-                )}
-              </View>
-            ) : null}
-
-            {tab === "images" ? (
-              <View style={styles.section}>
-                {(tabs.images?.length ?? 0) === 0 ? (
-                  <Text style={styles.muted}>No IMDb stills synced yet.</Text>
-                ) : (
-                  tabs.images!.map((im) => (
-                    <View key={im.id} style={styles.stillBlock}>
-                      <Image
-                        source={{ uri: im.url }}
-                        style={styles.stillImg}
-                        contentFit="contain"
-                        recyclingKey={`${movie.id}:still:${im.id}:${im.url}`}
+            {tab === "media" ? (
+              <View style={styles.metaSection}>
+                {(() => {
+                  const vids = tabs.videos ?? [];
+                  const imgs = tabs.images ?? [];
+                  const hasVideos = vids.length > 0;
+                  const hasImages = imgs.length > 0;
+                  if (!hasVideos && !hasImages) {
+                    return (
+                      <EmptyStateCard
+                        colors={movieThemeColors}
+                        title="No media yet"
+                        body="Photos and videos haven't synced from IMDb for this title. Pull to refresh, or open media on IMDb."
                       />
-                      {im.caption ? <Text style={styles.muted}>{im.caption}</Text> : null}
-                    </View>
-                  ))
-                )}
+                    );
+                  }
+                  const showSegment = hasVideos && hasImages;
+                  const showStills = hasImages && (!showSegment || mediaSegment === "stills");
+                  const showVideos = hasVideos && (!showSegment || mediaSegment === "videos");
+                  return (
+                    <>
+                      {showSegment ? (
+                        <View style={styles.mediaSegmentBar}>
+                          <Pressable
+                            style={[
+                              styles.mediaSegmentSlot,
+                              mediaSegment === "stills" ? styles.mediaSegmentSlotOn : undefined,
+                            ]}
+                            onPress={() => setMediaSegment("stills")}
+                          >
+                            <Text
+                              style={[
+                                styles.mediaSegmentSlotText,
+                                mediaSegment === "stills" ? styles.mediaSegmentSlotTextOn : undefined,
+                              ]}
+                            >
+                              Stills ({imgs.length})
+                            </Text>
+                          </Pressable>
+                          <Pressable
+                            style={[
+                              styles.mediaSegmentSlot,
+                              mediaSegment === "videos" ? styles.mediaSegmentSlotOn : undefined,
+                            ]}
+                            onPress={() => setMediaSegment("videos")}
+                          >
+                            <Text
+                              style={[
+                                styles.mediaSegmentSlotText,
+                                mediaSegment === "videos" ? styles.mediaSegmentSlotTextOn : undefined,
+                              ]}
+                            >
+                              Videos ({vids.length})
+                            </Text>
+                          </Pressable>
+                        </View>
+                      ) : null}
+                      {showStills ? (
+                        <View style={styles.mediaStillsColumn}>
+                          {imgs.map((im) => (
+                            <Pressable
+                              key={im.id}
+                              style={styles.mediaStillCard}
+                              onPress={() =>
+                                setMediaLightbox({
+                                  url: im.url,
+                                  caption: im.caption?.trim() || undefined,
+                                })
+                              }
+                            >
+                              <View
+                                style={{
+                                  alignSelf: "stretch",
+                                  width: "100%",
+                                  height: computeStillThumbHeight(windowWidth, im),
+                                }}
+                              >
+                                <Image
+                                  source={{ uri: im.url }}
+                                  style={styles.mediaStillImage}
+                                  contentFit="cover"
+                                  recyclingKey={`${movie.id}:still:${im.id}:${im.url}`}
+                                />
+                              </View>
+                            </Pressable>
+                          ))}
+                        </View>
+                      ) : null}
+                      {showVideos
+                        ? vids.map((v) => (
+                            <Pressable
+                              key={v.id}
+                              style={styles.videoRow}
+                              onPress={() => void openURL(`https://www.imdb.com/video/${v.id}/`)}
+                            >
+                              {v.thumbnailUrl ? (
+                                <Image
+                                  source={{ uri: v.thumbnailUrl }}
+                                  style={styles.videoThumb}
+                                  recyclingKey={`${movie.id}:vid:${v.id}:${v.thumbnailUrl}`}
+                                />
+                              ) : (
+                                <View style={[styles.videoThumb, styles.relatedPosterPh]}>
+                                  <Text style={styles.relatedPosterPhText}>▶</Text>
+                                </View>
+                              )}
+                              <View style={{ flex: 1 }}>
+                                <Text style={styles.relatedTitle}>{v.name}</Text>
+                                <Text style={styles.muted}>{v.contentType ?? "Video"}</Text>
+                              </View>
+                            </Pressable>
+                          ))
+                        : null}
+                    </>
+                  );
+                })()}
               </View>
             ) : null}
             </View>
           </ScrollView>
         </View>
       ) : null}
+
+      <Modal
+        visible={mediaLightbox !== null}
+        animationType="fade"
+        transparent
+        statusBarTranslucent
+        onRequestClose={() => setMediaLightbox(null)}
+      >
+        <View style={[styles.mediaLightboxRoot, { paddingBottom: insets.bottom }]}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Close fullscreen image"
+            hitSlop={12}
+            style={[styles.mediaLightboxClose, { top: insets.top + 6 }]}
+            onPress={() => setMediaLightbox(null)}
+          >
+            <Ionicons name="close" size={30} color="#f5f5f4" />
+          </Pressable>
+          <View style={[styles.mediaLightboxImageSlot, { paddingTop: insets.top + 44 }]}>
+            {mediaLightbox ? (
+              <Image
+                source={{ uri: mediaLightbox.url }}
+                style={{ width: "100%", flex: 1 }}
+                contentFit="contain"
+                recyclingKey={`lightbox:${mediaLightbox.url}`}
+              />
+            ) : null}
+          </View>
+          {mediaLightbox?.caption ? (
+            <View style={styles.mediaLightboxCaptionWrap}>
+              <Text style={styles.mediaLightboxCaption}>{mediaLightbox.caption}</Text>
+            </View>
+          ) : null}
+        </View>
+      </Modal>
     </>
   );
 }
