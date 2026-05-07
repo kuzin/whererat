@@ -100,12 +100,6 @@ function getImdbNameSearchUrl(name: string): string {
   return `https://www.imdb.com/find/?q=${encodeURIComponent(q)}&s=nm`;
 }
 
-function getImdbRecommendationsUrl(imdbTitleUrl: string): string {
-  const trimmed = imdbTitleUrl.trim();
-  const base = trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
-  return `${base}/recommendations/`;
-}
-
 /** List thumbnail: scales to meta section width, caps height. */
 function computeStillThumbHeight(
   screenWidth: number,
@@ -125,6 +119,12 @@ function computeStillThumbHeight(
 
 function createMovieStyles(colors: ThemeColors) {
   const surface = colors.headerBg;
+  /** Canvas behind sighting lists / meta only — sticky chrome stays `headerBg`. */
+  const tabScrollCanvasBg = mixTowardHex(
+    colors.headerBg,
+    colors.mode === "dark" ? "#0c0a09" : "#1c1410",
+    colors.mode === "dark" ? 0.11 : 0.038,
+  );
   const heroTopInset = Platform.OS === "ios" ? 136 : 28;
 
   return StyleSheet.create({
@@ -137,16 +137,29 @@ function createMovieStyles(colors: ThemeColors) {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(12,10,9,0.38)",
     },
-    /** Canvas: visible when overscrolling / pulling from top; not between white section cards. */
-    scroll: { flex: 1, backgroundColor: colors.headerBg },
+    /** Canvas: visible when overscrolling / pulling from top; slightly darker than sticky chrome. */
+    scroll: { flex: 1, backgroundColor: tabScrollCanvasBg },
     scrollContent: { paddingBottom: 40, flexGrow: 1, position: "relative" },
     /** White body zone for all content sections below the top zone. */
     scrollBodyPanel: {
       flexGrow: 1,
-      backgroundColor: colors.headerBg,
+      backgroundColor: tabScrollCanvasBg,
       gap: 12,
       paddingTop: 16,
       overflow: "hidden",
+    },
+    /** Shrinks top inset when sticky filter/segment row sits above the scroll view. */
+    scrollBodyPanelTightTop: {
+      paddingTop: 10,
+    },
+    /** Holds filter bars / media segment controls fixed under tab bar while list scrolls. */
+    tabStickyChrome: {
+      backgroundColor: colors.headerBg,
+      paddingHorizontal: 14,
+      paddingTop: 8,
+      paddingBottom: 8,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.tabDivider,
     },
     center: {
       flex: 1,
@@ -346,13 +359,21 @@ function createMovieStyles(colors: ThemeColors) {
       paddingVertical: 7,
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: 8,
       flex: 1,
       minHeight: 36,
     },
+    /** Label + current value consume space up to chevron so ▼ stays right-aligned in the pill. */
+    filterSortBtnMain: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      minWidth: 0,
+    },
     filterSortBtnFull: { width: "100%" },
     filterSortBtnLabel: { color: colors.textMuted, fontSize: 12, fontWeight: "700" },
-    filterSortBtnText: { color: colors.text, fontSize: 12.5, fontWeight: "700", flexShrink: 1 },
+    filterSortBtnText: { color: colors.text, fontSize: 12.5, fontWeight: "700", flex: 1, minWidth: 0 },
     sortSelect: {
       flexDirection: "row",
       alignItems: "center",
@@ -373,7 +394,7 @@ function createMovieStyles(colors: ThemeColors) {
       fontWeight: "600",
       flexShrink: 1,
     },
-    sortSelectChevron: { color: colors.textMuted, fontSize: 12, fontWeight: "700" },
+    sortSelectChevron: { color: colors.textMuted, fontSize: 12, fontWeight: "700", flexShrink: 0 },
     loadingMoreWrap: { paddingVertical: 12, alignItems: "center", justifyContent: "center" },
     sheetBackdrop: {
       ...StyleSheet.absoluteFillObject,
@@ -504,7 +525,6 @@ function createMovieStyles(colors: ThemeColors) {
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.border,
       overflow: "hidden",
-      marginBottom: 6,
       alignSelf: "stretch",
     },
     mediaSegmentSlot: {
@@ -744,18 +764,22 @@ function FilterSortBar({
   return (
     <View style={styles.filterBar}>
       <Pressable style={[styles.filterSortBtn, !hasSecondary && styles.filterSortBtnFull]} onPress={onPressPrimary}>
-        <Text style={styles.filterSortBtnLabel}>{primaryLabel}</Text>
-        <Text style={styles.filterSortBtnText} numberOfLines={1}>
-          {primaryValue}
-        </Text>
+        <View style={styles.filterSortBtnMain}>
+          <Text style={styles.filterSortBtnLabel}>{primaryLabel}</Text>
+          <Text style={styles.filterSortBtnText} numberOfLines={1}>
+            {primaryValue}
+          </Text>
+        </View>
         <Text style={styles.sortSelectChevron}>▼</Text>
       </Pressable>
       {hasSecondary ? (
         <Pressable style={styles.filterSortBtn} onPress={onPressSecondary}>
-          <Text style={styles.filterSortBtnLabel}>{secondaryLabel}</Text>
-          <Text style={styles.filterSortBtnText} numberOfLines={1}>
-            {secondaryValue}
-          </Text>
+          <View style={styles.filterSortBtnMain}>
+            <Text style={styles.filterSortBtnLabel}>{secondaryLabel}</Text>
+            <Text style={styles.filterSortBtnText} numberOfLines={1}>
+              {secondaryValue}
+            </Text>
+          </View>
           <Text style={styles.sortSelectChevron}>▼</Text>
         </Pressable>
       ) : null}
@@ -808,33 +832,22 @@ function SortOptionsSheet<T extends string>({
   );
 }
 
-function SightingsSection({
+/** Sticky under tab strip: sightings sort + spoilers (Featured Rats). */
+function SightingsStickyChrome({
   sightings,
-  totalCount,
-  loadingMore,
-  sortOptions,
   activeSort,
-  setSightSort,
-  isSortOpen,
+  sortOptions,
   setSortOpen,
   showSpoilers,
   setShowSpoilers,
-  sightingCardSurface,
-  themeColors,
   styles,
 }: {
   sightings: SightingPublic[];
-  totalCount: number;
-  loadingMore: boolean;
-  sortOptions: { value: MovieSightingsSort; label: string }[];
   activeSort: MovieSightingsSort;
-  setSightSort: (s: MovieSightingsSort) => void;
-  isSortOpen: boolean;
+  sortOptions: { value: MovieSightingsSort; label: string }[];
   setSortOpen: Dispatch<boolean>;
   showSpoilers: boolean;
   setShowSpoilers: Dispatch<boolean>;
-  sightingCardSurface?: string;
-  themeColors: ThemeColors;
   styles: MovieStyles;
 }) {
   const activeSortLabel = sortOptions.find((opt) => opt.value === activeSort)?.label ?? "Newest";
@@ -842,7 +855,7 @@ function SightingsSection({
   const [spoilerModeOpen, setSpoilerModeOpen] = useState(false);
   const spoilerMode = showSpoilers ? "shown" : "hidden";
   return (
-    <View style={styles.sightingsSection}>
+    <View style={styles.tabStickyChrome}>
       <FilterSortBar
         primaryLabel="Sort"
         primaryValue={activeSortLabel}
@@ -856,7 +869,142 @@ function SightingsSection({
         onPressSecondary={spoilerCount > 0 ? () => setSpoilerModeOpen(true) : undefined}
         styles={styles}
       />
-      <View style={styles.tabSectionDivider} />
+      <SortOptionsSheet
+        open={spoilerModeOpen}
+        setOpen={setSpoilerModeOpen}
+        title="Spoiler mode"
+        options={[
+          { value: "hidden", label: "Hide spoiler text" },
+          { value: "shown", label: "Show all spoilers" },
+        ]}
+        activeValue={spoilerMode}
+        onSelect={(value) => setShowSpoilers(value === "shown")}
+        styles={styles}
+      />
+    </View>
+  );
+}
+
+function ReviewsStickyChrome({
+  reviews,
+  reviewSort,
+  reviewsRatOnly,
+  setReviewSortOpen,
+  setReviewFilterOpen,
+  styles,
+}: {
+  reviews: NonNullable<MovieDetailResponse["tabs"]["reviews"]>;
+  reviewSort: ReviewSortKey;
+  reviewsRatOnly: boolean;
+  setReviewSortOpen: Dispatch<boolean>;
+  setReviewFilterOpen: Dispatch<boolean>;
+  styles: MovieStyles;
+}) {
+  const ratCount = reviews.filter((r) => r.mentionsRat).length;
+  const reviewSortOptions = [
+    { value: "latest" as const, label: "Latest" },
+    { value: "highest" as const, label: "Highest rated" },
+    { value: "lowest" as const, label: "Lowest rated" },
+  ];
+  const activeReviewSortLabel =
+    reviewSortOptions.find((opt) => opt.value === reviewSort)?.label ?? "Latest";
+
+  return (
+    <View style={styles.tabStickyChrome}>
+      <FilterSortBar
+        primaryLabel="Sort"
+        primaryValue={activeReviewSortLabel}
+        onPressPrimary={() => setReviewSortOpen(true)}
+        secondaryLabel={ratCount > 0 ? "Filter" : undefined}
+        secondaryValue={
+          ratCount > 0
+            ? reviewsRatOnly
+              ? `Rat-only (${ratCount})`
+              : `All reviews (${reviews.length})`
+            : undefined
+        }
+        onPressSecondary={ratCount > 0 ? () => setReviewFilterOpen(true) : undefined}
+        styles={styles}
+      />
+    </View>
+  );
+}
+
+/** Sticky Stills / Videos switcher (media tab when both exist). */
+function MediaSegmentStickyChrome({
+  mediaSegment,
+  setMediaSegment,
+  stillsCount,
+  videosCount,
+  styles,
+}: {
+  mediaSegment: "stills" | "videos";
+  setMediaSegment: Dispatch<"stills" | "videos">;
+  stillsCount: number;
+  videosCount: number;
+  styles: MovieStyles;
+}) {
+  return (
+    <View style={styles.tabStickyChrome}>
+      <View style={styles.mediaSegmentBar}>
+        <Pressable
+          style={[styles.mediaSegmentSlot, mediaSegment === "stills" ? styles.mediaSegmentSlotOn : undefined]}
+          onPress={() => setMediaSegment("stills")}
+        >
+          <Text
+            style={[
+              styles.mediaSegmentSlotText,
+              mediaSegment === "stills" ? styles.mediaSegmentSlotTextOn : undefined,
+            ]}
+          >
+            Stills ({stillsCount})
+          </Text>
+        </Pressable>
+        <Pressable
+          style={[styles.mediaSegmentSlot, mediaSegment === "videos" ? styles.mediaSegmentSlotOn : undefined]}
+          onPress={() => setMediaSegment("videos")}
+        >
+          <Text
+            style={[
+              styles.mediaSegmentSlotText,
+              mediaSegment === "videos" ? styles.mediaSegmentSlotTextOn : undefined,
+            ]}
+          >
+            Videos ({videosCount})
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function SightingsSection({
+  sightings,
+  loadingMore,
+  sortOptions,
+  activeSort,
+  setSightSort,
+  isSortOpen,
+  setSortOpen,
+  showSpoilers,
+  sightingCardSurface,
+  themeColors,
+  styles,
+}: {
+  sightings: SightingPublic[];
+  loadingMore: boolean;
+  sortOptions: { value: MovieSightingsSort; label: string }[];
+  activeSort: MovieSightingsSort;
+  setSightSort: (s: MovieSightingsSort) => void;
+  isSortOpen: boolean;
+  setSortOpen: Dispatch<boolean>;
+  showSpoilers: boolean;
+  sightingCardSurface?: string;
+  themeColors: ThemeColors;
+  styles: MovieStyles;
+}) {
+  return (
+    <View style={styles.sightingsSection}>
       {sightings.length === 0 ? (
         <EmptyStateCard
           colors={themeColors}
@@ -887,18 +1035,6 @@ function SightingsSection({
         options={sortOptions}
         activeValue={activeSort}
         onSelect={setSightSort}
-        styles={styles}
-      />
-      <SortOptionsSheet
-        open={spoilerModeOpen}
-        setOpen={setSpoilerModeOpen}
-        title="Spoiler mode"
-        options={[
-          { value: "hidden", label: "Hide spoiler text" },
-          { value: "shown", label: "Show all spoilers" },
-        ]}
-        activeValue={spoilerMode}
-        onSelect={(value) => setShowSpoilers(value === "shown")}
         styles={styles}
       />
     </View>
@@ -1118,6 +1254,13 @@ export default function MovieScreen() {
     }));
   }, [featured]);
 
+  const mediaImgsLen = tabs?.images?.length ?? 0;
+  const mediaVidsLen = tabs?.videos?.length ?? 0;
+  const stickySightingsChrome = Boolean(featured && tab === "sightings");
+  const stickyReviewsChrome = tab === "reviews" && (tabs?.reviews?.length ?? 0) > 0;
+  const stickyMediaChrome = tab === "media" && mediaImgsLen > 0 && mediaVidsLen > 0;
+  const tabStickyChromeVisible = stickySightingsChrome || stickyReviewsChrome || stickyMediaChrome;
+
   const loadMoreSightings = useCallback(async () => {
     if (!slug || tab !== "sightings" || loading || refreshing || loadingMoreSightings) return;
     if (sightPageMeta.page >= sightPageMeta.pageCount) return;
@@ -1223,25 +1366,57 @@ export default function MovieScreen() {
           />
           <MovieTabsBar tab={tab} setTab={setTab} styles={styles} />
 
-          <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                tintColor={movieThemeColors.accent}
-                colors={[movieThemeColors.accent]}
-                progressBackgroundColor={movieThemeColors.panel}
-                titleColor={movieThemeColors.accent}
+          <View style={{ flex: 1, minHeight: 0, backgroundColor: movieThemeColors.headerBg }}>
+            {stickySightingsChrome ? (
+              <SightingsStickyChrome
+                sightings={sightings}
+                activeSort={sightSort}
+                sortOptions={sortOptions}
+                setSortOpen={setSortOpen}
+                showSpoilers={showSpoilers}
+                setShowSpoilers={setShowSpoilers}
+                styles={styles}
               />
-            }
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-            onScroll={onMainScroll}
-            scrollEventThrottle={16}
-            bounces
-            alwaysBounceVertical
-          >
-            <View style={styles.scrollBodyPanel}>
+            ) : stickyReviewsChrome ? (
+              <ReviewsStickyChrome
+                reviews={tabs.reviews}
+                reviewSort={reviewSort}
+                reviewsRatOnly={reviewsRatOnly}
+                setReviewSortOpen={setReviewSortOpen}
+                setReviewFilterOpen={setReviewFilterOpen}
+                styles={styles}
+              />
+            ) : stickyMediaChrome ? (
+              <MediaSegmentStickyChrome
+                mediaSegment={mediaSegment}
+                setMediaSegment={setMediaSegment}
+                stillsCount={mediaImgsLen}
+                videosCount={mediaVidsLen}
+                styles={styles}
+              />
+            ) : null}
+
+            <ScrollView
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  tintColor={movieThemeColors.accent}
+                  colors={[movieThemeColors.accent]}
+                  progressBackgroundColor={movieThemeColors.panel}
+                  titleColor={movieThemeColors.accent}
+                />
+              }
+              style={styles.scroll}
+              contentContainerStyle={styles.scrollContent}
+              onScroll={onMainScroll}
+              scrollEventThrottle={16}
+              bounces
+              alwaysBounceVertical
+            >
+              <View
+                style={[styles.scrollBodyPanel, tabStickyChromeVisible && styles.scrollBodyPanelTightTop]}
+              >
               {error ? (
                 <View style={styles.softBanner}>
                   <Text style={styles.softBannerText}>{error}</Text>
@@ -1251,7 +1426,6 @@ export default function MovieScreen() {
               {tab === "sightings" && featured ? (
                 <SightingsSection
                   sightings={sightings}
-                  totalCount={sightPageMeta.totalCount}
                   loadingMore={loadingMoreSightings}
                   sortOptions={sortOptions}
                   activeSort={sightSort}
@@ -1259,7 +1433,6 @@ export default function MovieScreen() {
                   isSortOpen={isSortOpen}
                   setSortOpen={setSortOpen}
                   showSpoilers={showSpoilers}
-                  setShowSpoilers={setShowSpoilers}
                   sightingCardSurface={sightingCardSurface}
                   themeColors={movieThemeColors}
                   styles={styles}
@@ -1268,18 +1441,6 @@ export default function MovieScreen() {
 
               {tab === "facts" ? (
                 <View style={styles.metaSection}>
-                  <MovieTabSectionHeader
-                    title="Rat Facts"
-                    accentColor={movieThemeColors.accent}
-                    colors={movieThemeColors}
-                    actionLabel="View trivia on IMDb"
-                    onActionPress={() =>
-                      void openURL(
-                        `${data.links.imdbTitle.endsWith("/") ? data.links.imdbTitle : `${data.links.imdbTitle}/`}trivia/`,
-                      )
-                    }
-                  />
-                  <View style={styles.tabSectionDivider} />
                   {(tabs.facts?.length ?? 0) === 0 ? (
                     <EmptyStateCard
                       colors={movieThemeColors}
@@ -1299,14 +1460,6 @@ export default function MovieScreen() {
 
               {tab === "meta" ? (
                 <View style={styles.metaSection}>
-                  <MovieTabSectionHeader
-                    title="Meta information"
-                    accentColor={movieThemeColors.accent}
-                    colors={movieThemeColors}
-                    actionLabel="View on IMDb"
-                    onActionPress={() => void openURL(data.links.imdbTitle)}
-                  />
-                  <View style={styles.tabSectionDivider} />
                   {movie.summary.trim() ? (
                     <View style={styles.metaSynopsisWrap}>
                       <Text style={styles.metaLabel}>Synopsis</Text>
@@ -1367,26 +1520,12 @@ export default function MovieScreen() {
 
             {tab === "reviews" ? (
               <View style={styles.metaSection}>
-                <MovieTabSectionHeader
-                  title="Reviews"
-                  accentColor={movieThemeColors.accent}
-                  colors={movieThemeColors}
-                  actionLabel="View reviews on IMDb"
-                  onActionPress={() =>
-                    void openURL(
-                      `${data.links.imdbTitle.endsWith("/") ? data.links.imdbTitle : `${data.links.imdbTitle}/`}reviews/`,
-                    )
-                  }
-                />
                 {(tabs.reviews?.length ?? 0) === 0 ? (
-                  <>
-                    <View style={styles.tabSectionDivider} />
-                    <EmptyStateCard
-                      colors={movieThemeColors}
-                      title="No reviews yet"
-                      body="IMDb user reviews haven't been synced for this title yet. Pull to refresh, or browse reviews on IMDb."
-                    />
-                  </>
+                  <EmptyStateCard
+                    colors={movieThemeColors}
+                    title="No reviews yet"
+                    body="IMDb user reviews haven't been synced for this title yet. Pull to refresh, or browse reviews on IMDb."
+                  />
                 ) : (
                   (() => {
                     const all = tabs.reviews!;
@@ -1398,26 +1537,8 @@ export default function MovieScreen() {
                       { value: "highest" as const, label: "Highest rated" },
                       { value: "lowest" as const, label: "Lowest rated" },
                     ];
-                    const activeReviewSortLabel =
-                      reviewSortOptions.find((opt) => opt.value === reviewSort)?.label ?? "Latest";
                     return (
                       <>
-                        <FilterSortBar
-                          primaryLabel="Sort"
-                          primaryValue={activeReviewSortLabel}
-                          onPressPrimary={() => setReviewSortOpen(true)}
-                          secondaryLabel={ratCount > 0 ? "Filter" : undefined}
-                          secondaryValue={
-                            ratCount > 0
-                              ? reviewsRatOnly
-                                ? `Rat-only (${ratCount})`
-                                : `All reviews (${all.length})`
-                              : undefined
-                          }
-                          onPressSecondary={ratCount > 0 ? () => setReviewFilterOpen(true) : undefined}
-                          styles={styles}
-                        />
-                        <View style={styles.tabSectionDivider} />
                         {ratCount > 0 && reviewsRatOnly && visible.length === 0 ? (
                           <EmptyStateCard
                             colors={movieThemeColors}
@@ -1513,14 +1634,6 @@ export default function MovieScreen() {
 
             {tab === "related" ? (
               <View style={styles.metaSection}>
-                <MovieTabSectionHeader
-                  title="Related"
-                  accentColor={movieThemeColors.accent}
-                  colors={movieThemeColors}
-                  actionLabel="View related on IMDb"
-                  onActionPress={() => void openURL(getImdbRecommendationsUrl(data.links.imdbTitle))}
-                />
-                <View style={styles.tabSectionDivider} />
                 {(tabs.related?.length ?? 0) === 0 ? (
                   <EmptyStateCard
                     colors={movieThemeColors}
@@ -1591,42 +1704,6 @@ export default function MovieScreen() {
                   const showVideos = hasVideos && (!showSegment || mediaSegment === "videos");
                   return (
                     <>
-                      {showSegment ? (
-                        <View style={styles.mediaSegmentBar}>
-                          <Pressable
-                            style={[
-                              styles.mediaSegmentSlot,
-                              mediaSegment === "stills" ? styles.mediaSegmentSlotOn : undefined,
-                            ]}
-                            onPress={() => setMediaSegment("stills")}
-                          >
-                            <Text
-                              style={[
-                                styles.mediaSegmentSlotText,
-                                mediaSegment === "stills" ? styles.mediaSegmentSlotTextOn : undefined,
-                              ]}
-                            >
-                              Stills ({imgs.length})
-                            </Text>
-                          </Pressable>
-                          <Pressable
-                            style={[
-                              styles.mediaSegmentSlot,
-                              mediaSegment === "videos" ? styles.mediaSegmentSlotOn : undefined,
-                            ]}
-                            onPress={() => setMediaSegment("videos")}
-                          >
-                            <Text
-                              style={[
-                                styles.mediaSegmentSlotText,
-                                mediaSegment === "videos" ? styles.mediaSegmentSlotTextOn : undefined,
-                              ]}
-                            >
-                              Videos ({vids.length})
-                            </Text>
-                          </Pressable>
-                        </View>
-                      ) : null}
                       {showStills ? (
                         <View style={styles.mediaStillsColumn}>
                           {imgs.map((im) => (
@@ -1688,8 +1765,9 @@ export default function MovieScreen() {
                 })()}
               </View>
             ) : null}
-            </View>
-          </ScrollView>
+              </View>
+            </ScrollView>
+          </View>
         </View>
       ) : null}
 
