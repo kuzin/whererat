@@ -123,7 +123,7 @@ function createMovieStyles(colors: ThemeColors) {
   const tabScrollCanvasBg = mixTowardHex(
     colors.headerBg,
     colors.mode === "dark" ? "#0c0a09" : "#1c1410",
-    colors.mode === "dark" ? 0.11 : 0.038,
+    colors.mode === "dark" ? 0.22 : 0.072,
   );
   const heroTopInset = Platform.OS === "ios" ? 136 : 28;
 
@@ -140,17 +140,24 @@ function createMovieStyles(colors: ThemeColors) {
     /** Canvas: visible when overscrolling / pulling from top; slightly darker than sticky chrome. */
     scroll: { flex: 1, backgroundColor: tabScrollCanvasBg },
     scrollContent: { paddingBottom: 40, flexGrow: 1, position: "relative" },
-    /** White body zone for all content sections below the top zone. */
+    /** White body zone for all tab content — horizontal + top/bottom inset is shared across tabs. */
     scrollBodyPanel: {
       flexGrow: 1,
       backgroundColor: tabScrollCanvasBg,
       gap: 12,
-      paddingTop: 16,
+      paddingHorizontal: 14,
+      paddingTop: 12,
+      paddingBottom: 12,
       overflow: "hidden",
     },
-    /** Shrinks top inset when sticky filter/segment row sits above the scroll view. */
+    /** Matches default top inset even with sticky chrome (no double stack with section padding). */
     scrollBodyPanelTightTop: {
-      paddingTop: 10,
+      paddingTop: 12,
+    },
+    /** Vertical stack for sibling cards/lists inside a tab (reviews, media videos, …). */
+    tabContentStack: {
+      alignSelf: "stretch",
+      gap: 12,
     },
     /** Holds filter bars / media segment controls fixed under tab bar while list scrolls. */
     tabStickyChrome: {
@@ -284,8 +291,8 @@ function createMovieStyles(colors: ThemeColors) {
       paddingHorizontal: 10,
     },
     softBanner: {
-      marginHorizontal: 16,
-      marginBottom: 12,
+      alignSelf: "stretch",
+      marginBottom: 0,
       padding: 10,
       borderRadius: 8,
       backgroundColor: colors.dangerBg,
@@ -306,7 +313,7 @@ function createMovieStyles(colors: ThemeColors) {
     },
     tabChipOn: { borderBottomColor: colors.accent },
     tabChipText: { color: colors.text, opacity: 0.78, fontWeight: "600", fontSize: 14 },
-    tabChipTextOn: { color: colors.text, fontWeight: "800" },
+    tabChipTextOn: { color: colors.accent, fontWeight: "800", opacity: 1 },
     section: {
       paddingHorizontal: 16,
       paddingVertical: 12,
@@ -318,16 +325,22 @@ function createMovieStyles(colors: ThemeColors) {
       borderColor: colors.border,
     },
     sightingsSection: {
-      paddingHorizontal: 14,
-      paddingTop: 12,
-      paddingBottom: 14,
-      gap: 10,
+      flex: 1,
+      alignSelf: "stretch",
+      minHeight: 0,
+      paddingHorizontal: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      gap: 12,
     },
     metaSection: {
-      paddingHorizontal: 14,
-      paddingTop: 6,
-      paddingBottom: 12,
-      gap: 8,
+      flex: 1,
+      alignSelf: "stretch",
+      minHeight: 0,
+      paddingHorizontal: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      gap: 12,
     },
     sightingsList: {
       gap: 12,
@@ -395,7 +408,11 @@ function createMovieStyles(colors: ThemeColors) {
       flexShrink: 1,
     },
     sortSelectChevron: { color: colors.textMuted, fontSize: 12, fontWeight: "700", flexShrink: 0 },
-    loadingMoreWrap: { paddingVertical: 12, alignItems: "center", justifyContent: "center" },
+    loadingMoreWrap: {
+      paddingVertical: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
     sheetBackdrop: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0,0,0,0.45)",
@@ -438,7 +455,6 @@ function createMovieStyles(colors: ThemeColors) {
     sheetRowTextOn: { color: colors.text, fontWeight: "700" },
     sheetCheck: { color: colors.accent, fontWeight: "800" },
     factCard: {
-      marginBottom: 8,
       padding: 12,
       borderRadius: 10,
       backgroundColor: colors.panel,
@@ -455,7 +471,6 @@ function createMovieStyles(colors: ThemeColors) {
     },
     factText: { color: colors.textMuted, fontSize: 15, lineHeight: 22 },
     reviewCard: {
-      marginBottom: 8,
       padding: 12,
       borderRadius: 10,
       backgroundColor: colors.panel,
@@ -509,16 +524,28 @@ function createMovieStyles(colors: ThemeColors) {
     relatedListRatingRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
     relatedListRatingIcon: { color: colors.accent },
     relatedListRatingText: { color: colors.accent, fontSize: 13, fontWeight: "600" },
-    relatedListChevron: { color: colors.textMuted, fontSize: 28, fontWeight: "200" },
     relatedListWrap: { alignSelf: "stretch" },
     relatedTitle: { color: colors.text, fontWeight: "700", fontSize: 16 },
     videoRow: {
       flexDirection: "row",
       gap: 12,
       alignItems: "center",
-      marginBottom: 14,
+      paddingVertical: 4,
     },
     videoThumb: { width: 120, height: 68, borderRadius: 6, backgroundColor: colors.panel },
+    videoOpenBtn: {
+      flexShrink: 0,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      paddingHorizontal: 11,
+      paddingVertical: 8,
+      borderRadius: 9,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.accent,
+      backgroundColor: colors.panel,
+    },
+    videoOpenBtnText: { color: colors.accent, fontSize: 12, fontWeight: "800" },
     mediaSegmentBar: {
       flexDirection: "row",
       borderRadius: 10,
@@ -536,11 +563,10 @@ function createMovieStyles(colors: ThemeColors) {
     },
     mediaSegmentSlotOn: { backgroundColor: colors.chipActive },
     mediaSegmentSlotText: { fontSize: 14, fontWeight: "600", color: colors.textMuted },
-    mediaSegmentSlotTextOn: { fontWeight: "800", color: colors.text },
+    mediaSegmentSlotTextOn: { fontWeight: "800", color: colors.accent },
     mediaStillsColumn: {
       alignSelf: "stretch",
-      gap: 10,
-      marginTop: 2,
+      gap: 12,
     },
     mediaStillCard: {
       borderRadius: 8,
@@ -1120,10 +1146,17 @@ export default function MovieScreen() {
 
   const movieThemeColors = useMemo(() => {
     const p = colors.mode === "dark" ? movie?.pagePaletteDark : movie?.pagePalette;
-    if (!p) return colors;
+    const accent = typeof p?.accent === "string" ? p.accent.trim() : "";
+    if (!p || !accent) return colors;
+    /** Segment / sheet-selected surfaces follow poster accent instead of global `chipActive`. */
+    const chipActive =
+      colors.mode === "dark"
+        ? mixTowardHex(accent, "#0c0a09", 0.7)
+        : mixTowardHex(accent, colors.panelMuted, 0.76);
     return {
       ...colors,
-      accent: p.accent,
+      accent,
+      chipActive,
     };
   }, [colors, movie?.pagePalette, movie?.pagePaletteDark, colors.mode]);
 
@@ -1539,22 +1572,24 @@ export default function MovieScreen() {
                     ];
                     return (
                       <>
-                        {ratCount > 0 && reviewsRatOnly && visible.length === 0 ? (
-                          <EmptyStateCard
-                            colors={movieThemeColors}
-                            title="No rat-tagged reviews"
-                            body="Switch the filter to All reviews to see everything in the list."
-                          />
-                        ) : null}
-                        {visible.map((r) => {
-                          const isLong = (r.text?.length ?? 0) > 400;
-                          const expanded = Boolean(expandedReviews[r.id]);
-                          const bodyText = !isLong || expanded ? r.text : `${r.text.slice(0, 280).trimEnd()}...`;
-                          const rating = typeof r.rating === "number" ? Math.max(0, Math.min(10, r.rating)) : null;
-                          const filledStars =
-                            rating === null ? 0 : Math.max(0, Math.min(5, Math.round(rating / 2)));
-                          return (
-                    <View key={r.id} style={styles.reviewCard}>
+                        <View style={styles.tabContentStack}>
+                          {ratCount > 0 && reviewsRatOnly && visible.length === 0 ? (
+                            <EmptyStateCard
+                              expand={false}
+                              colors={movieThemeColors}
+                              title="No rat-tagged reviews"
+                              body="Switch the filter to All reviews to see everything in the list."
+                            />
+                          ) : null}
+                          {visible.map((r) => {
+                            const isLong = (r.text?.length ?? 0) > 400;
+                            const expanded = Boolean(expandedReviews[r.id]);
+                            const bodyText = !isLong || expanded ? r.text : `${r.text.slice(0, 280).trimEnd()}...`;
+                            const rating = typeof r.rating === "number" ? Math.max(0, Math.min(10, r.rating)) : null;
+                            const filledStars =
+                              rating === null ? 0 : Math.max(0, Math.min(5, Math.round(rating / 2)));
+                            return (
+                              <View key={r.id} style={styles.reviewCard}>
                               <View style={styles.reviewCardTopRow}>
                                 <View style={styles.reviewTitleStack}>
                                   <Text style={styles.reviewSummary}>{r.summary}</Text>
@@ -1601,9 +1636,10 @@ export default function MovieScreen() {
                                   </Text>
                                 </Pressable>
                               ) : null}
-                    </View>
-                          );
-                        })}
+                              </View>
+                            );
+                          })}
+                        </View>
                         <SortOptionsSheet
                           open={reviewSortOpen}
                           setOpen={setReviewSortOpen}
@@ -1648,6 +1684,7 @@ export default function MovieScreen() {
                         style={styles.relatedListRow}
                         onPress={() => void openURL(`https://www.imdb.com/title/${r.id}/`)}
                         accessibilityRole="link"
+                        accessibilityHint="Opens this title on IMDb in your browser"
                         accessibilityLabel={`${r.title}${typeof r.year === "number" ? ` (${r.year})` : ""} on IMDb`}
                       >
                         {r.posterUrl ? (
@@ -1675,7 +1712,10 @@ export default function MovieScreen() {
                             </View>
                           ) : null}
                         </View>
-                        <Text style={styles.relatedListChevron}>›</Text>
+                        <View style={styles.videoOpenBtn} pointerEvents="none" importantForAccessibility="no-hide-descendants">
+                          <Ionicons name="open-outline" size={16} color={movieThemeColors.accent} />
+                          <Text style={styles.videoOpenBtnText}>IMDB</Text>
+                        </View>
                       </Pressable>
                     ))}
                   </View>
@@ -1735,12 +1775,16 @@ export default function MovieScreen() {
                           ))}
                         </View>
                       ) : null}
-                      {showVideos
-                        ? vids.map((v) => (
+                      {showVideos ? (
+                        <View style={styles.tabContentStack}>
+                          {vids.map((v) => (
                             <Pressable
                               key={v.id}
                               style={styles.videoRow}
                               onPress={() => void openURL(`https://www.imdb.com/video/${v.id}/`)}
+                              accessibilityRole="link"
+                              accessibilityHint="Opens this trailer or clip on IMDb in your browser"
+                              accessibilityLabel={`${v.name}, open on IMDb`}
                             >
                               {v.thumbnailUrl ? (
                                 <Image
@@ -1753,13 +1797,20 @@ export default function MovieScreen() {
                                   <Text style={styles.relatedPosterPhText}>▶</Text>
                                 </View>
                               )}
-                              <View style={{ flex: 1 }}>
-                                <Text style={styles.relatedTitle}>{v.name}</Text>
+                              <View style={{ flex: 1, minWidth: 0 }}>
+                                <Text style={styles.relatedTitle} numberOfLines={2}>
+                                  {v.name}
+                                </Text>
                                 <Text style={styles.muted}>{v.contentType ?? "Video"}</Text>
                               </View>
+                              <View style={styles.videoOpenBtn} pointerEvents="none" importantForAccessibility="no-hide-descendants">
+                                <Ionicons name="open-outline" size={16} color={movieThemeColors.accent} />
+                                <Text style={styles.videoOpenBtnText}>IMDB</Text>
+                              </View>
                             </Pressable>
-                          ))
-                        : null}
+                          ))}
+                        </View>
+                      ) : null}
                     </>
                   );
                 })()}

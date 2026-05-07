@@ -1,0 +1,149 @@
+import { openURL } from "expo-linking";
+import Constants from "expo-constants";
+import { Ionicons } from "@expo/vector-icons";
+import { useMemo } from "react";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+import { getApiOrigin } from "../../lib/api";
+import { type ThemeColors, useTheme } from "../../lib/theme";
+
+export default function AboutWhereRatScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const origin = getApiOrigin();
+  const version =
+    Constants.nativeApplicationVersion ?? Constants.expoConfig?.version ?? "—";
+  const build =
+    Constants.nativeBuildVersion ??
+    (typeof Constants.expoConfig?.runtimeVersion === "string"
+      ? Constants.expoConfig.runtimeVersion
+      : undefined);
+
+  return (
+    <ScrollView
+      style={[styles.scroll, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.scrollContent}
+    >
+      <Text style={styles.body}>
+        WhereRat is a spoiler-aware catalog of rat appearances in film and TV. The native app mirrors the
+        public site: browse titles, sightings, and IMDb reference content with anonymous, read-only requests.
+      </Text>
+      <View style={styles.metaBlock}>
+        <Text style={styles.metaLabel}>Version</Text>
+        <Text style={styles.metaValue}>{version}</Text>
+        {build ? (
+          <>
+            <Text style={[styles.metaLabel, styles.metaLabelSpaced]}>Build</Text>
+            <Text style={styles.metaValue}>{build}</Text>
+          </>
+        ) : null}
+        <Text style={[styles.metaLabel, styles.metaLabelSpaced]}>Platform</Text>
+        <Text style={styles.metaValue}>{Platform.OS === "ios" ? "iOS" : "Android"}</Text>
+      </View>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel="Open WhereRat website"
+        onPress={() => void openURL(origin)}
+        style={({ pressed }) => [styles.linkBtn, pressed && styles.linkBtnPressed]}
+      >
+        <Ionicons name="open-outline" size={18} color={colors.accent} />
+        <Text style={styles.linkBtnText}>whererat.com</Text>
+      </Pressable>
+      <Text style={styles.footerNote}>
+        Submissions and sign-in may be available on the website before they ship in the app — check the site
+        for the latest.
+      </Text>
+
+      <View style={styles.siteFooter}>
+        <Text style={styles.siteFooterTagline}>
+          Spoiler-aware · Crowd-sourced · Obsessively maintained
+        </Text>
+        <Text style={styles.siteFooterDedication}>For Kaitlyn. ❤️</Text>
+        <Text style={styles.siteFooterCopyright}>
+          Copyright 2026. Design by{" "}
+          <Text
+            accessibilityRole="link"
+            accessibilityLabel="Kuz, opens website"
+            onPress={() => void openURL("https://kuzn.me")}
+            style={styles.siteFooterLink}
+          >
+            Kuz
+          </Text>
+          . All rights reserved.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+}
+
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    scroll: { flex: 1 },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 },
+    body: {
+      color: colors.text,
+      fontSize: 16,
+      lineHeight: 24,
+      marginBottom: 20,
+    },
+    metaBlock: {
+      borderRadius: 12,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      padding: 16,
+      marginBottom: 20,
+    },
+    metaLabel: { color: colors.textMuted, fontSize: 12, fontWeight: "700", textTransform: "uppercase" },
+    metaLabelSpaced: { marginTop: 12 },
+    metaValue: { color: colors.text, fontSize: 16, fontWeight: "600", marginTop: 4 },
+    linkBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      alignSelf: "flex-start",
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: 10,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.accent,
+      backgroundColor: colors.panel,
+    },
+    linkBtnPressed: { opacity: 0.9 },
+    linkBtnText: { color: colors.accent, fontSize: 16, fontWeight: "800" },
+    footerNote: { color: colors.textMuted, fontSize: 14, lineHeight: 21, marginTop: 24 },
+    siteFooter: {
+      marginTop: 32,
+      paddingTop: 22,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.border,
+      gap: 10,
+      paddingBottom: 8,
+    },
+    siteFooterTagline: {
+      color: colors.textMuted,
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: "600",
+    },
+    siteFooterDedication: {
+      color: colors.textMuted,
+      fontSize: 14,
+      lineHeight: 20,
+      fontStyle: "italic",
+      opacity: 0.92,
+    },
+    siteFooterCopyright: {
+      color: colors.text,
+      fontSize: 14,
+      lineHeight: 22,
+      marginTop: 4,
+    },
+    siteFooterLink: {
+      color: colors.accent,
+      fontWeight: "700",
+      textDecorationLine: "underline",
+      textDecorationColor: colors.accent,
+    },
+  });
+}

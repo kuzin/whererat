@@ -58,6 +58,7 @@ function RootNavigator() {
       <GestureHandlerRootView style={[styles.root, { backgroundColor: colors.background }]}>
         <Stack screenOptions={stackScreenOptions}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="info" options={{ headerShown: false }} />
         </Stack>
       </GestureHandlerRootView>
     </NavigationThemeProvider>

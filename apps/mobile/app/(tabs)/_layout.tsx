@@ -13,6 +13,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HeaderThemeWordmark } from "../../components/HeaderThemeWordmark";
+import { InfoMenuHeaderButton } from "../../components/InfoMenuHeaderButton";
 import { TabBarBackdrop } from "../../components/TabBarBackdrop";
 import { useTheme } from "../../lib/theme";
 
@@ -46,17 +47,25 @@ function useReduceMotionEnabled(): boolean {
   return enabled;
 }
 
-function ChipTabButton({
-  accessibilityState,
-  accessibilityLabel,
-  testID,
-  children,
-  style,
-  onPress,
-  onLongPress,
-}: BottomTabBarButtonProps) {
+function ChipTabButton(props: BottomTabBarButtonProps) {
+  const {
+    accessibilityState,
+    accessibilityLabel,
+    testID,
+    children,
+    style,
+    onPress,
+    onLongPress,
+    ...rawRest
+  } = props;
+  /** Ref types from `tabBarButton` overlap `LegacyRef` in Pressable typings; omit from spread. */
+  const { ref: _unusedTabRef, ...rest } = rawRest as typeof rawRest & { ref?: unknown };
+  void _unusedTabRef;
   const { colors } = useTheme();
-  const focused = Boolean(accessibilityState?.selected);
+  /** `BottomTabItem` sets `aria-selected` but often omits `accessibilityState.selected`. */
+  const ariaSel = (rest as { "aria-selected"?: boolean | string })["aria-selected"];
+  const focused =
+    Boolean(accessibilityState?.selected) || ariaSel === true || ariaSel === "true";
   const reduceMotion = useReduceMotionEnabled();
   const resting = focused ? REST_FOCUS : REST_IDLE;
   const scale = useRef(new Animated.Value(resting)).current;
@@ -81,17 +90,14 @@ function ChipTabButton({
 
   return (
     <Pressable
+      {...rest}
       accessibilityRole="button"
-      accessibilityState={accessibilityState}
+      accessibilityState={{ ...accessibilityState, selected: focused }}
       accessibilityLabel={accessibilityLabel}
       testID={testID}
       onPress={onPress}
       onLongPress={onLongPress}
-      style={[
-        style,
-        styles.tabBarPressable,
-        focused && { backgroundColor: colors.tabActiveFill },
-      ]}
+      style={[style, styles.tabBarPressable]}
       android_ripple={{ color: "transparent" }}
     >
       {({ pressed }) => (
@@ -103,7 +109,21 @@ function ChipTabButton({
             },
           ]}
         >
-          {children}
+          <View
+            style={[
+              styles.tabPill,
+              focused &&
+                (colors.mode === "light"
+                  ? {
+                      backgroundColor: colors.chipActive,
+                      borderWidth: StyleSheet.hairlineWidth,
+                      borderColor: colors.accent,
+                    }
+                  : { backgroundColor: colors.accent }),
+            ]}
+          >
+            {children}
+          </View>
         </Animated.View>
       )}
     </Pressable>
@@ -158,6 +178,7 @@ export default function TabsLayout() {
       tabBarItemStyle: styles.tabBarItem,
       tabBarIconStyle: styles.tabBarIcon,
       tabBarButton: (props: BottomTabBarButtonProps) => <ChipTabButton {...props} />,
+      headerRight: () => <InfoMenuHeaderButton />,
     }),
     [colors],
   );
@@ -169,7 +190,6 @@ export default function TabsLayout() {
         options={{
           title: "Catalog",
           tabBarLabel: "Catalog",
-          tabBarItemStyle: [styles.tabBarItemFirst, { borderRightColor: colors.tabDivider }],
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "film" : "film-outline"}
@@ -237,9 +257,9 @@ const styles = StyleSheet.create({
     width: TAB_BAR_WIDTH,
     borderRadius: 0,
     height: 72,
-    paddingTop: 0,
-    paddingBottom: 0,
-    paddingHorizontal: 0,
+    paddingTop: 4,
+    paddingBottom: 4,
+    paddingHorizontal: 6,
   },
   tabBarLabel: {
     fontWeight: "700",
@@ -254,14 +274,6 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     minWidth: 0,
   },
-  tabBarItemFirst: {
-    flex: 1,
-    marginHorizontal: 0,
-    marginVertical: 0,
-    borderRadius: 0,
-    minWidth: 0,
-    borderRightWidth: StyleSheet.hairlineWidth,
-  },
   tabBarIcon: {
     marginBottom: 0,
   },
@@ -274,12 +286,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignSelf: "stretch",
     width: "100%",
-    borderRadius: 0,
-    borderWidth: 0,
-    backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
+    paddingVertical: 2,
     paddingHorizontal: 2,
+  },
+  /** Hug icon + label; active pill uses catalog-toggle colors in `ChipTabButton`. */
+  tabPill: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    backgroundColor: "transparent",
   },
 });

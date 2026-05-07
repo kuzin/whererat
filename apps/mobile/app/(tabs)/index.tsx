@@ -17,6 +17,7 @@ import {
 
 import { EmptyStateCard } from "../../components/EmptyStateCard";
 import { fetchCatalogPage } from "../../lib/api";
+import { mixTowardHex } from "../../lib/posterTone";
 import { type ThemeColors, useTheme } from "../../lib/theme";
 import type { CatalogMovieRow, CatalogResponse, CatalogSort } from "../../lib/types";
 
@@ -38,6 +39,8 @@ const SPACE_Y = 12;
 const CATALOG_SEARCH_TO_FILTERS_GAP = 8;
 const CARD_GAP = SPACE_Y;
 const CATALOG_CONTENT_INSET_X = 20;
+/** Tighter horizontal inset for list rows than the card grid */
+const CATALOG_LIST_INSET_X = 14;
 /** Reserve space above floating tab bar + pager */
 const SCROLL_BOTTOM_PAD = 92;
 const REFRESH_SPINNER_COLOR = "#f59e0b";
@@ -50,14 +53,21 @@ function createCatalogStyles(colors: ThemeColors) {
   const warmLine = colors.mode === "light" ? "rgba(28,25,23,0.32)" : colors.border;
   const warmLineSoft = colors.mode === "light" ? "rgba(28,25,23,0.22)" : colors.border;
   const warmPanel = "transparent";
+  /** Slightly darker than app `background`; matches movie tab-scroll treatment a bit more softly */
+  const catalogCanvasBg = mixTowardHex(
+    colors.background,
+    colors.mode === "dark" ? "#0c0a09" : "#1c1410",
+    colors.mode === "dark" ? 0.17 : 0.055,
+  );
 
   return StyleSheet.create({
     screen: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: catalogCanvasBg,
     },
     catalogList: {
       flex: 1,
+      backgroundColor: catalogCanvasBg,
     },
     /** Full-width band matching stack header (`headerBg`) */
     catalogHeaderStripe: {
@@ -217,12 +227,19 @@ function createCatalogStyles(colors: ThemeColors) {
       color: colors.text,
       fontWeight: "700",
     },
-    /** Same horizontal inset as `catalogTop`; list + card grids share this */
-    catalogScrollContent: {
-      paddingHorizontal: CATALOG_CONTENT_INSET_X,
-      paddingTop: SPACE_Y + 4,
+    /** Shared scroll canvas; combine with list or card inset style */
+    catalogScrollContentBase: {
       paddingBottom: SCROLL_BOTTOM_PAD,
       flexGrow: 1,
+      backgroundColor: catalogCanvasBg,
+    },
+    catalogScrollContentList: {
+      paddingHorizontal: CATALOG_LIST_INSET_X,
+      paddingTop: 8,
+    },
+    catalogScrollContentCard: {
+      paddingHorizontal: CATALOG_CONTENT_INSET_X,
+      paddingTop: SPACE_Y + 4,
     },
     cardGridRow: {
       gap: CARD_GAP,
@@ -244,16 +261,15 @@ function createCatalogStyles(colors: ThemeColors) {
       borderRadius: 8,
       backgroundColor: colors.panel,
     },
-    row: {
+    catalogListRow: {
       flexDirection: "row",
       alignItems: "center",
-      paddingVertical: 13,
-      gap: SPACE_Y + 4,
+      paddingVertical: 9,
+      gap: 10,
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: warmLine,
       backgroundColor: warmPanel,
-      borderRadius: 8,
-      paddingHorizontal: 8,
+      paddingHorizontal: 2,
     },
     poster: {
       width: 52,
@@ -414,7 +430,7 @@ function MovieRow({
 }) {
   return (
     <Pressable
-      style={styles.row}
+      style={styles.catalogListRow}
       onPress={() => router.push(`/movie/${encodeURIComponent(item.slug)}`)}
     >
       <Image
@@ -501,6 +517,23 @@ export default function CatalogScreen() {
       setRefreshing(false);
     }
   }, [load]);
+
+  const resetCatalogFilters = useCallback(() => {
+    setQueryInput("");
+    setQueryApplied("");
+    setGenre("all");
+    setSort("latest-added-title");
+    setPage(1);
+  }, []);
+
+  const emptyListShowsReset =
+    (queryInput.trim().length > 0 ||
+      queryApplied.trim().length > 0 ||
+      genre !== "all" ||
+      sort !== "latest-added-title" ||
+      page > 1) &&
+    !loading &&
+    ((data?.movies?.length ?? 0) === 0);
 
   const genres = data?.genres ?? [];
   const genreOptions = useMemo(
@@ -641,16 +674,23 @@ export default function CatalogScreen() {
         }
         ListEmptyComponent={
           !loading ? (
-            <View style={{ paddingTop: SPACE_Y * 2, paddingBottom: SPACE_Y }}>
-              <EmptyStateCard
-                colors={colors}
-                title="No rats in this hole."
-                body="Widen those filters—or check back once more titles land in the catalog."
-              />
-            </View>
+            <EmptyStateCard
+              colors={colors}
+              title="No rats in this hole."
+              body="Widen those filters—or check back once more titles land in the catalog."
+              actionLabel={
+                emptyListShowsReset ? "Reset filters & search" : undefined
+              }
+              onActionPress={
+                emptyListShowsReset ? resetCatalogFilters : undefined
+              }
+            />
           ) : null
         }
-        contentContainerStyle={styles.catalogScrollContent}
+        contentContainerStyle={[
+          styles.catalogScrollContentBase,
+          layoutMode === "list" ? styles.catalogScrollContentList : styles.catalogScrollContentCard,
+        ]}
       />
 
       {data && data.pageCount > 1 ? (
