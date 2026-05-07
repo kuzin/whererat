@@ -29,7 +29,11 @@ function verifyCronAuth(request: NextRequest): boolean {
 export async function GET(request: NextRequest) {
   if (!process.env.CRON_SECRET?.trim()) {
     return NextResponse.json(
-      { ok: false, error: "CRON_SECRET is not configured" },
+      {
+        ok: false,
+        error:
+          "CRON_SECRET is missing or empty in this deployment. Set a non-empty value in Vercel → Settings → Environment Variables (Production), then redeploy.",
+      },
       { status: 503 },
     );
   }
