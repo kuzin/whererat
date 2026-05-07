@@ -21,7 +21,11 @@ Next.js app for a **spoiler-aware** public catalog of rat cameos in films, with 
 ## Prerequisites
 
 - Node.js (LTS recommended)  
-- Postgres instance and a `DATABASE_URL`  
+- Postgres instance and a **`DATABASE_URL`**
+
+If anything DB-backed fails with **`DATABASE_URL` is required** or returns **500** on `/api/v1/*`, the running build or server simply **does not have that env var**. After editing `.env.local`, **restart `npm run dev`**. On **Vercel**, set **`DATABASE_URL`** under **Project → Settings → Environment Variables** for **each** scope you need (**Production**, **Preview**, **Development**)—Preview deploys omit vars that aren’t explicitly enabled there—then **redeploy**.
+
+Sanity check: **`GET /api/health/db`** should return **`{ ok: true }`** when Postgres is reachable.
 
 ## Local setup
 
@@ -31,7 +35,7 @@ Next.js app for a **spoiler-aware** public catalog of rat cameos in films, with 
 npm install
 ```
 
-**2.** Create `.env.local` in the repo root (Next and the DB scripts load `.env.local` / `.env` via `scripts/load-env.ts`). Example:
+**2.** Create `.env.local` in the repo root. Start from [`.env.example`](.env.example): `cp .env.example .env.local`, then paste your real **`DATABASE_URL`**. Next and the DB scripts load `.env.local` / `.env` via `scripts/load-env.ts`.
 
 ```env
 # Required
