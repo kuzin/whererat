@@ -14,8 +14,7 @@ import {
   type SightingImageSlot,
 } from "@/lib/whererat";
 import { persistSightingFiles } from "@/lib/media-storage";
-import { getCatalogMovies } from "@/lib/movie-catalog";
-import { syncMovieFromImdb } from "@/lib/movie-imdb-sync";
+import { resyncAllCatalogMoviesFromImdb } from "@/lib/movie-imdb-sync";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 
@@ -187,18 +186,7 @@ export async function resyncAllMovies() {
     redirect("/moderation?toast=error");
   }
 
-  const movies = await getCatalogMovies();
-  let synced = 0;
-  let errors = 0;
-
-  for (const movie of movies) {
-    try {
-      await syncMovieFromImdb(movie);
-      synced++;
-    } catch {
-      errors++;
-    }
-  }
+  const { synced, errors } = await resyncAllCatalogMoviesFromImdb();
 
   revalidatePath("/");
   revalidatePath("/movies/[slug]", "layout");

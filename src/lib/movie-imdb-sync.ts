@@ -1,4 +1,5 @@
 import { updateMovieOverride } from "@/lib/movie-edit-store";
+import { getCatalogMovies } from "@/lib/movie-catalog";
 import type { ImdbImage, ImdbRelatedTitle, ImdbReview, ImdbVideo, Movie } from "@/lib/whererat";
 
 // ---------------------------------------------------------------------------
@@ -435,4 +436,24 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
       ...(imdbMedia.images.length > 0 ? { imdbImages: imdbMedia.images } : {}),
     },
   });
+}
+
+/** Sequentially resync every catalog title from OMDb/IMDb (for owner action + cron). */
+export async function resyncAllCatalogMoviesFromImdb(): Promise<{
+  total: number;
+  synced: number;
+  errors: number;
+}> {
+  const movies = await getCatalogMovies();
+  let synced = 0;
+  let errors = 0;
+  for (const movie of movies) {
+    try {
+      await syncMovieFromImdb(movie);
+      synced++;
+    } catch {
+      errors++;
+    }
+  }
+  return { total: movies.length, synced, errors };
 }

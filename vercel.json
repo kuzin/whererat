@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/imdb-resync",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}
