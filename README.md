@@ -94,6 +94,7 @@ More database notes: [`db/README.md`](db/README.md).
 | `npm run db:seed` | Truncate seeded tables and load `db/seed.json` |
 | `npm run db:bootstrap` | Export seed → apply schema → seed |
 | `npm run db:clear:content` | Clear catalog/submissions/etc.; **keeps** existing `accounts` rows |
+| `npx tsx scripts/db-add-temp-content.ts` | Add temporary bulk content (~30 movies / few hundred sightings) directly to live tables for UI density checks |
 | `npm run media:migrate:uploads-to-s3` | Migrate legacy local uploads to S3 |
 
 ## Repo layout (high level)
@@ -111,7 +112,7 @@ More database notes: [`db/README.md`](db/README.md).
 
 Iterating on the **top bar** is easiest here:
 
-1. **`src/components/site-masthead.tsx`** — Structure, Tailwind classes for the bar (`sticky`, padding, blur), brand link hit area, inclusion of `ThemeDevToggle`.
+1. **`src/components/site-masthead.tsx`** — Structure, Tailwind classes for the bar (`sticky`, padding, blur), brand link hit area, top nav theme toggle placement.
 2. **`src/app/globals.css`** — Masthead chrome: `--wr-header-bg`, `--wr-header-border`, and logo mask colors `--wr-brand-mark`, `--wr-brand-wordmark` (both light `:root` and `.dark`).
 3. **`src/app/nav-links.tsx`** — Catalog / Submit / Moderate / Profile links and mobile drawer.
 4. **`public/brand/mark.svg`** & **`public/brand/logo.svg`** — Assets behind the CSS masks (see `.wr-brand-mark` / `.wr-brand-wordmark` in `globals.css`). Paths are exported from `src/lib/brand.ts` if you rename files.
@@ -133,3 +134,4 @@ Icons / PWA: favicon + manifest icons use **`SEEDED_MODERATOR_AVATAR_URL`** (`sr
 - Use **`.env.local`** for local overrides (never commit secrets).  
 - **OMDb** (`OMDB_API_KEY`) improves movie title search when set (`src/app/api/movies/search`).  
 - **`TMDB_*`** improves backdrops/lightbox stills on movie pages (`src/lib/tmdb-banner.ts`); catalog can be empty until you rebuild seed/data.
+- Temporary bulk data inserted by `scripts/db-add-temp-content.ts` uses IDs prefixed with `temp-livefill-` so it can be removed easily later.
