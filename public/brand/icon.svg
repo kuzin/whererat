@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Amber background -->
-  <rect width="512" height="512" rx="96" fill="#f59e0b"/>
+  <!-- Brand orange (matches --wr-cheese / mobile icon) -->
+  <rect width="512" height="512" rx="96" fill="#ea580c"/>
   <!-- Rat mark, scaled and centred -->
   <g transform="translate(79, 100) scale(1.0)" fill="#1c1917">
     <path d="M101.6,253.76l-34.72-.77c-5.64-.12-11.94-4.72-16.68-8.09C-3.2,206.98-14.36,129.21,18.46,72.66,34.52,45,59.21,24.26,88.26,11.48,110.25,2.85,132.33-.49,156.06.06c31.6.75,63.46,9.38,88.7,31.01-43.81-18.32-91.98-20.53-135.15-1.5C56.81,52.83,27.9,108.01,37.64,164.55c6.58,38.17,28.7,70.09,63.96,89.21Z"/>

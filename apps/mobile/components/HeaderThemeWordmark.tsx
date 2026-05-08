@@ -1,4 +1,4 @@
-import { Platform, Pressable } from "react-native";
+import { View } from "react-native";
 
 import { useTheme } from "../lib/theme";
 import { WhereRatWordmark } from "./WhereRatWordmark";
@@ -8,27 +8,22 @@ type Props = {
   wordmarkColor?: string;
 };
 
-/** Center header title: wordmark replaces screen title; tap toggles light/dark. */
+/** Center header title: wordmark replaces screen title (appearance is under Settings). */
 export function HeaderThemeWordmark({ wordmarkColor }: Props) {
-  const { colors, toggleTheme, mode } = useTheme();
+  const { colors } = useTheme();
   const markColor = wordmarkColor ?? colors.headerText;
-  const ripple =
-    Platform.OS === "android" ? { color: colors.headerBg, borderless: true as const } : undefined;
 
   return (
-    <Pressable
-      onPress={toggleTheme}
-      hitSlop={{ top: 12, bottom: 12, left: 16, right: 16 }}
-      accessibilityRole="button"
-      accessibilityLabel={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      android_ripple={ripple}
+    <View
       style={{
         height: 44,
         justifyContent: "center",
         alignItems: "center",
       }}
+      accessibilityRole="header"
+      accessibilityLabel="WhereRat"
     >
       <WhereRatWordmark color={markColor} height={24} />
-    </Pressable>
+    </View>
   );
 }

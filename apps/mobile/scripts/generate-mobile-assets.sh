@@ -6,9 +6,14 @@ MOBILE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 # apps/mobile → monorepo root
 REPO_ROOT="$(cd "$MOBILE_DIR/../.." && pwd)"
 
+# Match web `globals.css` --wr-cheese / favicon `icon.svg`
+BRAND_ORANGE_BG='#ea580c'
+
 RAT_SRC="${REPO_ROOT}/public/brand/rat.svg"
 ICON_OUT="${MOBILE_DIR}/assets/icon.png"
 SPLASH_OUT="${MOBILE_DIR}/assets/splash.png"
+# Cheese texture (source file in repo) — see assets/splash-source/SPLASH_IMAGE_LICENSE.txt
+SPLASH_SRC_JPEG="${MOBILE_DIR}/assets/splash-source/cheese-texture-shutterstock.jpg"
 
 if ! command -v magick >/dev/null 2>&1; then
   echo "Install ImageMagick (brew install imagemagick)" >&2
@@ -17,6 +22,10 @@ fi
 
 if [[ ! -f "$RAT_SRC" ]]; then
   echo "Missing rat mark: $RAT_SRC" >&2
+  exit 1
+fi
+if [[ ! -f "$SPLASH_SRC_JPEG" ]]; then
+  echo "Missing splash source JPEG: $SPLASH_SRC_JPEG" >&2
   exit 1
 fi
 
@@ -49,22 +58,17 @@ PY
 
 magick -density 360 -background none "$COMPOSITE_SVG" -resize 1024x1024 PNG32:"$ICON_OUT"
 
-echo "Generating cheese splash (1284×2778)…"
-magick -size 1284x2778 \( plasma:'#fef3c7-#f59e0b' -colorspace sRGB \) \
-  -blur 0x18 \
-  \( +clone -colorspace gray +noise Random -blur 0x1.2 \) \
-  -compose softlight -composite \
-  \( +clone -colorspace gray +noise Random -resize 60% -blur 0x8 -resize 167%! \) \
-  -compose multiply -composite \
-  -modulate 108,92,103 \
-  \( -size 1284x2778 xc:none \
-     -fill 'rgba(180,83,9,0.12)' -draw 'ellipse 320,400 45,35 0,360' \
-     -fill 'rgba(146,64,14,0.08)' -draw 'ellipse 900,1200 55,40 15,360' \
-     -fill 'rgba(217,119,6,0.1)' -draw 'ellipse 200,2100 50,38 -20,360' \
-     -fill 'rgba(180,83,9,0.11)' -draw 'ellipse 1000,2400 48,36 30,360' \
-     -blur 0x6 \
-  \) \
-  -compose over -composite \
+echo "Splash from cheese texture JPEG → 1284×2778 (cover + brand tint)…"
+# Landscape photo → portrait splash: fill frame, center-crop; light colorize toward brand orange.
+magick "$SPLASH_SRC_JPEG" \
+  -strip \
+  -colorspace sRGB \
+  -filter Lanczos \
+  -resize '1284x2778^' \
+  -gravity center \
+  -extent 1284x2778 \
+  -fill "${BRAND_ORANGE_BG}" \
+  -colorize 20 \
   PNG24:"$SPLASH_OUT"
 
 magick identify "$ICON_OUT" "$SPLASH_OUT"

@@ -1,6 +1,8 @@
 <resources>
-  <color name="splashscreen_background">#292524</color>
-  <color name="iconBackground">#292524</color>
+  <!-- Adaptive icon backdrop — match `app.json` → `expo.android.adaptiveIcon.backgroundColor`. -->
+  <color name="iconBackground">#ea580c</color>
+  <!-- Android splash backdrop — keep in sync with `app.json` -> `expo.splash.backgroundColor`. -->
+  <color name="splashscreen_background">#ea580c</color>
   <color name="colorPrimary">#023c69</color>
   <color name="colorPrimaryDark">#292524</color>
 </resources>

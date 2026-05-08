@@ -1,6 +1,6 @@
 import { Stack, router } from "expo-router";
 import { useMemo } from "react";
-import { Platform } from "react-native";
+import { Platform, type ViewStyle } from "react-native";
 
 import { stackMinimalHeaderLeft } from "../../lib/stackMinimalHeaderLeft";
 import { useTheme } from "../../lib/theme";
@@ -13,6 +13,20 @@ export default function InfoLayout() {
       headerStyle: { backgroundColor: colors.headerBg },
       headerTintColor: colors.accent,
       headerTitleStyle: { fontWeight: "800" as const, color: colors.text },
+      headerTitleAlign: "center" as const,
+      /** True center with back/chevron — same pattern as catalog wordmark header. */
+      headerTitleContainerStyle: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: "center",
+        justifyContent: "center",
+        marginHorizontal: 0,
+        maxWidth: "100%",
+        pointerEvents: "box-none",
+      } satisfies ViewStyle,
       /** Separator under the bar — scroll content reads clearer on solid `headerBg`. */
       headerShadowVisible: true,
       contentStyle: { backgroundColor: colors.background },

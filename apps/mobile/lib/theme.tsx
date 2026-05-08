@@ -10,10 +10,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { Appearance } from "react-native";
 
-const STORAGE_KEY = "@whererat/theme-mode";
+const THEME_PREF_KEY = "@whererat/theme-preference";
+/** Legacy key — migrated once to {@link THEME_PREF_KEY}. */
+const LEGACY_THEME_MODE_KEY = "@whererat/theme-mode";
 
 export type ThemeMode = "light" | "dark";
+
+/** User-facing choice; resolved appearance uses {@link ThemeMode} when not system. */
+export type ThemePreference = "light" | "dark" | "system";
 
 export type ThemeColors = {
   mode: ThemeMode;
@@ -163,47 +169,74 @@ function palette(mode: ThemeMode): ThemeColors {
   return mode === "dark" ? darkColors : lightColors;
 }
 
+function schemeToMode(scheme: string | null | undefined): ThemeMode {
+  return scheme === "dark" ? "dark" : "light";
+}
+
 type ThemeContextValue = {
+  /** Resolved light/dark used for colors and navigation chrome. */
   mode: ThemeMode;
+  themePreference: ThemePreference;
+  setThemePreference: (p: ThemePreference) => void;
   colors: ThemeColors;
-  toggleTheme: () => void;
-  setMode: (m: ThemeMode) => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>("dark");
+  const [themePreference, setThemePreferenceState] = useState<ThemePreference>("system");
+  const [systemMode, setSystemMode] = useState<ThemeMode>(() =>
+    schemeToMode(Appearance.getColorScheme()),
+  );
+
+  useEffect(() => {
+    const sub = Appearance.addChangeListener(({ colorScheme }) => {
+      setSystemMode(schemeToMode(colorScheme));
+    });
+    return () => sub.remove();
+  }, []);
 
   useEffect(() => {
     let alive = true;
-    AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+    void (async () => {
+      const storedPref = await AsyncStorage.getItem(THEME_PREF_KEY);
       if (!alive) return;
-      if (raw === "light" || raw === "dark") setModeState(raw);
-    });
+      if (storedPref === "light" || storedPref === "dark" || storedPref === "system") {
+        setThemePreferenceState(storedPref);
+        return;
+      }
+      const legacy = await AsyncStorage.getItem(LEGACY_THEME_MODE_KEY);
+      if (!alive) return;
+      if (legacy === "light" || legacy === "dark") {
+        setThemePreferenceState(legacy);
+        await AsyncStorage.setItem(THEME_PREF_KEY, legacy);
+      }
+    })();
     return () => {
       alive = false;
     };
   }, []);
 
-  const setMode = useCallback((m: ThemeMode) => {
-    setModeState(m);
-    void AsyncStorage.setItem(STORAGE_KEY, m);
+  const resolvedMode: ThemeMode = useMemo(
+    () => (themePreference === "system" ? systemMode : themePreference),
+    [themePreference, systemMode],
+  );
+
+  const setThemePreference = useCallback((p: ThemePreference) => {
+    setThemePreferenceState(p);
+    void AsyncStorage.setItem(THEME_PREF_KEY, p);
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setModeState((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      void AsyncStorage.setItem(STORAGE_KEY, next);
-      return next;
-    });
-  }, []);
-
-  const colors = useMemo(() => palette(mode), [mode]);
+  const colors = useMemo(() => palette(resolvedMode), [resolvedMode]);
 
   const value = useMemo(
-    () => ({ mode, colors, toggleTheme, setMode }),
-    [mode, colors, toggleTheme, setMode],
+    () => ({
+      mode: resolvedMode,
+      themePreference,
+      setThemePreference,
+      colors,
+    }),
+    [resolvedMode, themePreference, setThemePreference, colors],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

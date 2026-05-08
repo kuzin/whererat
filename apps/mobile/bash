@@ -1,0 +1,7 @@
+Android device/emulator already connected.
+env: load .env
+env: export EXPO_PUBLIC_API_BASE_URL
+› Skipping dev server
+› Building app...
+Starting a Gradle Daemon, 1 stopped Daemon could not be reused, use --status for details
+Configuration on demand is an incubating feature.

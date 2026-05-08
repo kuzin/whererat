@@ -1,9 +1,49 @@
+import Constants from "expo-constants";
+import { Platform } from "react-native";
+
 import type { CatalogResponse, MovieDetailResponse } from "./types";
+
+/**
+ * Android emulator: `localhost` / `127.0.0.1` refer to the emulator itself, not your dev machine.
+ * Rewrite to `10.0.2.2` only when running on the **emulator** (`Constants.isDevice === false`).
+ * Physical devices keep the URL — use your computer's LAN IP in EXPO_PUBLIC_API_BASE_URL.
+ */
+function normalizeDevApiOrigin(raw: string): string {
+  let base = raw.replace(/\/$/, "");
+  if (Platform.OS !== "android") return base;
+  if (Constants.isDevice) return base;
+  try {
+    const u = new URL(base);
+    const h = u.hostname.replace(/^\[|\]$/g, "").toLowerCase();
+    if (h === "localhost" || h === "127.0.0.1" || h === "::1") {
+      u.hostname = "10.0.2.2";
+      return u.toString().replace(/\/$/, "");
+    }
+  } catch {
+    return base;
+  }
+  return base;
+}
 
 function baseUrl(): string {
   const raw = process.env.EXPO_PUBLIC_API_BASE_URL?.trim();
-  if (raw) return raw.replace(/\/$/, "");
+  if (raw) return normalizeDevApiOrigin(raw);
   return "https://whererat.com";
+}
+
+/** User-facing copy when `fetch` fails (e.g. RN's "Network request failed"). */
+export function formatApiError(e: unknown): string {
+  const raw = e instanceof Error ? e.message : String(e);
+  const networkFailed =
+    raw === "Network request failed" ||
+    raw.includes("Failed to fetch") ||
+    /network request failed/i.test(raw);
+  if (networkFailed) {
+    return Platform.OS === "android"
+      ? "Couldn’t reach the server. Emulator maps localhost→your PC automatically; on a physical phone use your computer’s LAN IP in EXPO_PUBLIC_API_BASE_URL."
+      : "Couldn’t reach the server. Check your connection and EXPO_PUBLIC_API_BASE_URL.";
+  }
+  return raw;
 }
 
 async function getJson<T>(path: string): Promise<T> {

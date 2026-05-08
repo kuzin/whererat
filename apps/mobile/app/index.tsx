@@ -18,8 +18,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AppToast } from "../components/AppToast";
 import { EmptyStateCard } from "../components/EmptyStateCard";
-import { fetchCatalogPage } from "../lib/api";
+import { fetchCatalogPage, formatApiError } from "../lib/api";
+import { useOptionalBottomTabBarHeight } from "../lib/useOptionalBottomTabBarHeight";
 import { mixTowardHex } from "../lib/posterTone";
 import { type ThemeColors, useTheme } from "../lib/theme";
 import type { CatalogMovieRow, CatalogResponse, CatalogSort } from "../lib/types";
@@ -303,23 +305,6 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
     rowRatingIcon: { color: colors.accent },
     chevron: { color: colors.textMuted, fontSize: 28, fontWeight: "200" },
     center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 40 },
-    banner: {
-      marginHorizontal: INSET_X,
-      marginBottom: SPACE_Y,
-      padding: SPACE_Y,
-      borderRadius: 10,
-      backgroundColor: colors.dangerBg,
-      gap: 8,
-    },
-    bannerText: { color: colors.dangerText },
-    retryBtn: {
-      alignSelf: "flex-start",
-      backgroundColor: colors.accent,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 8,
-    },
-    retryText: { color: colors.retryOnAccent, fontWeight: "700" },
     pager: {
       flexDirection: "row",
       alignItems: "center",
@@ -564,8 +549,15 @@ export default function CatalogScreen() {
 
   useEffect(() => {
     if (params.success !== "1") return;
+    /** Opening modal only — `router.replace("/")` here clears params immediately and can remount catalog state before `successPreviewOpen` sticks (modal never appears). Strip params when the user dismisses instead. */
     setSuccessPreviewOpen(true);
-    router.replace("/");
+  }, [params.success]);
+
+  const dismissSuccessPreview = useCallback(() => {
+    setSuccessPreviewOpen(false);
+    if (params.success === "1") {
+      router.replace("/");
+    }
   }, [params.success]);
 
   const load = useCallback(async () => {
@@ -579,7 +571,7 @@ export default function CatalogScreen() {
       });
       setData(res);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load catalog.");
+      setError(formatApiError(e));
     } finally {
       setLoading(false);
     }
@@ -626,6 +618,9 @@ export default function CatalogScreen() {
   const sortLabel = SORT_OPTIONS.find((o) => o.value === sort)?.label ?? sort;
 
   const catalogSearchHasText = queryInput.length > 0;
+
+  const tabBarHeight = useOptionalBottomTabBarHeight();
+  const toastBottom = tabBarHeight + Math.max(insets.bottom, 10);
 
   return (
     <View style={styles.screen}>
@@ -735,12 +730,12 @@ export default function CatalogScreen() {
         visible={successPreviewOpen}
         transparent
         animationType="fade"
-        onRequestClose={() => setSuccessPreviewOpen(false)}
+        onRequestClose={dismissSuccessPreview}
       >
         <View style={styles.modalRoot}>
           <Pressable
             style={styles.successBackdrop}
-            onPress={() => setSuccessPreviewOpen(false)}
+            onPress={dismissSuccessPreview}
             accessibilityRole="button"
             accessibilityLabel="Dismiss success message"
           />
@@ -753,7 +748,7 @@ export default function CatalogScreen() {
               </Text>
               <Pressable
                 style={styles.successBtnPrimary}
-                onPress={() => setSuccessPreviewOpen(false)}
+                onPress={dismissSuccessPreview}
                 accessibilityRole="button"
                 accessibilityLabel="Done"
               >
@@ -763,15 +758,6 @@ export default function CatalogScreen() {
           </View>
         </View>
       </Modal>
-
-      {error ? (
-        <View style={styles.banner}>
-          <Text style={styles.bannerText}>{error}</Text>
-          <Pressable onPress={() => void load()} style={styles.retryBtn}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : null}
 
       {loading && !data ? (
         <View style={styles.center}>
@@ -851,6 +837,13 @@ export default function CatalogScreen() {
           </Pressable>
         </View>
       ) : null}
+
+      <AppToast
+        message={error}
+        onDismiss={() => setError(null)}
+        bottomOffset={toastBottom}
+        action={{ label: "Retry", onPress: () => void load() }}
+      />
     </View>
   );
 }

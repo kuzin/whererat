@@ -17,12 +17,15 @@ import {
   View,
 } from "react-native";
 
+import { AppToast } from "./AppToast";
 import { AppTextInput } from "./AppTextInput";
 import {
   fetchImdbMovieSearch,
+  formatApiError,
   type ImdbMovieSearchResult,
   postSightingSubmission,
 } from "../lib/api";
+import { useOptionalBottomTabBarHeight } from "../lib/useOptionalBottomTabBarHeight";
 import { contrastingForeground } from "../lib/posterTone";
 import { type ThemeColors, useTheme } from "../lib/theme";
 import Markdown from "react-native-markdown-display";
@@ -468,18 +471,6 @@ function createFormStyles(colors: ThemeColors) {
       paddingRight: SPACE.md,
     },
     toggleHint: { color: colors.textMuted, fontSize: 12, lineHeight: 16 },
-    errorBanner: {
-      padding: 12,
-      borderRadius: 10,
-      backgroundColor: colors.dangerBg,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.inputBorder,
-    },
-    errorText: {
-      color: colors.dangerText,
-      fontSize: 13,
-      fontWeight: "600",
-    },
     formIntroCard: { gap: SPACE.xs, paddingTop: SPACE.sm },
     formIntroTitle: {
       color: colors.text,
@@ -524,6 +515,8 @@ export function LogSightingForm() {
     posterUrl?: string;
   }>();
   const insets = useSafeAreaInsets();
+  const tabBarH = useOptionalBottomTabBarHeight();
+  const toastBottom = tabBarH + Math.max(insets.bottom, 10);
   const headerOffset = useContext(HeaderHeightContext) ?? 0;
   const styles = useMemo(() => createFormStyles(colors), [colors]);
 
@@ -797,8 +790,7 @@ export function LogSightingForm() {
       clearMovie();
       router.replace({ pathname: "/", params: { success: "1" } });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Submission failed.";
-      setFormError(msg);
+      setFormError(formatApiError(e));
     } finally {
       setSubmitting(false);
     }
@@ -870,12 +862,6 @@ export function LogSightingForm() {
         </Text>
       </View>
       <View style={styles.formStartDivider} />
-
-      {formError ? (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{formError}</Text>
-        </View>
-      ) : null}
 
       <View style={styles.formSection}>
         {!(imdbId && selectedHit) ? (
@@ -1246,6 +1232,12 @@ export function LogSightingForm() {
           )}
         </Pressable>
       </View>
+
+      <AppToast
+        message={formError}
+        onDismiss={() => setFormError(null)}
+        bottomOffset={toastBottom}
+      />
     </View>
     </KeyboardAvoidingView>
   );

@@ -101,7 +101,7 @@ const layout = StyleSheet.create({
     alignItems: "center",
     padding: 0,
     marginVertical: 0,
-    marginHorizontal: Platform.OS === "android" ? 4 : 0,
+    marginHorizontal: 0,
     alignSelf: "center",
   },
   pressedIos: { opacity: 0.42 },

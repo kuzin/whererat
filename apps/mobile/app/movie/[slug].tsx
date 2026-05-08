@@ -2,9 +2,11 @@ import { openURL } from "expo-linking";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
+import { HeaderHeightContext } from "@react-navigation/elements";
 import { Stack, router, useLocalSearchParams, useNavigation } from "expo-router";
 import {
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -24,10 +26,11 @@ import {
   View,
 } from "react-native";
 
+import { AppToast } from "../../components/AppToast";
 import { EmptyStateCard } from "../../components/EmptyStateCard";
 import { HeaderThemeWordmark } from "../../components/HeaderThemeWordmark";
 import { SightingCard } from "../../components/SightingCard";
-import { fetchMovieDetail } from "../../lib/api";
+import { fetchMovieDetail, formatApiError } from "../../lib/api";
 import { stackMinimalHeaderLeft } from "../../lib/stackMinimalHeaderLeft";
 import { extractChromeFromPosterUri } from "../../lib/posterChromeFromImage";
 import {
@@ -125,7 +128,16 @@ const MEDIA_LIGHTBOX = {
   closeIcon: "#f5f5f4",
 } as const;
 
-function createMovieStyles(colors: ThemeColors) {
+/** iOS movie hero: fixed inset below transparent header (long-standing catalog layout feel). */
+const IOS_MOVIE_HERO_TOP_INSET_PX = 136;
+
+/** Android only — gap under toolbar when deriving inset from measured bar height + safe area. */
+const HERO_UNDER_TOOLBAR_GAP_ANDROID_PX = 28;
+
+/** Android only — min toolbar height when measurement missing or unreliable. */
+const HERO_MIN_TOOLBAR_FALLBACK_ANDROID_PX = 58;
+
+function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
   const surface = colors.headerBg;
   /** Label/icon on poster-tinted `chipActive` (selected sheet rows, media segment). */
   const fgOnChip = contrastingForeground(colors.chipActive);
@@ -135,7 +147,6 @@ function createMovieStyles(colors: ThemeColors) {
     colors.panel,
     colors.mode === "dark" ? 0.22 : 0.072,
   );
-  const heroTopInset = Platform.OS === "ios" ? 136 : 28;
 
   return StyleSheet.create({
     screen: { flex: 1, backgroundColor: surface },
@@ -296,14 +307,6 @@ function createMovieStyles(colors: ThemeColors) {
       flexDirection: "row",
       paddingHorizontal: 10,
     },
-    softBanner: {
-      alignSelf: "stretch",
-      marginBottom: 0,
-      padding: 10,
-      borderRadius: 8,
-      backgroundColor: colors.dangerBg,
-    },
-    softBannerText: { color: colors.dangerText, fontSize: 14 },
     tabChip: {
       borderRadius: 0,
       paddingHorizontal: 14,
@@ -1153,6 +1156,7 @@ export default function MovieScreen() {
 
   const { width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const measuredHeaderHeight = useContext(HeaderHeightContext);
   const [mediaSegment, setMediaSegment] = useState<"stills" | "videos">("stills");
   const [mediaLightboxIndex, setMediaLightboxIndex] = useState<number | null>(null);
 
@@ -1224,7 +1228,7 @@ export default function MovieScreen() {
       headerTitleAlign: "center",
       headerTitle: () => <HeaderThemeWordmark wordmarkColor={movieBar?.fg} />,
       headerStyle: { backgroundColor: "transparent" },
-      headerTransparent: Platform.OS === "ios",
+      headerTransparent: true,
       headerTintColor: fgChrome,
       headerShadowVisible: false,
       headerBackButtonDisplayMode: "minimal",
@@ -1251,7 +1255,21 @@ export default function MovieScreen() {
     movieThemeColors.statusBarStyle,
   ]);
 
-  const styles = useMemo(() => createMovieStyles(movieThemeColors), [movieThemeColors]);
+  const heroTopInset = useMemo(() => {
+    if (Platform.OS === "ios") {
+      return IOS_MOVIE_HERO_TOP_INSET_PX;
+    }
+    const minBar = HERO_MIN_TOOLBAR_FALLBACK_ANDROID_PX;
+    const measured = measuredHeaderHeight;
+    const plausible = measured != null && measured >= minBar * 0.55;
+    const barH = plausible ? Math.max(measured, minBar) : minBar;
+    return Math.round(insets.top + barH + HERO_UNDER_TOOLBAR_GAP_ANDROID_PX);
+  }, [insets.top, measuredHeaderHeight]);
+
+  const styles = useMemo(
+    () => createMovieStyles(movieThemeColors, heroTopInset),
+    [movieThemeColors, heroTopInset],
+  );
   const sightingCardSurface = useMemo(() => {
     if (movieThemeColors.mode !== "dark") return undefined;
     return mixTowardHex(movieThemeColors.headerBg, movieThemeColors.panel, 0.42);
@@ -1289,7 +1307,7 @@ export default function MovieScreen() {
       });
     } catch (e) {
       if (decodeURIComponent(slug).trim() === slugSnap && sightSort === sortSnap) {
-        setError(e instanceof Error ? e.message : "Could not load movie.");
+        setError(formatApiError(e));
         setData(null);
         setSightings([]);
         setSightPageMeta({ page: 1, pageCount: 1, totalCount: 0 });
@@ -1372,7 +1390,7 @@ export default function MovieScreen() {
         totalCount: res.featuredRats.totalCount,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load more sightings.");
+      setError(formatApiError(e));
     } finally {
       setLoadingMoreSightings(false);
     }
@@ -1427,11 +1445,12 @@ export default function MovieScreen() {
       ) : null}
 
       {error && !data ? (
-        <View style={styles.center}>
-          <Text style={styles.errorText}>{error}</Text>
-          <Pressable style={styles.primaryBtn} onPress={() => void load()}>
-            <Text style={styles.primaryBtnText}>Retry</Text>
-          </Pressable>
+        <View style={[styles.center, { flex: 1 }]}>
+          <EmptyStateCard
+            colors={colors}
+            title="Couldn’t load this title"
+            body="Check your connection, then try again. You can also pull to refresh once the page opens."
+          />
         </View>
       ) : null}
 
@@ -1508,12 +1527,6 @@ export default function MovieScreen() {
               <View
                 style={[styles.scrollBodyPanel, tabStickyChromeVisible && styles.scrollBodyPanelTightTop]}
               >
-              {error ? (
-                <View style={styles.softBanner}>
-                  <Text style={styles.softBannerText}>{error}</Text>
-                </View>
-              ) : null}
-
               {tab === "sightings" && featured ? (
                 <SightingsSection
                   sightings={sightings}
@@ -1930,6 +1943,13 @@ export default function MovieScreen() {
           </View>
         </View>
       </Modal>
+
+      <AppToast
+        message={error}
+        onDismiss={() => setError(null)}
+        bottomOffset={Math.max(insets.bottom, 12) + 8}
+        action={{ label: "Retry", onPress: () => void load() }}
+      />
     </>
   );
 }

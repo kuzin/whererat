@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Platform, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import {
+  HEADER_TOOLBAR_EDGE_INSET_ANDROID,
   HEADER_TOOLBAR_HIT_PX,
   HEADER_TOOLBAR_ICON,
   HEADER_TOOLBAR_ICON_PX,
@@ -10,15 +11,20 @@ import {
 import { useTheme } from "../lib/theme";
 import { InfoMenuHeaderButton } from "./InfoMenuHeaderButton";
 
-/** Mirrors settings trailing inset on catalog so the logo stays visually centered (Android edge padding). */
-const EDGE_PAD = Platform.select<number>({ ios: 0, default: 16 }) ?? 16;
+/** Leading / trailing inset for catalog toolbar (Android only — native bar insets on iOS). */
+const EDGE_PAD = HEADER_TOOLBAR_EDGE_INSET_ANDROID;
 
 /** Catalog home — leading “log a sighting” control. */
 export function CatalogHeaderLogSightingLeading() {
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.slotOuter, { paddingLeft: EDGE_PAD, height: HEADER_TOOLBAR_HIT_PX }]}>
+    <View
+      style={[
+        styles.slotOuter,
+        { paddingLeft: EDGE_PAD, height: HEADER_TOOLBAR_HIT_PX },
+      ]}
+    >
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Log a sighting"
@@ -58,7 +64,7 @@ export function CatalogHeaderLogSightingLeading() {
 /** Catalog home — trailing settings only. */
 export function CatalogHeaderSettingsTrailing() {
   return (
-    <View style={Platform.OS === "android" ? { paddingRight: EDGE_PAD } : undefined}>
+    <View style={EDGE_PAD > 0 ? { paddingRight: EDGE_PAD } : undefined}>
       <InfoMenuHeaderButton />
     </View>
   );

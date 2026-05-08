@@ -8,6 +8,7 @@ import { Stack, useRouter } from "expo-router";
 import { useMemo } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Platform, StyleSheet, type ViewStyle } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
   CatalogHeaderLogSightingLeading,
@@ -61,6 +62,19 @@ function RootNavigator() {
     () => ({
       headerTitle: "Log a Sighting",
       headerTitleStyle: { fontWeight: "700" as const, color: colors.text },
+      headerTitleAlign: "center" as const,
+      headerTitleContainerStyle: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: "center",
+        justifyContent: "center",
+        marginHorizontal: 0,
+        maxWidth: "100%",
+        pointerEvents: "box-none",
+      } satisfies ViewStyle,
       /** Custom control — avoids UIKit’s glass-styled system back affordance on iOS 26+. */
       headerLeft: stackMinimalHeaderLeft(() => router.back()),
     }),
@@ -107,9 +121,11 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootNavigator />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <RootNavigator />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 

@@ -5,19 +5,16 @@ import { Platform, StyleSheet, View, type ViewStyle } from "react-native";
 
 import { HeaderThemeWordmark } from "../../components/HeaderThemeWordmark";
 import { InfoMenuHeaderButton } from "../../components/InfoMenuHeaderButton";
+import { HEADER_TOOLBAR_EDGE_INSET_ANDROID } from "../../lib/headerToolbarChrome";
 import { useTheme } from "../../lib/theme";
 
 /** Matches `InfoMenuHeaderButton` tap target width. */
 const TAB_HEADER_ACTION_W = 44;
 /**
- * Trailing padding for the settings control. iOS navigation chrome already insets bar-button
- * content — adding catalog edge inset again kept the cog visibly left of catalog search.
+ * Trailing padding for the settings control. iOS: native insets only. Android: small extra
+ * inset so the cog isn’t flush to the edge; matches {@link HEADER_TOOLBAR_EDGE_INSET_ANDROID}.
  */
-const TAB_HEADER_COG_TRAILING_PAD =
-  Platform.select<number>({
-    ios: 0,
-    default: 16,
-  }) ?? 16;
+const TAB_HEADER_COG_TRAILING_PAD = HEADER_TOOLBAR_EDGE_INSET_ANDROID;
 /** Same occupied width as trailing slot so Header’s flex doesn’t widen `end` vs empty `start`. */
 const TAB_HEADER_SIDE_MIRROR_W = TAB_HEADER_ACTION_W + TAB_HEADER_COG_TRAILING_PAD;
 
