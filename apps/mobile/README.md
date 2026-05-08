@@ -19,7 +19,10 @@ Copy the mobile template and point at production or local Next:
 cp .env.example .env
 ```
 
-When unset, the app defaults to `https://whererat.com`.
+Resolution rules:
+
+- **Dev/local builds** (`__DEV__ === true`): defaults to `http://localhost:3000` (Android emulator auto-maps localhost to `10.0.2.2`). You can override with `EXPO_PUBLIC_API_BASE_URL` for LAN device testing.
+- **Production/release builds**: always uses `https://whererat.com` (ignores `EXPO_PUBLIC_API_BASE_URL`).
 
 ### Local device against dev machine
 

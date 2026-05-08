@@ -26,9 +26,14 @@ function normalizeDevApiOrigin(raw: string): string {
 }
 
 function baseUrl(): string {
+  // Production/release builds should always hit live API.
+  if (!__DEV__) return "https://whererat.com";
+
+  // Local/dev builds default to localhost API, with optional env override
+  // for physical-device testing on LAN.
   const raw = process.env.EXPO_PUBLIC_API_BASE_URL?.trim();
   if (raw) return normalizeDevApiOrigin(raw);
-  return "https://whererat.com";
+  return normalizeDevApiOrigin("http://localhost:3000");
 }
 
 /** User-facing copy when `fetch` fails (e.g. RN's "Network request failed"). */
