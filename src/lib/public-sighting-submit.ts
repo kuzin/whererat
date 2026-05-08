@@ -87,6 +87,11 @@ export async function executePublicSightingSubmit(
     const movieTitle = selectedMovieTitle;
     const imdbId = normalizeImdbId(String(formData.get("imdbId") ?? ""));
     const movieYear = Number(formData.get("movieYear") || "");
+    const imdbKindRaw = String(formData.get("imdbKind") ?? "").trim().toLowerCase();
+    const imdbKind = imdbKindRaw === "series" ? "series" : "movie";
+    const seasonNumberRaw = Number.parseInt(String(formData.get("seasonNumber") ?? "").trim(), 10);
+    const episodeNumberRaw = Number.parseInt(String(formData.get("episodeNumber") ?? "").trim(), 10);
+    const episodeTitle = String(formData.get("episodeTitle") ?? "").trim();
     const moviePosterUrl = String(formData.get("moviePosterUrl") || "").trim();
     const sightingTitle = String(formData.get("sightingTitle") ?? "").trim();
     const timestamp = normalizeSightingTimestampInput(String(formData.get("timestamp") ?? ""));
@@ -103,6 +108,17 @@ export async function executePublicSightingSubmit(
     if (!imdbId) {
       return { ok: false, code: "no-imdb" };
     }
+    const seasonNumber =
+      imdbKind === "series" && Number.isFinite(seasonNumberRaw) && seasonNumberRaw >= 1
+        ? seasonNumberRaw
+        : undefined;
+    const episodeNumber =
+      imdbKind === "series" && Number.isFinite(episodeNumberRaw) && episodeNumberRaw >= 1
+        ? episodeNumberRaw
+        : undefined;
+    if (imdbKind === "series" && (!seasonNumber || !episodeNumber)) {
+      return { ok: false, code: "missing", message: "Season and episode are required for shows." };
+    }
 
     const existingMovie =
       (imdbId ? await getCatalogMovieByImdbId(imdbId) : undefined) ??
@@ -115,6 +131,10 @@ export async function executePublicSightingSubmit(
       movieTitle,
       movieYear: Number.isFinite(movieYear) ? movieYear : undefined,
       imdbId: imdbId || undefined,
+      imdbKind,
+      seasonNumber,
+      episodeNumber,
+      episodeTitle: episodeTitle || undefined,
       timestamp,
       title: sightingTitle,
       description,

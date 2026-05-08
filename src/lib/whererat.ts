@@ -50,6 +50,7 @@ export type SceneType =
 export type Confidence = "needs-source" | "likely" | "verified";
 export type VerificationState = "verified" | "pending" | "rejected";
 export type SubmissionStatus = "pending" | "approved" | "rejected";
+export type ImdbTitleKind = "movie" | "series";
 
 export const MOVIE_SIGHTINGS_PAGE_SIZE = 10;
 
@@ -58,6 +59,7 @@ export const movieSightingsSortOptions = [
   "rats",
   "appearance-early",
   "appearance-late",
+  "episode",
 ] as const;
 
 export type MovieSightingsSortOption = (typeof movieSightingsSortOptions)[number];
@@ -67,7 +69,15 @@ export const movieSightingsSortLabels: Record<MovieSightingsSortOption, string> 
   rats: "Most rats (est.)",
   "appearance-early": "Earliest in film",
   "appearance-late": "Latest in film",
+  episode: "Episode order",
 };
+
+export function getMovieSightingsSortOptions(isSeries: boolean): MovieSightingsSortOption[] {
+  if (isSeries) {
+    return ["newest", "rats", "episode"];
+  }
+  return ["newest", "rats", "appearance-early", "appearance-late"];
+}
 
 export type Movie = {
   id: string;
@@ -191,6 +201,11 @@ export type Sighting = {
   submitterName?: string;
   /** ISO timestamp from moderator review when promoted from an approved submission (for sorting). */
   submissionReviewedAtISO?: string;
+  /** IMDb kind + episodic context for series submissions. */
+  imdbKind?: ImdbTitleKind;
+  seasonNumber?: number;
+  episodeNumber?: number;
+  episodeTitle?: string;
 };
 
 export function clampApproximateRatCount(value: unknown): number {
@@ -209,6 +224,10 @@ export type Submission = {
   movieTitle: string;
   movieYear?: number;
   imdbId?: string;
+  imdbKind?: ImdbTitleKind;
+  seasonNumber?: number;
+  episodeNumber?: number;
+  episodeTitle?: string;
   /** Submission moment, stored as percent (e.g. "42%") or legacy timecode. */
   timestamp: string;
   /** Sighting headline shown on the movie page when promoted to the catalog. */
@@ -230,6 +249,19 @@ export type Submission = {
   images?: SightingImageSlot[];
   moviePosterUrl?: string;
 };
+
+export function formatSubmissionEpisodeContext(submission: Pick<
+  Submission,
+  "imdbKind" | "seasonNumber" | "episodeNumber" | "episodeTitle"
+>): string | undefined {
+  if (submission.imdbKind !== "series") return undefined;
+  const s = submission.seasonNumber;
+  const e = submission.episodeNumber;
+  if (!Number.isFinite(s) || !Number.isFinite(e) || !s || !e) return undefined;
+  const base = `S${s}E${e}`;
+  const title = submission.episodeTitle?.trim();
+  return title ? `${base} · ${title}` : base;
+}
 
 export type ReviewAction = {
   id: string;
@@ -420,6 +452,21 @@ export function formatSightingStartingTimeDisplay(sighting: Sighting): string {
   return formatColonTimecodeDisplay(sighting.timestamp);
 }
 
+export function formatSightingEpisodeContext(
+  sighting: Pick<
+    Sighting,
+    "imdbKind" | "seasonNumber" | "episodeNumber" | "episodeTitle"
+  >,
+): string | undefined {
+  if (sighting.imdbKind !== "series") return undefined;
+  const s = sighting.seasonNumber;
+  const e = sighting.episodeNumber;
+  if (!Number.isFinite(s) || !Number.isFinite(e) || !s || !e) return undefined;
+  const code = `S${s}E${e}`;
+  const title = sighting.episodeTitle?.trim();
+  return title ? `${code} · ${title}` : code;
+}
+
 /** @deprecated Use {@link formatSightingStartingTimeDisplay}. */
 export function formatSightingTimecodeDisplay(sighting: Sighting): string {
   return formatSightingStartingTimeDisplay(sighting);
@@ -555,6 +602,18 @@ function sightingAppearanceSortValue(
   return seconds;
 }
 
+function sightingEpisodeSortValue(
+  sighting: Pick<Sighting, "seasonNumber" | "episodeNumber">,
+): number {
+  const season = Number.isFinite(sighting.seasonNumber)
+    ? Math.max(0, Math.floor(sighting.seasonNumber as number))
+    : 0;
+  const episode = Number.isFinite(sighting.episodeNumber)
+    ? Math.max(0, Math.floor(sighting.episodeNumber as number))
+    : 0;
+  return season * 10_000 + episode;
+}
+
 export function parseMovieSightingsSortParam(
   value: string | undefined,
 ): MovieSightingsSortOption {
@@ -562,7 +621,8 @@ export function parseMovieSightingsSortParam(
     value === "rats" ||
     value === "newest" ||
     value === "appearance-early" ||
-    value === "appearance-late"
+    value === "appearance-late" ||
+    value === "episode"
   ) {
     return value;
   }
@@ -645,6 +705,16 @@ export function prepareMovieSightingsView({
           sightingAppearanceSortValue(b, runtimeMinutes) -
           sightingAppearanceSortValue(a, runtimeMinutes),
       );
+      break;
+    case "episode":
+      ordered.sort((a, b) => {
+        const de = sightingEpisodeSortValue(a) - sightingEpisodeSortValue(b);
+        if (de !== 0) return de;
+        return (
+          sightingAppearanceSortValue(a, runtimeMinutes) -
+          sightingAppearanceSortValue(b, runtimeMinutes)
+        );
+      });
       break;
     default:
       break;

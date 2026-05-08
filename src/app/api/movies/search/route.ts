@@ -6,13 +6,18 @@ import { getCatalogMovies } from "@/lib/movie-catalog";
 type MovieSearchResult = {
   title: string;
   year: string;
+  yearRange?: string;
   imdbId: string;
+  kind: "movie" | "series";
   posterUrl: string;
   runtime?: string;
   genre?: string;
   rating?: string;
+  imdbRating?: string;
   plot?: string;
   source: "OMDb" | "Seed";
+  totalSeasons?: number;
+  totalEpisodes?: number;
 };
 
 type OmdbSearchItem = {
@@ -31,7 +36,10 @@ type OmdbDetails = {
   Runtime?: string;
   Genre?: string;
   Rated?: string;
+  imdbRating?: string;
   Plot?: string;
+  Type?: string;
+  totalSeasons?: string;
   Response: "True" | "False";
 };
 
@@ -41,15 +49,38 @@ type OmdbSearchPayload = {
   Error?: string;
 };
 
-const FALLBACK_POSTER =
-  "https://placehold.co/600x900/292524/fef3c7/png?text=IMDb+Title";
-
 function posterOrFallback(poster: string | undefined) {
-  return poster && poster !== "N/A" ? poster : FALLBACK_POSTER;
+  return poster && poster !== "N/A" ? poster : "";
 }
 
 function normalizeSearchTerm(value: string) {
   return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function readSeriesYearRange(snapshot: Record<string, unknown> | undefined): string | undefined {
+  const raw =
+    typeof snapshot?.Year === "string"
+      ? snapshot.Year
+      : typeof snapshot?.year === "string"
+        ? snapshot.year
+        : "";
+  const cleaned = raw.trim();
+  if (!cleaned) return undefined;
+  return cleaned.replace("-", "–");
+}
+
+function readSeriesTotalSeasons(snapshot: Record<string, unknown> | undefined): number | undefined {
+  const raw = snapshot?.totalSeasons ?? snapshot?.TotalSeasons;
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return n;
+}
+
+function readSeriesTotalEpisodes(snapshot: Record<string, unknown> | undefined): number | undefined {
+  const raw = snapshot?.totalEpisodes ?? snapshot?.TotalEpisodes ?? snapshot?.episodeCount;
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return n;
 }
 
 function searchSeedCatalog(
@@ -67,17 +98,30 @@ function searchSeedCatalog(
       return normalizedLabel.includes(normalizedQuery);
     })
     .slice(0, 8)
-    .map((movie) => ({
-      title: movie.title,
-      year: String(movie.releaseYear),
-      imdbId: movie.externalIds.imdb,
-      posterUrl: movie.posterUrl,
-      runtime: `${movie.runtimeMinutes} min`,
-      genre: movie.genres.join(", "),
-      rating: movie.metadata.rating,
-      plot: movie.summary,
-      source: "Seed",
-    }));
+    .map((movie) => {
+      const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
+      const typeRaw =
+        typeof syncSnapshot?.Type === "string"
+          ? syncSnapshot.Type.trim().toLowerCase()
+          : "";
+      const kind = typeRaw === "series" ? "series" : "movie";
+      return {
+        title: movie.title,
+        year: String(movie.releaseYear),
+        yearRange: kind === "series" ? readSeriesYearRange(syncSnapshot) : undefined,
+        imdbId: movie.externalIds.imdb,
+        kind,
+        posterUrl: movie.posterUrl,
+        runtime: kind === "movie" ? `${movie.runtimeMinutes} min` : undefined,
+        genre: movie.genres.join(", "),
+        rating: movie.metadata.rating,
+        imdbRating: movie.metadata.imdbRating || undefined,
+        plot: movie.summary,
+        source: "Seed",
+        totalSeasons: kind === "series" ? readSeriesTotalSeasons(syncSnapshot) : undefined,
+        totalEpisodes: kind === "series" ? readSeriesTotalEpisodes(syncSnapshot) : undefined,
+      };
+    });
 }
 
 async function fetchOmdbDetails(imdbId: string, apiKey: string) {
@@ -105,7 +149,6 @@ async function fetchOmdbSearch(query: string, apiKey: string, page = 1) {
   const searchUrl = new URL("https://www.omdbapi.com/");
   searchUrl.searchParams.set("apikey", apiKey);
   searchUrl.searchParams.set("s", query);
-  searchUrl.searchParams.set("type", "movie");
   if (page > 1) searchUrl.searchParams.set("page", String(page));
 
   const response = await fetch(searchUrl, { next: { revalidate: 60 * 60 } });
@@ -241,9 +284,10 @@ export async function GET(request: Request) {
     });
   }
 
-  const filteredItems = searchItems.filter(
-    (item) => !deletedImdbIds.has(item.imdbID.toLowerCase()),
-  );
+  const filteredItems = searchItems.filter((item) => {
+    if (deletedImdbIds.has(item.imdbID.toLowerCase())) return false;
+    return item.Type === "movie" || item.Type === "series";
+  });
   // OMDb returns up to 10 per page; if we got a full page there are likely more
   const hasMore = searchItems.length === 10;
   const visibleItems = filteredItems.slice(0, 10);
@@ -258,13 +302,27 @@ export async function GET(request: Request) {
       return {
         title: itemDetails?.Title ?? item.Title,
         year: itemDetails?.Year ?? item.Year,
+        yearRange:
+          (itemDetails?.Type ?? item.Type)?.toLowerCase() === "series"
+            ? (itemDetails?.Year ?? item.Year).replace("-", "–")
+            : undefined,
         imdbId: itemDetails?.imdbID ?? item.imdbID,
+        kind:
+          (itemDetails?.Type ?? item.Type)?.toLowerCase() === "series"
+            ? "series"
+            : "movie",
         posterUrl: posterOrFallback(itemDetails?.Poster ?? item.Poster),
         runtime: itemDetails?.Runtime,
         genre: itemDetails?.Genre,
         rating: itemDetails?.Rated,
+        imdbRating:
+          itemDetails?.imdbRating && itemDetails.imdbRating !== "N/A"
+            ? itemDetails.imdbRating
+            : undefined,
         plot: itemDetails?.Plot,
         source: "OMDb",
+        totalSeasons: Number.parseInt(itemDetails?.totalSeasons ?? "", 10) || undefined,
+        totalEpisodes: undefined,
       };
     },
   );

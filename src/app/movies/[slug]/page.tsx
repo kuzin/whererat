@@ -35,6 +35,7 @@ import {
   parseMovieSightingsPageParam,
   parseMovieSightingsSortParam,
   prepareMovieSightingsView,
+  getMovieSightingsSortOptions,
   splitImdbCreditSegments,
   type Movie,
 } from "@/lib/whererat";
@@ -77,17 +78,94 @@ export async function generateMetadata({
   };
 }
 
+function parseHexColor(hex: string): [number, number, number] | null {
+  const normalized = hex.trim().replace(/^#/, "");
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null;
+  const r = Number.parseInt(normalized.slice(0, 2), 16);
+  const g = Number.parseInt(normalized.slice(2, 4), 16);
+  const b = Number.parseInt(normalized.slice(4, 6), 16);
+  return [r, g, b];
+}
+
+function sRgbToLinear(channel: number): number {
+  const c = channel / 255;
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  return 0.2126 * sRgbToLinear(r) + 0.7152 * sRgbToLinear(g) + 0.0722 * sRgbToLinear(b);
+}
+
+function contrastRatio(a: [number, number, number], b: [number, number, number]): number {
+  const l1 = relativeLuminance(a);
+  const l2 = relativeLuminance(b);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function pickReadableInk(accentHex: string): string {
+  const accent = parseHexColor(accentHex);
+  if (!accent) return "#fff";
+  const softBlack: [number, number, number] = [28, 25, 23];
+  const white: [number, number, number] = [255, 255, 255];
+  return contrastRatio(accent, white) >= contrastRatio(accent, softBlack)
+    ? "#fff"
+    : "rgb(28 25 23)";
+}
+
 function trimMeta(value: string | undefined): string {
   return value?.trim() ?? "";
 }
 
-function movieHeroMetaLine(movie: Movie): string | null {
+function readSeriesYearRange(snapshot: Record<string, unknown> | undefined): string | undefined {
+  const raw =
+    typeof snapshot?.Year === "string"
+      ? snapshot.Year
+      : typeof snapshot?.year === "string"
+        ? snapshot.year
+        : "";
+  const cleaned = raw.trim();
+  if (!cleaned) return undefined;
+  return cleaned.replace("-", "–");
+}
+
+function readSeriesTotalSeasons(snapshot: Record<string, unknown> | undefined): number | undefined {
+  const raw = snapshot?.totalSeasons ?? snapshot?.TotalSeasons;
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return n;
+}
+
+function readSeriesTotalEpisodes(snapshot: Record<string, unknown> | undefined): number | undefined {
+  const raw = snapshot?.totalEpisodes ?? snapshot?.TotalEpisodes ?? snapshot?.episodeCount;
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return n;
+}
+
+function movieHeroMetaLine(movie: Movie, isSeriesTitle: boolean): string | null {
   const parts: string[] = [];
-  if (Number.isFinite(movie.releaseYear) && movie.releaseYear > 0) {
-    parts.push(String(movie.releaseYear));
-  }
-  if (Number.isFinite(movie.runtimeMinutes) && movie.runtimeMinutes > 0) {
-    parts.push(`${movie.runtimeMinutes} min`);
+  const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
+
+  if (isSeriesTitle) {
+    const yearRange = readSeriesYearRange(syncSnapshot) ?? String(movie.releaseYear);
+    parts.push(yearRange);
+    const totalSeasons = readSeriesTotalSeasons(syncSnapshot);
+    const totalEpisodes = readSeriesTotalEpisodes(syncSnapshot);
+    if (totalSeasons) {
+      parts.push(`${totalSeasons} ${totalSeasons === 1 ? "season" : "seasons"}`);
+    }
+    if (totalEpisodes) {
+      parts.push(`${totalEpisodes} ${totalEpisodes === 1 ? "episode" : "episodes"}`);
+    }
+  } else {
+    if (Number.isFinite(movie.releaseYear) && movie.releaseYear > 0) {
+      parts.push(String(movie.releaseYear));
+    }
+    if (Number.isFinite(movie.runtimeMinutes) && movie.runtimeMinutes > 0) {
+      parts.push(`${movie.runtimeMinutes} min`);
+    }
   }
   const rating = trimMeta(movie.metadata.rating);
   if (rating) parts.push(rating);
@@ -169,6 +247,9 @@ export default async function MoviePage({
   const page = parseMovieSightingsPageParam(single(query.page));
 
   const movieSightings = await getMergedSightingsForMovie(movie.id);
+  const isSeriesTitle = movieSightings.some((sighting) => sighting.imdbKind === "series");
+  const allowedSorts = getMovieSightingsSortOptions(isSeriesTitle);
+  const safeSort = allowedSorts.includes(sort) ? sort : "newest";
   const movieSpoilerCount = movieSightings.filter((s) => s.spoiler).length;
   const approxRatsInMovie = movieSightings.reduce(
     (sum, s) => sum + estimateRatsForAppearance(s),
@@ -176,15 +257,15 @@ export default async function MoviePage({
   );
   const sightingsView = prepareMovieSightingsView({
     items: movieSightings,
-    sort,
+    sort: safeSort,
     page,
     runtimeMinutes: movie.runtimeMinutes,
   });
 
-  if (page !== sightingsView.safePage) {
+  if (page !== sightingsView.safePage || safeSort !== sort) {
     redirect(
       buildMovieSightingsPath(slug, {
-        sort,
+        sort: safeSort,
         page: sightingsView.safePage,
       }),
     );
@@ -192,7 +273,7 @@ export default async function MoviePage({
 
   const { pageSlice } = sightingsView;
   const sightingsBasePath = buildMovieSightingsPath(slug, {
-    sort,
+    sort: safeSort,
     page: sightingsView.safePage,
   });
   const editingSighting = editSightingId
@@ -203,22 +284,24 @@ export default async function MoviePage({
     : [];
   const visuals = await getMoviePageVisuals(movie);
   const palette = visuals.palette;
-  const heroMetaLine = movieHeroMetaLine(movie);
+  const heroMetaLine = movieHeroMetaLine(movie, isSeriesTitle);
   const manualPalette = movie.metadata.pagePalette;
   const manualPaletteDark = movie.metadata.pagePaletteDark;
+  const darkPalette = manualPaletteDark ?? visuals.paletteDark;
 
   const rootStyle: CSSProperties | undefined = palette
     ? ({
         "--movie-wash": palette.wash,
         "--movie-column-wash": palette.columnWash,
         "--movie-accent": palette.accent,
+        "--movie-accent-ink": pickReadableInk(palette.accent),
         "--movie-hero-bloom": palette.heroBloom,
-        "--movie-wash-dark": (manualPaletteDark ?? visuals.paletteDark)?.wash ?? palette.wash,
-        "--movie-column-wash-dark":
-          (manualPaletteDark ?? visuals.paletteDark)?.columnWash ?? palette.columnWash,
-        "--movie-accent-dark": (manualPaletteDark ?? visuals.paletteDark)?.accent ?? palette.accent,
+        "--movie-wash-dark": darkPalette?.wash ?? palette.wash,
+        "--movie-column-wash-dark": darkPalette?.columnWash ?? palette.columnWash,
+        "--movie-accent-dark": darkPalette?.accent ?? palette.accent,
+        "--movie-accent-ink-dark": pickReadableInk(darkPalette?.accent ?? palette.accent),
         "--movie-hero-bloom-dark":
-          (manualPaletteDark ?? visuals.paletteDark)?.heroBloom ?? palette.heroBloom,
+          darkPalette?.heroBloom ?? palette.heroBloom,
       } as CSSProperties)
     : undefined;
 
@@ -263,7 +346,7 @@ export default async function MoviePage({
       <div className="flex items-center justify-between gap-3">
         <Link
           href="/#catalog"
-          className="wr-btn-ghost inline-flex px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
+          className="wr-btn-ghost inline-flex h-11 items-center px-4 text-xs font-semibold uppercase tracking-[0.16em]"
         >
           ← Back to catalog
         </Link>
@@ -274,7 +357,7 @@ export default async function MoviePage({
                 <input type="hidden" name="slug" value={slug} />
                 <button
                   type="submit"
-                  className="wr-btn-ghost inline-flex px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+                  className="wr-btn-ghost inline-flex h-11 items-center px-3 text-xs font-semibold uppercase tracking-[0.12em]"
                 >
                   Resync
                 </button>
@@ -284,14 +367,14 @@ export default async function MoviePage({
                 <ConfirmSubmitButton
                   confirmMessage="Delete this movie? This cannot be undone."
                   type="submit"
-                  className="wr-btn-ghost inline-flex px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-red-800 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/35"
+                  className="wr-btn-ghost inline-flex h-11 items-center px-3 text-xs font-semibold uppercase tracking-[0.12em] text-red-800 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/35"
                 >
                   Delete
                 </ConfirmSubmitButton>
               </form>
               <Link
                 href={`/movies/${slug}?editMovie=1`}
-                className="wr-btn-ghost inline-flex h-9 w-9 items-center justify-center px-0 text-lg"
+                className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 text-lg"
                 aria-label="Edit movie information"
                 title="Edit movie information"
               >
@@ -301,7 +384,7 @@ export default async function MoviePage({
           ) : null}
           <Link
             href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
-            className={`inline-flex items-center gap-1.5 text-sm ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
+            className={`inline-flex h-11 items-center gap-1.5 text-sm ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
           >
             Submit a Sighting
           </Link>
@@ -633,8 +716,9 @@ export default async function MoviePage({
                 {movieSightings.length > 0 ? (
                   <MovieSightingsSortControl
                     slug={slug}
-                    sort={sort}
+                    sort={safeSort}
                     palette={Boolean(palette)}
+                    isSeries={isSeriesTitle}
                   />
                 ) : null}
               </div>
@@ -643,7 +727,7 @@ export default async function MoviePage({
             {movieSightings.length > 0 ? (
               <MovieSightingsPagingBar
                 slug={slug}
-                sort={sort}
+                sort={safeSort}
                 safePage={sightingsView.safePage}
                 pageCount={sightingsView.pageCount}
                 totalCount={sightingsView.totalCount}
@@ -683,6 +767,7 @@ export default async function MoviePage({
                   spoilerCountMovie={movieSpoilerCount}
                   canEditSightings={canEditSightings}
                   editBasePath={sightingsBasePath}
+                  isSeries={isSeriesTitle}
                 />
               ) : null}
             </div>
@@ -690,7 +775,7 @@ export default async function MoviePage({
             {movieSightings.length > 0 ? (
               <MovieSightingsPagingBar
                 slug={slug}
-                sort={sort}
+                sort={safeSort}
                 safePage={sightingsView.safePage}
                 pageCount={sightingsView.pageCount}
                 totalCount={sightingsView.totalCount}
@@ -1035,7 +1120,7 @@ export default async function MoviePage({
                   className="accent-amber-700 dark:accent-amber-400"
                 />
                 <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Stored as a percentage into the movie.
+                  Stored as a percentage into the {isSeriesTitle ? "episode" : "movie"}.
                 </p>
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
@@ -1057,7 +1142,7 @@ export default async function MoviePage({
                   rows={4}
                   required
                   defaultValue={editingSighting.description}
-                  className="wr-input"
+                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
                 />
                 <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
                   Markdown is supported (bold, lists, links, headings). It renders on movie pages.
@@ -1070,18 +1155,22 @@ export default async function MoviePage({
                   rows={3}
                   defaultValue={editingSighting.curatorNote ?? ""}
                   placeholder="Optional note shown with the published sighting."
-                  className="wr-input"
+                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
                 />
               </label>
               <EditableSightingImagesField initialImages={editingSightingImages} />
-              <label className="flex items-center gap-3 rounded-2xl bg-amber-100 p-4 text-sm font-bold text-stone-700 dark:bg-amber-900/45 dark:text-amber-100">
-                <input
-                  name="spoiler"
-                  type="checkbox"
-                  defaultChecked={editingSighting.spoiler}
-                  className="h-5 w-5"
-                />
-                Contains spoilers
+              <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-900/12 bg-stone-50 px-3 py-2.5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/10 dark:bg-stone-900/50 dark:text-stone-100 dark:hover:bg-white/5">
+                <span>Contains spoilers</span>
+                <span className="relative inline-flex shrink-0 items-center">
+                  <input
+                    name="spoiler"
+                    type="checkbox"
+                    defaultChecked={editingSighting.spoiler}
+                    className="peer sr-only"
+                  />
+                  <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+                  <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+                </span>
               </label>
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <ConfirmSubmitButton

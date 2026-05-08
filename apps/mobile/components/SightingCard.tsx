@@ -19,6 +19,7 @@ import type { SightingPublic } from "../lib/types";
 function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
   const strongBorder = colors.mode === "dark" ? colors.dividerStrong : colors.border;
   const dividerBorder = colors.inputBorder;
+  const sectionDivider = colors.mode === "dark" ? colors.dividerStrong : dividerBorder;
   return StyleSheet.create({
     card: {
       borderRadius: 12,
@@ -105,38 +106,49 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
       textShadowOffset: { width: 0, height: 1 },
       textShadowRadius: 3,
     },
-    body: { paddingHorizontal: 18, paddingVertical: 16, gap: 10 },
+    body: { paddingHorizontal: 18, paddingVertical: 18, gap: 6 },
     row: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
-    titleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+    tagCloudRow: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+    titleRow: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+    titleContent: { minWidth: 0, flex: 1 },
     timestampTag: {
-      alignSelf: "flex-start",
-      borderRadius: 999,
+      borderRadius: 8,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: dividerBorder,
       backgroundColor: colors.chipActive,
       paddingHorizontal: 8,
       paddingVertical: 3,
     },
-    timestampTagText: { color: colors.textMuted, fontSize: 12, fontWeight: "600" },
+    timestampTagText: { color: colors.textMuted, fontSize: 12.5, fontWeight: "700" },
+    episodeTag: {
+      borderRadius: 8,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.accent,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+    },
+    episodeTagText: { color: colors.accent, fontSize: 12.5, fontWeight: "800" },
     spoilerBadge: {
       backgroundColor: colors.dangerBg,
       paddingHorizontal: 8,
-      paddingVertical: 2,
-      borderRadius: 6,
+      paddingVertical: 3,
+      borderRadius: 8,
     },
-    spoilerText: { color: colors.dangerText, fontSize: 11, fontWeight: "600" },
-    title: { color: colors.text, fontSize: 19, fontWeight: "700", lineHeight: 25 },
+    spoilerText: { color: colors.dangerText, fontSize: 12, fontWeight: "600" },
+    title: { color: colors.text, fontSize: 20, fontWeight: "700", lineHeight: 26 },
     redactLineStack: {
-      gap: 6,
+      gap: 8,
     },
     /** Single title-height redaction stripe (approx one line of title text). */
     redactTitleStripe: {
-      marginVertical: 4,
+      marginTop: 0,
+      marginBottom: 2,
       maxWidth: "92%",
     },
     redactBar: {
-      height: 10,
-      borderRadius: 4,
+      height: 12,
+      borderRadius: 5,
       /** Light: softer than body text so redaction reads as placeholder, not heavy black bars. */
       backgroundColor: colors.placeholderFill,
       alignSelf: "stretch",
@@ -149,35 +161,35 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
     ratLine: { color: colors.textMuted, fontSize: 12, fontWeight: "600" },
     ratMeterRow: { flexDirection: "row", alignItems: "center", gap: 1 },
     ratMeterGlyph: { fontSize: 14, color: colors.accent },
-    ratMeterGlyphOff: { opacity: 0.2 },
-    desc: { color: colors.text, fontSize: 15, lineHeight: 22 },
-    submitter: { color: colors.textMuted, fontSize: 12, fontStyle: "italic", marginTop: 6 },
-    curatorNoteCard: {
-      marginTop: 6,
-      borderRadius: 10,
+    ratTag: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      borderRadius: 8,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: dividerBorder,
       backgroundColor: colors.panelMuted,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      gap: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
     },
-    curatorNoteLabel: {
-      color: colors.textMuted,
-      fontSize: 10.5,
-      fontWeight: "800",
-      textTransform: "uppercase",
-      letterSpacing: 0.6,
+    ratTagText: { color: colors.textMuted, fontSize: 12.5, fontWeight: "700" },
+    desc: { color: colors.text, fontSize: 15, lineHeight: 22 },
+    submitter: { color: colors.textMuted, fontSize: 13, fontStyle: "italic", marginBottom: 6 },
+    curatorNoteDivider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: sectionDivider,
+      marginTop: 0,
+      marginBottom: 8,
     },
     curatorNoteText: {
       color: colors.text,
-      fontSize: 13,
-      lineHeight: 19,
+      fontSize: 14,
+      lineHeight: 21,
       fontWeight: "500",
     },
     contentBlock: {
-      paddingTop: 2,
-      gap: 4,
+      paddingTop: 0,
+      gap: 2,
     },
     /** Match vertical padding above/below redacted body lines vs surrounding rows */
     contentBlockRedacted: {
@@ -185,11 +197,11 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
       paddingBottom: 6,
     },
     footerBlock: {
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: dividerBorder,
       marginTop: 0,
-      paddingTop: 8,
-      gap: 8,
+      paddingTop: 10,
+      gap: 10,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: sectionDivider,
     },
   });
 }
@@ -202,8 +214,6 @@ type Props = {
 };
 
 const PLACEHOLDER_STILL_PATTERN = /placehold\.co\//i;
-const MAX_RAT_SLOTS = 5;
-
 function getSightingImageSlides(s: SightingPublic): { url: string; alt?: string }[] {
   const out: { url: string; alt?: string }[] = [];
   const seen = new Set<string>();
@@ -257,6 +267,16 @@ function parseTimestampPercent(timestamp: string): number | null {
   return Math.max(0, Math.min(100, parsed));
 }
 
+function formatEpisodeContext(sighting: SightingPublic): string | undefined {
+  if (sighting.imdbKind !== "series") return undefined;
+  const s = sighting.seasonNumber;
+  const e = sighting.episodeNumber;
+  if (!Number.isFinite(s) || !Number.isFinite(e) || !s || !e) return undefined;
+  const code = `S${s}E${e}`;
+  const title = sighting.episodeTitle?.trim();
+  return title ? `${code} · ${title}` : code;
+}
+
 export function SightingCard({
   sighting,
   surfaceColor,
@@ -282,15 +302,18 @@ export function SightingCard({
   const ratSlots = getRatPresenceSlots(estimatedRats);
   const slideWidth = imageWidth > 0 ? imageWidth : Math.max(1, Math.floor(viewportWidth - 32));
   const timestampPercent = parseTimestampPercent(sighting.timestamp);
+  const episodeContext = formatEpisodeContext(sighting);
   const timestampLine =
-    timestampPercent === null ? sighting.timestamp : `${timestampPercent}% into film`;
+    timestampPercent === null
+      ? sighting.timestamp
+      : `${timestampPercent}% into ${sighting.imdbKind === "series" ? "episode" : "film"}`;
   const markdownStyles = useMemo(
     () => ({
-      body: { color: colors.text, fontSize: 14, lineHeight: 22, marginTop: 0, marginBottom: 0 },
+      body: { color: colors.text, fontSize: 16, lineHeight: 24, marginTop: 0, marginBottom: 0 },
       paragraph: {
         color: colors.text,
-        fontSize: 14,
-        lineHeight: 22,
+        fontSize: 16,
+        lineHeight: 24,
         marginTop: 0,
         marginBottom: 6,
       },
@@ -421,7 +444,7 @@ export function SightingCard({
       ) : null}
       <View style={styles.body}>
         <View style={styles.titleRow}>
-          <View style={{ flex: 1, minWidth: 0 }}>
+          <View style={styles.titleContent}>
             {spoilerHidden ? (
               <View style={[styles.redactLineStack, styles.redactTitleStripe]} pointerEvents="none">
                 <View style={styles.redactBar} />
@@ -430,11 +453,6 @@ export function SightingCard({
               <Text style={styles.title}>{headline}</Text>
             )}
           </View>
-          {sighting.spoiler ? (
-            <View style={styles.spoilerBadge}>
-              <Text style={styles.spoilerText}>Spoiler</Text>
-            </View>
-          ) : null}
         </View>
         <View style={[styles.contentBlock, spoilerHidden && styles.contentBlockRedacted]}>
           {spoilerHidden ? (
@@ -447,28 +465,43 @@ export function SightingCard({
             <Markdown style={markdownStyles}>{sighting.description}</Markdown>
           )}
         </View>
+        {sighting.submitterName ? <Text style={styles.submitter}>Submitted by {sighting.submitterName}</Text> : null}
         <View style={styles.footerBlock}>
-          <View style={styles.row}>
-            <View style={styles.ratMeterRow}>
-              {Array.from({ length: MAX_RAT_SLOTS }).map((_, index) => (
-                <Text key={index} style={[styles.ratMeterGlyph, index >= ratSlots && styles.ratMeterGlyphOff]}>
-                  🐀
-                </Text>
-              ))}
+          <View style={styles.tagCloudRow}>
+            <View style={styles.ratTag}>
+              <View style={styles.ratMeterRow}>
+                {Array.from({ length: ratSlots }).map((_, index) => (
+                  <Text key={index} style={styles.ratMeterGlyph}>
+                    🐀
+                  </Text>
+                ))}
+              </View>
+              <Text style={styles.ratTagText}>{ratLine}</Text>
             </View>
-            <Text style={styles.ratLine}>{ratLine}</Text>
-            <View style={[styles.timestampTag, { marginLeft: "auto" }]}>
+            {episodeContext ? (
+              <View style={styles.episodeTag}>
+                <Text style={styles.episodeTagText} numberOfLines={1}>
+                  {episodeContext}
+                </Text>
+              </View>
+            ) : null}
+            <View style={styles.timestampTag}>
               <Text style={styles.timestampTagText}>{timestampLine}</Text>
             </View>
+            {sighting.spoiler ? (
+              <View style={styles.spoilerBadge}>
+                <Text style={styles.spoilerText}>Spoiler</Text>
+              </View>
+            ) : null}
           </View>
-          {sighting.submitterName ? (
-            <Text style={styles.submitter}>Submitted by {sighting.submitterName}</Text>
-          ) : null}
           {curatorNote ? (
-            <View style={styles.curatorNoteCard}>
-              <Text style={styles.curatorNoteLabel}>Curator note</Text>
-              <Text style={styles.curatorNoteText}>{curatorNote}</Text>
-            </View>
+            <>
+              <View style={styles.curatorNoteDivider} />
+              <Text style={styles.curatorNoteText}>
+                <Text style={{ fontWeight: "800" }}>From the curator: </Text>
+                {curatorNote}
+              </Text>
+            </>
           ) : null}
         </View>
       </View>

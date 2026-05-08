@@ -67,6 +67,36 @@ function trimMetaValue(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function readSeriesYearRange(snapshot: Record<string, unknown> | undefined): string | undefined {
+  const raw =
+    typeof snapshot?.Year === "string"
+      ? snapshot.Year
+      : typeof snapshot?.year === "string"
+        ? snapshot.year
+        : "";
+  const cleaned = raw.trim();
+  if (!cleaned) return undefined;
+  return cleaned.replace("-", "–");
+}
+
+function readSeriesTotalSeasons(snapshot: Record<string, unknown> | undefined): number | undefined {
+  const raw = snapshot?.totalSeasons ?? snapshot?.TotalSeasons;
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return n;
+}
+
+function isSeriesMovie(movie: NonNullable<MovieDetailResponse["movie"]>): boolean {
+  const snapshot =
+    movie.metadata && typeof movie.metadata.syncSnapshot === "object"
+      ? (movie.metadata.syncSnapshot as Record<string, unknown>)
+      : undefined;
+  const typeRaw =
+    typeof snapshot?.Type === "string" ? snapshot.Type.trim().toLowerCase() : "";
+  if (typeRaw === "series") return true;
+  return false;
+}
+
 function formatReviewDate(value: string): string {
   try {
     return new Date(value).toLocaleDateString("en-US", {
@@ -684,7 +714,14 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
       textAlign: "right",
       lineHeight: 21,
     },
-    metaLink: { color: colors.accent, fontSize: 14, fontWeight: "700" },
+    metaLink: {
+      color: colors.accent,
+      fontSize: 14,
+      fontWeight: "700",
+      textDecorationLine: "underline",
+      textDecorationStyle: "solid",
+      textDecorationColor: "#ea580c",
+    },
     metaSynopsisWrap: {
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
@@ -715,7 +752,8 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
       fontWeight: "700",
       lineHeight: 20,
       textDecorationLine: "underline",
-      textDecorationStyle: "dotted",
+      textDecorationStyle: "solid",
+      textDecorationColor: "#ea580c",
     },
   });
 }
@@ -739,9 +777,24 @@ function HeroBlock({
     typeof movie.metadata?.rating === "string" ? movie.metadata.rating.trim() : "";
   const imdbStarRating =
     typeof movie.metadata?.imdbRating === "string" ? movie.metadata.imdbRating.trim() : "";
-  const metaLine = [String(movie.releaseYear), `${movie.runtimeMinutes} min`, contentRating]
-    .filter(Boolean)
-    .join(" · ");
+  const syncSnapshot =
+    movie.metadata && typeof movie.metadata.syncSnapshot === "object"
+      ? (movie.metadata.syncSnapshot as Record<string, unknown>)
+      : undefined;
+  const series = isSeriesMovie(movie);
+  const metaLine = series
+    ? [
+        readSeriesYearRange(syncSnapshot) ?? String(movie.releaseYear),
+        readSeriesTotalSeasons(syncSnapshot)
+          ? `${readSeriesTotalSeasons(syncSnapshot)} ${readSeriesTotalSeasons(syncSnapshot) === 1 ? "season" : "seasons"}`
+          : undefined,
+        contentRating,
+      ]
+        .filter(Boolean)
+        .join(" · ")
+    : [String(movie.releaseYear), `${movie.runtimeMinutes} min`, contentRating]
+        .filter(Boolean)
+        .join(" · ");
   const statsBits: { key: string; label: string; imdb?: boolean }[] = [
     typeof movie.sightingCount === "number"
       ? {
@@ -804,6 +857,7 @@ function HeroBlock({
                   imdbId: movie.externalIds.imdb,
                   title: movie.title,
                   year: String(movie.releaseYear),
+                  kind: isSeriesMovie(movie) ? "series" : "movie",
                   posterUrl: movie.posterUrl,
                 },
               })
@@ -1239,7 +1293,8 @@ export default function MovieScreen() {
           parsed.sightSort === "newest" ||
           parsed.sightSort === "rats" ||
           parsed.sightSort === "appearance-early" ||
-          parsed.sightSort === "appearance-late"
+          parsed.sightSort === "appearance-late" ||
+          parsed.sightSort === "episode"
         ) {
           setSightSort(parsed.sightSort);
         }

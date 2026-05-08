@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import {
   MOVIE_SIGHTINGS_PAGE_SIZE,
   buildMovieSightingsPath,
+  getMovieSightingsSortOptions,
   movieSightingsSortLabels,
-  movieSightingsSortOptions,
   type MovieSightingsSortOption,
 } from "@/lib/whererat";
 
@@ -15,11 +15,13 @@ type SortProps = {
   slug: string;
   sort: MovieSightingsSortOption;
   palette: boolean;
+  isSeries: boolean;
 };
 
-export function MovieSightingsSortControl({ slug, sort, palette }: SortProps) {
+export function MovieSightingsSortControl({ slug, sort, palette, isSeries }: SortProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const sortOptions = getMovieSightingsSortOptions(isSeries);
 
   const selectSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
@@ -32,10 +34,6 @@ export function MovieSightingsSortControl({ slug, sort, palette }: SortProps) {
     });
     startTransition(() => router.push(href, { scroll: false }));
   };
-
-  const bottomDividerSkin = palette
-    ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.72))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
-    : "border-stone-900/22 dark:border-white/18";
 
   return (
     <label className="flex w-full flex-row flex-wrap items-center gap-3 sm:w-auto sm:max-w-none">
@@ -50,7 +48,7 @@ export function MovieSightingsSortControl({ slug, sort, palette }: SortProps) {
           pushSort(event.target.value as MovieSightingsSortOption)
         }
       >
-        {movieSightingsSortOptions.map((option) => (
+        {sortOptions.map((option) => (
           <option key={option} value={option}>
             {movieSightingsSortLabels[option]}
           </option>

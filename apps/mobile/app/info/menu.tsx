@@ -1,11 +1,9 @@
 import { openURL } from "expo-linking";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect, useNavigation } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AppToast } from "../../components/AppToast";
 import { type ThemeColors, type ThemePreference, useTheme } from "../../lib/theme";
 
 type Row = {
@@ -44,11 +42,8 @@ const APPEARANCE_OPTIONS: { value: ThemePreference; title: string; subtitle: str
 
 export default function InfoSettingsMenuScreen() {
   const { colors, themePreference, setThemePreference } = useTheme();
-  const insets = useSafeAreaInsets();
-  const [previewToast, setPreviewToast] = useState<string | null>(null);
   const styles = useMemo(() => createStyles(colors), [colors]);
   const navigation = useNavigation();
-  const toastBottom = Math.max(insets.bottom, 12);
 
   /**
    * Popping the hub would surface the hidden `/info` gate — leave the stack flow for catalog instead.
@@ -142,73 +137,66 @@ export default function InfoSettingsMenuScreen() {
       </View>
 
       <View style={styles.hubFooter}>
-        <Text style={styles.footerTagline}>
-          Spoiler-aware · Crowd-sourced · Obsessively maintained
-        </Text>
-        <Text style={styles.footerDedication}>For Kaitlyn. ❤️</Text>
+        <View style={styles.socialRow}>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="LinkedIn, opens website"
+            onPress={() => void openURL("https://www.linkedin.com/in/mikekuzin")}
+            style={({ pressed }) => [styles.socialIconBtn, pressed && styles.rowPressed]}
+          >
+            <Ionicons name="logo-linkedin" size={17} color={colors.accent} />
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="X, opens website"
+            onPress={() => void openURL("https://x.com/kuzin")}
+            style={({ pressed }) => [styles.socialIconBtn, pressed && styles.rowPressed]}
+          >
+            <Text style={styles.socialX}>X</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="Instagram, opens website"
+            onPress={() => void openURL("https://instagram.com/kuzin")}
+            style={({ pressed }) => [styles.socialIconBtn, pressed && styles.rowPressed]}
+          >
+            <Ionicons name="logo-instagram" size={17} color={colors.accent} />
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="Dribbble, opens website"
+            onPress={() => void openURL("https://dribbble.com/kuzin")}
+            style={({ pressed }) => [styles.socialIconBtn, pressed && styles.rowPressed]}
+          >
+            <Ionicons name="logo-dribbble" size={17} color={colors.accent} />
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="GitHub, opens website"
+            onPress={() => void openURL("https://github.com/kuzin")}
+            style={({ pressed }) => [styles.socialIconBtn, pressed && styles.rowPressed]}
+          >
+            <Ionicons name="logo-github" size={17} color={colors.accent} />
+          </Pressable>
+        </View>
         <Text style={styles.copyrightLine}>
-          Copyright 2026. Design by{" "}
+          © 2026. Design by{" "}
           <Text
             accessibilityRole="link"
             accessibilityLabel="Kuz, opens website"
             onPress={() => void openURL("https://kuzn.me")}
             style={styles.copyrightLink}
           >
-            Kuz
+            kuz
           </Text>
-          . All rights reserved.
+          .
         </Text>
+        <Text style={styles.copyrightLine}>
+          All rights reserved.
+        </Text>
+        <Text style={styles.footerDedication}>For Kaitlyn. ❤️</Text>
       </View>
-
-      {__DEV__ ? (
-        <>
-          <Text style={[styles.sectionHeading, styles.sectionHeadingSpaced]}>
-            Developer
-          </Text>
-          <View style={styles.list}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Preview error toast"
-              onPress={() =>
-                setPreviewToast(
-                  "Something went wrong (preview). This is not a real error.",
-                )
-              }
-              style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
-            >
-              <View style={styles.rowTextCol}>
-                <Text style={styles.rowTitle}>Preview error toast</Text>
-                <Text style={styles.rowSubtitle}>
-                  Shows the same banner used for API failures
-                </Text>
-              </View>
-              <Ionicons name="flask-outline" size={20} color={colors.iconMuted} />
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Preview sighting submitted modal"
-              onPress={() =>
-                router.replace({ pathname: "/", params: { success: "1" } })
-              }
-              style={({ pressed }) => [styles.row, styles.rowLast, pressed && styles.rowPressed]}
-            >
-              <View style={styles.rowTextCol}>
-                <Text style={styles.rowTitle}>Preview submit success modal</Text>
-                <Text style={styles.rowSubtitle}>
-                  Opens catalog with the post-submit celebration sheet
-                </Text>
-              </View>
-              <Ionicons name="checkmark-done-outline" size={20} color={colors.iconMuted} />
-            </Pressable>
-          </View>
-        </>
-      ) : null}
     </ScrollView>
-    <AppToast
-      message={previewToast}
-      onDismiss={() => setPreviewToast(null)}
-      bottomOffset={toastBottom}
-    />
     </View>
   );
 }
@@ -237,19 +225,36 @@ function createStyles(colors: ThemeColors) {
     radioPlaceholder: { width: 22, height: 22 },
     hubFooter: {
       alignItems: "center",
-      gap: 10,
-      marginTop: 24,
-      paddingTop: 22,
+      gap: 8,
+      marginTop: 28,
+      paddingTop: 18,
       borderTopWidth: StyleSheet.hairlineWidth,
       borderTopColor: border,
-      paddingBottom: 8,
+      paddingBottom: 14,
     },
-    footerTagline: {
-      color: colors.textMuted,
+    socialRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      flexWrap: "wrap",
+      gap: 8,
+      marginBottom: 2,
+    },
+    socialIconBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 999,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: border,
+      backgroundColor: colors.panel,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    socialX: {
+      color: colors.accent,
       fontSize: 14,
-      lineHeight: 20,
-      fontWeight: "600",
-      textAlign: "center",
+      fontWeight: "800",
+      lineHeight: 16,
     },
     footerDedication: {
       color: colors.textMuted,

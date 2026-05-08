@@ -92,6 +92,10 @@ create table if not exists submissions (
   movie_title text not null,
   movie_year int,
   imdb_id text,
+  imdb_kind text check (imdb_kind in ('movie', 'series')),
+  season_number int check (season_number is null or season_number >= 1),
+  episode_number int check (episode_number is null or episode_number >= 1),
+  episode_title text,
   timestamp_code text not null,
   title text,
   description text not null,
@@ -106,6 +110,29 @@ create table if not exists submissions (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table submissions add column if not exists imdb_kind text;
+alter table submissions add column if not exists season_number int;
+alter table submissions add column if not exists episode_number int;
+alter table submissions add column if not exists episode_title text;
+
+alter table submissions
+  drop constraint if exists submissions_imdb_kind_check;
+alter table submissions
+  add constraint submissions_imdb_kind_check
+  check (imdb_kind is null or imdb_kind in ('movie', 'series'));
+
+alter table submissions
+  drop constraint if exists submissions_season_number_check;
+alter table submissions
+  add constraint submissions_season_number_check
+  check (season_number is null or season_number >= 1);
+
+alter table submissions
+  drop constraint if exists submissions_episode_number_check;
+alter table submissions
+  add constraint submissions_episode_number_check
+  check (episode_number is null or episode_number >= 1);
 
 create table if not exists submission_images (
   id uuid primary key default gen_random_uuid(),

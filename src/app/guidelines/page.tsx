@@ -68,7 +68,7 @@ export default function GuidelinesPage() {
           <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
             Guidelines
           </h1>
-          <p className="mt-5 leading-relaxed text-orange-950 dark:text-amber-50/90">
+          <p className="mt-5 leading-relaxed text-orange-950">
             Standards for submissions, spoilers, moderation, inclusivity, and accessibility — so the catalog stays accurate, welcoming, and easy to trust.
           </p>
         </aside>
@@ -87,7 +87,7 @@ export default function GuidelinesPage() {
               </article>
             ))}
 
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-stone-900/15 bg-amber-50/60 p-5 dark:border-white/12 dark:bg-amber-950/20">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-orange-700/28 bg-orange-100/80 p-5 dark:border-white/12 dark:bg-amber-950/20">
               <div>
                 <p className="font-bold text-stone-900 dark:text-stone-100">Ready to submit a sighting?</p>
                 <p className="mt-0.5 text-sm text-stone-600 dark:text-stone-400">You know the rules — go log that rat.</p>

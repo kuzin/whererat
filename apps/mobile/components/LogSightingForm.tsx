@@ -10,6 +10,7 @@ import {
   InputAccessoryView,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -23,7 +24,9 @@ import { AppToast } from "./AppToast";
 import { AppTextInput } from "./AppTextInput";
 import {
   fetchImdbMovieSearch,
+  fetchImdbEpisodes,
   formatApiError,
+  type ImdbEpisodeLookupResponse,
   type ImdbMovieSearchResult,
   postSightingSubmission,
 } from "../lib/api";
@@ -44,6 +47,8 @@ const IMDB_SEARCH_DEBOUNCE_MS = 400;
 const MAX_SIGHTING_IMAGES = 5;
 type FieldErrorKey =
   | "movieSelection"
+  | "seasonNumber"
+  | "episodeNumber"
   | "sightingTitle"
   | "timestamp"
   | "description"
@@ -58,9 +63,25 @@ function firstReleaseYear(yearStr: string): number | undefined {
 }
 
 function formatMovieAutocompleteMeta(hit: ImdbMovieSearchResult): string {
-  const runtime = hit.runtime?.trim() || "Runtime TBD";
   const rating = hit.rating?.trim() || "Rating TBD";
+  if (hit.kind === "series") {
+    const yearRange = hit.yearRange?.trim() || hit.year;
+    const seasons = hit.totalSeasons
+      ? `${hit.totalSeasons} ${hit.totalSeasons === 1 ? "season" : "seasons"}`
+      : undefined;
+    const episodes = hit.totalEpisodes
+      ? `${hit.totalEpisodes} ${hit.totalEpisodes === 1 ? "episode" : "episodes"}`
+      : undefined;
+    return [yearRange, seasons, episodes, rating].filter(Boolean).join(" · ");
+  }
+  const runtime = hit.runtime?.trim() || "Runtime TBD";
   return `${hit.year} · ${runtime} · ${rating}`;
+}
+
+function formatImdbStars(value: string | undefined): string {
+  const n = Number.parseFloat(String(value ?? "").trim());
+  if (!Number.isFinite(n) || n <= 0) return "IMDb rating unavailable";
+  return `★ ${n.toFixed(1)} IMDb`;
 }
 
 const SEARCH_POSTER_W = 88;
@@ -362,10 +383,10 @@ function createFormStyles(colors: ThemeColors) {
       lineHeight: 22,
     },
     movieHitMeta: { color: colors.textMuted, fontSize: 13, fontWeight: "600", lineHeight: 18 },
-    movieHitImdb: {
+    movieHitStars: {
       fontSize: 11,
       fontWeight: "800",
-      letterSpacing: 0.9,
+      letterSpacing: 0.8,
       textTransform: "uppercase",
       color: colors.accent,
     },
@@ -387,7 +408,7 @@ function createFormStyles(colors: ThemeColors) {
     },
     selectedTitle: { color: colors.text, fontSize: 20, fontWeight: "800", lineHeight: 26 },
     selectedMeta: { color: colors.textMuted, fontSize: 14, fontWeight: "600", lineHeight: 20 },
-    selectedImdb: {
+    selectedStars: {
       fontSize: 11,
       fontWeight: "800",
       letterSpacing: 0.9,
@@ -430,6 +451,87 @@ function createFormStyles(colors: ThemeColors) {
       color: colors.dangerText,
       fontSize: 12.5,
       lineHeight: 17,
+      fontWeight: "700",
+    },
+    selectTrigger: {
+      minHeight: 48,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
+      borderRadius: 10,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    selectTriggerDisabled: {
+      borderColor: colors.inputBorderDisabled,
+      backgroundColor: colors.inputBackgroundDisabled,
+      opacity: 0.75,
+    },
+    selectTriggerInvalid: {
+      borderColor: colors.dangerText,
+    },
+    selectTriggerText: {
+      flex: 1,
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    selectTriggerPlaceholder: {
+      color: colors.iconMuted,
+      fontWeight: "500",
+    },
+    sheetBackdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: colors.overlayScrim,
+    },
+    sheetCenterOuter: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: "center",
+      paddingHorizontal: INSET_X,
+      pointerEvents: "box-none",
+    },
+    sheetCard: {
+      backgroundColor: colors.panel,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
+      paddingVertical: 8,
+      pointerEvents: "auto",
+      overflow: "hidden",
+      maxHeight: 420,
+    },
+    sheetTitle: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "700",
+      paddingHorizontal: INSET_X,
+      paddingBottom: SPACE.sm,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.inputBorder,
+      marginBottom: 2,
+    },
+    sheetRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 11,
+      paddingHorizontal: INSET_X,
+      gap: SPACE.sm,
+    },
+    sheetRowOn: {
+      backgroundColor: colors.chipActive,
+    },
+    sheetRowText: {
+      flex: 1,
+      color: colors.textMuted,
+      fontSize: 16,
+      fontWeight: "500",
+    },
+    sheetRowTextOn: {
+      color: colors.text,
       fontWeight: "700",
     },
     primaryBtn: {
@@ -528,14 +630,15 @@ function createFormStyles(colors: ThemeColors) {
     },
     uploadBtn: {
       flex: 1,
-      minHeight: 48,
-      borderRadius: 12,
+      minHeight: 42,
+      borderRadius: 10,
       borderWidth: 0,
       borderColor: "transparent",
       backgroundColor: colors.accent,
       alignItems: "center",
       justifyContent: "center",
-      paddingHorizontal: 10,
+      paddingHorizontal: 9,
+      paddingVertical: 8,
     },
     uploadBtnCompact: {
       flex: 0,
@@ -548,12 +651,12 @@ function createFormStyles(colors: ThemeColors) {
       alignItems: "center",
     },
     uploadBtnDisabled: { opacity: 0.55 },
-    uploadBtnText: { color: "#ffffff", fontSize: 13.5, fontWeight: "800" },
+    uploadBtnText: { color: "#ffffff", fontSize: 12.5, fontWeight: "800" },
     uploadBtnInner: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: 6,
+      gap: 5,
     },
     selectedImagesWrap: { gap: 8 },
     selectedImageRow: {
@@ -597,10 +700,61 @@ type SightingImageAsset = {
   fileSize?: number;
 };
 
+type SelectSheetOption = { value: string; label: string };
+
 function friendlyImageSize(size: number | undefined): string {
   if (!size || !Number.isFinite(size) || size <= 0) return "Size unknown";
   if (size >= 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   return `${Math.max(1, Math.round(size / 1024))} KB`;
+}
+
+function SelectSheet({
+  open,
+  title,
+  options,
+  activeValue,
+  onSelect,
+  onClose,
+  styles,
+  accentColor,
+}: {
+  open: boolean;
+  title: string;
+  options: SelectSheetOption[];
+  activeValue: string;
+  onSelect: (value: string) => void;
+  onClose: () => void;
+  styles: ReturnType<typeof createFormStyles>;
+  accentColor: string;
+}) {
+  return (
+    <Modal transparent visible={open} animationType="fade" onRequestClose={onClose}>
+      <Pressable style={styles.sheetBackdrop} onPress={onClose} accessibilityRole="button" accessibilityLabel="Dismiss picker" />
+      <View style={styles.sheetCenterOuter} pointerEvents="box-none">
+        <View style={styles.sheetCard}>
+          <Text style={styles.sheetTitle}>{title}</Text>
+          <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled>
+            {options.map((opt) => {
+              const on = activeValue === opt.value;
+              return (
+                <Pressable
+                  key={opt.value}
+                  onPress={() => {
+                    onSelect(opt.value);
+                    onClose();
+                  }}
+                  style={[styles.sheetRow, on && styles.sheetRowOn]}
+                >
+                  <Text style={[styles.sheetRowText, on && styles.sheetRowTextOn]}>{opt.label}</Text>
+                  {on ? <Ionicons name="checkmark" size={20} color={accentColor} /> : null}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
 }
 
 export function LogSightingForm() {
@@ -610,6 +764,7 @@ export function LogSightingForm() {
     imdbId?: string;
     title?: string;
     year?: string;
+    kind?: string;
     posterUrl?: string;
   }>();
   const insets = useSafeAreaInsets();
@@ -676,6 +831,15 @@ export function LogSightingForm() {
   const [searchPage, setSearchPage] = useState(1);
   /** Full hit for autocomplete + selected-card layout (poster, runtime, rating, source). */
   const [selectedHit, setSelectedHit] = useState<ImdbMovieSearchResult | null>(null);
+  const [seasonNumber, setSeasonNumber] = useState("");
+  const [episodeNumber, setEpisodeNumber] = useState("");
+  const [episodeTitle, setEpisodeTitle] = useState("");
+  const [episodes, setEpisodes] = useState<Array<{ number: number; title: string }>>([]);
+  const [episodeLookupBusy, setEpisodeLookupBusy] = useState(false);
+  const [episodeLookupError, setEpisodeLookupError] = useState<string | undefined>(undefined);
+  const isSeriesSelection = selectedHit?.kind === "series";
+  const [seasonSheetOpen, setSeasonSheetOpen] = useState(false);
+  const [episodeSheetOpen, setEpisodeSheetOpen] = useState(false);
 
   const [sightingTitle, setSightingTitle] = useState("");
   const [filmPct, setFilmPct] = useState(50);
@@ -782,6 +946,10 @@ export function LogSightingForm() {
     if (!prefImdbId || !prefTitle) return;
 
     const prefYear = typeof params.year === "string" ? params.year.trim() : "";
+    const prefKind =
+      typeof params.kind === "string" && params.kind.trim().toLowerCase() === "series"
+        ? "series"
+        : "movie";
     const prefPoster = typeof params.posterUrl === "string" ? params.posterUrl.trim() : "";
     prefillAppliedRef.current = true;
     imdbSearchSeqRef.current += 1;
@@ -798,15 +966,60 @@ export function LogSightingForm() {
       title: prefTitle,
       year: prefYear || "—",
       imdbId: prefImdbId,
+      kind: prefKind,
       posterUrl: prefPoster,
       runtime: undefined,
       genre: undefined,
       rating: undefined,
+      imdbRating: undefined,
+      yearRange: undefined,
+      totalSeasons: undefined,
+      totalEpisodes: undefined,
       plot: undefined,
       source: "Seed",
     });
     setFormError(null);
   }, [params]);
+
+  useEffect(() => {
+    if (!isSeriesSelection || !selectedHit?.imdbId || !seasonNumber.trim()) return;
+    let canceled = false;
+    setEpisodeLookupBusy(true);
+    setEpisodeLookupError(undefined);
+    void fetchImdbEpisodes({
+      imdbId: selectedHit.imdbId,
+      season: seasonNumber.trim(),
+    })
+      .then((payload: ImdbEpisodeLookupResponse) => {
+        if (canceled) return;
+        if (!payload.ok) {
+          setEpisodes([]);
+          setEpisodeLookupError(payload.error ?? "Could not load episode list.");
+          return;
+        }
+        const nextEpisodes = payload.episodes ?? [];
+        setEpisodes(nextEpisodes);
+        const keepSelection = nextEpisodes.some((ep) => String(ep.number) === episodeNumber);
+        if (!keepSelection) {
+          setEpisodeNumber("");
+          setEpisodeTitle("");
+        } else {
+          const match = nextEpisodes.find((ep) => String(ep.number) === episodeNumber);
+          setEpisodeTitle(match?.title ?? "");
+        }
+      })
+      .catch(() => {
+        if (canceled) return;
+        setEpisodes([]);
+        setEpisodeLookupError("Could not load episode list.");
+      })
+      .finally(() => {
+        if (!canceled) setEpisodeLookupBusy(false);
+      });
+    return () => {
+      canceled = true;
+    };
+  }, [isSeriesSelection, selectedHit?.imdbId, seasonNumber, episodeNumber]);
 
   const selectMovie = useCallback((hit: ImdbMovieSearchResult) => {
     imdbSearchSeqRef.current += 1;
@@ -820,6 +1033,11 @@ export function LogSightingForm() {
     setMoviePosterUrl(poster ?? "");
     setImdbId(hit.imdbId.trim());
     setSelectedHit(hit);
+    setSeasonNumber("");
+    setEpisodeNumber("");
+    setEpisodeTitle("");
+    setEpisodes([]);
+    setEpisodeLookupError(undefined);
     setFormError(null);
     setSearchNotice(undefined);
   }, []);
@@ -831,6 +1049,11 @@ export function LogSightingForm() {
     setMovieYear(undefined);
     setMoviePosterUrl("");
     setSelectedHit(null);
+    setSeasonNumber("");
+    setEpisodeNumber("");
+    setEpisodeTitle("");
+    setEpisodes([]);
+    setEpisodeLookupError(undefined);
     setSearchHits([]);
     setSearchNotice(undefined);
     setSearchHasMore(false);
@@ -937,6 +1160,16 @@ export function LogSightingForm() {
     }
     if (!sightingTitle.trim()) errors.sightingTitle = "Sighting title is required.";
     if (filmPct < 0 || filmPct > 100) errors.timestamp = "Use a percentage from 0 to 100.";
+    if (isSeriesSelection) {
+      const season = Number.parseInt(seasonNumber.trim(), 10);
+      const episode = Number.parseInt(episodeNumber.trim(), 10);
+      if (!Number.isFinite(season) || season < 1) {
+        errors.seasonNumber = "Season number is required for shows.";
+      }
+      if (!Number.isFinite(episode) || episode < 1) {
+        errors.episodeNumber = "Episode number is required for shows.";
+      }
+    }
     if (!description.trim()) errors.description = "Description is required.";
     if (!submitterName.trim()) errors.submitterName = "Your name is required.";
     if (submitterEmail.trim()) {
@@ -945,9 +1178,43 @@ export function LogSightingForm() {
       }
     }
     return errors;
-  }, [imdbId, movieTitleResolved, sightingTitle, filmPct, description, submitterName, submitterEmail]);
+  }, [
+    imdbId,
+    movieTitleResolved,
+    sightingTitle,
+    filmPct,
+    isSeriesSelection,
+    seasonNumber,
+    episodeNumber,
+    description,
+    submitterName,
+    submitterEmail,
+  ]);
 
   const formComplete = useMemo(() => Object.keys(validateFields()).length === 0, [validateFields]);
+  const seasonOptions = useMemo<SelectSheetOption[]>(() => {
+    if (!isSeriesSelection) return [];
+    const total = Number.isFinite(selectedHit?.totalSeasons)
+      ? Math.max(1, Number(selectedHit?.totalSeasons))
+      : 20;
+    return Array.from({ length: total }, (_, i) => ({
+      value: String(i + 1),
+      label: `Season ${i + 1}`,
+    }));
+  }, [isSeriesSelection, selectedHit?.totalSeasons]);
+  const episodeOptions = useMemo<SelectSheetOption[]>(() => {
+    if (!seasonNumber.trim()) return [];
+    if (episodes.length > 0) {
+      return episodes.map((ep) => ({
+        value: String(ep.number),
+        label: `E${ep.number}${ep.title ? ` · ${ep.title}` : ""}`,
+      }));
+    }
+    return Array.from({ length: 60 }, (_, i) => ({
+      value: String(i + 1),
+      label: `Episode ${i + 1}`,
+    }));
+  }, [seasonNumber, episodes]);
 
   const onSubmit = useCallback(async () => {
     if (submitting) return;
@@ -965,6 +1232,12 @@ export function LogSightingForm() {
       fd.append("imdbId", imdbId.trim());
       if (movieYear !== undefined) fd.append("movieYear", String(movieYear));
       if (moviePosterUrl.trim()) fd.append("moviePosterUrl", moviePosterUrl.trim());
+      fd.append("imdbKind", isSeriesSelection ? "series" : "movie");
+      if (isSeriesSelection) {
+        fd.append("seasonNumber", seasonNumber.trim());
+        fd.append("episodeNumber", episodeNumber.trim());
+        if (episodeTitle.trim()) fd.append("episodeTitle", episodeTitle.trim());
+      }
       fd.append("sightingTitle", sightingTitle.trim());
       fd.append("timestamp", `${filmPct}%`);
       fd.append("description", description.trim());
@@ -1003,6 +1276,10 @@ export function LogSightingForm() {
     imdbId,
     movieYear,
     moviePosterUrl,
+    isSeriesSelection,
+    seasonNumber,
+    episodeNumber,
+    episodeTitle,
     sightingTitle,
     filmPct,
     description,
@@ -1096,6 +1373,11 @@ export function LogSightingForm() {
                   setMovieYear(undefined);
                   setMoviePosterUrl("");
                   setSelectedHit(null);
+                  setSeasonNumber("");
+                  setEpisodeNumber("");
+                  setEpisodeTitle("");
+                  setEpisodes([]);
+                  setEpisodeLookupError(undefined);
                 }
               }}
               autoCorrect={false}
@@ -1138,8 +1420,8 @@ export function LogSightingForm() {
                       <Text style={styles.movieHitMeta} numberOfLines={2}>
                         {formatMovieAutocompleteMeta(m)}
                       </Text>
-                      <Text style={styles.movieHitImdb}>
-                        IMDb {m.imdbId} · {m.source}
+                      <Text style={styles.movieHitStars}>
+                        {formatImdbStars(m.imdbRating)}
                       </Text>
                     </View>
                   </Pressable>
@@ -1186,8 +1468,8 @@ export function LogSightingForm() {
                 <Text style={styles.selectedMeta} numberOfLines={2}>
                   {formatMovieAutocompleteMeta(selectedHit)}
                 </Text>
-                <Text style={styles.selectedImdb}>
-                  IMDb {selectedHit.imdbId} · {selectedHit.source}
+                <Text style={styles.selectedStars}>
+                  {formatImdbStars(selectedHit.imdbRating)}
                 </Text>
               </View>
               <Pressable
@@ -1204,6 +1486,76 @@ export function LogSightingForm() {
       </View>
 
       <View style={styles.formSection}>
+        {isSeriesSelection ? (
+          <View style={styles.fieldGroup}>
+            <Text style={styles.fieldLabel}>
+              Episode details <Text style={{ color: requiredAsteriskColor }}>*</Text>
+            </Text>
+            {fieldErrors.seasonNumber ? (
+              <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+                {fieldErrors.seasonNumber}
+              </Text>
+            ) : null}
+            {fieldErrors.episodeNumber ? (
+              <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+                {fieldErrors.episodeNumber}
+              </Text>
+            ) : null}
+            <Pressable
+              style={[
+                styles.selectTrigger,
+                Boolean(fieldErrors.seasonNumber) && styles.selectTriggerInvalid,
+                submitting && styles.selectTriggerDisabled,
+              ]}
+              onPress={() => setSeasonSheetOpen(true)}
+              disabled={submitting}
+              accessibilityRole="button"
+              accessibilityLabel="Select season"
+            >
+              <Text
+                style={[
+                  styles.selectTriggerText,
+                  !seasonNumber && styles.selectTriggerPlaceholder,
+                ]}
+                numberOfLines={1}
+              >
+                {seasonNumber ? `Season ${seasonNumber}` : "Select season"}
+              </Text>
+              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+            </Pressable>
+            <Pressable
+              style={[
+                styles.selectTrigger,
+                Boolean(fieldErrors.episodeNumber) && styles.selectTriggerInvalid,
+                (submitting || !seasonNumber.trim()) && styles.selectTriggerDisabled,
+              ]}
+              onPress={() => setEpisodeSheetOpen(true)}
+              disabled={submitting || !seasonNumber.trim()}
+              accessibilityRole="button"
+              accessibilityLabel="Select episode"
+            >
+              <Text
+                style={[
+                  styles.selectTriggerText,
+                  !episodeNumber && styles.selectTriggerPlaceholder,
+                ]}
+                numberOfLines={1}
+              >
+                {episodeNumber
+                  ? `Episode ${episodeNumber}${episodeTitle ? ` · ${episodeTitle}` : ""}`
+                  : "Select episode"}
+              </Text>
+              <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
+            </Pressable>
+            {episodeLookupBusy ? (
+              <Text style={styles.helper}>Loading episodes…</Text>
+            ) : null}
+            {episodeLookupError ? (
+              <Text style={styles.helper}>{episodeLookupError}</Text>
+            ) : null}
+          </View>
+        ) : null}
+
         <View style={styles.fieldGroup}>
           <Text style={styles.fieldLabel}>
             Sighting title <Text style={{ color: requiredAsteriskColor }}>*</Text>
@@ -1233,7 +1585,7 @@ export function LogSightingForm() {
 
         <View style={styles.fieldGroup}>
           <Text style={styles.fieldLabel}>
-            How far into the film did you spot the rat(s)?{" "}
+            How far into the {isSeriesSelection ? "the episode" : "the film"} did you spot the rat(s)?{" "}
             <Text style={{ color: requiredAsteriskColor }}>*</Text>
           </Text>
           {fieldErrors.timestamp ? (
@@ -1256,7 +1608,7 @@ export function LogSightingForm() {
               maximumTrackTintColor={filmTrackMax}
               thumbTintColor={filmThumbTint}
               disabled={submitting}
-              accessibilityLabel="How far into the film did you spot the rat(s)?"
+              accessibilityLabel={`How far into the ${isSeriesSelection ? "episode" : "film"} did you spot the rat(s)?`}
             />
             <View style={styles.filmPctInline} pointerEvents="none">
               <Text style={styles.filmPctBig}>{filmPct}%</Text>
@@ -1572,6 +1924,39 @@ export function LogSightingForm() {
         message={formError}
         onDismiss={() => setFormError(null)}
         bottomOffset={toastBottom}
+      />
+      <SelectSheet
+        open={seasonSheetOpen}
+        title="Select season"
+        options={seasonOptions}
+        activeValue={seasonNumber}
+        onSelect={(value) => {
+          setSeasonNumber(value);
+          setEpisodeNumber("");
+          setEpisodeTitle("");
+          setEpisodes([]);
+          setEpisodeLookupError(undefined);
+          clearFieldError("seasonNumber");
+          clearFieldError("episodeNumber");
+        }}
+        onClose={() => setSeasonSheetOpen(false)}
+        styles={styles}
+        accentColor={colors.accent}
+      />
+      <SelectSheet
+        open={episodeSheetOpen}
+        title="Select episode"
+        options={episodeOptions}
+        activeValue={episodeNumber}
+        onSelect={(value) => {
+          setEpisodeNumber(value);
+          const match = episodes.find((ep) => String(ep.number) === value);
+          setEpisodeTitle(match?.title ?? "");
+          clearFieldError("episodeNumber");
+        }}
+        onClose={() => setEpisodeSheetOpen(false)}
+        styles={styles}
+        accentColor={colors.accent}
       />
     </View>
     </KeyboardAvoidingView>

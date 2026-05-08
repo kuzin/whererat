@@ -40,6 +40,33 @@ function parseCatalogSort(value: string | undefined): CatalogSortOption {
   return "latest-added-title";
 }
 
+function readSeriesYearRange(snapshot: Record<string, unknown> | undefined): string | undefined {
+  const raw =
+    typeof snapshot?.Year === "string"
+      ? snapshot.Year
+      : typeof snapshot?.year === "string"
+        ? snapshot.year
+        : "";
+  const cleaned = raw.trim();
+  if (!cleaned) return undefined;
+  // OMDb commonly returns "2008-2013" for series; normalize to an en dash.
+  return cleaned.replace("-", "–");
+}
+
+function readSeriesTotalSeasons(snapshot: Record<string, unknown> | undefined): number | undefined {
+  const raw = snapshot?.totalSeasons ?? snapshot?.TotalSeasons;
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return n;
+}
+
+function readSeriesTotalEpisodes(snapshot: Record<string, unknown> | undefined): number | undefined {
+  const raw = snapshot?.totalEpisodes ?? snapshot?.TotalEpisodes ?? snapshot?.episodeCount;
+  const n = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return n;
+}
+
 export default async function Home({
   searchParams,
 }: {
@@ -73,6 +100,7 @@ export default async function Home({
       );
       return {
         movie,
+        sightings,
         sightingCount: sightings.length,
         latestSightingMs,
         ratsLogged,
@@ -101,6 +129,9 @@ export default async function Home({
   const results = pagedMetrics.map((item) => item.movie);
   const sightingCountByMovie = new Map(
     pagedMetrics.map((item) => [item.movie.id, item.sightingCount]),
+  );
+  const sightingsByMovie = new Map(
+    pagedMetrics.map((item) => [item.movie.id, item.sightings]),
   );
   const catalogFiltersActive =
     query.trim().length > 0 || genre !== "all";
@@ -139,6 +170,25 @@ export default async function Home({
             <div className="mt-10 grid gap-5 lg:grid-cols-2">
               {results.map((movie) => {
                 const sightingCount = sightingCountByMovie.get(movie.id) ?? 0;
+                const sightings = sightingsByMovie.get(movie.id) ?? [];
+                const isSeriesTitle = sightings.some((sighting) => sighting.imdbKind === "series");
+                const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
+                const seriesYearRange = readSeriesYearRange(syncSnapshot);
+                const totalSeasons = readSeriesTotalSeasons(syncSnapshot);
+                const totalEpisodes = readSeriesTotalEpisodes(syncSnapshot);
+                const seriesMetaLine = [
+                  seriesYearRange ?? String(movie.releaseYear),
+                  totalSeasons
+                    ? `${totalSeasons} ${totalSeasons === 1 ? "season" : "seasons"}`
+                    : undefined,
+                  totalEpisodes
+                    ? `${totalEpisodes} ${totalEpisodes === 1 ? "episode" : "episodes"}`
+                    : undefined,
+                  movie.metadata.rating || undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" · ");
+                const movieMetaLine = `${movie.releaseYear} · ${movie.runtimeMinutes} min · ${movie.metadata.rating}`;
 
                 return (
                   <Link
@@ -168,8 +218,7 @@ export default async function Home({
                           {movie.title}
                         </h3>
                         <p className="mt-1 text-sm font-semibold text-stone-600 dark:text-stone-400">
-                          {movie.releaseYear} · {movie.runtimeMinutes} min ·{" "}
-                          {movie.metadata.rating}
+                          {isSeriesTitle ? seriesMetaLine : movieMetaLine}
                         </p>
                       </div>
                       <p className="line-clamp-2 text-sm leading-relaxed text-stone-700 dark:text-stone-400">

@@ -1,9 +1,12 @@
 import {
   createModeratorSession,
   getModeratorAccounts,
+  SEEDED_MODERATOR_AVATAR_URL,
   type ModeratorAccount,
 } from "@/lib/auth";
 import { getDbPool } from "@/lib/db";
+
+const LEGACY_ADMIN_AVATAR_URL = "https://placehold.co/160x160/292524/fef3c7/png?text=Admin";
 
 async function ensureSeedAccounts() {
   const pool = getDbPool();
@@ -36,12 +39,18 @@ function rowToAccount(row: {
   role: "owner" | "moderator";
   password_hash: string;
 }): ModeratorAccount {
+  const avatarUrl =
+    row.username === "admin" &&
+    (!row.avatar_url || row.avatar_url === LEGACY_ADMIN_AVATAR_URL)
+      ? SEEDED_MODERATOR_AVATAR_URL
+      : row.avatar_url;
+
   return {
     id: row.id,
     username: row.username,
     name: row.display_name,
     email: row.email,
-    avatarUrl: row.avatar_url,
+    avatarUrl,
     role: row.role,
     password: row.password_hash,
   };

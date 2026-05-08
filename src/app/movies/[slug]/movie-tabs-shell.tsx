@@ -107,6 +107,7 @@ export function MovieTabsShell({
                     : [
                         // Transparent border — same box size as active, invisible edge
                         "border-transparent",
+                        "-translate-y-px",
                         inactiveBg,
                         inactiveText,
                         inactiveHoverBg,

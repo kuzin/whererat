@@ -47,8 +47,15 @@ function SwarmSignal({ count }: { count: number }) {
 type PreselectedMovie = {
   title: string;
   year: string;
+  yearRange?: string;
   imdbId: string;
+  kind: "movie" | "series";
   posterUrl: string;
+  runtime?: string;
+  rating?: string;
+  imdbRating?: string;
+  totalSeasons?: number;
+  totalEpisodes?: number;
 };
 
 type SubmitFormProps = {
@@ -69,6 +76,9 @@ export function SubmitForm({
   initialMovie,
 }: SubmitFormProps) {
   const lockedSubmitterFields = Boolean(loggedInName && loggedInEmail);
+  const [selectedImdbKind, setSelectedImdbKind] = useState<"movie" | "series" | undefined>(
+    initialMovie?.kind,
+  );
   const [errors, setErrors] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [sightingPercent, setSightingPercent] = useState(50);
@@ -96,6 +106,9 @@ export function SubmitForm({
     const imdbFromForm = normalizeImdbId(String(data.get("imdbId") ?? ""));
     const submitterName = String(data.get("submitterName") ?? "").trim();
     const submitterEmail = String(data.get("submitterEmail") ?? "").trim();
+    const imdbKind = String(data.get("imdbKind") ?? "").trim();
+    const seasonNumber = String(data.get("seasonNumber") ?? "").trim();
+    const episodeNumber = String(data.get("episodeNumber") ?? "").trim();
 
     const setFieldError = (name: string, message: string) => {
       if (!nextFieldErrors[name]) nextFieldErrors[name] = message;
@@ -129,6 +142,16 @@ export function SubmitForm({
     if (!submitterName) {
       setFieldError("submitterName", "Your name is required.");
     }
+    if (imdbKind === "series") {
+      const season = Number.parseInt(seasonNumber, 10);
+      const episode = Number.parseInt(episodeNumber, 10);
+      if (!Number.isFinite(season) || season < 1) {
+        setFieldError("seasonNumber", "Season number is required for shows.");
+      }
+      if (!Number.isFinite(episode) || episode < 1) {
+        setFieldError("episodeNumber", "Episode number is required for shows.");
+      }
+    }
     if (submitterEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail)) {
       setFieldError("submitterEmail", "Enter a valid email address or leave it blank.");
     }
@@ -142,6 +165,8 @@ export function SubmitForm({
         "sightingTitle",
         "timestamp",
         "description",
+        "seasonNumber",
+        "episodeNumber",
         "submitterName",
         "submitterEmail",
       ];
@@ -185,9 +210,10 @@ export function SubmitForm({
       <div className="grid gap-6">
         <MovieSearchField
           fieldErrors={fieldErrors}
+          onKindChange={setSelectedImdbKind}
           initialMovie={
             initialMovie
-              ? { ...initialMovie, runtime: undefined, genre: undefined, rating: undefined, plot: undefined, source: "Seed" }
+              ? { ...initialMovie, genre: undefined, plot: undefined, source: "Seed" }
               : undefined
           }
         />
@@ -215,7 +241,7 @@ export function SubmitForm({
       <div className="flex flex-col gap-6">
         <div className="flex w-full flex-col gap-2" data-field="timestamp">
           <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
-            Approx. point in movie
+            Approx. point in {selectedImdbKind === "series" ? "episode" : "movie"}
             <RequiredMarker />
           </p>
           <div className="pt-1">
@@ -311,7 +337,7 @@ export function SubmitForm({
             onChange={(event) => setDescriptionDraft(event.currentTarget.value)}
             placeholder="Describe exactly where the rat appears and what it is doing."
             aria-invalid={Boolean(errorFor("description"))}
-            className={`wr-input ${errorFor("description") ? inputErrorClass : ""}`}
+            className={`wr-input h-auto min-h-36 resize-y py-3 ${errorFor("description") ? inputErrorClass : ""}`}
           />
           <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
             <p className="max-w-prose text-xs leading-relaxed text-stone-500 dark:text-stone-400">

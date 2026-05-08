@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { ExternalLinkIcon } from "@/components/external-link-icon";
 import {
+  formatSubmissionEpisodeContext,
   formatSightingMomentDisplay,
   getSightingTimestampPercent,
   getImdbTitleUrl,
@@ -171,15 +172,15 @@ export default async function ModerationPage({
   return (
     <main className="wr-page-shell py-10">
       {session.role === "owner" ? (
-        <details className="group mb-8 overflow-hidden rounded-2xl border border-amber-500/50 bg-amber-50/70 dark:border-amber-500/25 dark:bg-amber-950/15">
-          <summary className="flex cursor-pointer select-none list-none items-center gap-3 p-5 sm:p-6">
+        <details className="group mb-8 overflow-hidden rounded-2xl border border-amber-600/60 bg-amber-100/90 dark:border-amber-500/25 dark:bg-amber-950/15">
+          <summary className="flex cursor-pointer select-none list-none items-center gap-3 p-5 text-amber-950 sm:p-6 dark:text-amber-100">
             <span aria-hidden className="text-xl">⚠</span>
-            <span className="font-black text-amber-900 dark:text-amber-200">Owner Controls</span>
-            <span className="ml-2 rounded-md border border-amber-400/60 bg-amber-100 px-2 py-0.5 text-xs font-bold uppercase tracking-[0.12em] text-amber-800 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-300">
+            <span className="font-black text-amber-950 dark:text-amber-200">Owner Controls</span>
+            <span className="ml-2 rounded-md border border-amber-600/70 bg-amber-200 px-2 py-0.5 text-xs font-bold uppercase tracking-[0.12em] text-amber-900 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-300">
               Danger zone
             </span>
             <svg
-              className="ml-auto h-4 w-4 shrink-0 text-amber-700 transition-transform group-open:rotate-180 dark:text-amber-400"
+              className="ml-auto h-4 w-4 shrink-0 text-amber-900 transition-transform group-open:rotate-180 dark:text-amber-400"
               viewBox="0 0 16 16"
               fill="currentColor"
               aria-hidden
@@ -188,7 +189,7 @@ export default async function ModerationPage({
             </svg>
           </summary>
 
-          <div className="space-y-5 border-t border-amber-400/30 px-5 py-5 sm:px-6 dark:border-amber-500/20">
+          <div className="space-y-5 border-t border-amber-600/35 px-5 py-5 sm:px-6 dark:border-amber-500/20">
             {/* Stats row */}
             <div>
               <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-amber-800 dark:text-amber-400">
@@ -225,45 +226,63 @@ export default async function ModerationPage({
       ) : null}
 
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="space-y-6">
-          <div className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
+        <aside className="contents lg:block lg:space-y-6">
+          <div className="order-1 self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
             <div className="text-4xl leading-none sm:text-5xl">
               <span aria-hidden>🔍</span>
             </div>
             <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
               Moderation queue
             </h1>
-            <p className="mt-5 leading-relaxed text-orange-950 dark:text-amber-50/90">
+            <p className="mt-5 leading-relaxed text-orange-950">
               Triage sightings with approve, tighten-up edits, or gentle rejections
               that explain why Netflix might not need another duplicate starting time.
             </p>
           </div>
 
-          <div className="wr-card-soft space-y-3 p-6 sm:p-7">
+          <div className="order-3 wr-card-soft space-y-3 p-6 sm:p-7">
             <h2 className="text-xl font-black text-stone-950 dark:text-stone-100">Queue health</h2>
-            <dl className="mt-5 grid gap-3">
-              <div className="flex items-center justify-between rounded-lg border border-stone-900/20 bg-[#fecdd3] px-4 py-3 dark:border-white/12 dark:bg-rose-950/45">
-                <dt className="font-bold text-stone-600 dark:text-rose-200">Pending</dt>
-                <dd className="text-2xl font-black text-stone-950 dark:text-rose-100">{pendingSubmissions.length}</dd>
+            <dl className="mt-3 divide-y divide-stone-900/12 dark:divide-white/12">
+              <div className="flex items-center justify-between py-3">
+                <dt className="flex items-center gap-2 font-bold text-stone-600 dark:text-stone-300">
+                  <span
+                    aria-hidden
+                    className="inline-block h-2.5 w-2.5 rounded-full bg-yellow-500 dark:bg-yellow-400"
+                  />
+                  Pending
+                </dt>
+                <dd className="text-2xl font-black text-stone-950 dark:text-yellow-100">{pendingSubmissions.length}</dd>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-stone-900/18 bg-amber-200 px-4 py-3 dark:border-white/12 dark:bg-amber-900/45">
-                <dt className="font-bold text-stone-600 dark:text-amber-200">Verified public</dt>
-                <dd className="text-2xl font-black text-stone-950 dark:text-amber-100">{stats.sightings}</dd>
+              <div className="flex items-center justify-between py-3">
+                <dt className="flex items-center gap-2 font-bold text-stone-600 dark:text-stone-300">
+                  <span
+                    aria-hidden
+                    className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400"
+                  />
+                  Verified public
+                </dt>
+                <dd className="text-2xl font-black text-stone-950 dark:text-emerald-100">{stats.sightings}</dd>
               </div>
-              <div className="flex items-center justify-between rounded-lg border border-stone-900/18 bg-yellow-50 px-4 py-3 dark:border-white/12 dark:bg-yellow-900/35">
-                <dt className="font-bold text-stone-600 dark:text-yellow-200">Spoiler flags</dt>
-                <dd className="text-2xl font-black text-stone-950 dark:text-yellow-100">{stats.spoilerSightings}</dd>
+              <div className="flex items-center justify-between py-3">
+                <dt className="flex items-center gap-2 font-bold text-stone-600 dark:text-stone-300">
+                  <span
+                    aria-hidden
+                    className="inline-block h-2.5 w-2.5 rounded-full bg-rose-500 dark:bg-rose-400"
+                  />
+                  Spoiler flags
+                </dt>
+                <dd className="text-2xl font-black text-stone-950 dark:text-rose-100">{stats.spoilerSightings}</dd>
               </div>
             </dl>
           </div>
 
-          <div className="wr-card-soft space-y-3 p-6 sm:p-7">
+          <div className="order-4 wr-card-soft space-y-3 p-6 sm:p-7">
             <h2 className="text-xl font-black text-stone-950 dark:text-stone-100">User trust signals</h2>
-            <div className="mt-4 space-y-3">
+            <div className="mt-2 divide-y divide-stone-900/12 dark:divide-white/12">
               {trustSignalAccounts.map((user) => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between rounded-2xl bg-amber-50 p-4 dark:bg-stone-900/70"
+                  className="flex items-center justify-between py-3"
                 >
                   <div className="flex items-center gap-3">
                     <Image
@@ -293,7 +312,7 @@ export default async function ModerationPage({
 
         </aside>
 
-        <section className="wr-card p-6 sm:p-7">
+        <section className="order-2 wr-card-soft p-6 sm:p-7">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-3xl font-black tracking-tight">
@@ -304,12 +323,12 @@ export default async function ModerationPage({
 
           <div className="mt-6 space-y-5">
             {pendingSubmissions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-stone-400/65 bg-orange-50/70 p-10 text-center dark:border-white/20 dark:bg-orange-950/30">
+              <div className="rounded-2xl border border-dashed border-stone-500/75 bg-stone-100/90 p-10 text-center dark:border-white/20 dark:bg-stone-900/40">
                 <p className="text-4xl">🕳️</p>
                 <h3 className="wr-display mt-3 text-2xl font-bold">
                   Quiet burrow. No crumbs.
                 </h3>
-                <p className="mt-2 text-stone-600 dark:text-stone-300">
+                <p className="mt-2 text-stone-700 dark:text-stone-300">
                   New public submissions will appear here as pending reviews.
                 </p>
               </div>
@@ -319,6 +338,8 @@ export default async function ModerationPage({
               const attachmentSlides = getSubmissionImageRefs(submission);
               const sightingTitle = getSubmissionSightingTitle(submission);
               const startingPretty = formatSightingMomentDisplay(submission.timestamp);
+              const episodeContext = formatSubmissionEpisodeContext(submission);
+              const isSeriesSubmission = submission.imdbKind === "series";
               const catalogMovie = catalogMovieBySubmissionId.get(submission.id);
               const posterUrl = catalogMovie?.posterUrl ?? submission.moviePosterUrl;
               return (
@@ -357,6 +378,11 @@ export default async function ModerationPage({
                             </span>
                           ) : null}
                         </h3>
+                        {episodeContext ? (
+                          <p className="mt-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
+                            {episodeContext}
+                          </p>
+                        ) : null}
                         {catalogMovie ? (
                           <div className="mt-1 space-y-0.5 text-sm text-stone-600 dark:text-stone-400">
                             {catalogMovie.metadata.director ? (
@@ -390,7 +416,15 @@ export default async function ModerationPage({
 
                     {/* ── Sighting block ── */}
                     <dl className="mt-3 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1.5 text-sm">
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">Point in film</dt>
+                      {episodeContext ? (
+                        <>
+                          <dt className="font-bold text-stone-600 dark:text-stone-400">Episode</dt>
+                          <dd className="text-stone-700 dark:text-stone-200">{episodeContext}</dd>
+                        </>
+                      ) : null}
+                      <dt className="font-bold text-stone-600 dark:text-stone-400">
+                        Point in {isSeriesSubmission ? "episode" : "film"}
+                      </dt>
                       <dd className="text-stone-700 dark:text-stone-200">{startingPretty.replace(" into movie", "")}</dd>
                       <dt className="font-bold text-stone-600 dark:text-stone-400">Approx. rats</dt>
                       <dd className="text-stone-700 dark:text-stone-200">~{submission.approximateRatCount} {submission.approximateRatCount === 1 ? "rat" : "rats"}</dd>
@@ -455,7 +489,7 @@ export default async function ModerationPage({
                         rows={3}
                         defaultValue={submission.curatorNote ?? ""}
                         placeholder="Optional note shown with the published sighting."
-                        className="wr-input"
+                        className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
                       />
                     </label>
                     <div className="grid gap-2 sm:grid-cols-2">
@@ -538,8 +572,8 @@ export default async function ModerationPage({
             </div>
 
             {historySlice.length === 0 ? (
-              <div className="mt-5 rounded-2xl border border-dashed border-stone-400/60 bg-stone-50/70 p-8 text-center dark:border-white/20 dark:bg-stone-900/40">
-                <p className="text-sm text-stone-600 dark:text-stone-300">
+              <div className="mt-5 rounded-2xl border border-dashed border-stone-500/75 bg-stone-100/90 p-8 text-center dark:border-white/20 dark:bg-stone-900/40">
+                <p className="text-sm text-stone-700 dark:text-stone-300">
                   No {historyTab} sightings yet.
                 </p>
               </div>
@@ -548,7 +582,7 @@ export default async function ModerationPage({
                 {historySlice.map((submission) => (
                   <article
                     key={submission.id}
-                    className="rounded-xl border border-stone-900/15 bg-white p-4 dark:border-white/12 dark:bg-stone-900/70"
+                    className="rounded-xl border border-stone-900/25 bg-stone-50 p-4 dark:border-white/12 dark:bg-stone-900/70"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
@@ -558,6 +592,9 @@ export default async function ModerationPage({
                         <p className="text-sm text-stone-600 dark:text-stone-300">
                           {submission.movieTitle}
                           {submission.movieYear ? ` (${submission.movieYear})` : ""}
+                          {formatSubmissionEpisodeContext(submission)
+                            ? ` · ${formatSubmissionEpisodeContext(submission)}`
+                            : ""}
                         </p>
                       </div>
                       <p
@@ -688,6 +725,10 @@ export default async function ModerationPage({
 
             <form action={moderateSubmission} className="mt-6 grid gap-4">
               <input name="submissionId" type="hidden" value={editingSubmission.id} />
+              <input name="imdbKind" type="hidden" value={editingSubmission.imdbKind ?? "movie"} />
+              <input name="seasonNumber" type="hidden" value={editingSubmission.seasonNumber ?? ""} />
+              <input name="episodeNumber" type="hidden" value={editingSubmission.episodeNumber ?? ""} />
+              <input name="episodeTitle" type="hidden" value={editingSubmission.episodeTitle ?? ""} />
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Sighting title
                 <input
@@ -698,7 +739,7 @@ export default async function ModerationPage({
                 />
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. point in movie
+                Approx. point in {editingSubmission.imdbKind === "series" ? "episode" : "movie"}
                 <input
                   name="timestamp"
                   type="range"
@@ -709,7 +750,7 @@ export default async function ModerationPage({
                   className="accent-amber-700 dark:accent-amber-400"
                 />
                 <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Stored as a percentage into the movie.
+                  Stored as a percentage into the {editingSubmission.imdbKind === "series" ? "episode" : "movie"}.
                 </p>
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
@@ -731,7 +772,7 @@ export default async function ModerationPage({
                   required
                   rows={4}
                   defaultValue={editingSubmission.description}
-                  className="wr-input"
+                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
                 />
                 <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
                   Markdown is supported (bold, lists, links, headings). It renders on movie pages.
@@ -744,7 +785,7 @@ export default async function ModerationPage({
                   rows={3}
                   defaultValue={editingSubmission.curatorNote ?? ""}
                   placeholder="Optional note shown with the published sighting."
-                  className="wr-input"
+                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
                 />
               </label>
               <EditableSightingImagesField initialImages={editingAttachmentSlides} />

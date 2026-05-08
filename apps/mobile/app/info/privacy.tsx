@@ -15,7 +15,14 @@ export default function PrivacyScreen() {
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
     >
-      <Text style={styles.effective}>Last updated: May 2026</Text>
+      <View style={styles.headerBlock}>
+        <Text style={styles.headerIcon}>🔒</Text>
+        <Text style={styles.headerTitle}>Privacy policy</Text>
+        <Text style={styles.headerBody}>
+          How WhereRat handles data in the mobile app today, what third-party services may see, and what
+          changes as features expand.
+        </Text>
+      </View>
 
       <Section styles={styles} title="Introduction">
         <Text style={styles.paragraph}>
@@ -39,10 +46,20 @@ export default function PrivacyScreen() {
           requests to WhereRat APIs. It does not transmit account credentials because authentication is not built into
           {" "}v1.
         </Text>
+      </Section>
+
+      <Section styles={styles} title="Third-party services">
         <Text style={styles.paragraph}>
-          When you view posters, banners, or similar media, your device may reach image hosts referenced in
-          catalog data (for example third-party CDNs). Separately, tapping external links (such as IMDb) sends
-          HTTP requests to those sites under their own privacy terms.
+          WhereRat relies on IMDb-linked metadata providers, including OMDb, and may load posters/stills from
+          referenced media hosts. Tapping external links (such as IMDb pages) sends requests to those third-party
+          sites under their own privacy policies and terms.
+        </Text>
+      </Section>
+
+      <Section styles={styles} title="Data retention (v1 mobile)">
+        <Text style={styles.paragraph}>
+          The v1 app is read-only and does not create in-app accounts or submission records. Local data is limited to
+          temporary app/device cache used to display catalog content.
         </Text>
       </Section>
 
@@ -83,6 +100,13 @@ export default function PrivacyScreen() {
         </Text>
       </Section>
 
+      <Section styles={styles} title="Accessibility and support">
+        <Text style={styles.paragraph}>
+          If you need this policy in another format or encounter accessibility barriers, use the public support
+          channels listed on WhereRat.com and in app store support metadata.
+        </Text>
+      </Section>
+
       <Section styles={styles} title="Full policy on the web">
         <Text style={styles.paragraph}>
           For the authoritative page and future updates, open the site:
@@ -96,6 +120,8 @@ export default function PrivacyScreen() {
           <Text style={styles.linkText}>whererat.com/privacy</Text>
         </Pressable>
       </Section>
+
+      <Text style={styles.effective}>Last updated: May 2026</Text>
     </ScrollView>
   );
 }
@@ -110,7 +136,7 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <View style={styles.section}>
+    <View style={styles.sectionCard}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {children}
     </View>
@@ -121,26 +147,59 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     scroll: { flex: 1 },
     scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 },
+    headerBlock: {
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: colors.mode === "dark" ? "rgba(251,191,36,0.26)" : "rgba(217,119,6,0.4)",
+      backgroundColor: colors.mode === "dark" ? "rgba(180,83,9,0.38)" : "#fcd34d",
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      marginBottom: 14,
+      gap: 6,
+    },
+    headerIcon: {
+      fontSize: 28,
+      lineHeight: 30,
+    },
+    headerTitle: {
+      color: colors.mode === "dark" ? "#fef3c7" : "#292524",
+      fontSize: 28,
+      fontWeight: "800",
+      lineHeight: 32,
+    },
+    headerBody: {
+      color: colors.mode === "dark" ? "#fde68a" : "#7c2d12",
+      fontSize: 14.5,
+      lineHeight: 21,
+      fontWeight: "600",
+    },
     effective: {
       color: colors.textMuted,
       fontSize: 14,
       lineHeight: 20,
-      marginBottom: 24,
+      marginBottom: 12,
+      paddingHorizontal: 2,
     },
-    section: {
-      marginBottom: 22,
+    sectionCard: {
+      marginBottom: 12,
+      borderRadius: 12,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      paddingHorizontal: 14,
+      paddingVertical: 13,
     },
     sectionTitle: {
       color: colors.text,
       fontSize: 17,
       fontWeight: "800",
-      marginBottom: 10,
+      marginBottom: 8,
     },
     paragraph: {
       color: colors.textMuted,
       fontSize: 15,
       lineHeight: 22,
-      marginBottom: 12,
+      marginBottom: 10,
     },
     bold: { color: colors.textMuted, fontWeight: "700" },
     link: {

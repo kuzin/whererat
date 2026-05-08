@@ -31,6 +31,9 @@ export type CatalogMovieRow = {
   rating?: string;
   imdbRating?: string;
   imdbVotes?: string;
+  yearRange?: string;
+  totalSeasons?: number;
+  totalEpisodes?: number;
 };
 
 export type CatalogResponse = {
@@ -49,7 +52,8 @@ export type MovieSightingsSort =
   | "newest"
   | "rats"
   | "appearance-early"
-  | "appearance-late";
+  | "appearance-late"
+  | "episode";
 
 export type SightingPublic = {
   id: string;
@@ -71,6 +75,10 @@ export type SightingPublic = {
   verificationState: string;
   verifiedBy: string;
   sourceIds: string[];
+  imdbKind?: "movie" | "series";
+  seasonNumber?: number;
+  episodeNumber?: number;
+  episodeTitle?: string;
 };
 
 export type MovieDetailResponse = {

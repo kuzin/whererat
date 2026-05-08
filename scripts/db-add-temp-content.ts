@@ -21,6 +21,38 @@ const GENRES = [
 const PROMINENCE = ["blink-and-miss", "background", "scene-stealer"] as const;
 const SCENE_TYPES = ["live-action", "animated", "symbolic", "swarm", "final-shot"] as const;
 const CONFIDENCE = ["needs-source", "likely", "verified"] as const;
+const TEMP_IMDB_IDS = [
+  "tt0111161", // The Shawshank Redemption
+  "tt0068646", // The Godfather
+  "tt0468569", // The Dark Knight
+  "tt0071562", // The Godfather Part II
+  "tt0050083", // 12 Angry Men
+  "tt0108052", // Schindler's List
+  "tt0167260", // The Lord of the Rings: The Return of the King
+  "tt0110912", // Pulp Fiction
+  "tt0120737", // The Lord of the Rings: The Fellowship of the Ring
+  "tt0060196", // The Good, the Bad and the Ugly
+  "tt0109830", // Forrest Gump
+  "tt0133093", // The Matrix
+  "tt0167261", // The Lord of the Rings: The Two Towers
+  "tt0099685", // Goodfellas
+  "tt1375666", // Inception
+  "tt0073486", // One Flew Over the Cuckoo's Nest
+  "tt0047478", // Seven Samurai
+  "tt0114369", // Se7en
+  "tt0038650", // It's a Wonderful Life
+  "tt0102926", // The Silence of the Lambs
+  "tt0120815", // Saving Private Ryan
+  "tt0317248", // City of God
+  "tt0120689", // The Green Mile
+  "tt0816692", // Interstellar
+  "tt0118799", // Life Is Beautiful
+  "tt0245429", // Spirited Away
+  "tt0088763", // Back to the Future
+  "tt0076759", // Star Wars
+  "tt0110357", // The Lion King
+  "tt0103064", // Terminator 2: Judgment Day
+] as const;
 const RAT_BEHAVIORS = [
   "darting across the hallway",
   "peeking from a crate",
@@ -48,12 +80,13 @@ function sampleGenres() {
   return shuffled.slice(0, count);
 }
 
-function makeImdbId(n: number) {
-  // "tt" + 7 digits; unique for this temp batch.
-  return `tt${String(9000000 + n).padStart(7, "0")}`;
-}
-
 async function main() {
+  if (MOVIE_COUNT > TEMP_IMDB_IDS.length) {
+    throw new Error(
+      `MOVIE_COUNT (${MOVIE_COUNT}) exceeds available IMDb IDs (${TEMP_IMDB_IDS.length}).`,
+    );
+  }
+
   const pool = getDbPool();
   const client = await pool.connect();
   const batchTag = `temp-livefill-${Date.now()}`;
@@ -69,7 +102,7 @@ async function main() {
       const title = `Temp Catalog Movie ${i}`;
       const releaseYear = randInt(1978, 2025);
       const runtime = randInt(82, 172);
-      const imdbId = makeImdbId(i);
+      const imdbId = TEMP_IMDB_IDS[i - 1]!;
       const genres = sampleGenres();
       const posterTone = pick(["rat-brown", "ember", "moody-blue", "neon", "slate"]);
       const summary = `Temporary catalog fill item ${i}. Added for visual density and QA of list, detail, and moderation surfaces.`;

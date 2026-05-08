@@ -124,11 +124,16 @@ export function fetchMovieDetail(params: {
 export type ImdbMovieSearchResult = {
   title: string;
   year: string;
+  yearRange?: string;
   imdbId: string;
+  kind: "movie" | "series";
   posterUrl: string;
   runtime?: string;
   genre?: string;
   rating?: string;
+  imdbRating?: string;
+  totalSeasons?: number;
+  totalEpisodes?: number;
   plot?: string;
   source: "OMDb" | "Seed";
 };
@@ -139,6 +144,13 @@ export type ImdbMovieSearchResponse = {
   results: ImdbMovieSearchResult[];
   hasMore?: boolean;
   page?: number;
+};
+
+export type ImdbEpisodeLookupResponse = {
+  ok: boolean;
+  totalSeasons?: number;
+  episodes?: Array<{ number: number; title: string }>;
+  error?: string;
 };
 
 /**
@@ -177,6 +189,32 @@ export async function fetchImdbMovieSearch(params: {
   }
 
   return out;
+}
+
+export async function fetchImdbEpisodes(params: {
+  imdbId: string;
+  season: string;
+}): Promise<ImdbEpisodeLookupResponse> {
+  const sp = new URLSearchParams();
+  sp.set("imdbId", params.imdbId.trim());
+  sp.set("season", params.season.trim());
+  const url = `${baseUrl()}/api/movies/episodes?${sp.toString()}`;
+  const res = await fetch(url, { headers: { Accept: "application/json" } });
+  let json: unknown;
+  try {
+    json = await res.json();
+  } catch {
+    json = {};
+  }
+  const rec = json && typeof json === "object" ? (json as Record<string, unknown>) : {};
+  return {
+    ok: rec.ok === true,
+    totalSeasons: typeof rec.totalSeasons === "number" ? rec.totalSeasons : undefined,
+    episodes: Array.isArray(rec.episodes)
+      ? (rec.episodes as Array<{ number: number; title: string }>)
+      : undefined,
+    error: typeof rec.error === "string" ? rec.error : undefined,
+  };
 }
 
 export type SubmitSightingResponse = {

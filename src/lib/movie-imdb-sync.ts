@@ -41,6 +41,9 @@ function mentionsRat(text: string): boolean {
 type OmdbFullDetails = {
   Title: string;
   Year: string;
+  Type?: string;
+  totalSeasons?: string;
+  TotalSeasons?: string;
   Rated?: string;
   Runtime?: string;
   Genre?: string;
@@ -56,6 +59,11 @@ type OmdbFullDetails = {
   imdbRating?: string;
   imdbVotes?: string;
   Response: "True" | "False";
+};
+
+type OmdbSeasonDetails = {
+  Response: "True" | "False";
+  Episodes?: Array<{ Episode?: string }>;
 };
 
 function omdbStr(val: string | undefined) {
@@ -81,6 +89,38 @@ async function fetchOmdbData(
   } catch {
     return undefined;
   }
+}
+
+async function fetchOmdbTotalEpisodeCount(params: {
+  imdbId: string;
+  apiKey: string;
+  totalSeasonsRaw?: string;
+}): Promise<number | undefined> {
+  const totalSeasons = Number.parseInt(params.totalSeasonsRaw ?? "", 10);
+  if (!Number.isFinite(totalSeasons) || totalSeasons < 1) return undefined;
+  const cappedSeasons = Math.min(200, totalSeasons);
+  let totalEpisodes = 0;
+
+  for (let season = 1; season <= cappedSeasons; season++) {
+    try {
+      const url = new URL("https://www.omdbapi.com/");
+      url.searchParams.set("apikey", params.apiKey);
+      url.searchParams.set("i", params.imdbId);
+      url.searchParams.set("Season", String(season));
+      const res = await fetch(url.toString(), {
+        cache: "no-store",
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) continue;
+      const json = (await res.json()) as OmdbSeasonDetails;
+      if (json.Response !== "True") continue;
+      totalEpisodes += Array.isArray(json.Episodes) ? json.Episodes.length : 0;
+    } catch {
+      // Ignore season-level errors; keep best-effort total from successful seasons.
+    }
+  }
+
+  return totalEpisodes > 0 ? totalEpisodes : undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -407,6 +447,23 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
     : undefined;
   const posterUrl =
     omdb?.Poster && omdb.Poster !== "N/A" ? omdb.Poster : undefined;
+  const totalEpisodes = await fetchOmdbTotalEpisodeCount({
+    imdbId,
+    apiKey,
+    totalSeasonsRaw: omdb?.totalSeasons ?? omdb?.TotalSeasons,
+  });
+  const prevSyncSnapshot =
+    movie.metadata.syncSnapshot && typeof movie.metadata.syncSnapshot === "object"
+      ? movie.metadata.syncSnapshot
+      : {};
+  const nextSyncSnapshot: Record<string, unknown> = {
+    ...prevSyncSnapshot,
+    ...(omdb?.Year ? { Year: omdb.Year } : {}),
+    ...(omdbStr(omdb?.Type) ? { Type: omdb!.Type } : {}),
+    ...(omdbStr(omdb?.totalSeasons) ? { totalSeasons: omdb!.totalSeasons } : {}),
+    ...(omdbStr(omdb?.TotalSeasons) ? { TotalSeasons: omdb!.TotalSeasons } : {}),
+    ...(Number.isFinite(totalEpisodes) ? { totalEpisodes } : {}),
+  };
 
   await updateMovieOverride(movie.id, {
     ...(omdb && omdbStr(omdb.Title) ? { title: omdb.Title } : {}),
@@ -429,6 +486,7 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
       ...(productionCountries ? { productionCountries } : {}),
       metadataProvider: "OMDb via IMDb ID",
       lastSyncedAt: new Date().toISOString().slice(0, 10),
+      syncSnapshot: nextSyncSnapshot,
       ...(ratFacts.length > 0 ? { ratFacts } : {}),
       ...(imdbReviews.length > 0 ? { imdbReviews } : {}),
       ...(imdbRelated.length > 0 ? { imdbRelated } : {}),

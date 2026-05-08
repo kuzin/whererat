@@ -5,6 +5,7 @@ import { useId, useLayoutEffect, useMemo, useRef, useState, useCallback } from "
 import {
   estimateRatsForAppearance,
   formatApproximateRatLine,
+  formatSightingEpisodeContext,
   formatSightingStartingTimeDisplay,
   getSightingCardHeadline,
   getSightingImageRefs,
@@ -97,9 +98,9 @@ function canvasWrapLineWidths(text: string, font: string, maxWidthPx: number): n
 }
 
 const bodyLineClass =
-  "h-[0.55em] min-h-[11px] max-h-[17px] shrink-0 rounded-full bg-[color-mix(in_srgb,rgb(147_143_139)_52%,transparent)] dark:bg-[color-mix(in_srgb,rgb(168_162_158)_48%,rgb(53_46_41))]";
+  "h-[0.55em] min-h-[11px] max-h-[17px] shrink-0 rounded-full bg-stone-600/55 dark:bg-stone-700/85";
 const headlineRowClass =
-  "h-[0.76em] min-h-[1.0625rem] max-h-[1.5rem] shrink-0 rounded-full bg-[color-mix(in_srgb,rgb(147_143_139)_56%,transparent)] dark:bg-[color-mix(in_srgb,rgb(166_159_154)_52%,rgb(48_41_37))]";
+  "h-[0.76em] min-h-[1.0625rem] max-h-[1.5rem] shrink-0 rounded-full bg-stone-600/55 dark:bg-stone-700/85";
 
 /** Solid pill bars sized to approximate real headline + description line lengths. */
 function SpoilerPlaceholderCopy({
@@ -223,6 +224,7 @@ export function MovieSightingsCards({
   spoilerCountMovie,
   canEditSightings = false,
   editBasePath = "",
+  isSeries = false,
 }: {
   items: Sighting[];
   palette: boolean;
@@ -230,6 +232,7 @@ export function MovieSightingsCards({
   spoilerCountMovie: number;
   canEditSightings?: boolean;
   editBasePath?: string;
+  isSeries?: boolean;
 }) {
   const [showSpoilers, setShowSpoilers] = useState(false);
   const spoilerToggleLabelId = useId();
@@ -307,33 +310,18 @@ export function MovieSightingsCards({
           const headlineText = getSightingCardHeadline(sighting);
           const startingTimeLabel = formatSightingStartingTimeDisplay(sighting);
           const ratEstimate = estimateRatsForAppearance(sighting);
+          const episodeContext = formatSightingEpisodeContext(sighting);
           const submitterCredit = trimNote(sighting.submitterName);
-          const submittedByLine =
-            submitterCredit ? (
-              <p className="text-sm italic leading-relaxed text-stone-600/75 dark:text-stone-400/70">
-                <span className="font-semibold">Submitted by </span>
-                {submitterCredit}
-              </p>
-            ) : null;
+          const submittedByLine = submitterCredit ? (
+            <p className="pt-1 text-left text-sm italic leading-relaxed text-stone-600/75 dark:text-stone-400/70">
+              <span className="font-semibold">Submitted by </span>
+              {submitterCredit}
+            </p>
+          ) : null;
           const editHref =
             canEditSightings && editBasePath
               ? `${editBasePath}${editBasePath.includes("?") ? "&" : "?"}editSighting=${encodeURIComponent(sighting.id)}`
               : undefined;
-
-          const headerRight = (
-            <div className="flex shrink-0 flex-row flex-wrap items-center gap-2">
-              <SightingRatPresenceVisual
-                estimatedCount={ratEstimate}
-                palette={palette}
-              />
-              <span
-                className="inline-flex h-9 items-center rounded-lg border border-amber-900/25 bg-amber-50 px-3 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
-                title="Estimated rats on screen for this moment"
-              >
-                {formatApproximateRatLine(ratEstimate)}
-              </span>
-            </div>
-          );
 
           return (
             <article
@@ -349,7 +337,17 @@ export function MovieSightingsCards({
               <div
                 className={`p-5 sm:p-6 md:p-7 ${hasCarousel ? "" : "pt-6 sm:pt-7"}`}
               >
-                <div className="flex flex-col gap-4">
+                <div className="relative flex flex-col gap-3">
+                  {editHref ? (
+                    <Link
+                      href={editHref}
+                      className="wr-btn-ghost absolute right-0 top-0 inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
+                      aria-label="Edit sighting"
+                      title="Edit sighting"
+                    >
+                      ✎
+                    </Link>
+                  ) : null}
                   {/* Content */}
                   <div className="flex flex-col gap-2 md:gap-2.5">
                     {blackoutSpoiler ? (
@@ -357,7 +355,7 @@ export function MovieSightingsCards({
                         <div
                           role="heading"
                           aria-level={3}
-                          className="wr-display w-full max-w-none text-2xl leading-snug md:text-3xl md:leading-[1.18]"
+                          className="wr-display min-w-0 max-w-none pr-11 text-2xl leading-snug md:text-3xl md:leading-[1.18]"
                           aria-label="Sighting title hidden until spoilers are shown"
                         >
                           <SpoilerPlaceholderCopy
@@ -365,6 +363,7 @@ export function MovieSightingsCards({
                             descriptionMarkdown={sighting.description}
                           />
                         </div>
+                        {submittedByLine}
                         <span className="sr-only">
                           Sighting title and description hidden: turn on “Show spoilers”
                           above to read them.
@@ -372,56 +371,59 @@ export function MovieSightingsCards({
                       </>
                     ) : (
                       <>
-                        <h3 className="wr-display w-full max-w-none text-2xl font-bold leading-snug text-stone-950 md:text-3xl md:leading-[1.18] dark:text-stone-50">
+                        <h3 className="wr-display min-w-0 max-w-none pr-11 text-2xl font-bold leading-snug text-stone-950 md:text-3xl md:leading-[1.18] dark:text-stone-50">
                           {headlineText}
                         </h3>
                         <SightingMarkdown
                           markdown={sighting.description}
                           className="w-full min-w-0 max-w-none text-stone-700 dark:text-stone-300"
                         />
+                        {submittedByLine}
                       </>
                     )}
-                    {submittedByLine}
                   </div>
-                  {curatorNote ? (
-                    <div className="rounded-xl border border-stone-200/90 bg-stone-50 p-4 shadow-sm dark:border-amber-200/22 dark:bg-[rgb(26_22_18)] dark:shadow-none sm:p-5">
-                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
-                        Curator note
-                      </p>
-                      <p className="mt-3 text-sm leading-relaxed text-stone-800 dark:text-stone-200">
-                        {curatorNote}
-                      </p>
-                    </div>
-                  ) : null}
                   {/* Footer bar */}
-                  <div className="flex w-full flex-wrap items-center gap-2 border-t border-stone-900/10 pt-3 dark:border-white/10">
+                  <div className="flex w-full flex-wrap items-center gap-2 border-t border-stone-900/10 pt-4 pb-1 dark:border-white/10">
                     <p
                       className="inline-flex h-9 items-center gap-x-1 rounded-lg border border-orange-800/25 bg-orange-50 px-3 text-sm tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
-                      title="Position in film"
-                      aria-label={`Sighting at ${startingTimeLabel} into the film`}
+                      title={isSeries ? "Position in episode" : "Position in film"}
+                      aria-label={`Sighting at ${startingTimeLabel} into the ${isSeries ? "episode" : "film"}`}
                     >
                       <span className="font-bold tabular-nums">{startingTimeLabel}</span>
-                      <span className="font-medium opacity-70">into film</span>
+                      <span className="font-medium opacity-70">
+                        {isSeries ? "into episode" : "into film"}
+                      </span>
                     </p>
+                    {episodeContext ? (
+                      <span className="inline-flex h-9 items-center rounded-lg border border-sky-800/25 bg-sky-50 px-3 text-xs font-semibold tracking-tight text-sky-950 dark:border-sky-400/35 dark:bg-sky-950/45 dark:text-sky-100">
+                        {episodeContext}
+                      </span>
+                    ) : null}
                     {sighting.spoiler ? (
                       <span className="inline-flex h-9 items-center rounded-lg border border-red-800/30 bg-[#fecaca] px-3 text-xs font-semibold text-red-950 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
                         Spoiler
                       </span>
                     ) : null}
-                    <div className="ml-auto flex items-center gap-2">
-                      {headerRight}
-                      {editHref ? (
-                        <Link
-                          href={editHref}
-                          className="wr-btn-ghost inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
-                          aria-label="Edit sighting"
-                          title="Edit sighting"
-                        >
-                          ✎
-                        </Link>
-                      ) : null}
-                    </div>
+                    <span
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-900/25 bg-amber-50 px-2.5 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
+                      title="Estimated rats on screen for this moment"
+                    >
+                      <SightingRatPresenceVisual
+                        estimatedCount={ratEstimate}
+                        palette={palette}
+                        className="-mx-0.5"
+                      />
+                      <span>{formatApproximateRatLine(ratEstimate)}</span>
+                    </span>
                   </div>
+                  {curatorNote ? (
+                    <div className="border-t border-stone-900/10 pt-3 dark:border-white/10">
+                      <p className="text-sm italic leading-relaxed text-stone-800 dark:text-stone-300">
+                        <span className="font-bold">From the curator: </span>
+                        {curatorNote}
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </article>

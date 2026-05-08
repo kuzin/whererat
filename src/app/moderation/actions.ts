@@ -49,6 +49,11 @@ export async function moderateSubmission(formData: FormData) {
     | "rejected";
   const reason = String(formData.get("reason") ?? "").trim();
   const curatorNote = String(formData.get("curatorNote") ?? "").trim();
+  const imdbKindRaw = String(formData.get("imdbKind") ?? "").trim().toLowerCase();
+  const imdbKind = imdbKindRaw === "series" ? "series" : "movie";
+  const seasonNumberRaw = Number.parseInt(String(formData.get("seasonNumber") ?? "").trim(), 10);
+  const episodeNumberRaw = Number.parseInt(String(formData.get("episodeNumber") ?? "").trim(), 10);
+  const episodeTitle = String(formData.get("episodeTitle") ?? "").trim();
   const imageListManaged = String(formData.get("imageListManaged") ?? "") === "1";
   let nextImages: SightingImageSlot[] = [];
   if (imageListManaged) {
@@ -95,6 +100,10 @@ export async function moderateSubmission(formData: FormData) {
 
   const hasEditFields =
     formData.has("sightingTitle") ||
+    formData.has("imdbKind") ||
+    formData.has("seasonNumber") ||
+    formData.has("episodeNumber") ||
+    formData.has("episodeTitle") ||
     formData.has("timestamp") ||
     formData.has("description") ||
     formData.has("approximateRatCount") ||
@@ -104,6 +113,16 @@ export async function moderateSubmission(formData: FormData) {
   const edits = hasEditFields
     ? {
         title: String(formData.get("sightingTitle") ?? "").trim(),
+        imdbKind,
+        seasonNumber:
+          imdbKind === "series" && Number.isFinite(seasonNumberRaw) && seasonNumberRaw >= 1
+            ? seasonNumberRaw
+            : undefined,
+        episodeNumber:
+          imdbKind === "series" && Number.isFinite(episodeNumberRaw) && episodeNumberRaw >= 1
+            ? episodeNumberRaw
+            : undefined,
+        episodeTitle: imdbKind === "series" ? episodeTitle || undefined : undefined,
         timestamp: normalizeSightingTimestampInput(
           String(formData.get("timestamp") ?? ""),
         ),

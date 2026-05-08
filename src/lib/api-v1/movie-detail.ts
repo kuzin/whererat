@@ -8,6 +8,8 @@ import { getCatalogMovieBySlug } from "@/lib/movie-catalog";
 import type { Movie, Sighting } from "@/lib/whererat";
 import {
   estimateRatsForAppearance,
+  getMovieSightingsSortOptions,
+  movieSightingsSortLabels,
   parseMovieSightingsPageParam,
   parseMovieSightingsSortParam,
   prepareMovieSightingsView,
@@ -31,6 +33,10 @@ export function serializeSightingPublic(sighting: Sighting) {
     submitterName: sighting.submitterName,
     submissionReviewedAtISO: sighting.submissionReviewedAtISO,
     curatorNote: sighting.curatorNote,
+    imdbKind: sighting.imdbKind,
+    seasonNumber: sighting.seasonNumber,
+    episodeNumber: sighting.episodeNumber,
+    episodeTitle: sighting.episodeTitle,
     confidence: sighting.confidence,
     verificationState: sighting.verificationState,
     verifiedBy: sighting.verifiedBy,
@@ -72,10 +78,13 @@ export async function getV1MovieDetailJson(
 
   const sort = parseMovieSightingsSortParam(sightingsQuery.sort ?? undefined);
   const page = parseMovieSightingsPageParam(sightingsQuery.page ?? undefined);
+  const isSeriesTitle = sightings.some((sighting) => sighting.imdbKind === "series");
+  const allowedSorts = getMovieSightingsSortOptions(isSeriesTitle);
+  const safeSort = allowedSorts.includes(sort) ? sort : "newest";
 
   const view = prepareMovieSightingsView({
     items: sightings,
-    sort,
+    sort: safeSort,
     page,
     runtimeMinutes: movie.runtimeMinutes,
   });
@@ -96,13 +105,10 @@ export async function getV1MovieDetailJson(
     version: 1 as const,
     movie: m,
     featuredRats: {
-      sort,
-      sortLabels: {
-        newest: "Latest submission",
-        rats: "Most rats (est.)",
-        "appearance-early": "Earliest in film",
-        "appearance-late": "Latest in film",
-      },
+      sort: safeSort,
+      sortLabels: Object.fromEntries(
+        allowedSorts.map((option) => [option, movieSightingsSortLabels[option]]),
+      ),
       page: view.safePage,
       pageCount: view.pageCount,
       totalCount: view.totalCount,

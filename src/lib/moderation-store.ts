@@ -26,6 +26,10 @@ type SubmissionEdits = Partial<
     | "movieTitle"
     | "movieYear"
     | "title"
+    | "imdbKind"
+    | "seasonNumber"
+    | "episodeNumber"
+    | "episodeTitle"
     | "timestamp"
     | "description"
     | "spoiler"
@@ -55,6 +59,10 @@ function toDbSubmission(row: {
   movie_title: string;
   movie_year: number | null;
   imdb_id: string | null;
+  imdb_kind: "movie" | "series" | null;
+  season_number: number | null;
+  episode_number: number | null;
+  episode_title: string | null;
   timestamp_code: string;
   title: string | null;
   description: string;
@@ -95,6 +103,10 @@ function toDbSubmission(row: {
     movieTitle: row.movie_title,
     movieYear: row.movie_year ?? undefined,
     imdbId: row.imdb_id ?? undefined,
+    imdbKind: row.imdb_kind ?? undefined,
+    seasonNumber: row.season_number ?? undefined,
+    episodeNumber: row.episode_number ?? undefined,
+    episodeTitle: row.episode_title ?? undefined,
     timestamp: row.timestamp_code,
     title: row.title ?? undefined,
     description: row.description,
@@ -148,14 +160,18 @@ async function ensureSeedModerationStore() {
   for (const submission of seedSubmissions) {
     await pool.query(
       `insert into submissions
-        (id, movie_title, movie_year, imdb_id, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+        (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
        on conflict (id) do nothing`,
       [
         submission.id,
         submission.movieTitle,
         submission.movieYear ?? null,
         submission.imdbId ?? null,
+        submission.imdbKind ?? "movie",
+        submission.seasonNumber ?? null,
+        submission.episodeNumber ?? null,
+        submission.episodeTitle ?? null,
         submission.timestamp,
         submission.title ?? null,
         submission.description,
@@ -209,6 +225,10 @@ export async function readModerationStore() {
       movie_title: string;
       movie_year: number | null;
       imdb_id: string | null;
+      imdb_kind: "movie" | "series" | null;
+      season_number: number | null;
+      episode_number: number | null;
+      episode_title: string | null;
       timestamp_code: string;
       title: string | null;
       description: string;
@@ -274,13 +294,17 @@ export async function addSubmission(
   };
   await pool.query(
     `insert into submissions
-      (id, movie_title, movie_year, imdb_id, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
+      (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
     [
       nextSubmission.id,
       nextSubmission.movieTitle,
       nextSubmission.movieYear ?? null,
       nextSubmission.imdbId ?? null,
+      nextSubmission.imdbKind ?? "movie",
+      nextSubmission.seasonNumber ?? null,
+      nextSubmission.episodeNumber ?? null,
+      nextSubmission.episodeTitle ?? null,
       nextSubmission.timestamp,
       nextSubmission.title ?? null,
       nextSubmission.description,
@@ -354,6 +378,10 @@ async function submissionToSyntheticSighting(
     submitterName: name || undefined,
     curatorNote: submission.curatorNote,
     submissionReviewedAtISO: reviewedAtISO,
+    imdbKind: submission.imdbKind,
+    seasonNumber: submission.seasonNumber,
+    episodeNumber: submission.episodeNumber,
+    episodeTitle: submission.episodeTitle,
   };
 }
 
@@ -505,17 +533,21 @@ export async function reviewSubmission({
         set movie_title = $2,
             movie_year = $3,
             imdb_id = $4,
-            timestamp_code = $5,
-            title = $6,
-            description = $7,
-            spoiler = $8,
-            approximate_rat_count = $9,
-            status = $10,
-            submitted_by = $11,
-            submitter_email = $12,
-            curator_note = $13,
-            duplicate_hint = $14,
-            movie_poster_url = $15,
+            imdb_kind = $5,
+            season_number = $6,
+            episode_number = $7,
+            episode_title = $8,
+            timestamp_code = $9,
+            title = $10,
+            description = $11,
+            spoiler = $12,
+            approximate_rat_count = $13,
+            status = $14,
+            submitted_by = $15,
+            submitter_email = $16,
+            curator_note = $17,
+            duplicate_hint = $18,
+            movie_poster_url = $19,
             updated_at = now()
       where id = $1`,
     [
@@ -523,6 +555,10 @@ export async function reviewSubmission({
       reviewedSubmission.movieTitle,
       reviewedSubmission.movieYear ?? null,
       reviewedSubmission.imdbId ?? null,
+      reviewedSubmission.imdbKind ?? "movie",
+      reviewedSubmission.seasonNumber ?? null,
+      reviewedSubmission.episodeNumber ?? null,
+      reviewedSubmission.episodeTitle ?? null,
       reviewedSubmission.timestamp,
       reviewedSubmission.title ?? null,
       reviewedSubmission.description,

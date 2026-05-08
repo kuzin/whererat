@@ -3,8 +3,7 @@ import { createHmac, timingSafeEqual, randomUUID } from "crypto";
 export const MODERATOR_SESSION_COOKIE = "whererat_moderator";
 
 /** Matches seeded moderator avatar; used for favicon / PWA icons (single source of truth). */
-export const SEEDED_MODERATOR_AVATAR_URL =
-  "https://placehold.co/160x160/292524/fef3c7/png?text=Admin";
+export const SEEDED_MODERATOR_AVATAR_URL = "/favicon.svg";
 
 const SESSION_SECRET =
   process.env.SESSION_SECRET ?? "dev-insecure-secret-change-in-prod";

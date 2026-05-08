@@ -234,6 +234,9 @@ async function fetchReviewsForResync(imdbId: string): Promise<ImdbReview[]> {
 type OmdbFullDetails = {
   Title: string;
   Year: string;
+  Type?: string;
+  totalSeasons?: string;
+  TotalSeasons?: string;
   Rated?: string;
   Runtime?: string;
   Genre?: string;
@@ -250,6 +253,43 @@ type OmdbFullDetails = {
   imdbVotes?: string;
   Response: "True" | "False";
 };
+
+type OmdbSeasonDetails = {
+  Response: "True" | "False";
+  Episodes?: Array<{ Episode?: string }>;
+};
+
+async function fetchOmdbTotalEpisodeCount(params: {
+  imdbId: string;
+  apiKey: string;
+  totalSeasonsRaw?: string;
+}): Promise<number | undefined> {
+  const totalSeasons = Number.parseInt(params.totalSeasonsRaw ?? "", 10);
+  if (!Number.isFinite(totalSeasons) || totalSeasons < 1) return undefined;
+  const cappedSeasons = Math.min(200, totalSeasons);
+  let totalEpisodes = 0;
+
+  for (let season = 1; season <= cappedSeasons; season++) {
+    try {
+      const url = new URL("https://www.omdbapi.com/");
+      url.searchParams.set("apikey", params.apiKey);
+      url.searchParams.set("i", params.imdbId);
+      url.searchParams.set("Season", String(season));
+      const res = await fetch(url.toString(), {
+        cache: "no-store",
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) continue;
+      const json = (await res.json()) as OmdbSeasonDetails;
+      if (json.Response !== "True") continue;
+      totalEpisodes += Array.isArray(json.Episodes) ? json.Episodes.length : 0;
+    } catch {
+      // Best-effort aggregation: ignore per-season failures.
+    }
+  }
+
+  return totalEpisodes > 0 ? totalEpisodes : undefined;
+}
 
 export async function resyncMovieFromImdb(formData: FormData) {
   await requireModerator();
@@ -306,12 +346,18 @@ export async function resyncMovieFromImdb(formData: FormData) {
 
   const posterUrl =
     omdb.Poster && omdb.Poster !== "N/A" ? omdb.Poster : undefined;
+  const totalEpisodesPromise = fetchOmdbTotalEpisodeCount({
+    imdbId,
+    apiKey,
+    totalSeasonsRaw: omdb.totalSeasons ?? omdb.TotalSeasons,
+  });
 
-  const [ratFactsResult, imdbReviews, imdbRelated, imdbMedia] = await Promise.all([
+  const [ratFactsResult, imdbReviews, imdbRelated, imdbMedia, totalEpisodes] = await Promise.all([
     fetchRatFacts(imdbId),
     fetchReviewsForResync(imdbId),
     fetchImdbRelated(imdbId),
     fetchImdbMedia(imdbId),
+    totalEpisodesPromise,
   ]);
   const ratFacts = ratFactsResult.status === "found" ? ratFactsResult.facts : [];
   const tmdbBackdrop = await getTmdbBackdropUrl({
@@ -330,6 +376,11 @@ export async function resyncMovieFromImdb(formData: FormData) {
   });
   const nextSyncSnapshot: Record<string, unknown> = {
     title: omdb.Title,
+    Year: omdb.Year,
+    ...(omdbStr(omdb.Type) ? { Type: omdb.Type } : {}),
+    ...(omdbStr(omdb.totalSeasons) ? { totalSeasons: omdb.totalSeasons } : {}),
+    ...(omdbStr(omdb.TotalSeasons) ? { TotalSeasons: omdb.TotalSeasons } : {}),
+    ...(Number.isFinite(totalEpisodes) ? { totalEpisodes } : {}),
     releaseYear: omdb.Year,
     runtimeMinutes: runtimeMinutes ?? movie.runtimeMinutes,
     genres: genres ?? movie.genres,
@@ -360,6 +411,11 @@ export async function resyncMovieFromImdb(formData: FormData) {
   const changedLabels: string[] = [];
   const syncFieldLabels: Record<string, string> = {
     title: "Title",
+    Year: "Year range",
+    Type: "Title type",
+    totalSeasons: "Total seasons",
+    TotalSeasons: "Total seasons",
+    totalEpisodes: "Total episodes",
     releaseYear: "Release year",
     runtimeMinutes: "Runtime",
     genres: "Genres",

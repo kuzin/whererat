@@ -51,15 +51,15 @@ export default async function ProfilePage({
             alt={`${account.name} profile picture`}
             width={160}
             height={160}
-            className="h-28 w-28 rounded-2xl border-2 border-amber-300/70 object-cover"
+            className="h-28 w-28 rounded-2xl border-2 border-stone-950/90 object-cover shadow-[2px_2px_0_0_var(--wr-shadow-btn-soft)] dark:border-white/22 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.45)]"
           />
           <h1 className="wr-display mt-6 text-4xl font-bold tracking-tight">
             {account.name}
           </h1>
-          <p className="mt-2 text-orange-950 dark:text-amber-50/90">
+          <p className="mt-2 text-orange-950">
             @{account.username} · {account.role}
           </p>
-          <p className="mt-1 text-orange-950 dark:text-amber-50/90">{account.email}</p>
+          <p className="mt-1 text-orange-950">{account.email}</p>
 
         </aside>
 

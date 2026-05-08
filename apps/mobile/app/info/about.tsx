@@ -24,10 +24,42 @@ export default function AboutWhereRatScreen() {
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
     >
-      <Text style={styles.body}>
-        WhereRat is a spoiler-aware catalog of rat appearances in film and TV. The native app mirrors the
-        public site: browse titles, sightings, and IMDb reference content with anonymous, read-only requests.
-      </Text>
+      <View style={styles.infoCard}>
+        <Text style={styles.infoCardTitle}>About WhereRat</Text>
+        <Text style={styles.infoCardBody}>
+          WhereRat is a spoiler-aware catalog of rat appearances in film and TV. The native app mirrors the
+          public site: browse titles, sightings, and IMDb reference content with anonymous, read-only requests.
+        </Text>
+      </View>
+      <View style={styles.infoCard}>
+        <Text style={styles.infoCardTitle}>Technology</Text>
+        <Text style={styles.infoCardBody}>
+          Mobile app: React Native + Expo (Expo Router), written in TypeScript. Web app: Next.js + React.
+          Catalog and sightings are served by WhereRat APIs over HTTPS.
+        </Text>
+      </View>
+      <View style={styles.infoCard}>
+        <Text style={styles.infoCardTitle}>Data and API credits</Text>
+        <Text style={styles.infoCardBody}>
+          Title metadata, posters, and ratings are synchronized from IMDb-linked data providers (including
+          OMDb). External links in the app open third-party destinations such as IMDb under their terms.
+        </Text>
+      </View>
+      <View style={styles.infoCard}>
+        <Text style={styles.infoCardTitle}>AI usage</Text>
+        <Text style={styles.infoCardBody}>
+          This app was built with significant AI-assisted development support for ideation, coding, refactors,
+          copy iteration, and UI polish. Final implementation decisions, reviews, and releases are curated by
+          the project owner.
+        </Text>
+      </View>
+      <View style={styles.infoCard}>
+        <Text style={styles.infoCardTitle}>Accessibility</Text>
+        <Text style={styles.infoCardBody}>
+          WhereRat aims to keep content readable, spoiler-safe by default, and easier to navigate across devices.
+          If you run into accessibility issues, please use the public support channels listed on the site.
+        </Text>
+      </View>
       <View style={styles.metaBlock}>
         <Text style={styles.metaLabel}>Version</Text>
         <Text style={styles.metaValue}>{version}</Text>
@@ -49,10 +81,6 @@ export default function AboutWhereRatScreen() {
         <Ionicons name="open-outline" size={18} color={colors.accent} />
         <Text style={styles.linkBtnText}>whererat.com</Text>
       </Pressable>
-      <Text style={styles.footerNote}>
-        Submissions and sign-in may be available on the website before they ship in the app — check the site
-        for the latest.
-      </Text>
     </ScrollView>
   );
 }
@@ -61,11 +89,26 @@ function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     scroll: { flex: 1 },
     scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 },
-    body: {
+    infoCard: {
+      borderRadius: 12,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.panel,
+      padding: 14,
+      marginBottom: 12,
+      gap: 6,
+    },
+    infoCardTitle: {
       color: colors.text,
       fontSize: 16,
-      lineHeight: 24,
-      marginBottom: 20,
+      fontWeight: "800",
+      lineHeight: 22,
+    },
+    infoCardBody: {
+      color: colors.textMuted,
+      fontSize: 14,
+      lineHeight: 21,
+      fontWeight: "500",
     },
     metaBlock: {
       borderRadius: 12,
@@ -92,6 +135,5 @@ function createStyles(colors: ThemeColors) {
     },
     linkBtnPressed: { opacity: 0.9 },
     linkBtnText: { color: colors.accent, fontSize: 16, fontWeight: "800" },
-    footerNote: { color: colors.textMuted, fontSize: 14, lineHeight: 21, marginTop: 24 },
   });
 }

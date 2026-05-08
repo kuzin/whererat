@@ -40,15 +40,17 @@
 
   --wr-btn-ghost-hover: rgb(245 245 244);
   --wr-btn-ghost-active: rgb(231 229 228);
+  --wr-btn-ghost-bg: rgb(255 255 255 / 0.94);
+  --wr-btn-ghost-border: rgb(87 83 78 / 0.72);
 
   --wr-input-bg: #ffffff;
   --wr-input-border: rgb(28 25 23 / 0.22);
   --wr-input-border-focus: #ea580c;
   --wr-input-text: #1c1410;
   --wr-input-placeholder: #78716c;
-  --wr-panel-warm-bg: #fef3c7;
-  --wr-panel-warm-fg: #78350f;
-  --wr-panel-warm-border: rgb(146 64 14 / 0.30);
+  --wr-panel-warm-bg: #fcd34d;
+  --wr-panel-warm-fg: #292524;
+  --wr-panel-warm-border: rgb(217 119 6 / 0.46);
   --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2357534e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 
@@ -88,6 +90,8 @@
 
     --wr-btn-ghost-hover: rgb(53 46 41);
     --wr-btn-ghost-active: rgb(63 54 46);
+    --wr-btn-ghost-bg: rgb(68 64 60 / 0.88);
+    --wr-btn-ghost-border: rgb(214 211 209 / 0.24);
 
     --wr-input-bg: #1c1917;
     --wr-input-border: rgb(254 243 199 / 0.18);
@@ -95,7 +99,7 @@
     --wr-input-text: #fef3c7;
     --wr-input-placeholder: #a8a29e;
     --wr-panel-warm-bg: #431407;
-    --wr-panel-warm-fg: #fef3c7;
+    --wr-panel-warm-fg: #292524;
     --wr-panel-warm-border: rgb(251 191 36 / 0.20);
     --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
@@ -300,25 +304,26 @@ body {
 
 /* Movie-palette-tinted primary button — uses --movie-accent CSS var */
 .wr-btn-movie {
-  background-color: color-mix(in srgb, var(--movie-accent) 82%, #000 18%);
-  border-color: color-mix(in srgb, var(--movie-accent) 58%, #000 42%);
-  color: #fff;
+  background-color: color-mix(in srgb, var(--movie-accent) 68%, #fff 32%);
+  border-color: color-mix(in srgb, var(--movie-accent) 60%, #000 40%);
+  color: var(--movie-accent-ink, #fff);
 }
 .wr-btn-movie:hover {
-  background-color: color-mix(in srgb, var(--movie-accent) 90%, #000 10%);
+  background-color: color-mix(in srgb, var(--movie-accent) 74%, #fff 26%);
 }
 .dark .wr-btn-movie {
   background-color: color-mix(in srgb, var(--movie-accent) 72%, #fff 28%);
   border-color: color-mix(in srgb, var(--movie-accent) 55%, #fff 45%);
-  color: rgb(28 25 23);
+  color: var(--movie-accent-ink-dark, #fff);
 }
 .dark .wr-btn-movie:hover {
   background-color: color-mix(in srgb, var(--movie-accent) 80%, #fff 20%);
 }
 
 @utility wr-btn-ghost {
-  @apply inline-flex items-center justify-center rounded-xl border-2 border-stone-950/90 px-5 py-2.5 text-center text-sm font-semibold text-stone-900 outline-none transition hover:shadow-none focus-visible:ring-2 focus-visible:ring-stone-950/40 focus-visible:ring-offset-2 active:brightness-[0.99] dark:border-white/22 dark:text-stone-100 dark:focus-visible:ring-amber-400/55 dark:focus-visible:ring-offset-stone-900;
-  background-color: var(--wr-card-bg);
+  @apply inline-flex items-center justify-center rounded-xl border-2 px-5 py-2.5 text-center text-sm font-semibold text-stone-900 outline-none transition hover:shadow-none focus-visible:ring-2 focus-visible:ring-stone-950/40 focus-visible:ring-offset-2 active:brightness-[0.99] dark:text-stone-100 dark:focus-visible:ring-amber-400/55 dark:focus-visible:ring-offset-stone-900;
+  background-color: var(--wr-btn-ghost-bg);
+  border-color: var(--wr-btn-ghost-border);
   box-shadow: 2px 2px 0 0 var(--wr-shadow-btn-soft);
 }
 
@@ -361,6 +366,12 @@ body {
 @utility wr-panel-warm {
   border-color: var(--wr-panel-warm-border);
   background-color: var(--wr-panel-warm-bg);
+  background-image:
+    linear-gradient(145deg, rgb(255 255 255 / 0.34), rgb(194 65 12 / 0.09)),
+    url("/brand/cheese-texture-shutterstock.jpg");
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
   color: var(--wr-panel-warm-fg);
 }
 
@@ -389,9 +400,29 @@ body {
   animation: wr-carousel-slide-fade 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+@keyframes wr-mobile-nav-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.wr-mobile-nav-enter {
+  transform-origin: top right;
+  animation: wr-mobile-nav-pop-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wr-carousel-slide-enter {
     animation: wr-carousel-fade-soft 0.18s ease-out both;
+  }
+
+  .wr-mobile-nav-enter {
+    animation: wr-carousel-fade-soft 0.12s ease-out both;
   }
 }
 
