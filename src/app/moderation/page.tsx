@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { ExternalLinkIcon } from "@/components/external-link-icon";
 import {
   formatSightingMomentDisplay,
@@ -29,6 +30,16 @@ import { ResyncAllButton } from "./resync-all-button";
 import { readUserStore } from "@/lib/user-store";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export const metadata: Metadata = {
+  title: "Moderation Queue",
+  description:
+    "Review pending submissions, approve or reject sightings, and manage catalog moderation activity.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;

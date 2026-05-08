@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -45,7 +46,6 @@ const CATALOG_CONTENT_INSET_X = 20;
 const CATALOG_LIST_INSET_X = 14;
 /** Extra inset below catalog scroll plus safe-area (pager sits above home indicator). */
 const SCROLL_BOTTOM_EXTRA = 28;
-const REFRESH_YELLOW = "#fbbf24";
 function gridPosterWidthPx(screenWidth: number): number {
   return (screenWidth - CATALOG_CONTENT_INSET_X * 2 - CARD_GAP * (CARD_COLS - 1)) / CARD_COLS;
 }
@@ -339,6 +339,40 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
     pageBtnDisabled: { opacity: 0.35 },
     pageBtnText: { color: colors.retryOnAccent, fontWeight: "700" },
     pageInfo: { color: colors.text, fontWeight: "600" },
+    successBackdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: colors.overlayScrim,
+    },
+    successCenterOuter: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: "center",
+      paddingHorizontal: INSET_X,
+      pointerEvents: "box-none",
+    },
+    successCard: {
+      pointerEvents: "auto",
+      borderRadius: 14,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.chipActiveOutline,
+      backgroundColor: colors.panel,
+      padding: 16,
+      gap: 12,
+    },
+    successEmoji: { fontSize: 32, lineHeight: 36, textAlign: "center" },
+    successTitle: { color: colors.text, fontSize: 20, fontWeight: "800", textAlign: "center" },
+    successBody: {
+      color: colors.textMuted,
+      fontSize: 14,
+      lineHeight: 20,
+      textAlign: "center",
+    },
+    successBtnPrimary: {
+      backgroundColor: colors.accent,
+      borderRadius: 10,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    successBtnPrimaryText: { color: colors.retryOnAccent, fontSize: 15, fontWeight: "800" },
   });
 }
 
@@ -482,6 +516,8 @@ function MovieRow({
 
 export default function CatalogScreen() {
   const { colors } = useTheme();
+  const params = useLocalSearchParams<{ success?: string }>();
+  const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const scrollBottomPad = Math.max(insets.bottom, 14) + SCROLL_BOTTOM_EXTRA;
   const styles = useMemo(() => createCatalogStyles(colors, scrollBottomPad), [colors, scrollBottomPad]);
@@ -504,6 +540,7 @@ export default function CatalogScreen() {
   const [error, setError] = useState<string | null>(null);
   const [catalogSearchFocused, setCatalogSearchFocused] = useState(false);
   const lastMovieNavAtRef = useRef(0);
+  const [successPreviewOpen, setSuccessPreviewOpen] = useState(false);
 
   /**
    * Guard against accidental double-taps that push the same route twice.
@@ -524,6 +561,12 @@ export default function CatalogScreen() {
   useEffect(() => {
     setPage(1);
   }, [queryApplied, genre, sort]);
+
+  useEffect(() => {
+    if (params.success !== "1") return;
+    setSuccessPreviewOpen(true);
+    router.replace("/");
+  }, [params.success]);
 
   const load = useCallback(async () => {
     setError(null);
@@ -688,6 +731,38 @@ export default function CatalogScreen() {
         styles={styles}
         accentColor={colors.accent}
       />
+      <Modal
+        visible={successPreviewOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSuccessPreviewOpen(false)}
+      >
+        <View style={styles.modalRoot}>
+          <Pressable
+            style={styles.successBackdrop}
+            onPress={() => setSuccessPreviewOpen(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Dismiss success message"
+          />
+          <View style={styles.successCenterOuter}>
+            <View style={styles.successCard}>
+              <Text style={styles.successEmoji}>🐀</Text>
+              <Text style={styles.successTitle}>Sighting submitted!</Text>
+              <Text style={styles.successBody}>
+                Thanks for logging it. Your sighting is in the moderation queue and will appear after review.
+              </Text>
+              <Pressable
+                style={styles.successBtnPrimary}
+                onPress={() => setSuccessPreviewOpen(false)}
+                accessibilityRole="button"
+                accessibilityLabel="Done"
+              >
+                <Text style={styles.successBtnPrimaryText}>Done</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {error ? (
         <View style={styles.banner}>
@@ -712,13 +787,13 @@ export default function CatalogScreen() {
         columnWrapperStyle={layoutMode === "card" ? styles.cardGridRow : undefined}
         refreshControl={
           <RefreshControl
-            key={`catalog-refresh-${colors.mode}`}
+            key={`catalog-refresh-${colors.mode}-${isFocused ? "focused" : "blurred"}`}
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={REFRESH_YELLOW}
-            colors={[REFRESH_YELLOW]}
-            progressBackgroundColor={colors.panelMuted}
-            titleColor={REFRESH_YELLOW}
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressBackgroundColor={colors.formCanvas}
+            titleColor={colors.accent}
           />
         }
         renderItem={({ item }) =>

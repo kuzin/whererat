@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
 import {
   canAutoApproveSubmissions,
   MODERATOR_SESSION_COOKIE,
@@ -8,6 +9,15 @@ import { submitSighting } from "./actions";
 import { SubmitForm } from "./submit-form";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export const metadata: Metadata = {
+  title: "Submit a Sighting",
+  description:
+    "Submit a new rat sighting with movie match, timestamp, spoiler flag, and optional screenshot.",
+  alternates: {
+    canonical: "/submit",
+  },
+};
 
 function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;

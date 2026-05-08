@@ -2,7 +2,7 @@ import { openURL } from "expo-linking";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
+import { Stack, router, useLocalSearchParams, useNavigation } from "expo-router";
 import {
   useCallback,
   useEffect,
@@ -51,7 +51,6 @@ const TAB_DEFS: { key: TabKey; label: string }[] = [
   { key: "media", label: "Media" },
   { key: "meta", label: "Meta" },
 ];
-const LOADER_YELLOW = "#fbbf24";
 function resolveHeaderBannerUrl(movie: NonNullable<MovieDetailResponse["movie"]>): string {
   return movie.headerBanner?.trim() || movie.posterUrl;
 }
@@ -116,6 +115,15 @@ function computeStillThumbHeight(
   }
   return Math.min(maxH, Math.round(contentW * (9 / 16)));
 }
+
+/** Fullscreen stills lightbox: always dark chrome, even when the app is in light mode. */
+const MEDIA_LIGHTBOX = {
+  background: "#0c0a09",
+  captionBg: "rgba(12,10,9,0.94)",
+  captionBorder: "rgba(254,243,199,0.15)",
+  text: "#f5f5f4",
+  closeIcon: "#f5f5f4",
+} as const;
 
 function createMovieStyles(colors: ThemeColors) {
   const surface = colors.headerBg;
@@ -517,7 +525,12 @@ function createMovieStyles(colors: ThemeColors) {
     relatedListRatingRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
     relatedListRatingIcon: { color: colors.accent },
     relatedListRatingText: { color: colors.accent, fontSize: 13, fontWeight: "600" },
-    relatedListWrap: { alignSelf: "stretch" },
+    relatedListWrap: {
+      alignSelf: "stretch",
+      paddingHorizontal: 2,
+      paddingTop: 2,
+      paddingBottom: 2,
+    },
     relatedTitle: { color: colors.text, fontWeight: "700", fontSize: 16 },
     videoRow: {
       flexDirection: "row",
@@ -570,7 +583,7 @@ function createMovieStyles(colors: ThemeColors) {
       borderColor: colors.border,
     },
     mediaStillImage: { width: "100%", height: "100%" },
-    mediaLightboxRoot: { flex: 1, backgroundColor: colors.background },
+    mediaLightboxRoot: { flex: 1, backgroundColor: MEDIA_LIGHTBOX.background },
     mediaLightboxClose: {
       position: "absolute",
       right: 12,
@@ -581,17 +594,20 @@ function createMovieStyles(colors: ThemeColors) {
       flex: 1,
       minHeight: 0,
       justifyContent: "center",
-      paddingHorizontal: 8,
+      paddingHorizontal: 0,
     },
+    mediaLightboxPager: { flex: 1 },
+    mediaLightboxSlide: { justifyContent: "center", alignItems: "center" },
     mediaLightboxCaptionWrap: {
       paddingHorizontal: 16,
       paddingTop: 8,
-      backgroundColor: colors.overlayScrimStrong,
+      paddingBottom: 10,
+      backgroundColor: MEDIA_LIGHTBOX.captionBg,
       borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.inputBorder,
+      borderTopColor: MEDIA_LIGHTBOX.captionBorder,
     },
     mediaLightboxCaption: {
-      color: colors.onScrimText,
+      color: MEDIA_LIGHTBOX.text,
       fontSize: 14,
       lineHeight: 21,
       textAlign: "center",
@@ -726,6 +742,27 @@ function HeroBlock({
               ))}
             </View>
           ) : null}
+          <Pressable
+            style={styles.imdbBtn}
+            onPress={() =>
+              router.push({
+                pathname: "/submit",
+                params: {
+                  prefill: "1",
+                  imdbId: movie.externalIds.imdb,
+                  title: movie.title,
+                  year: String(movie.releaseYear),
+                  posterUrl: movie.posterUrl,
+                },
+              })
+            }
+            accessibilityRole="button"
+            accessibilityLabel={`Add a sighting for ${movie.title}`}
+            accessibilityHint="Opens submit form with this movie preselected"
+          >
+            <Ionicons name="add-circle-outline" size={15} style={styles.imdbBtnIcon} />
+            <Text style={styles.imdbBtnText}>Add a sighting</Text>
+          </Pressable>
         </View>
         <Image
           style={styles.poster}
@@ -1068,7 +1105,7 @@ function SightingsSection({
       )}
       {loadingMore ? (
         <View style={styles.loadingMoreWrap}>
-          <ActivityIndicator size="small" color={LOADER_YELLOW} />
+          <ActivityIndicator size="small" color={themeColors.accent} />
         </View>
       ) : null}
       <SortOptionsSheet
@@ -1117,7 +1154,7 @@ export default function MovieScreen() {
   const { width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [mediaSegment, setMediaSegment] = useState<"stills" | "videos">("stills");
-  const [mediaLightbox, setMediaLightbox] = useState<{ url: string; caption?: string } | null>(null);
+  const [mediaLightboxIndex, setMediaLightboxIndex] = useState<number | null>(null);
 
   const apiChromeFallback = useMemo(() => {
     if (!movie) return colors.headerBg;
@@ -1307,6 +1344,7 @@ export default function MovieScreen() {
 
   const mediaImgsLen = tabs?.images?.length ?? 0;
   const mediaVidsLen = tabs?.videos?.length ?? 0;
+  const lightboxImages = tabs?.images ?? [];
   const stickySightingsChrome = Boolean(featured && tab === "sightings");
   const stickyReviewsChrome = tab === "reviews" && (tabs?.reviews?.length ?? 0) > 0;
   const stickyMediaChrome = tab === "media" && mediaImgsLen > 0 && mediaVidsLen > 0;
@@ -1351,11 +1389,11 @@ export default function MovieScreen() {
   );
 
   useEffect(() => {
-    setMediaLightbox(null);
+    setMediaLightboxIndex(null);
   }, [slug]);
 
   useEffect(() => {
-    if (tab !== "media") setMediaLightbox(null);
+    if (tab !== "media") setMediaLightboxIndex(null);
   }, [tab]);
 
   useEffect(() => {
@@ -1384,7 +1422,7 @@ export default function MovieScreen() {
       <Stack.Screen options={{ headerShown: true }} />
       {loading && !data ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={LOADER_YELLOW} />
+          <ActivityIndicator size="large" color={movieThemeColors.accent} />
         </View>
       ) : null}
 
@@ -1454,10 +1492,10 @@ export default function MovieScreen() {
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
-                  tintColor={LOADER_YELLOW}
-                  colors={[LOADER_YELLOW]}
+                  tintColor={movieThemeColors.accent}
+                  colors={[movieThemeColors.accent]}
                   progressBackgroundColor={movieThemeColors.panel}
-                  titleColor={LOADER_YELLOW}
+                  titleColor={movieThemeColors.accent}
                 />
               }
               style={styles.scroll}
@@ -1771,10 +1809,7 @@ export default function MovieScreen() {
                               key={im.id}
                               style={styles.mediaStillCard}
                               onPress={() =>
-                                setMediaLightbox({
-                                  url: im.url,
-                                  caption: im.caption?.trim() || undefined,
-                                })
+                                setMediaLightboxIndex(Math.max(0, imgs.findIndex((x) => x.id === im.id)))
                               }
                             >
                               <View
@@ -1843,11 +1878,11 @@ export default function MovieScreen() {
       ) : null}
 
       <Modal
-        visible={mediaLightbox !== null}
+        visible={mediaLightboxIndex !== null}
         animationType="fade"
         transparent
         statusBarTranslucent
-        onRequestClose={() => setMediaLightbox(null)}
+        onRequestClose={() => setMediaLightboxIndex(null)}
       >
         <View style={[styles.mediaLightboxRoot, { paddingBottom: insets.bottom }]}>
           <Pressable
@@ -1855,25 +1890,44 @@ export default function MovieScreen() {
             accessibilityLabel="Close fullscreen image"
             hitSlop={12}
             style={[styles.mediaLightboxClose, { top: insets.top + 6 }]}
-            onPress={() => setMediaLightbox(null)}
+            onPress={() => setMediaLightboxIndex(null)}
           >
-            <Ionicons name="close" size={30} color={movieThemeColors.onScrimText} />
+            <Ionicons name="close" size={30} color={MEDIA_LIGHTBOX.closeIcon} />
           </Pressable>
           <View style={[styles.mediaLightboxImageSlot, { paddingTop: insets.top + 44 }]}>
-            {mediaLightbox ? (
-              <Image
-                source={{ uri: mediaLightbox.url }}
-                style={{ width: "100%", flex: 1 }}
-                contentFit="contain"
-                recyclingKey={`lightbox:${mediaLightbox.url}`}
-              />
+            {lightboxImages.length > 0 && mediaLightboxIndex !== null ? (
+              <ScrollView
+                key={`lightbox:${movie?.id ?? "movie"}:${mediaLightboxIndex}`}
+                horizontal
+                pagingEnabled
+                style={styles.mediaLightboxPager}
+                showsHorizontalScrollIndicator={false}
+                contentOffset={{ x: mediaLightboxIndex * windowWidth, y: 0 }}
+                onMomentumScrollEnd={(event) => {
+                  const x = event.nativeEvent.contentOffset.x;
+                  const idx = Math.round(x / Math.max(1, windowWidth));
+                  const safe = Math.max(0, Math.min(lightboxImages.length - 1, idx));
+                  setMediaLightboxIndex(safe);
+                }}
+              >
+                {lightboxImages.map((im) => (
+                  <View key={`lightbox-slide:${im.id}`} style={[styles.mediaLightboxSlide, { width: windowWidth }]}>
+                    <Image
+                      source={{ uri: im.url }}
+                      style={{ width: windowWidth, flex: 1 }}
+                      contentFit="contain"
+                      recyclingKey={`lightbox:${im.id}:${im.url}`}
+                    />
+                  </View>
+                ))}
+              </ScrollView>
             ) : null}
           </View>
-          {mediaLightbox?.caption ? (
-            <View style={styles.mediaLightboxCaptionWrap}>
-              <Text style={styles.mediaLightboxCaption}>{mediaLightbox.caption}</Text>
-            </View>
-          ) : null}
+          <View style={styles.mediaLightboxCaptionWrap}>
+            <Text style={styles.mediaLightboxCaption}>
+              {mediaLightboxIndex !== null ? lightboxImages[mediaLightboxIndex]?.caption?.trim() || " " : " "}
+            </Text>
+          </View>
         </View>
       </Modal>
     </>

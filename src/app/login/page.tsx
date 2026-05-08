@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import { loginModerator } from "./actions";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export const metadata: Metadata = {
+  title: "Moderator Login",
+  description: "Sign in to access the WhereRat moderation queue.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;

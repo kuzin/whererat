@@ -1,3 +1,14 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Submission Guidelines",
+  description:
+    "Read WhereRat submission guidelines for valid sightings, spoilers, moderation, accessibility, and sources.",
+  alternates: {
+    canonical: "/guidelines",
+  },
+};
+
 const guidelines = [
   {
     icon: "🐀",

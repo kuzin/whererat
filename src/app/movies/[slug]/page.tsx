@@ -388,7 +388,7 @@ export default async function MoviePage({
                         : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78"
                     }
                   >
-                    Catalog sightings
+                    Sightings
                   </dt>
                   <dd
                     className={`wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
@@ -414,7 +414,7 @@ export default async function MoviePage({
                         : "max-w-[10rem] text-[0.65rem] font-bold uppercase leading-snug tracking-[0.18em] text-amber-200/78"
                     }
                   >
-                    Rats on screen (est.)
+                    Total rats
                   </dt>
                   <dd
                     className={`wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${

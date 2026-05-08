@@ -1,10 +1,10 @@
 import Slider from "@react-native-community/slider";
 import { Image } from "expo-image";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { HeaderHeightContext } from "@react-navigation/elements";
 import {
   ActivityIndicator,
-  Alert,
   InputAccessoryView,
   Keyboard,
   KeyboardAvoidingView,
@@ -516,6 +516,13 @@ function createFormStyles(colors: ThemeColors) {
 
 export function LogSightingForm() {
   const { colors } = useTheme();
+  const params = useLocalSearchParams<{
+    prefill?: string;
+    imdbId?: string;
+    title?: string;
+    year?: string;
+    posterUrl?: string;
+  }>();
   const insets = useSafeAreaInsets();
   const headerOffset = useContext(HeaderHeightContext) ?? 0;
   const styles = useMemo(() => createFormStyles(colors), [colors]);
@@ -590,6 +597,7 @@ export function LogSightingForm() {
   const [submitting, setSubmitting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prefillAppliedRef = useRef(false);
   /** Invalidate in-flight IMDb search when a movie is picked so late responses can't repopulate the list. */
   const imdbSearchSeqRef = useRef(0);
 
@@ -670,6 +678,40 @@ export function LogSightingForm() {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [movieQuery, imdbId, runImdbSearch]);
+
+  useEffect(() => {
+    if (prefillAppliedRef.current) return;
+    if (params.prefill !== "1") return;
+    const prefImdbId = typeof params.imdbId === "string" ? params.imdbId.trim() : "";
+    const prefTitle = typeof params.title === "string" ? params.title.trim() : "";
+    if (!prefImdbId || !prefTitle) return;
+
+    const prefYear = typeof params.year === "string" ? params.year.trim() : "";
+    const prefPoster = typeof params.posterUrl === "string" ? params.posterUrl.trim() : "";
+    prefillAppliedRef.current = true;
+    imdbSearchSeqRef.current += 1;
+    setMovieQuery("");
+    setSearchHits([]);
+    setSearchHasMore(false);
+    setSearchPage(1);
+    setSearchNotice(undefined);
+    setImdbId(prefImdbId);
+    setMovieTitleResolved(prefTitle);
+    setMovieYear(firstReleaseYear(prefYear));
+    setMoviePosterUrl(prefPoster);
+    setSelectedHit({
+      title: prefTitle,
+      year: prefYear || "—",
+      imdbId: prefImdbId,
+      posterUrl: prefPoster,
+      runtime: undefined,
+      genre: undefined,
+      rating: undefined,
+      plot: undefined,
+      source: "Seed",
+    });
+    setFormError(null);
+  }, [params]);
 
   const selectMovie = useCallback((hit: ImdbMovieSearchResult) => {
     imdbSearchSeqRef.current += 1;
@@ -753,10 +795,7 @@ export function LogSightingForm() {
       setSpoiler(false);
       setDescriptionMode("write");
       clearMovie();
-      Alert.alert(
-        "Thanks!",
-        "Your sighting is in the moderator review queue. You’ll see it live after approval.",
-      );
+      router.replace({ pathname: "/", params: { success: "1" } });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Submission failed.";
       setFormError(msg);

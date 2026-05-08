@@ -41,24 +41,39 @@ export const metadata: Metadata = {
     default: "WhereRat",
     template: "%s | WhereRat",
   },
-  description: "The catalog of rat appearances in film and TV.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://whererat.com"),
+  applicationName: "WhereRat",
+  description: "Spoiler-aware catalog of rat appearances in film and TV, with community sightings.",
+  keywords: [
+    "WhereRat",
+    "rat sightings",
+    "movie catalog",
+    "IMDb rat scenes",
+    "film database",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
+    type: "website",
+    url: "/",
     siteName: "WhereRat",
     title: "WhereRat",
-    description: "An obsessive guide to rats on film.",
+    description: "Spoiler-aware catalog of rat appearances in film and TV.",
     images: [{ url: "/brand/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "WhereRat",
-    description: "An obsessive guide to rats on film.",
+    description: "Spoiler-aware catalog of rat appearances in film and TV.",
     images: ["/brand/og-image.png"],
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/brand/icon.svg", type: "image/svg+xml" },
-    ],
+    icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/brand/icon.svg" }],
   },
   appleWebApp: {

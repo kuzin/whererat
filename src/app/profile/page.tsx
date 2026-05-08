@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import {
   MODERATOR_SESSION_COOKIE,
   parseModeratorSession,
@@ -10,6 +11,15 @@ import { updatePassword, updateProfile } from "./actions";
 import { AvatarUploadField } from "./avatar-upload-field";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export const metadata: Metadata = {
+  title: "Profile",
+  description: "Manage moderator profile details, avatar, and password.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function ProfilePage({
   searchParams,

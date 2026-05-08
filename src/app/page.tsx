@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getApprovedSubmissionRatTally } from "@/lib/moderation-store";
 import { getDeletedMovieIds } from "@/lib/movie-edit-store";
 import { estimateRatsForAppearance } from "@/lib/whererat";
@@ -13,6 +14,15 @@ import { getMergedSightingsForMovie } from "@/lib/moderation-store";
 import { CatalogFilters, CatalogPagination, type CatalogSortOption } from "./catalog-filters";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export const metadata: Metadata = {
+  title: "Catalog",
+  description:
+    "Browse the WhereRat catalog of rat sightings in movies, with filters, stats, and spoiler-aware entries.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
