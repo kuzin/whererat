@@ -11,6 +11,7 @@ import { deleteSubmissionById, reviewSubmission } from "@/lib/moderation-store";
 import {
   clampApproximateRatCount,
   normalizeSightingTimestampInput,
+  type ImdbTitleKind,
   type SightingImageSlot,
 } from "@/lib/whererat";
 import { persistSightingFiles } from "@/lib/media-storage";
@@ -50,7 +51,7 @@ export async function moderateSubmission(formData: FormData) {
   const reason = String(formData.get("reason") ?? "").trim();
   const curatorNote = String(formData.get("curatorNote") ?? "").trim();
   const imdbKindRaw = String(formData.get("imdbKind") ?? "").trim().toLowerCase();
-  const imdbKind = imdbKindRaw === "series" ? "series" : "movie";
+  const imdbKind: ImdbTitleKind = imdbKindRaw === "series" ? "series" : "movie";
   const seasonNumberRaw = Number.parseInt(String(formData.get("seasonNumber") ?? "").trim(), 10);
   const episodeNumberRaw = Number.parseInt(String(formData.get("episodeNumber") ?? "").trim(), 10);
   const episodeTitle = String(formData.get("episodeTitle") ?? "").trim();

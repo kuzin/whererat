@@ -447,11 +447,13 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
     : undefined;
   const posterUrl =
     omdb?.Poster && omdb.Poster !== "N/A" ? omdb.Poster : undefined;
-  const totalEpisodes = await fetchOmdbTotalEpisodeCount({
-    imdbId,
-    apiKey,
-    totalSeasonsRaw: omdb?.totalSeasons ?? omdb?.TotalSeasons,
-  });
+  const totalEpisodes = apiKey
+    ? await fetchOmdbTotalEpisodeCount({
+        imdbId,
+        apiKey,
+        totalSeasonsRaw: omdb?.totalSeasons ?? omdb?.TotalSeasons,
+      })
+    : undefined;
   const prevSyncSnapshot =
     movie.metadata.syncSnapshot && typeof movie.metadata.syncSnapshot === "object"
       ? movie.metadata.syncSnapshot
