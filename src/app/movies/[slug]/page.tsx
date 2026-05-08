@@ -489,7 +489,7 @@ export default async function MoviePage({
                 alt={movie.posterAlt}
                 width={480}
                 height={720}
-                className={`aspect-[2/3] w-full shrink-0 rounded-xl object-cover ring-2 dark:ring-white/12 ${palette ? "ring-[color-mix(in_srgb,var(--movie-accent)_22%,transparent)]" : "ring-stone-950/10"}`}
+                className={`aspect-[2/3] w-full max-w-[18rem] self-center shrink-0 rounded-xl object-cover ring-2 lg:max-w-full dark:ring-white/12 ${palette ? "ring-[color-mix(in_srgb,var(--movie-accent)_22%,transparent)]" : "ring-stone-950/10"}`}
               />
               <section className="space-y-2.5">
                 <h2 className={sidebarSectionTitleClass}>Synopsis</h2>

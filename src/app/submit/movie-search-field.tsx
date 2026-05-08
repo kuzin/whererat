@@ -164,7 +164,12 @@ export function MovieSearchField({
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-        IMDb title search
+        <span>
+          Movie
+          <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">
+            *
+          </span>
+        </span>
         <input
           data-field="movieSelection"
           value={query}

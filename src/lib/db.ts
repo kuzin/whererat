@@ -2,6 +2,29 @@ import { Pool } from "pg";
 
 let sharedPool: Pool | undefined;
 
+const PG_SSLMODE_ALIASES = new Set(["prefer", "require", "verify-ca"]);
+
+/**
+ * pg-connection-string warns that `prefer` / `require` / `verify-ca` aliases
+ * will change semantics in pg v9. Keep current behavior explicit by upgrading
+ * these values to `verify-full` at runtime.
+ */
+function normalizeSslMode(connectionString: string): string {
+  try {
+    const parsed = new URL(connectionString);
+    const sslmode = parsed.searchParams.get("sslmode")?.toLowerCase();
+    if (!sslmode) return connectionString;
+    if (!PG_SSLMODE_ALIASES.has(sslmode)) return connectionString;
+    if (parsed.searchParams.get("uselibpqcompat") === "true") {
+      return connectionString;
+    }
+    parsed.searchParams.set("sslmode", "verify-full");
+    return parsed.toString();
+  } catch {
+    return connectionString;
+  }
+}
+
 function resolveConnectionString(): string | undefined {
   const candidates = [
     process.env.DATABASE_URL,
@@ -11,7 +34,7 @@ function resolveConnectionString(): string | undefined {
   ];
   for (const raw of candidates) {
     const trimmed = raw?.trim();
-    if (trimmed) return trimmed;
+    if (trimmed) return normalizeSslMode(trimmed);
   }
   return undefined;
 }

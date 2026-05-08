@@ -34,6 +34,10 @@ export function CaitlinEasterEggToggle({
   const [mode, setMode] = useState<ThemeMode>("light");
 
   useEffect(() => {
+    applyTheme(mode);
+  }, [mode]);
+
+  useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       const domIsDark = isDarkApplied();
@@ -47,7 +51,6 @@ export function CaitlinEasterEggToggle({
             ? "dark"
             : "light";
       setMode(initial);
-      applyTheme(initial);
     } catch {
       // Ignore storage issues in private/restricted contexts.
     }

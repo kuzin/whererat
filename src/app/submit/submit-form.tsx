@@ -6,6 +6,14 @@ import { SightingMarkdown } from "@/components/sighting-markdown";
 import { MovieSearchField } from "./movie-search-field";
 import { SightingImageUpload } from "./sighting-image-upload";
 
+function RequiredMarker() {
+  return (
+    <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">
+      *
+    </span>
+  );
+}
+
 function SwarmSignal({ count }: { count: number }) {
   const { label, sublabel, fill } = (() => {
     if (count === 1) return { label: "Lone scout", sublabel: "A solitary rat. Brave.", fill: 1 };
@@ -184,7 +192,10 @@ export function SubmitForm({
           }
         />
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          Sighting title
+          <span>
+            Sighting title
+            <RequiredMarker />
+          </span>
           <input
             data-field="sightingTitle"
             name="sightingTitle"
@@ -204,14 +215,12 @@ export function SubmitForm({
       <div className="flex flex-col gap-6">
         <div className="flex w-full flex-col gap-2" data-field="timestamp">
           <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
-            How far into the film did you spot the rat(s)?
+            Approx. point in movie
+            <RequiredMarker />
           </p>
           <div className="pt-1">
-            <div>
-              <span className="text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">{sightingPercent}%</span>
-              <span className="ml-2 text-sm font-medium text-stone-500 dark:text-stone-400">into the film</span>
-            </div>
-            <div className="relative mt-4">
+            <div className="mt-2 flex items-center gap-3">
+              <div className="relative flex-1">
               <div className="h-5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700">
                 <div
                   className="h-full rounded-full bg-amber-500 transition-all duration-100"
@@ -242,10 +251,12 @@ export function SubmitForm({
                 aria-label="How far into the film did you spot the rat(s)?"
                 className="absolute inset-0 h-full w-full cursor-grab active:cursor-grabbing opacity-0"
               />
-            </div>
-            <div className="mt-2 flex justify-between text-sm font-semibold text-stone-500 dark:text-stone-400">
-              <span>Opening</span>
-              <span>Ending</span>
+              </div>
+              <div className="shrink-0 text-right">
+                <span className="text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">
+                  {sightingPercent}%
+                </span>
+              </div>
             </div>
           </div>
           {errorFor("timestamp") ? (
@@ -287,7 +298,10 @@ export function SubmitForm({
 
       <div className="flex flex-col gap-2">
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          Description
+          <span>
+            Description
+            <RequiredMarker />
+          </span>
           <textarea
             data-field="description"
             name="description"
@@ -347,7 +361,10 @@ export function SubmitForm({
 
       <div className="grid gap-4">
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          Your name
+          <span>
+            Your name
+            <RequiredMarker />
+          </span>
           {lockedSubmitterFields ? (
             <input name="submitterName" type="hidden" value={loggedInName} />
           ) : null}

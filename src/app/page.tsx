@@ -109,28 +109,6 @@ export default async function Home({
   const ratsTallied = stats.ratsTallied + approvedSubmissionRats;
   const availableGenres = await getCatalogGenres();
 
-  const statsBarItems = [
-    {
-      value: Math.max(0, stats.movies - deletedMovieIds.size),
-      shortLabel: "Movies Cataloged",
-      fullLabel: "Movies in collection",
-      detailTitle: undefined as string | undefined,
-    },
-    {
-      value: stats.sightings,
-      shortLabel: "Total Sightings",
-      fullLabel: "Sightings logged",
-      detailTitle: undefined as string | undefined,
-    },
-    {
-      value: ratsTallied,
-      shortLabel: "Total Rats Logged (EST.)",
-      fullLabel: "Rats tallied (est.)",
-      detailTitle:
-        "Catalog heuristic (swarms weigh more) plus submitter-rated counts from moderator-approved queue items.",
-    },
-  ];
-
   return (
     <main className="relative">
       <section className="py-12 sm:py-16">
@@ -145,32 +123,11 @@ export default async function Home({
         </div>
       </section>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-0 sm:px-6 sm:pb-0 lg:px-8">
-        <div className="wr-cheese-stats-slab overflow-hidden rounded-2xl rounded-b-none border-2 border-stone-950 shadow-[4px_4px_0_0_rgb(28_25_23/0.28)] dark:border-amber-400/35 dark:shadow-[4px_4px_0_0_rgb(0_0_0/0.38)]">
-          <div className="flex divide-x-2 divide-stone-950/20 dark:divide-white/15">
-            {statsBarItems.map((item) => (
-              <div
-                key={item.fullLabel}
-                title={item.detailTitle ?? item.fullLabel}
-                className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-3 py-3.5 sm:px-8 sm:py-4"
-              >
-                <p className="wr-display text-2xl font-black leading-none tracking-[0.02em] tabular-nums text-stone-950 dark:text-[#fff7dc] sm:text-3xl">
-                  {item.value.toLocaleString()}
-                </p>
-                <p className="text-center text-[0.84rem] font-bold uppercase tracking-[0.13em] text-stone-800/90 dark:text-amber-200/90 sm:text-[0.9rem]">
-                  {item.shortLabel}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <section
         id="catalog"
         className="mx-auto max-w-7xl px-4 pt-0 pb-20 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
       >
-        <div className="wr-card rounded-t-none border-t-0 bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
+        <div className="wr-card bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
           <CatalogFilters
             availableGenres={availableGenres}
             defaultQuery={query}

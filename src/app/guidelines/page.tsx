@@ -93,7 +93,7 @@ export default function GuidelinesPage() {
                 <p className="mt-0.5 text-sm text-stone-600 dark:text-stone-400">You know the rules — go log that rat.</p>
               </div>
               <a href="/submit" className="wr-btn-primary shrink-0 px-5 py-2.5 text-sm font-bold">
-                Submit →
+                Submit a sighting →
               </a>
             </div>
 

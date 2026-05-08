@@ -205,7 +205,7 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
                 <ReviewCard
                   review={review}
                   className={cardClass}
-                  dim={!onlyRats && !review.mentionsRat}
+                  highlight={review.mentionsRat}
                 />
               </div>
             ))}
@@ -219,16 +219,22 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
 function ReviewCard({
   review,
   className,
-  dim = false,
+  highlight = false,
 }: {
   review: ImdbReview;
   className: string;
-  dim?: boolean;
+  highlight?: boolean;
 }) {
   const isLong = review.text.length > 400;
 
   return (
-    <article className={`${className} transition-opacity ${dim ? "opacity-50" : "opacity-100"}`}>
+    <article
+      className={`${className} ${
+        highlight
+          ? "ring-2 ring-amber-400/65 ring-offset-2 ring-offset-transparent dark:ring-amber-300/55"
+          : ""
+      }`}
+    >
       {/* Top row: author + date on left, rating + rat badge on right */}
       <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
