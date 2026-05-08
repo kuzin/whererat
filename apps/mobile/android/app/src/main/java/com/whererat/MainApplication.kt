@@ -1,4 +1,4 @@
-package com.whererat.app
+package com.whererat
 
 import android.app.Application
 import android.content.res.Configuration

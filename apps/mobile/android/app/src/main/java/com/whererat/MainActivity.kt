@@ -1,4 +1,4 @@
-package com.whererat.app
+package com.whererat
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

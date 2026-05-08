@@ -12,7 +12,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#ea580c"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.whererat.app",
@@ -27,9 +29,12 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ea580c"
       },
-      "package": "com.whererat.app",
+      "package": "com.whererat",
       "edgeToEdgeEnabled": true,
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -43,6 +48,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7ce556ec-1c86-4a6b-ac05-10e1bc11b02b"
+      }
+    },
+    "owner": "mikekuzin"
   }
 }
