@@ -1,14 +1,19 @@
 import Slider from "@react-native-community/slider";
 import { Image } from "expo-image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { HeaderHeightContext } from "@react-navigation/elements";
 import {
   ActivityIndicator,
   Alert,
+  InputAccessoryView,
+  Keyboard,
+  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 
@@ -18,9 +23,17 @@ import {
   type ImdbMovieSearchResult,
   postSightingSubmission,
 } from "../lib/api";
+import { contrastingForeground } from "../lib/posterTone";
 import { type ThemeColors, useTheme } from "../lib/theme";
+import Markdown from "react-native-markdown-display";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const INSET_X = 16;
+const IOS_INPUT_ACCESSORY_ID = "LogSightingInputAccessory";
+/**
+ * 8pt grid — vertical rhythm between labels, controls, and sections (Material / iOS–style density).
+ */
+const SPACE = { xs: 4, sm: 8, md: 16, lg: 24 } as const;
 /** Wait for typing to settle before hitting OMDb (matches web submit field ~300ms, slightly longer for mobile). */
 const IMDB_SEARCH_DEBOUNCE_MS = 400;
 
@@ -146,8 +159,12 @@ function RatSwarmSignal({
         ))}
       </View>
       <View style={styles.ratMeterTextCol}>
-        <Text style={styles.ratMeterTitle}>{label}</Text>
-        <Text style={styles.ratMeterSub}>{sublabel}</Text>
+        <Text style={styles.ratMeterTitle} numberOfLines={1} ellipsizeMode="tail">
+          {label}
+        </Text>
+        <Text style={styles.ratMeterSub} numberOfLines={2} ellipsizeMode="tail">
+          {sublabel}
+        </Text>
       </View>
     </View>
   );
@@ -155,69 +172,127 @@ function RatSwarmSignal({
 
 function createFormStyles(colors: ThemeColors) {
   const line = colors.inputBorder;
+  const fgOnChip = contrastingForeground(colors.chipActive);
   return StyleSheet.create({
-    block: { gap: 8 },
-    sectionCard: {
-      gap: 14,
-      padding: 16,
-      borderRadius: 14,
-      backgroundColor: colors.panel,
+    /** Same as scroll section `gap` — keeps space between field groups aligned with space between major blocks. */
+    formSection: { gap: SPACE.lg },
+    /** Space inside one logical field (label → helper → control). */
+    fieldGroup: { gap: SPACE.sm },
+    descModeRow: {
+      flexDirection: "row",
+      borderRadius: 10,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.panelMuted,
+      overflow: "hidden",
+    },
+    descModeBtn: {
+      flex: 1,
+      minWidth: 0,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 10,
+      backgroundColor: "transparent",
+    },
+    descModeBtnDivider: {
+      borderLeftWidth: StyleSheet.hairlineWidth,
+      borderLeftColor: colors.border,
+    },
+    descModeBtnActive: {
+      backgroundColor: colors.chipActive,
+    },
+    descModeBtnText: {
+      fontSize: 13,
+      fontWeight: "700",
+      color: colors.textMuted,
+    },
+    descModeBtnTextActive: {
+      color: fgOnChip,
+    },
+    previewBox: {
+      minHeight: 120,
+      padding: 12,
+      borderRadius: 12,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: line,
+      backgroundColor: colors.panel,
+    },
+    previewEmpty: {
+      color: colors.textMuted,
+      fontSize: 14,
+      lineHeight: 20,
+      fontStyle: "italic",
     },
     filmPctBig: {
-      fontSize: 28,
+      fontSize: 22,
       fontWeight: "900",
       color: colors.text,
       fontVariant: ["tabular-nums"],
     },
-    filmPctInto: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: colors.textMuted,
+    filmSliderRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACE.sm,
     },
     filmSlider: {
-      width: "100%",
+      flex: 1,
+      minWidth: 0,
       height: Platform.OS === "ios" ? 44 : 40,
+    },
+    filmPctInline: {
+      alignItems: "flex-end",
+      justifyContent: "center",
+      minWidth: 56,
     },
     sliderEndLabels: {
       flexDirection: "row",
       justifyContent: "space-between",
-      marginTop: -2,
+      marginTop: SPACE.xs,
     },
     sliderEndLabel: {
       fontSize: 13,
       fontWeight: "700",
       color: colors.textMuted,
     },
-    ratControlsRow: {
-      flexDirection: "row",
+    /** Stepper + meter stack vertically so the swarm scale stays full width and nothing shares a cramped row. */
+    ratControlsStack: {
+      gap: SPACE.md,
       alignItems: "stretch",
-      gap: 12,
-      flexWrap: "wrap",
     },
+    /** Full-width segmented control aligned with `AppTextInput` chrome and height. */
     ratStepperOuter: {
+      width: "100%",
+      alignSelf: "stretch",
       flexDirection: "row",
       alignItems: "stretch",
-      borderWidth: 2,
-      borderColor: line,
-      borderRadius: 12,
+      minHeight: Platform.OS === "ios" ? 48 : 46,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.inputBorder,
+      borderRadius: 10,
       backgroundColor: colors.panel,
       overflow: "hidden",
-      alignSelf: "flex-start",
+    },
+    ratStepperOuterDisabled: {
+      borderColor: colors.inputBorderDisabled,
+      backgroundColor: colors.inputBackgroundDisabled,
     },
     ratStepperBtn: {
-      width: 44,
+      width: 48,
+      flexShrink: 0,
       justifyContent: "center",
       alignItems: "center",
     },
     ratStepperMid: {
-      minWidth: 52,
+      flex: 1,
+      minWidth: 0,
       justifyContent: "center",
       alignItems: "center",
-      borderLeftWidth: 2,
-      borderRightWidth: 2,
-      borderColor: line,
+      borderLeftWidth: StyleSheet.hairlineWidth,
+      borderRightWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.inputBorder,
+    },
+    ratStepperMidDisabled: {
+      borderColor: colors.inputBorderDisabled,
     },
     ratStepperVal: {
       fontSize: 16,
@@ -226,24 +301,25 @@ function createFormStyles(colors: ThemeColors) {
       fontVariant: ["tabular-nums"],
     },
     ratMeterCard: {
-      flex: 1,
-      flexGrow: 1,
-      minWidth: 160,
+      alignSelf: "stretch",
       flexDirection: "row",
       alignItems: "center",
       gap: 10,
       borderRadius: 10,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: line,
-      backgroundColor:
-        colors.mode === "light" ? "rgba(250,250,249,0.92)" : "rgba(41,37,36,0.55)",
+      backgroundColor: colors.panelMuted,
       paddingHorizontal: 12,
-      paddingVertical: 10,
+      paddingVertical: 12,
     },
-    ratEmojiRow: { flexDirection: "row", gap: 2 },
+    ratEmojiRow: {
+      flexDirection: "row",
+      flexShrink: 0,
+      gap: 2,
+    },
     ratEmoji: { fontSize: 16, lineHeight: 18, opacity: 1 },
     ratEmojiInactive: { opacity: 0.15 },
-    ratMeterTextCol: { flex: 1, minWidth: 0 },
+    ratMeterTextCol: { flex: 1, minWidth: 0, justifyContent: "center" },
     ratMeterTitle: {
       fontSize: 12,
       fontWeight: "800",
@@ -253,13 +329,6 @@ function createFormStyles(colors: ThemeColors) {
       fontSize: 12,
       lineHeight: 16,
       color: colors.textMuted,
-    },
-    sectionLabel: {
-      color: colors.textMuted,
-      fontSize: 12,
-      fontWeight: "700",
-      letterSpacing: 0.4,
-      textTransform: "uppercase",
     },
     fieldLabel: { color: colors.text, fontSize: 14, fontWeight: "700" },
     helper: { color: colors.textMuted, fontSize: 12, lineHeight: 17 },
@@ -296,15 +365,15 @@ function createFormStyles(colors: ThemeColors) {
       fontWeight: "800",
       letterSpacing: 0.9,
       textTransform: "uppercase",
-      color: colors.mode === "light" ? "#b45309" : "#fbbf24",
+      color: colors.accent,
     },
     selectedCard: {
       flexDirection: "row",
       alignItems: "stretch",
       borderRadius: 12,
       borderWidth: StyleSheet.hairlineWidth * 2,
-      borderColor: colors.mode === "light" ? "rgba(217,119,6,0.45)" : "rgba(251,191,36,0.35)",
-      backgroundColor: colors.mode === "light" ? "rgba(254,243,199,0.35)" : "rgba(120,53,15,0.22)",
+      borderColor: line,
+      backgroundColor: colors.panel,
       overflow: "hidden",
     },
     selectedBody: {
@@ -314,13 +383,6 @@ function createFormStyles(colors: ThemeColors) {
       justifyContent: "center",
       minWidth: 0,
     },
-    selectedKicker: {
-      fontSize: 11,
-      fontWeight: "800",
-      letterSpacing: 1.2,
-      textTransform: "uppercase",
-      color: colors.mode === "light" ? "rgba(120,53,15,0.85)" : "rgba(253,230,138,0.95)",
-    },
     selectedTitle: { color: colors.text, fontSize: 20, fontWeight: "800", lineHeight: 26 },
     selectedMeta: { color: colors.textMuted, fontSize: 14, fontWeight: "600", lineHeight: 20 },
     selectedImdb: {
@@ -328,62 +390,115 @@ function createFormStyles(colors: ThemeColors) {
       fontWeight: "800",
       letterSpacing: 0.9,
       textTransform: "uppercase",
-      color: colors.mode === "light" ? "#b45309" : "#fbbf24",
+      color: colors.accent,
     },
-    movieMeta: { color: colors.textMuted, fontSize: 12 },
-    stepper: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 2,
+    selectedClearBtn: {
+      marginTop: SPACE.sm,
+      alignSelf: "flex-start",
+      borderRadius: 8,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: line,
-      borderRadius: 10,
-      backgroundColor: colors.panel,
-      alignSelf: "flex-start",
+      backgroundColor: colors.panelMuted,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
     },
-    stepperBtn: {
-      minWidth: 44,
-      height: 40,
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    selectedClearBtnText: { color: colors.accent, fontSize: 13, fontWeight: "800" },
+    movieMeta: { color: colors.textMuted, fontSize: 12 },
     stepperBtnText: { fontSize: 20, fontWeight: "700", color: colors.textMuted },
-    stepperVal: {
-      minWidth: 48,
-      textAlign: "center",
-      fontSize: 16,
-      fontWeight: "700",
-      color: colors.text,
+    formRoot: {
+      flex: 1,
+      minHeight: 0,
+      alignSelf: "stretch",
+      width: "100%",
+    },
+    formScroll: {
+      flex: 1,
+      alignSelf: "stretch",
+      width: "100%",
+      backgroundColor: "transparent",
+    },
+    submitFooter: {
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: line,
+      backgroundColor: colors.panel,
+      paddingHorizontal: INSET_X,
+      paddingTop: SPACE.md,
     },
     primaryBtn: {
       backgroundColor: colors.accent,
       borderRadius: 12,
       paddingVertical: 14,
       alignItems: "center",
+      alignSelf: "stretch",
     },
     primaryBtnDisabled: { opacity: 0.55 },
     primaryBtnText: { color: colors.retryOnAccent, fontSize: 16, fontWeight: "800" },
+    keyboardAvoidRoot: {
+      flex: 1,
+      minHeight: 0,
+      alignSelf: "stretch",
+      width: "100%",
+    },
+    inputAccessoryBar: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      alignItems: "center",
+      paddingHorizontal: INSET_X,
+      paddingVertical: 10,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: line,
+      backgroundColor: colors.panel,
+    },
+    inputAccessoryDone: {
+      fontSize: 17,
+      fontWeight: "600",
+      color: colors.accent,
+    },
     toggleRow: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingVertical: 8,
+      paddingVertical: SPACE.sm,
     },
-    toggleHint: { color: colors.textMuted, fontSize: 12, flex: 1, paddingRight: 12 },
+    spoilerSection: { paddingBottom: SPACE.md },
+    toggleLabelStack: {
+      flex: 1,
+      minWidth: 0,
+      gap: SPACE.xs,
+      paddingRight: SPACE.md,
+    },
+    toggleHint: { color: colors.textMuted, fontSize: 12, lineHeight: 16 },
     errorBanner: {
       padding: 12,
       borderRadius: 10,
-      backgroundColor: colors.mode === "light" ? "rgba(220,38,38,0.09)" : "rgba(248,113,113,0.12)",
+      backgroundColor: colors.dangerBg,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.mode === "light" ? "rgba(220,38,38,0.35)" : "rgba(248,113,113,0.35)",
+      borderColor: colors.inputBorder,
     },
     errorText: {
-      color: colors.mode === "light" ? "#991b1b" : "#fecaca",
+      color: colors.dangerText,
       fontSize: 13,
       fontWeight: "600",
     },
+    formIntroCard: { gap: SPACE.xs, paddingTop: SPACE.sm },
+    formIntroTitle: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: "900",
+      letterSpacing: 0.2,
+    },
+    formIntroBody: {
+      color: colors.textMuted,
+      fontSize: 12,
+      lineHeight: 18,
+    },
+    formStartDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.dividerStrong },
+    searchBusyWrap: {
+      alignItems: "center",
+      paddingVertical: SPACE.sm,
+    },
     loadMoreBtn: {
-      marginTop: 4,
+      marginTop: SPACE.xs,
       paddingVertical: 12,
       paddingHorizontal: 16,
       borderRadius: 12,
@@ -401,12 +516,51 @@ function createFormStyles(colors: ThemeColors) {
 
 export function LogSightingForm() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const headerOffset = useContext(HeaderHeightContext) ?? 0;
   const styles = useMemo(() => createFormStyles(colors), [colors]);
+
+  const movieInputRef = useRef<TextInput>(null);
+  const titleInputRef = useRef<TextInput>(null);
+  const descriptionInputRef = useRef<TextInput>(null);
+  const nameInputRef = useRef<TextInput>(null);
+  const emailInputRef = useRef<TextInput>(null);
   const cardDivider = colors.inputBorder;
-  /** Matches submit page film slider (amber fill vs neutral track). */
-  const filmTrackMin = "#f59e0b";
-  const filmTrackMax = colors.mode === "light" ? "#e7e5e4" : "#57534e";
-  const filmThumbTint = colors.mode === "light" ? "#fafaf9" : "#f5f5f4";
+  /** Matches global accent + themed neutral track for contrast in both modes. */
+  const filmTrackMin = colors.accent;
+  const filmTrackMax = colors.sliderTrackMax;
+  const filmThumbTint = colors.panel;
+
+  const markdownStyles = useMemo(
+    () => ({
+      body: { color: colors.text, fontSize: 14, lineHeight: 22, marginTop: 0, marginBottom: 0 },
+      paragraph: {
+        color: colors.text,
+        fontSize: 14,
+        lineHeight: 22,
+        marginTop: 0,
+        marginBottom: 6,
+      },
+      bullet_list: { marginTop: 2, marginBottom: 8 },
+      ordered_list: { marginTop: 2, marginBottom: 8 },
+      list_item: { marginTop: 0, marginBottom: 4 },
+      strong: { color: colors.text, fontWeight: "700" as const },
+      em: { color: colors.text, fontStyle: "italic" as const },
+      link: { color: colors.accent, textDecorationLine: "underline" as const },
+      code_inline: { color: colors.text, backgroundColor: colors.chipActive },
+      fence: {
+        color: contrastingForeground(colors.chipActive),
+        backgroundColor: colors.chipActive,
+      },
+      blockquote: {
+        color: colors.textMuted,
+        borderLeftColor: colors.border,
+        borderLeftWidth: 3,
+        paddingLeft: 10,
+      },
+    }),
+    [colors],
+  );
 
   const [movieQuery, setMovieQuery] = useState("");
   const [imdbId, setImdbId] = useState("");
@@ -416,7 +570,6 @@ export function LogSightingForm() {
   const [searchHits, setSearchHits] = useState<ImdbMovieSearchResult[]>([]);
   const [searchBusy, setSearchBusy] = useState(false);
   const [searchLoadMoreBusy, setSearchLoadMoreBusy] = useState(false);
-  const [searchConfigured, setSearchConfigured] = useState(true);
   const [searchNotice, setSearchNotice] = useState<string | undefined>(undefined);
   /** OMDb returns 10 titles per page; `hasMore` enables paging. */
   const [searchHasMore, setSearchHasMore] = useState(false);
@@ -431,6 +584,7 @@ export function LogSightingForm() {
   const [submitterName, setSubmitterName] = useState("");
   const [submitterEmail, setSubmitterEmail] = useState("");
   const [spoiler, setSpoiler] = useState(false);
+  const [descriptionMode, setDescriptionMode] = useState<"write" | "preview">("write");
 
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -453,7 +607,6 @@ export function LogSightingForm() {
     try {
       const res = await fetchImdbMovieSearch({ q: trimmed, page: 1 });
       if (imdbSearchSeqRef.current !== seq) return;
-      setSearchConfigured(res.configured);
       setSearchNotice(res.error);
       setSearchHits(res.results);
       setSearchHasMore(Boolean(res.hasMore));
@@ -480,7 +633,6 @@ export function LogSightingForm() {
     try {
       const res = await fetchImdbMovieSearch({ q: trimmed, page: nextPage });
       if (imdbSearchSeqRef.current !== seqAtStart) return;
-      setSearchConfigured(res.configured);
       setSearchHits((prev) => {
         const seen = new Set(prev.map((h) => h.imdbId.toLowerCase()));
         const merged = res.results.filter((h) => !seen.has(h.imdbId.toLowerCase()));
@@ -550,20 +702,25 @@ export function LogSightingForm() {
   }, []);
 
   const validate = useCallback((): string | null => {
-    if (!imdbId.trim() || !movieTitleResolved.trim()) {
-      return "Pick a movie from IMDb search results.";
+    if (!movieTitleResolved.trim()) {
+      return "Select a movie from search.";
     }
-    if (!sightingTitle.trim()) return "Add a short sighting title.";
-    if (filmPct < 0 || filmPct > 100) return "Film position must be between 0 and 100%.";
+    if (!imdbId.trim()) {
+      return "Pick a result from IMDb search so the title links to a real IMDb ID.";
+    }
+    if (!sightingTitle.trim()) return "Sighting title is required.";
+    if (filmPct < 0 || filmPct > 100) return "Use a percentage from 0 to 100.";
     if (!description.trim()) return "Description is required.";
     if (!submitterName.trim()) return "Your name is required.";
     if (submitterEmail.trim()) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail.trim())) {
-        return "Enter a valid email or leave it blank.";
+        return "Enter a valid email address or leave it blank.";
       }
     }
     return null;
   }, [imdbId, movieTitleResolved, sightingTitle, filmPct, description, submitterName, submitterEmail]);
+
+  const formComplete = useMemo(() => validate() === null, [validate]);
 
   const onSubmit = useCallback(async () => {
     const err = validate();
@@ -594,6 +751,7 @@ export function LogSightingForm() {
       setRatCount(1);
       setFilmPct(50);
       setSpoiler(false);
+      setDescriptionMode("write");
       clearMovie();
       Alert.alert(
         "Thanks!",
@@ -621,34 +779,74 @@ export function LogSightingForm() {
     clearMovie,
   ]);
 
+  const footerBottomPad = 12 + insets.bottom;
+
+  const focusAfterTitle = useCallback(() => {
+    if (descriptionMode === "write") {
+      descriptionInputRef.current?.focus();
+    } else {
+      nameInputRef.current?.focus();
+    }
+  }, [descriptionMode]);
+
+  const iosAccessoryProps =
+    Platform.OS === "ios" ? ({ inputAccessoryViewID: IOS_INPUT_ACCESSORY_ID } as const) : {};
+
   return (
-    <ScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={{ paddingHorizontal: INSET_X, paddingBottom: 32, gap: 20 }}
-      keyboardShouldPersistTaps="handled"
-      keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+    <KeyboardAvoidingView
+      style={styles.keyboardAvoidRoot}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={headerOffset}
     >
+      {Platform.OS === "ios" ? (
+        <InputAccessoryView nativeID={IOS_INPUT_ACCESSORY_ID}>
+          <View style={styles.inputAccessoryBar}>
+            <Pressable
+              onPress={() => Keyboard.dismiss()}
+              accessibilityRole="button"
+              accessibilityLabel="Dismiss keyboard"
+            >
+              <Text style={styles.inputAccessoryDone}>Done</Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      ) : null}
+
+      <View style={styles.formRoot}>
+      <ScrollView
+        style={styles.formScroll}
+        contentContainerStyle={{
+          paddingHorizontal: INSET_X,
+          paddingTop: SPACE.md,
+          paddingBottom: SPACE.md,
+          gap: SPACE.lg,
+        }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+      >
+      <View style={styles.formIntroCard}>
+        <Text style={styles.formIntroTitle}>Log a 🐀 sighting</Text>
+        <Text style={styles.formIntroBody}>
+          Capture where it appears and what happens on screen. Every submission is reviewed before it goes live.
+        </Text>
+      </View>
+      <View style={styles.formStartDivider} />
+
       {formError ? (
         <View style={styles.errorBanner}>
           <Text style={styles.errorText}>{formError}</Text>
         </View>
       ) : null}
 
-      <View style={styles.sectionCard}>
-        <Text style={styles.sectionLabel}>Movie</Text>
-        <Text style={styles.helper}>
-          {imdbId && selectedHit
-            ? "Clear the movie below if you meant a different title — then search IMDb again."
-            : searchConfigured
-              ? "Search is powered by OMDb on the server and resolves the canonical IMDb title id (same as the website)."
-              : "OMDb isn’t configured on the server yet — results are only from a small embedded seed catalog. Production uses full IMDb title search."}
-        </Text>
+      <View style={styles.formSection}>
         {!(imdbId && selectedHit) ? (
-          <>
+          <View style={styles.fieldGroup}>
+            <Text style={styles.fieldLabel}>Search for a title…</Text>
             {searchNotice && searchHits.length === 0 ? (
-              <Text style={[styles.movieMeta, { marginTop: 2 }]}>{searchNotice}</Text>
+              <Text style={styles.movieMeta}>{searchNotice}</Text>
             ) : null}
             <AppTextInput
+              ref={movieInputRef}
               placeholder="Try The Departed, Ratatouille…"
               value={movieQuery}
               disabled={submitting}
@@ -664,13 +862,16 @@ export function LogSightingForm() {
               }}
               autoCorrect={false}
               autoCapitalize="words"
-              accessibilityLabel="IMDb movie title search"
+              accessibilityLabel="Search for a title"
+              returnKeyType="next"
+              onSubmitEditing={() => titleInputRef.current?.focus()}
+              {...iosAccessoryProps}
             />
-            {searchBusy && (
-              <View style={{ alignItems: "center", paddingVertical: 8 }}>
+            {searchBusy ? (
+              <View style={styles.searchBusyWrap}>
                 <ActivityIndicator color={colors.accent} />
               </View>
-            )}
+            ) : null}
             {!searchBusy && searchHits.length > 0 ? (
               <View style={styles.searchResultsWrap}>
                 {searchHits.map((m) => (
@@ -724,7 +925,7 @@ export function LogSightingForm() {
                 ) : null}
               </View>
             ) : null}
-          </>
+          </View>
         ) : null}
         {imdbId && selectedHit ? (
           <View style={styles.selectedCard}>
@@ -738,137 +939,225 @@ export function LogSightingForm() {
               mutedTextColor={colors.textMuted}
             />
             <View style={styles.selectedBody}>
-              <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 10 }}>
-                <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
-                  <Text style={styles.selectedKicker}>Selected IMDb title</Text>
-                  <Text style={styles.selectedTitle} numberOfLines={4}>
-                    {selectedHit.title}
-                  </Text>
-                  <Text style={styles.selectedMeta} numberOfLines={2}>
-                    {formatMovieAutocompleteMeta(selectedHit)}
-                  </Text>
-                  <Text style={styles.selectedImdb}>
-                    IMDb {selectedHit.imdbId} · {selectedHit.source}
-                  </Text>
-                </View>
-                <Pressable
-                  onPress={clearMovie}
-                  accessibilityRole="button"
-                  accessibilityLabel="Clear movie"
-                  hitSlop={8}
-                >
-                  <Text style={{ color: colors.accent, fontWeight: "800", fontSize: 13 }}>Clear</Text>
-                </Pressable>
+              <View style={{ flex: 1, minWidth: 0, gap: 6 }}>
+                <Text style={styles.selectedTitle} numberOfLines={4}>
+                  {selectedHit.title}
+                </Text>
+                <Text style={styles.selectedMeta} numberOfLines={2}>
+                  {formatMovieAutocompleteMeta(selectedHit)}
+                </Text>
+                <Text style={styles.selectedImdb}>
+                  IMDb {selectedHit.imdbId} · {selectedHit.source}
+                </Text>
               </View>
+              <Pressable
+                style={styles.selectedClearBtn}
+                onPress={clearMovie}
+                accessibilityRole="button"
+                accessibilityLabel="Clear selection"
+              >
+                <Text style={styles.selectedClearBtnText}>Clear selection</Text>
+              </Pressable>
             </View>
           </View>
         ) : null}
       </View>
 
-      <View style={styles.sectionCard}>
-        <Text style={styles.sectionLabel}>Sighting</Text>
-        <Text style={styles.fieldLabel}>Title</Text>
-        <AppTextInput
-          placeholder="Short headline for this appearance"
-          value={sightingTitle}
-          disabled={submitting}
-          onChangeText={setSightingTitle}
-          accessibilityLabel="Sighting headline"
-        />
-
-        <Text style={[styles.fieldLabel, { marginTop: 2 }]}>Approximate point in film</Text>
-        <View style={{ flexDirection: "row", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
-          <Text style={styles.filmPctBig}>{filmPct}%</Text>
-          <Text style={styles.filmPctInto}>into the film</Text>
-        </View>
-        <Slider
-          style={styles.filmSlider}
-          minimumValue={0}
-          maximumValue={100}
-          step={1}
-          value={filmPct}
-          onValueChange={(v) => setFilmPct(Math.round(v))}
-          minimumTrackTintColor={filmTrackMin}
-          maximumTrackTintColor={filmTrackMax}
-          thumbTintColor={filmThumbTint}
-          disabled={submitting}
-          accessibilityLabel="Approximate point in film"
-        />
-        <View style={styles.sliderEndLabels}>
-          <Text style={styles.sliderEndLabel}>Opening</Text>
-          <Text style={styles.sliderEndLabel}>Ending</Text>
+      <View style={styles.formSection}>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>Sighting title</Text>
+          <AppTextInput
+            ref={titleInputRef}
+            placeholder="Short headline for this appearance"
+            value={sightingTitle}
+            disabled={submitting}
+            onChangeText={setSightingTitle}
+            accessibilityLabel="Sighting title"
+            returnKeyType="next"
+            onSubmitEditing={focusAfterTitle}
+            {...iosAccessoryProps}
+          />
         </View>
 
-        <Text style={[styles.fieldLabel, { marginTop: 6 }]}>Approximate rats on screen</Text>
-        <View style={styles.ratControlsRow}>
-          <View style={styles.ratStepperOuter}>
-            <Pressable
-              style={styles.ratStepperBtn}
-              onPress={() => setRatCount((n) => Math.max(1, n - 1))}
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>
+            How far into the film did you spot the rat(s)?
+          </Text>
+          <View style={styles.filmSliderRow}>
+            <Slider
+              style={styles.filmSlider}
+              minimumValue={0}
+              maximumValue={100}
+              step={1}
+              value={filmPct}
+              onValueChange={(v) => setFilmPct(Math.round(v))}
+              minimumTrackTintColor={filmTrackMin}
+              maximumTrackTintColor={filmTrackMax}
+              thumbTintColor={filmThumbTint}
               disabled={submitting}
-              accessibilityRole="button"
-              accessibilityLabel="Decrease rat count"
-            >
-              <Text style={styles.stepperBtnText}>−</Text>
-            </Pressable>
-            <View style={styles.ratStepperMid}>
-              <Text style={styles.ratStepperVal}>{ratCount}</Text>
+              accessibilityLabel="How far into the film did you spot the rat(s)?"
+            />
+            <View style={styles.filmPctInline} pointerEvents="none">
+              <Text style={styles.filmPctBig}>{filmPct}%</Text>
             </View>
-            <Pressable
-              style={styles.ratStepperBtn}
-              onPress={() => setRatCount((n) => Math.min(999, n + 1))}
-              disabled={submitting}
-              accessibilityRole="button"
-              accessibilityLabel="Increase rat count"
+          </View>
+          <View style={styles.sliderEndLabels}>
+            <Text style={styles.sliderEndLabel}>Opening</Text>
+            <Text style={styles.sliderEndLabel}>Ending</Text>
+          </View>
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>Approximate rats on screen</Text>
+          <View style={styles.ratControlsStack}>
+            <View
+              style={[
+                styles.ratStepperOuter,
+                submitting && styles.ratStepperOuterDisabled,
+              ]}
             >
-              <Text style={styles.stepperBtnText}>+</Text>
+              <Pressable
+                style={styles.ratStepperBtn}
+                onPress={() => setRatCount((n) => Math.max(1, n - 1))}
+                disabled={submitting}
+                accessibilityRole="button"
+                accessibilityLabel="Decrease rat count"
+              >
+                <Text style={styles.stepperBtnText}>−</Text>
+              </Pressable>
+              <View
+                style={[
+                  styles.ratStepperMid,
+                  submitting && styles.ratStepperMidDisabled,
+                ]}
+              >
+                <Text style={styles.ratStepperVal}>{ratCount}</Text>
+              </View>
+              <Pressable
+                style={styles.ratStepperBtn}
+                onPress={() => setRatCount((n) => Math.min(999, n + 1))}
+                disabled={submitting}
+                accessibilityRole="button"
+                accessibilityLabel="Increase rat count"
+              >
+                <Text style={styles.stepperBtnText}>+</Text>
+              </Pressable>
+            </View>
+            <RatSwarmSignal count={ratCount} styles={styles} />
+          </View>
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>Description</Text>
+          <Text style={styles.helper}>
+            Markdown-friendly (bold, lists, links). Moderators review every submission before it ships.
+          </Text>
+          <View style={styles.descModeRow}>
+            <Pressable
+              onPress={() => setDescriptionMode("write")}
+              style={({ pressed }) => [
+                styles.descModeBtn,
+                descriptionMode === "write" && styles.descModeBtnActive,
+                pressed && { opacity: 0.88 },
+              ]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: descriptionMode === "write" }}
+              accessibilityLabel="Write description"
+            >
+              <Text
+                style={[
+                  styles.descModeBtnText,
+                  descriptionMode === "write" && styles.descModeBtnTextActive,
+                ]}
+              >
+                Write
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setDescriptionMode("preview")}
+              style={({ pressed }) => [
+                styles.descModeBtn,
+                styles.descModeBtnDivider,
+                descriptionMode === "preview" && styles.descModeBtnActive,
+                pressed && { opacity: 0.88 },
+              ]}
+              accessibilityRole="button"
+              accessibilityState={{ selected: descriptionMode === "preview" }}
+              accessibilityLabel="Preview markdown"
+            >
+              <Text
+                style={[
+                  styles.descModeBtnText,
+                  descriptionMode === "preview" && styles.descModeBtnTextActive,
+                ]}
+              >
+                Preview
+              </Text>
             </Pressable>
           </View>
-          <RatSwarmSignal count={ratCount} styles={styles} />
+          {descriptionMode === "write" ? (
+            <AppTextInput
+              ref={descriptionInputRef}
+              multiline
+              placeholder="Where on screen? What happens? What does the rat do?"
+              value={description}
+              disabled={submitting}
+              onChangeText={setDescription}
+              style={styles.textarea}
+              accessibilityLabel="Sighting description"
+              blurOnSubmit={false}
+              {...iosAccessoryProps}
+            />
+          ) : (
+            <View style={styles.previewBox}>
+              {description.trim() ? (
+                <Markdown style={markdownStyles}>{description}</Markdown>
+              ) : (
+                <Text style={styles.previewEmpty}>Nothing to preview yet.</Text>
+              )}
+            </View>
+          )}
         </View>
-
-        <Text style={[styles.fieldLabel, { marginTop: 8 }]}>Description</Text>
-        <Text style={[styles.helper, { marginBottom: 4 }]}>
-          Markdown-friendly (bold, lists, links). Moderators review every submission before it ships.
-        </Text>
-        <AppTextInput
-          multiline
-          placeholder="Where on screen? What happens? What does the rat do?"
-          value={description}
-          disabled={submitting}
-          onChangeText={setDescription}
-          style={styles.textarea}
-          accessibilityLabel="Sighting description"
-        />
       </View>
 
-      <View style={styles.sectionCard}>
-        <Text style={styles.sectionLabel}>You</Text>
-        <Text style={styles.fieldLabel}>Name</Text>
-        <AppTextInput
-          placeholder="Displayed with the listing if accepted"
-          value={submitterName}
-          disabled={submitting}
-          onChangeText={setSubmitterName}
-          autoComplete="name"
-          accessibilityLabel="Your name"
-        />
-        <Text style={[styles.fieldLabel, { marginTop: 10 }]}>Email (optional)</Text>
-        <AppTextInput
-          placeholder="moderators-only follow-up"
-          value={submitterEmail}
-          disabled={submitting}
-          onChangeText={setSubmitterEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoComplete="email"
-          accessibilityLabel="Email optional"
-        />
+      <View style={styles.formSection}>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>Your Name</Text>
+          <AppTextInput
+            ref={nameInputRef}
+            placeholder="Displayed with the listing if accepted"
+            value={submitterName}
+            disabled={submitting}
+            onChangeText={setSubmitterName}
+            autoComplete="name"
+            accessibilityLabel="Your name"
+            returnKeyType="next"
+            onSubmitEditing={() => emailInputRef.current?.focus()}
+            {...iosAccessoryProps}
+          />
+        </View>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>Your Email (optional)</Text>
+          <AppTextInput
+            ref={emailInputRef}
+            placeholder="moderators-only follow-up"
+            value={submitterEmail}
+            disabled={submitting}
+            onChangeText={setSubmitterEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoComplete="email"
+            accessibilityLabel="Your email (optional)"
+            returnKeyType="done"
+            onSubmitEditing={() => Keyboard.dismiss()}
+            {...iosAccessoryProps}
+          />
+        </View>
       </View>
 
-      <View style={styles.sectionCard}>
+      <View style={[styles.formSection, styles.spoilerSection]}>
         <View style={styles.toggleRow}>
-          <View style={{ flex: 1 }}>
+          <View style={styles.toggleLabelStack}>
             <Text style={styles.fieldLabel}>Contains plot spoilers</Text>
             <Text style={styles.toggleHint}>Check if revealing this moment ruins a major twist.</Text>
           </View>
@@ -897,20 +1186,28 @@ export function LogSightingForm() {
           </Pressable>
         </View>
       </View>
+      </ScrollView>
 
-      <Pressable
-        style={[styles.primaryBtn, submitting && styles.primaryBtnDisabled]}
-        onPress={() => void onSubmit()}
-        disabled={submitting}
-        accessibilityRole="button"
-        accessibilityLabel="Submit sighting for review"
-      >
-        {submitting ? (
-          <ActivityIndicator color={colors.retryOnAccent} />
-        ) : (
-          <Text style={styles.primaryBtnText}>Submit for review</Text>
-        )}
-      </Pressable>
-    </ScrollView>
+      <View style={[styles.submitFooter, { paddingBottom: footerBottomPad }]}>
+        <Pressable
+          style={[
+            styles.primaryBtn,
+            (!formComplete || submitting) && styles.primaryBtnDisabled,
+          ]}
+          onPress={() => void onSubmit()}
+          disabled={!formComplete || submitting}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !formComplete || submitting }}
+          accessibilityLabel="Submit sighting for review"
+        >
+          {submitting ? (
+            <ActivityIndicator color={colors.retryOnAccent} />
+          ) : (
+            <Text style={styles.primaryBtnText}>Submit for review</Text>
+          )}
+        </Pressable>
+      </View>
+    </View>
+    </KeyboardAvoidingView>
   );
 }

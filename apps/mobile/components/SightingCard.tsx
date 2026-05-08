@@ -16,8 +16,8 @@ import { type ThemeColors, useTheme } from "../lib/theme";
 import type { SightingPublic } from "../lib/types";
 
 function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
-  const strongBorder = colors.mode === "dark" ? "rgba(253,246,232,0.22)" : colors.border;
-  const dividerBorder = colors.mode === "dark" ? "rgba(253,246,232,0.16)" : colors.border;
+  const strongBorder = colors.mode === "dark" ? colors.dividerStrong : colors.border;
+  const dividerBorder = colors.inputBorder;
   return StyleSheet.create({
     card: {
       borderRadius: 12,
@@ -54,7 +54,7 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
     dotOn: { width: 18, backgroundColor: colors.accent },
     spoilerImageOverlay: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.58)",
+      backgroundColor: colors.overlayScrimStrong,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 20,
@@ -67,22 +67,22 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
       paddingHorizontal: 4,
     },
     spoilerImageTitle: {
-      color: "#fff",
+      color: colors.onScrimText,
       fontSize: 22,
       fontWeight: "800",
       lineHeight: 28,
       textAlign: "center",
-      textShadowColor: "rgba(0,0,0,0.7)",
+      textShadowColor: colors.overlayScrimStrong,
       textShadowOffset: { width: 0, height: 1 },
       textShadowRadius: 4,
     },
     spoilerImageNote: {
-      color: "rgba(255,255,255,0.9)",
+      color: colors.onScrimText,
       fontSize: 13,
       lineHeight: 18,
       fontWeight: "600",
       textAlign: "center",
-      textShadowColor: "rgba(0,0,0,0.6)",
+      textShadowColor: colors.overlayScrimStrong,
       textShadowOffset: { width: 0, height: 1 },
       textShadowRadius: 3,
     },
@@ -119,7 +119,7 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
       height: 10,
       borderRadius: 4,
       /** Light: softer than body text so redaction reads as placeholder, not heavy black bars. */
-      backgroundColor: colors.mode === "light" ? "#c9c4bf" : "#4a4a4a",
+      backgroundColor: colors.placeholderFill,
       alignSelf: "stretch",
     },
     redactBarShort: {

@@ -51,8 +51,7 @@ const TAB_DEFS: { key: TabKey; label: string }[] = [
   { key: "media", label: "Media" },
   { key: "meta", label: "Meta" },
 ];
-const REFRESH_SPINNER_COLOR = "#f59e0b";
-
+const LOADER_YELLOW = "#fbbf24";
 function resolveHeaderBannerUrl(movie: NonNullable<MovieDetailResponse["movie"]>): string {
   return movie.headerBanner?.trim() || movie.posterUrl;
 }
@@ -125,7 +124,7 @@ function createMovieStyles(colors: ThemeColors) {
   /** Canvas behind sighting lists / meta only — sticky chrome stays `headerBg`. */
   const tabScrollCanvasBg = mixTowardHex(
     colors.headerBg,
-    colors.mode === "dark" ? "#0c0a09" : "#1c1410",
+    colors.panel,
     colors.mode === "dark" ? 0.22 : 0.072,
   );
   const heroTopInset = Platform.OS === "ios" ? 136 : 28;
@@ -138,7 +137,7 @@ function createMovieStyles(colors: ThemeColors) {
     },
     fixedBackdropTint: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(12,10,9,0.38)",
+      backgroundColor: colors.overlayScrim,
     },
     /** Canvas: visible when overscrolling / pulling from top; slightly darker than sticky chrome. */
     scroll: { flex: 1, backgroundColor: tabScrollCanvasBg },
@@ -149,13 +148,13 @@ function createMovieStyles(colors: ThemeColors) {
       backgroundColor: tabScrollCanvasBg,
       gap: 12,
       paddingHorizontal: 14,
-      paddingTop: 12,
+      paddingTop: 14,
       paddingBottom: 12,
       overflow: "hidden",
     },
     /** Matches default top inset even with sticky chrome (no double stack with section padding). */
     scrollBodyPanelTightTop: {
-      paddingTop: 12,
+      paddingTop: 14,
     },
     /** Vertical stack for sibling cards/lists inside a tab (reviews, media videos, …). */
     tabContentStack: {
@@ -165,9 +164,7 @@ function createMovieStyles(colors: ThemeColors) {
     /** Holds filter bars / media segment controls fixed under tab bar while list scrolls. */
     tabStickyChrome: {
       backgroundColor: colors.headerBg,
-      paddingHorizontal: 14,
-      paddingTop: 8,
-      paddingBottom: 8,
+      padding: 12,
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.tabDivider,
     },
@@ -207,7 +204,7 @@ function createMovieStyles(colors: ThemeColors) {
       height: 144,
       borderRadius: 8,
       backgroundColor: colors.panel,
-      shadowColor: "#000",
+      shadowColor: colors.text,
       shadowOpacity: 0.26,
       shadowRadius: 10,
       shadowOffset: { width: 0, height: 6 },
@@ -219,14 +216,14 @@ function createMovieStyles(colors: ThemeColors) {
       fontSize: 22,
       fontWeight: "800",
       lineHeight: 28,
-      textShadowColor: "rgba(0,0,0,0.35)",
+      textShadowColor: colors.overlayScrim,
       textShadowOffset: { width: 0, height: 1 },
       textShadowRadius: 2,
     },
     meta: {
       color: colors.accent,
       fontWeight: "700",
-      textShadowColor: "rgba(0,0,0,0.25)",
+      textShadowColor: colors.overlayScrim,
       textShadowOffset: { width: 0, height: 1 },
       textShadowRadius: 2,
     },
@@ -239,15 +236,15 @@ function createMovieStyles(colors: ThemeColors) {
       marginTop: 6,
     },
     heroStatChip: {
-      backgroundColor: "rgba(12,10,9,0.62)",
+      backgroundColor: colors.chipActive,
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: "rgba(254,243,199,0.42)",
+      borderColor: colors.chipActiveOutline,
       borderRadius: 999,
       paddingHorizontal: 10,
       paddingVertical: 4,
     },
     heroStatChipText: {
-      color: "#fef3c7",
+      color: fgOnChip,
       fontSize: 11.5,
       fontWeight: "600",
       lineHeight: 14,
@@ -257,9 +254,7 @@ function createMovieStyles(colors: ThemeColors) {
       alignItems: "center",
       gap: 4,
     },
-    heroStatChipIcon: {
-      color: "#fbbf24",
-    },
+    heroStatChipIcon: { color: colors.accent },
     imdbBtn: {
       alignSelf: "flex-start",
       marginTop: 6,
@@ -355,12 +350,7 @@ function createMovieStyles(colors: ThemeColors) {
       gap: 10,
       marginBottom: 4,
     },
-    filterBar: {
-      marginTop: 4,
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
+    filterBar: { flexDirection: "row", alignItems: "center", gap: 8 },
     tabSectionDivider: {
       height: StyleSheet.hairlineWidth,
       backgroundColor: colors.border,
@@ -418,7 +408,7 @@ function createMovieStyles(colors: ThemeColors) {
     },
     sheetBackdrop: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.45)",
+      backgroundColor: colors.overlayScrim,
     },
     sheetCenterOuter: {
       ...StyleSheet.absoluteFillObject,
@@ -494,7 +484,7 @@ function createMovieStyles(colors: ThemeColors) {
     },
     reviewRatCorner: { fontSize: 20, lineHeight: 22, paddingTop: 1 },
     reviewStars: { flexDirection: "row", alignItems: "center", gap: 3, flexWrap: "wrap" },
-    reviewStarOn: { color: "#fbbf24", fontSize: 15 },
+    reviewStarOn: { color: colors.accent, fontSize: 15 },
     reviewStarOff: { color: colors.border, fontSize: 15 },
     reviewRatingText: { color: colors.textMuted, fontSize: 13, fontWeight: "700", marginLeft: 5 },
     readMoreBtn: { alignSelf: "flex-start", marginTop: 2 },
@@ -580,7 +570,7 @@ function createMovieStyles(colors: ThemeColors) {
       borderColor: colors.border,
     },
     mediaStillImage: { width: "100%", height: "100%" },
-    mediaLightboxRoot: { flex: 1, backgroundColor: "#000" },
+    mediaLightboxRoot: { flex: 1, backgroundColor: colors.background },
     mediaLightboxClose: {
       position: "absolute",
       right: 12,
@@ -596,12 +586,12 @@ function createMovieStyles(colors: ThemeColors) {
     mediaLightboxCaptionWrap: {
       paddingHorizontal: 16,
       paddingTop: 8,
-      backgroundColor: "rgba(0,0,0,0.94)",
+      backgroundColor: colors.overlayScrimStrong,
       borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: "rgba(255,255,255,0.12)",
+      borderTopColor: colors.inputBorder,
     },
     mediaLightboxCaption: {
-      color: "#e7e5e4",
+      color: colors.onScrimText,
       fontSize: 14,
       lineHeight: 21,
       textAlign: "center",
@@ -705,8 +695,8 @@ function HeroBlock({
         }
       : null,
   ].filter((bit): bit is { key: string; label: string; imdb?: boolean } => Boolean(bit));
-  const heroSubtitle = heroFg === "#1c1917" ? "#57534e" : "#f5f5f4";
-  const heroMuted = heroFg === "#1c1917" ? "#6b7280" : "#e7e5e4";
+  const heroSubtitle = mixTowardHex(heroFg, heroAccent, 0.2);
+  const heroMuted = mixTowardHex(heroFg, heroAccent, 0.32);
 
   return (
     <View style={styles.hero}>
@@ -715,10 +705,7 @@ function HeroBlock({
           <Text
             style={[
               styles.title,
-              {
-                color: heroFg,
-                textShadowColor: heroFg === "#1c1917" ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.45)",
-              },
+              { color: heroFg },
             ]}
           >
             {movie.title}
@@ -1081,7 +1068,7 @@ function SightingsSection({
       )}
       {loadingMore ? (
         <View style={styles.loadingMoreWrap}>
-          <ActivityIndicator size="small" />
+          <ActivityIndicator size="small" color={LOADER_YELLOW} />
         </View>
       ) : null}
       <SortOptionsSheet
@@ -1181,7 +1168,7 @@ export default function MovieScreen() {
     /** Segment / sheet-selected surfaces follow poster accent instead of global `chipActive`. */
     const chipActive =
       colors.mode === "dark"
-        ? mixTowardHex(accent, "#0c0a09", 0.7)
+        ? mixTowardHex(accent, colors.panel, 0.7)
         : mixTowardHex(accent, colors.panelMuted, 0.76);
     return {
       ...colors,
@@ -1230,8 +1217,8 @@ export default function MovieScreen() {
   const styles = useMemo(() => createMovieStyles(movieThemeColors), [movieThemeColors]);
   const sightingCardSurface = useMemo(() => {
     if (movieThemeColors.mode !== "dark") return undefined;
-    return mixTowardHex(movieThemeColors.headerBg, "#0c0a09", 0.42);
-  }, [movieThemeColors.mode, movieThemeColors.headerBg]);
+    return mixTowardHex(movieThemeColors.headerBg, movieThemeColors.panel, 0.42);
+  }, [movieThemeColors.mode, movieThemeColors.headerBg, movieThemeColors.panel]);
 
   const load = useCallback(async () => {
     if (!slug) return;
@@ -1397,7 +1384,7 @@ export default function MovieScreen() {
       <Stack.Screen options={{ headerShown: true }} />
       {loading && !data ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={movieThemeColors.accent} />
+          <ActivityIndicator size="large" color={LOADER_YELLOW} />
         </View>
       ) : null}
 
@@ -1424,8 +1411,8 @@ export default function MovieScreen() {
           <HeroBlock
             movie={movie}
             imdbTitleUrl={data.links.imdbTitle}
-              heroFg={movieBar?.fg ?? "#fef3c7"}
-              heroAccent={movieThemeColors.accent}
+            heroFg={movieBar?.fg ?? movieThemeColors.text}
+            heroAccent={movieThemeColors.accent}
             styles={styles}
           />
           <MovieTabsBar tab={tab} setTab={setTab} styles={styles} />
@@ -1467,10 +1454,10 @@ export default function MovieScreen() {
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
-                  tintColor={movieThemeColors.accent}
-                  colors={[movieThemeColors.accent]}
+                  tintColor={LOADER_YELLOW}
+                  colors={[LOADER_YELLOW]}
                   progressBackgroundColor={movieThemeColors.panel}
-                  titleColor={movieThemeColors.accent}
+                  titleColor={LOADER_YELLOW}
                 />
               }
               style={styles.scroll}
@@ -1870,7 +1857,7 @@ export default function MovieScreen() {
             style={[styles.mediaLightboxClose, { top: insets.top + 6 }]}
             onPress={() => setMediaLightbox(null)}
           >
-            <Ionicons name="close" size={30} color="#f5f5f4" />
+            <Ionicons name="close" size={30} color={movieThemeColors.onScrimText} />
           </Pressable>
           <View style={[styles.mediaLightboxImageSlot, { paddingTop: insets.top + 44 }]}>
             {mediaLightbox ? (

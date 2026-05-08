@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -45,20 +45,19 @@ const CATALOG_CONTENT_INSET_X = 20;
 const CATALOG_LIST_INSET_X = 14;
 /** Extra inset below catalog scroll plus safe-area (pager sits above home indicator). */
 const SCROLL_BOTTOM_EXTRA = 28;
-const REFRESH_SPINNER_COLOR = "#f59e0b";
-
+const REFRESH_YELLOW = "#fbbf24";
 function gridPosterWidthPx(screenWidth: number): number {
   return (screenWidth - CATALOG_CONTENT_INSET_X * 2 - CARD_GAP * (CARD_COLS - 1)) / CARD_COLS;
 }
 
 function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
-  const warmLine = colors.mode === "light" ? "rgba(28,25,23,0.32)" : colors.border;
-  const warmLineSoft = colors.mode === "light" ? "rgba(28,25,23,0.22)" : colors.border;
+  const warmLine = colors.dividerStrong;
+  const warmLineSoft = colors.inputBorder;
   const warmPanel = "transparent";
   /** Slightly darker than app `background`; matches movie tab-scroll treatment a bit more softly */
   const catalogCanvasBg = mixTowardHex(
     colors.background,
-    colors.mode === "dark" ? "#0c0a09" : "#1c1410",
+    colors.panel,
     colors.mode === "dark" ? 0.17 : 0.055,
   );
 
@@ -192,7 +191,7 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
     },
     sheetBackdrop: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.55)",
+      backgroundColor: colors.overlayScrim,
     },
     sheetCenterOuter: {
       ...StyleSheet.absoluteFillObject,
@@ -254,11 +253,11 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
     },
     catalogScrollContentList: {
       paddingHorizontal: CATALOG_LIST_INSET_X,
-      paddingTop: 8,
+      paddingTop: CATALOG_LIST_INSET_X,
     },
     catalogScrollContentCard: {
       paddingHorizontal: CATALOG_CONTENT_INSET_X,
-      paddingTop: SPACE_Y + 4,
+      paddingTop: CATALOG_CONTENT_INSET_X,
     },
     cardGridRow: {
       gap: CARD_GAP,
@@ -271,7 +270,7 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
       backgroundColor: colors.panel,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: warmLineSoft,
-      shadowColor: "#1c1917",
+      shadowColor: colors.text,
       shadowOpacity: colors.mode === "light" ? 0.08 : 0,
       shadowRadius: 6,
       shadowOffset: { width: 0, height: 2 },
@@ -415,16 +414,18 @@ function PosterTile({
   item,
   posterWidth,
   styles,
+  onOpenMovie,
 }: {
   item: CatalogMovieRow;
   posterWidth: number;
   styles: CatalogStyles;
+  onOpenMovie: (slug: string) => void;
 }) {
   const w = posterWidth;
   const h = Math.round(w * 1.52);
   return (
     <Pressable
-      onPress={() => router.push(`/movie/${encodeURIComponent(item.slug)}`)}
+      onPress={() => onOpenMovie(item.slug)}
       style={[styles.posterTile, { width: w }]}
       accessibilityRole="button"
       accessibilityLabel={item.title}
@@ -443,14 +444,16 @@ function PosterTile({
 function MovieRow({
   item,
   styles,
+  onOpenMovie,
 }: {
   item: CatalogMovieRow;
   styles: CatalogStyles;
+  onOpenMovie: (slug: string) => void;
 }) {
   return (
     <Pressable
       style={styles.catalogListRow}
-      onPress={() => router.push(`/movie/${encodeURIComponent(item.slug)}`)}
+      onPress={() => onOpenMovie(item.slug)}
     >
       <Image
         source={{ uri: item.posterUrl }}
@@ -500,6 +503,18 @@ export default function CatalogScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [catalogSearchFocused, setCatalogSearchFocused] = useState(false);
+  const lastMovieNavAtRef = useRef(0);
+
+  /**
+   * Guard against accidental double-taps that push the same route twice.
+   * This keeps back-navigation to a single step.
+   */
+  const openMovie = useCallback((slug: string) => {
+    const now = Date.now();
+    if (now - lastMovieNavAtRef.current < 650) return;
+    lastMovieNavAtRef.current = now;
+    router.push(`/movie/${encodeURIComponent(slug)}`);
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setQueryApplied(queryInput.trim()), 380);
@@ -687,8 +702,7 @@ export default function CatalogScreen() {
         <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.accent} />
         </View>
-      ) : null}
-
+      ) : (
       <FlatList
         style={styles.catalogList}
         key={layoutMode === "card" ? "catalog-card" : "catalog-list"}
@@ -698,19 +712,25 @@ export default function CatalogScreen() {
         columnWrapperStyle={layoutMode === "card" ? styles.cardGridRow : undefined}
         refreshControl={
           <RefreshControl
+            key={`catalog-refresh-${colors.mode}`}
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={REFRESH_SPINNER_COLOR}
-            colors={[REFRESH_SPINNER_COLOR]}
-            progressBackgroundColor={colors.panel}
-            titleColor={REFRESH_SPINNER_COLOR}
+            tintColor={REFRESH_YELLOW}
+            colors={[REFRESH_YELLOW]}
+            progressBackgroundColor={colors.panelMuted}
+            titleColor={REFRESH_YELLOW}
           />
         }
         renderItem={({ item }) =>
           layoutMode === "list" ? (
-            <MovieRow item={item} styles={styles} />
+            <MovieRow item={item} styles={styles} onOpenMovie={openMovie} />
           ) : (
-            <PosterTile item={item} posterWidth={posterWidth} styles={styles} />
+            <PosterTile
+              item={item}
+              posterWidth={posterWidth}
+              styles={styles}
+              onOpenMovie={openMovie}
+            />
           )
         }
         ListEmptyComponent={
@@ -733,6 +753,7 @@ export default function CatalogScreen() {
           layoutMode === "list" ? styles.catalogScrollContentList : styles.catalogScrollContentCard,
         ]}
       />
+      )}
 
       {data && data.pageCount > 1 ? (
         <View style={styles.pager}>

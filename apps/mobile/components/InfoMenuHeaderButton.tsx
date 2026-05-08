@@ -15,7 +15,7 @@ export function InfoMenuHeaderButton() {
   const ripple =
     Platform.OS === "android"
       ? {
-          color: colors.mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)",
+          color: colors.headerActionRipple,
           borderless: true as const,
         }
       : undefined;
@@ -36,7 +36,7 @@ export function InfoMenuHeaderButton() {
             ...(colors.mode === "light"
               ? {
                   borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: "rgba(28,25,23,0.14)",
+                  borderColor: colors.headerActionOutline,
                 }
               : {}),
           },

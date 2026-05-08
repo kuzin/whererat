@@ -203,7 +203,9 @@ export function SubmitForm({
 
       <div className="flex flex-col gap-6">
         <div className="flex w-full flex-col gap-2" data-field="timestamp">
-          <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Approx. point in film</p>
+          <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
+            How far into the film did you spot the rat(s)?
+          </p>
           <div className="pt-1">
             <div>
               <span className="text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">{sightingPercent}%</span>
@@ -237,7 +239,7 @@ export function SubmitForm({
                   setSightingPercent(Number.parseInt(event.currentTarget.value, 10) || 0)
                 }
                 aria-invalid={Boolean(errorFor("timestamp"))}
-                aria-label="Approximate point in film"
+                aria-label="How far into the film did you spot the rat(s)?"
                 className="absolute inset-0 h-full w-full cursor-grab active:cursor-grabbing opacity-0"
               />
             </div>

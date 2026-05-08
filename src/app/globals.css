@@ -7,10 +7,10 @@
   color-scheme: light;
   --background: #fff9f1;
   --foreground: #1c1410;
-  --wr-cheese: #fcd34d;
+  --wr-cheese: #f59e0b;
   --wr-cheddar: #f59e0b;
-  --wr-accent-btn: #fb923c;
-  --wr-accent-btn-hover: #f97316;
+  --wr-accent-btn: #f59e0b;
+  --wr-accent-btn-hover: #ea580c;
   --wr-accent-btn-dark: #b45309;
   --wr-accent-btn-dark-hover: #92400e;
 
@@ -52,10 +52,10 @@
   color-scheme: dark;
   --background: #120e0c;
   --foreground: #faf7f3;
-  --wr-cheese: #fbbf24;
-  --wr-cheddar: #fcd34d;
-  --wr-accent-btn: #b45309;
-  --wr-accent-btn-hover: #92400e;
+  --wr-cheese: #f59e0b;
+  --wr-cheddar: #f59e0b;
+  --wr-accent-btn: #f59e0b;
+  --wr-accent-btn-hover: #d97706;
   --wr-accent-btn-dark: #b45309;
   --wr-accent-btn-dark-hover: #92400e;
 

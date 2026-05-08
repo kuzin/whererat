@@ -51,7 +51,7 @@ function RoundMinimalHeaderBack({
         Platform.OS === "android"
           ? {
               color:
-                colors.mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)",
+                colors.headerActionRipple,
               borderless: true,
               foreground: Platform.Version >= 23,
             }
@@ -68,7 +68,7 @@ function RoundMinimalHeaderBack({
           ...(colors.mode === "light"
             ? {
                 borderWidth: StyleSheet.hairlineWidth,
-                borderColor: "rgba(28,25,23,0.14)",
+                borderColor: colors.headerActionOutline,
               }
             : {}),
           ...(isIos ? { borderCurve: "continuous" as const } : {}),

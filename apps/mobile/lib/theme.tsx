@@ -23,6 +23,10 @@ export type ThemeColors = {
   headerActionFill: string;
   /** Ionicons tint on those toolbar buttons — dark grey in light, accent in dark. */
   headerToolbarIcon: string;
+  /** Android ripple tint on circular header actions. */
+  headerActionRipple: string;
+  /** Light-mode outline on circular header actions for edge contrast. */
+  headerActionOutline: string;
   headerText: string;
   text: string;
   textMuted: string;
@@ -46,6 +50,20 @@ export type ThemeColors = {
   inputBorderFocused: string;
   inputBorderDisabled: string;
   inputBackgroundDisabled: string;
+  /** Elevated scroll surface used behind long forms/lists (submit/catalog). */
+  formCanvas: string;
+  /** Stronger line than `inputBorder` for section separators. */
+  dividerStrong: string;
+  /** Unfilled track color for % slider controls. */
+  sliderTrackMax: string;
+  /** Backdrop for modals/sheets/lightboxes. */
+  overlayScrim: string;
+  /** Higher-opacity scrim for spoiler overlays. */
+  overlayScrimStrong: string;
+  /** Text color on top of scrims / dark media. */
+  onScrimText: string;
+  /** Neutral placeholder stripe color for redacted content. */
+  placeholderFill: string;
   /** ≥4.5∶1 vs typical tab bar backdrop / panel reads for inactive 11 pt labels */
   tabInactive: string;
   tabDivider: string;
@@ -62,6 +80,8 @@ const darkColors: ThemeColors = {
   headerBg: "#292524",
   headerActionFill: "#1c1917",
   headerToolbarIcon: "#f59e0b",
+  headerActionRipple: "rgba(255,255,255,0.14)",
+  headerActionOutline: "rgba(254,243,199,0.2)",
   headerText: "#fef3c7",
   text: "#fef3c7",
   textMuted: "#a8a29e",
@@ -69,7 +89,7 @@ const darkColors: ThemeColors = {
   border: "#44403c",
   panel: "#0c0a09",
   panelMuted: "#1c1917",
-  chipActive: "#422006",
+  chipActive: "#351603",
   chipActiveOutline: "#f59e0b",
   dangerBg: "#431407",
   dangerText: "#fef3c7",
@@ -80,6 +100,13 @@ const darkColors: ThemeColors = {
   inputBorderFocused: "#fbbf24",
   inputBorderDisabled: "rgba(254,243,199,0.08)",
   inputBackgroundDisabled: "#292524",
+  formCanvas: "#120f0d",
+  dividerStrong: "rgba(254,243,199,0.35)",
+  sliderTrackMax: "#57534e",
+  overlayScrim: "rgba(0,0,0,0.55)",
+  overlayScrimStrong: "rgba(0,0,0,0.62)",
+  onScrimText: "#f5f5f4",
+  placeholderFill: "#4a4a4a",
   tabInactive: "#a8a29e",
   tabDivider: "rgba(254,243,199,0.14)",
   tabActiveFill: "#ea580c",
@@ -97,6 +124,8 @@ const lightColors: ThemeColors = {
   headerBg: "#fff8ed",
   headerActionFill: mixTowardHex("#fff8ed", "#1c1410", 0.13),
   headerToolbarIcon: "#44403c",
+  headerActionRipple: "rgba(0,0,0,0.08)",
+  headerActionOutline: "rgba(28,25,23,0.14)",
   headerText: "#1c1410",
   text: "#1c1410",
   textMuted: "#57534e",
@@ -104,7 +133,7 @@ const lightColors: ThemeColors = {
   border: "#a8a29e",
   panel: "#ffffff",
   panelMuted: "#fffdf8",
-  chipActive: "#fef3c7",
+  chipActive: "#fde68a",
   chipActiveOutline: "#b45309",
   dangerBg: "#fecaca",
   dangerText: "#450a0a",
@@ -114,6 +143,13 @@ const lightColors: ThemeColors = {
   inputBorderFocused: "#ea580c",
   inputBorderDisabled: "rgba(28,25,23,0.12)",
   inputBackgroundDisabled: "#fafaf9",
+  formCanvas: "#ebe5dc",
+  dividerStrong: "rgba(28,25,23,0.35)",
+  sliderTrackMax: "#a8a29e",
+  overlayScrim: "rgba(0,0,0,0.55)",
+  overlayScrimStrong: "rgba(0,0,0,0.58)",
+  onScrimText: "#ffffff",
+  placeholderFill: "#c9c4bf",
   tabInactive: "#57534e",
   tabDivider: "rgba(28,25,23,0.18)",
   tabActiveFill: "#fb923c",

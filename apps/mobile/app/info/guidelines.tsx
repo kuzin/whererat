@@ -33,7 +33,7 @@ export default function GuidelinesScreen() {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     scroll: { flex: 1 },
-    scrollContent: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40, gap: 12 },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40, gap: 12 },
     card: {
       borderRadius: 12,
       borderWidth: StyleSheet.hairlineWidth,

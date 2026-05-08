@@ -60,7 +60,7 @@ export default function AboutWhereRatScreen() {
 function createStyles(colors: ThemeColors) {
   return StyleSheet.create({
     scroll: { flex: 1 },
-    scrollContent: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 },
+    scrollContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 40 },
     body: {
       color: colors.text,
       fontSize: 16,

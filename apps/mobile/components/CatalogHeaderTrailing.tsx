@@ -27,7 +27,7 @@ export function CatalogHeaderLogSightingLeading() {
         onPress={() => router.push("/submit")}
         android_ripple={{
           color:
-            colors.mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)",
+            colors.headerActionRipple,
           borderless: true,
         }}
         style={({ pressed }) => [
@@ -38,7 +38,7 @@ export function CatalogHeaderLogSightingLeading() {
             ...(colors.mode === "light"
               ? {
                   borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: "rgba(28,25,23,0.14)",
+                  borderColor: colors.headerActionOutline,
                 }
               : {}),
           },

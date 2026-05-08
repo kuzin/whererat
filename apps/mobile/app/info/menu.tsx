@@ -124,7 +124,7 @@ function createStyles(colors: ThemeColors) {
     scroll: { flex: 1 },
     scrollContent: {
       paddingHorizontal: 20,
-      paddingTop: 16,
+      paddingTop: 20,
       paddingBottom: 40,
     },
     hubFooter: {
