@@ -8,6 +8,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
+    "generate-assets": "bash scripts/generate-mobile-assets.sh",
     "deploy": "npx expo export -p web && npx eas-cli@latest deploy",
     "postinstall": "patch-package"
   },

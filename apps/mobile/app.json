@@ -9,8 +9,8 @@
     "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#292524"
+      "resizeMode": "cover",
+      "backgroundColor": "#f59e0b"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -23,7 +23,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#292524"
+        "backgroundColor": "#f59e0b"
       },
       "package": "com.whererat.app",
       "edgeToEdgeEnabled": true,
