@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Class-based dark mode for manual / dev toggle */
+/* Class-based dark mode (set from footer easter-egg toggle). */
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
@@ -25,23 +25,27 @@
   --wr-footer-rule: rgb(28 25 23 / 0.2);
 
   --wr-card-bg: #ffffff;
-  --wr-surface-cream: #fffaf5;
+  --wr-surface-cream: #fff8ed;
   --wr-surface-cream-soft: #fffdf8;
-  --wr-surface-cream-muted: #fffbf5;
+  --wr-surface-cream-muted: #faf7f2;
   --wr-card-bg-soft: rgb(255 255 255 / 0.92);
-  --wr-card-border: rgb(28 25 23 / 0.9);
-  --wr-card-border-soft: rgb(28 25 23 / 0.75);
+  --wr-card-border: rgb(168 162 158 / 0.84);
+  --wr-card-border-soft: rgb(168 162 158 / 0.64);
 
-  --wr-shadow-card: rgb(28 25 23 / 0.88);
-  --wr-shadow-card-soft: rgb(28 25 23 / 0.72);
-  --wr-shadow-btn: rgb(28 25 23 / 0.9);
-  --wr-shadow-btn-soft: rgb(28 25 23 / 0.55);
+  --wr-shadow-card: rgb(87 83 78 / 0.42);
+  --wr-shadow-card-soft: rgb(87 83 78 / 0.3);
+  --wr-shadow-btn: rgb(87 83 78 / 0.5);
+  --wr-shadow-btn-soft: rgb(87 83 78 / 0.34);
   --wr-shadow-input-focus: rgb(251 191 36 / 0.65);
 
   --wr-btn-ghost-hover: rgb(245 245 244);
   --wr-btn-ghost-active: rgb(231 229 228);
 
   --wr-input-bg: #ffffff;
+  --wr-input-border: rgb(28 25 23 / 0.22);
+  --wr-input-border-focus: #ea580c;
+  --wr-input-text: #1c1410;
+  --wr-input-placeholder: #78716c;
   --wr-panel-warm-bg: #fef3c7;
   --wr-panel-warm-fg: #78350f;
   --wr-panel-warm-border: rgb(146 64 14 / 0.30);
@@ -49,47 +53,51 @@
 }
 
 .dark {
-  color-scheme: dark;
-  --background: #120e0c;
-  --foreground: #faf7f3;
-  --wr-cheese: #ea580c;
-  --wr-cheddar: #ea580c;
-  --wr-accent-btn: #ea580c;
-  --wr-accent-btn-hover: #c2410c;
-  --wr-accent-btn-dark: #b45309;
-  --wr-accent-btn-dark-hover: #92400e;
+    color-scheme: dark;
+    --background: #1c1917;
+    --foreground: #fef3c7;
+    --wr-cheese: #ea580c;
+    --wr-cheddar: #ea580c;
+    --wr-accent-btn: #ea580c;
+    --wr-accent-btn-hover: #c2410c;
+    --wr-accent-btn-dark: #b45309;
+    --wr-accent-btn-dark-hover: #92400e;
 
-  --wr-header-bg: rgb(22 17 14 / 0.94);
-  --wr-header-border: rgb(250 245 239 / 0.14);
-  --wr-brand-mark: #fbbf24;
-  --wr-brand-wordmark: #fef3c7;
+    --wr-header-bg: rgb(41 37 36 / 0.94);
+    --wr-header-border: rgb(254 243 199 / 0.14);
+    --wr-brand-mark: #fbbf24;
+    --wr-brand-wordmark: #fef3c7;
 
-  --wr-footer-bg: #3d2616;
-  --wr-footer-fg: #fff7dc;
-  --wr-footer-rule: rgb(253 243 220 / 0.12);
+    --wr-footer-bg: #3d2616;
+    --wr-footer-fg: #fff7dc;
+    --wr-footer-rule: rgb(253 243 220 / 0.12);
 
-  --wr-card-bg: rgb(40 34 29);
-  --wr-surface-cream: rgb(40 34 29);
-  --wr-surface-cream-soft: rgb(44 37 31);
-  --wr-surface-cream-muted: rgb(48 40 34);
-  --wr-card-bg-soft: rgb(40 34 29 / 0.94);
-  --wr-card-border: rgb(253 246 232 / 0.16);
-  --wr-card-border-soft: rgb(253 246 232 / 0.12);
+    --wr-card-bg: #0c0a09;
+    --wr-surface-cream: #1c1917;
+    --wr-surface-cream-soft: #292524;
+    --wr-surface-cream-muted: #1f1a17;
+    --wr-card-bg-soft: rgb(28 25 23 / 0.94);
+    --wr-card-border: rgb(68 64 60 / 0.95);
+    --wr-card-border-soft: rgb(68 64 60 / 0.72);
 
-  --wr-shadow-card: rgb(0 0 0 / 0.55);
-  --wr-shadow-card-soft: rgb(0 0 0 / 0.45);
-  --wr-shadow-btn: rgb(0 0 0 / 0.65);
-  --wr-shadow-btn-soft: rgb(0 0 0 / 0.35);
-  --wr-shadow-input-focus: rgb(251 191 36 / 0.35);
+    --wr-shadow-card: rgb(0 0 0 / 0.52);
+    --wr-shadow-card-soft: rgb(0 0 0 / 0.38);
+    --wr-shadow-btn: rgb(0 0 0 / 0.58);
+    --wr-shadow-btn-soft: rgb(0 0 0 / 0.32);
+    --wr-shadow-input-focus: rgb(251 191 36 / 0.35);
 
-  --wr-btn-ghost-hover: rgb(53 46 41);
-  --wr-btn-ghost-active: rgb(63 54 46);
+    --wr-btn-ghost-hover: rgb(53 46 41);
+    --wr-btn-ghost-active: rgb(63 54 46);
 
-  --wr-input-bg: rgb(32 27 23);
-  --wr-panel-warm-bg: #431407;
-  --wr-panel-warm-fg: #fef3c7;
-  --wr-panel-warm-border: rgb(251 191 36 / 0.20);
-  --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+    --wr-input-bg: #1c1917;
+    --wr-input-border: rgb(254 243 199 / 0.18);
+    --wr-input-border-focus: #f97316;
+    --wr-input-text: #fef3c7;
+    --wr-input-placeholder: #a8a29e;
+    --wr-panel-warm-bg: #431407;
+    --wr-panel-warm-fg: #fef3c7;
+    --wr-panel-warm-border: rgb(251 191 36 / 0.20);
+    --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -257,21 +265,23 @@ body {
 .wr-cheese-stats-slab {
   background-color: #fbbf24;
   background-image:
-    radial-gradient(circle at 12% 28%, rgb(146 64 14 / 0.16) 0 10px, transparent 11px),
-    radial-gradient(circle at 32% 72%, rgb(146 64 14 / 0.14) 0 8px, transparent 9px),
-    radial-gradient(circle at 58% 24%, rgb(146 64 14 / 0.15) 0 9px, transparent 10px),
-    radial-gradient(circle at 81% 66%, rgb(146 64 14 / 0.14) 0 11px, transparent 12px),
-    linear-gradient(to right, #fde047 0%, #fcd34d 44%, #fbbf24 100%);
+    linear-gradient(140deg, rgb(254 240 138 / 0.26), rgb(249 115 22 / 0.22)),
+    linear-gradient(to right, rgb(245 158 11 / 0.42), rgb(234 88 12 / 0.48)),
+    url("/brand/cheese-texture-shutterstock.jpg");
+  background-size: auto, auto, 220px 220px;
+  background-position: center, center, center;
+  background-repeat: no-repeat, no-repeat, repeat;
 }
 
 .dark .wr-cheese-stats-slab {
   background-color: #d97706;
   background-image:
-    radial-gradient(circle at 12% 28%, rgb(120 53 15 / 0.2) 0 10px, transparent 11px),
-    radial-gradient(circle at 32% 72%, rgb(120 53 15 / 0.18) 0 8px, transparent 9px),
-    radial-gradient(circle at 58% 24%, rgb(146 64 14 / 0.19) 0 9px, transparent 10px),
-    radial-gradient(circle at 81% 66%, rgb(120 53 15 / 0.18) 0 11px, transparent 12px),
-    linear-gradient(to right, #f59e0b 0%, #d97706 44%, #b45309 100%);
+    linear-gradient(140deg, rgb(28 25 23 / 0.54), rgb(12 10 9 / 0.62)),
+    linear-gradient(to right, rgb(194 65 12 / 0.44), rgb(120 53 15 / 0.52)),
+    url("/brand/cheese-texture-shutterstock.jpg");
+  background-size: auto, auto, 220px 220px;
+  background-position: center, center, center;
+  background-repeat: no-repeat, no-repeat, repeat;
 }
 
 @utility wr-btn {
@@ -322,8 +332,10 @@ body {
 }
 
 @utility wr-input {
-  @apply rounded-xl border-2 border-stone-950/90 px-4 py-2.5 text-sm font-medium text-stone-900 outline-none transition-shadow focus-visible:border-stone-950 dark:border-white/18 dark:text-stone-100 dark:focus-visible:border-amber-300/80;
+  @apply rounded-xl border px-4 py-2.5 text-sm font-medium outline-none transition-[background-color,border-color,box-shadow,color] placeholder:font-medium;
   background-color: var(--wr-input-bg);
+  border-color: var(--wr-input-border);
+  color: var(--wr-input-text);
   box-shadow: 0 0 0 0 transparent;
 }
 
@@ -333,7 +345,12 @@ body {
 }
 
 .wr-input:focus-visible {
+  border-color: var(--wr-input-border-focus);
   box-shadow: 0 0 0 3px var(--wr-shadow-input-focus);
+}
+
+.wr-input::placeholder {
+  color: var(--wr-input-placeholder);
 }
 
 @utility wr-pill-tag {

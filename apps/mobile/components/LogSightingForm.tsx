@@ -1,5 +1,7 @@
 import Slider from "@react-native-community/slider";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { HeaderHeightContext } from "@react-navigation/elements";
@@ -39,6 +41,14 @@ const IOS_INPUT_ACCESSORY_ID = "LogSightingInputAccessory";
 const SPACE = { xs: 4, sm: 8, md: 16, lg: 24 } as const;
 /** Wait for typing to settle before hitting OMDb (matches web submit field ~300ms, slightly longer for mobile). */
 const IMDB_SEARCH_DEBOUNCE_MS = 400;
+const MAX_SIGHTING_IMAGES = 5;
+type FieldErrorKey =
+  | "movieSelection"
+  | "sightingTitle"
+  | "timestamp"
+  | "description"
+  | "submitterName"
+  | "submitterEmail";
 
 function firstReleaseYear(yearStr: string): number | undefined {
   const m = /^(\d{4})/.exec(yearStr.trim());
@@ -175,7 +185,6 @@ function RatSwarmSignal({
 
 function createFormStyles(colors: ThemeColors) {
   const line = colors.inputBorder;
-  const fgOnChip = contrastingForeground(colors.chipActive);
   return StyleSheet.create({
     /** Same as scroll section `gap` — keeps space between field groups aligned with space between major blocks. */
     formSection: { gap: SPACE.lg },
@@ -202,7 +211,7 @@ function createFormStyles(colors: ThemeColors) {
       borderLeftColor: colors.border,
     },
     descModeBtnActive: {
-      backgroundColor: colors.chipActive,
+      backgroundColor: colors.accent,
     },
     descModeBtnText: {
       fontSize: 13,
@@ -210,7 +219,7 @@ function createFormStyles(colors: ThemeColors) {
       color: colors.textMuted,
     },
     descModeBtnTextActive: {
-      color: fgOnChip,
+      color: "#ffffff",
     },
     previewBox: {
       minHeight: 120,
@@ -246,16 +255,6 @@ function createFormStyles(colors: ThemeColors) {
       alignItems: "flex-end",
       justifyContent: "center",
       minWidth: 56,
-    },
-    sliderEndLabels: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginTop: SPACE.xs,
-    },
-    sliderEndLabel: {
-      fontSize: 13,
-      fontWeight: "700",
-      color: colors.textMuted,
     },
     /** Stepper + meter stack vertically so the swarm scale stays full width and nothing shares a cramped row. */
     ratControlsStack: {
@@ -427,6 +426,12 @@ function createFormStyles(colors: ThemeColors) {
       paddingHorizontal: INSET_X,
       paddingTop: SPACE.md,
     },
+    fieldErrorText: {
+      color: colors.dangerText,
+      fontSize: 12.5,
+      lineHeight: 17,
+      fontWeight: "700",
+    },
     primaryBtn: {
       backgroundColor: colors.accent,
       borderRadius: 12,
@@ -435,7 +440,7 @@ function createFormStyles(colors: ThemeColors) {
       alignSelf: "stretch",
     },
     primaryBtnDisabled: { opacity: 0.55 },
-    primaryBtnText: { color: colors.retryOnAccent, fontSize: 16, fontWeight: "800" },
+    primaryBtnText: { color: "#ffffff", fontSize: 16, fontWeight: "800" },
     keyboardAvoidRoot: {
       flex: 1,
       minHeight: 0,
@@ -464,6 +469,11 @@ function createFormStyles(colors: ThemeColors) {
       paddingVertical: SPACE.sm,
     },
     spoilerSection: { paddingBottom: SPACE.md },
+    spoilerDivider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: colors.dividerStrong,
+      marginBottom: SPACE.sm,
+    },
     toggleLabelStack: {
       flex: 1,
       minWidth: 0,
@@ -482,6 +492,12 @@ function createFormStyles(colors: ThemeColors) {
       color: colors.textMuted,
       fontSize: 12,
       lineHeight: 18,
+    },
+    requiredLegend: {
+      color: colors.textMuted,
+      fontSize: 11.5,
+      fontWeight: "700",
+      letterSpacing: 0.2,
     },
     formStartDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.dividerStrong },
     searchBusyWrap: {
@@ -502,7 +518,89 @@ function createFormStyles(colors: ThemeColors) {
     },
     loadMoreBtnDisabled: { opacity: 0.55 },
     loadMoreText: { color: colors.accent, fontSize: 15, fontWeight: "800" },
+    uploadCard: {
+      gap: 10,
+    },
+    uploadBtnRow: {
+      flexDirection: "row",
+      gap: 10,
+      alignItems: "stretch",
+    },
+    uploadBtn: {
+      flex: 1,
+      minHeight: 48,
+      borderRadius: 12,
+      borderWidth: 0,
+      borderColor: "transparent",
+      backgroundColor: colors.accent,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 10,
+    },
+    uploadBtnCompact: {
+      flex: 0,
+      minHeight: 36,
+      paddingHorizontal: 12,
+      borderRadius: 9,
+    },
+    uploadBtnRowCompact: {
+      justifyContent: "flex-start",
+      alignItems: "center",
+    },
+    uploadBtnDisabled: { opacity: 0.55 },
+    uploadBtnText: { color: "#ffffff", fontSize: 13.5, fontWeight: "800" },
+    uploadBtnInner: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+    },
+    selectedImagesWrap: { gap: 8 },
+    selectedImageRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      borderRadius: 10,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: line,
+      backgroundColor: colors.panel,
+      paddingLeft: 8,
+      paddingRight: 12,
+      paddingVertical: 8,
+    },
+    selectedImageThumb: {
+      width: 54,
+      height: 54,
+      borderRadius: 8,
+      backgroundColor: colors.panelMuted,
+    },
+    selectedImageMeta: { flex: 1, minWidth: 0, gap: 2 },
+    selectedImageName: { color: colors.text, fontSize: 13, fontWeight: "700" },
+    selectedImageDetail: { color: colors.textMuted, fontSize: 11, lineHeight: 15 },
+    selectedImageRemoveBtn: {
+      borderRadius: 8,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: line,
+      backgroundColor: colors.panelMuted,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
+      marginLeft: 2,
+    },
+    selectedImageRemoveText: { color: colors.accent, fontSize: 12, fontWeight: "800" },
   });
+}
+
+type SightingImageAsset = {
+  uri: string;
+  fileName: string;
+  mimeType: string;
+  fileSize?: number;
+};
+
+function friendlyImageSize(size: number | undefined): string {
+  if (!size || !Number.isFinite(size) || size <= 0) return "Size unknown";
+  if (size >= 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(size / 1024))} KB`;
 }
 
 export function LogSightingForm() {
@@ -526,10 +624,12 @@ export function LogSightingForm() {
   const nameInputRef = useRef<TextInput>(null);
   const emailInputRef = useRef<TextInput>(null);
   const cardDivider = colors.inputBorder;
+  const requiredAsteriskColor = colors.mode === "light" ? colors.dangerText : colors.accent;
+  const inlineErrorColor = colors.mode === "light" ? "#b91c1c" : colors.dangerText;
   /** Matches global accent + themed neutral track for contrast in both modes. */
   const filmTrackMin = colors.accent;
   const filmTrackMax = colors.sliderTrackMax;
-  const filmThumbTint = colors.panel;
+  const filmThumbTint = "#ffffff";
 
   const markdownStyles = useMemo(
     () => ({
@@ -585,8 +685,10 @@ export function LogSightingForm() {
   const [submitterEmail, setSubmitterEmail] = useState("");
   const [spoiler, setSpoiler] = useState(false);
   const [descriptionMode, setDescriptionMode] = useState<"write" | "preview">("write");
+  const [sightingImages, setSightingImages] = useState<SightingImageAsset[]>([]);
 
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldErrorKey, string>>>({});
   const [submitting, setSubmitting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -734,35 +836,127 @@ export function LogSightingForm() {
     setSearchHasMore(false);
     setSearchPage(1);
     setFormError(null);
+    setFieldErrors((prev) => {
+      if (!prev.movieSelection) return prev;
+      const next = { ...prev };
+      delete next.movieSelection;
+      return next;
+    });
   }, []);
 
-  const validate = useCallback((): string | null => {
+  const clearFieldError = useCallback((field: FieldErrorKey) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }, []);
+
+  const mergeImageAssets = useCallback((assets: ImagePicker.ImagePickerAsset[]) => {
+    setSightingImages((prev) => {
+      const next = [...prev];
+      const seen = new Set(prev.map((img) => img.uri));
+      for (const asset of assets) {
+        if (!asset.uri || seen.has(asset.uri)) continue;
+        if (next.length >= MAX_SIGHTING_IMAGES) break;
+        const fileName = asset.fileName?.trim() || `sighting-${next.length + 1}.jpg`;
+        const mimeType = asset.mimeType?.trim() || "image/jpeg";
+        next.push({
+          uri: asset.uri,
+          fileName,
+          mimeType,
+          fileSize: asset.fileSize ?? undefined,
+        });
+        seen.add(asset.uri);
+      }
+      return next;
+    });
+  }, []);
+
+  const pickImagesFromLibrary = useCallback(async () => {
+    if (submitting) return;
+    try {
+      const remaining = Math.max(0, MAX_SIGHTING_IMAGES - sightingImages.length);
+      if (remaining < 1) {
+        setFormError(`You can upload up to ${MAX_SIGHTING_IMAGES} images.`);
+        return;
+      }
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        setFormError("Photo library access is required to choose images.");
+        return;
+      }
+      const multiSelect = Platform.OS === "ios";
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsMultipleSelection: multiSelect,
+        selectionLimit: multiSelect ? remaining : undefined,
+        quality: 0.92,
+      });
+      if (!result.canceled) mergeImageAssets(result.assets);
+    } catch (e) {
+      setFormError(formatApiError(e));
+    }
+  }, [submitting, sightingImages.length, mergeImageAssets]);
+
+  const takePhotoForSighting = useCallback(async () => {
+    if (submitting) return;
+    try {
+      if (sightingImages.length >= MAX_SIGHTING_IMAGES) {
+        setFormError(`You can upload up to ${MAX_SIGHTING_IMAGES} images.`);
+        return;
+      }
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
+      if (!perm.granted) {
+        setFormError("Camera access is required to take a picture.");
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        quality: 0.92,
+      });
+      if (!result.canceled) mergeImageAssets(result.assets);
+    } catch (e) {
+      setFormError(formatApiError(e));
+    }
+  }, [submitting, sightingImages.length, mergeImageAssets]);
+
+  const removeSightingImage = useCallback((uri: string) => {
+    setSightingImages((prev) => prev.filter((img) => img.uri !== uri));
+  }, []);
+
+  const validateFields = useCallback((): Partial<Record<FieldErrorKey, string>> => {
+    const errors: Partial<Record<FieldErrorKey, string>> = {};
     if (!movieTitleResolved.trim()) {
-      return "Select a movie from search.";
+      errors.movieSelection = "Select a movie from search.";
     }
     if (!imdbId.trim()) {
-      return "Pick a result from IMDb search so the title links to a real IMDb ID.";
+      errors.movieSelection =
+        "Pick a result from IMDb search so the title links to a real IMDb ID.";
     }
-    if (!sightingTitle.trim()) return "Sighting title is required.";
-    if (filmPct < 0 || filmPct > 100) return "Use a percentage from 0 to 100.";
-    if (!description.trim()) return "Description is required.";
-    if (!submitterName.trim()) return "Your name is required.";
+    if (!sightingTitle.trim()) errors.sightingTitle = "Sighting title is required.";
+    if (filmPct < 0 || filmPct > 100) errors.timestamp = "Use a percentage from 0 to 100.";
+    if (!description.trim()) errors.description = "Description is required.";
+    if (!submitterName.trim()) errors.submitterName = "Your name is required.";
     if (submitterEmail.trim()) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(submitterEmail.trim())) {
-        return "Enter a valid email address or leave it blank.";
+        errors.submitterEmail = "Enter a valid email address or leave it blank.";
       }
     }
-    return null;
+    return errors;
   }, [imdbId, movieTitleResolved, sightingTitle, filmPct, description, submitterName, submitterEmail]);
 
-  const formComplete = useMemo(() => validate() === null, [validate]);
+  const formComplete = useMemo(() => Object.keys(validateFields()).length === 0, [validateFields]);
 
   const onSubmit = useCallback(async () => {
-    const err = validate();
-    if (err) {
-      setFormError(err);
+    if (submitting) return;
+    const nextErrors = validateFields();
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
       return;
     }
+    setFieldErrors({});
     setFormError(null);
     setSubmitting(true);
     try {
@@ -778,6 +972,13 @@ export function LogSightingForm() {
       if (submitterEmail.trim()) fd.append("submitterEmail", submitterEmail.trim());
       fd.append("approximateRatCount", String(ratCount));
       if (spoiler) fd.append("spoiler", "on");
+      for (const img of sightingImages) {
+        fd.append("sightingImages", {
+          uri: img.uri,
+          name: img.fileName,
+          type: img.mimeType,
+        } as any);
+      }
 
       await postSightingSubmission(fd);
       setSightingTitle("");
@@ -786,6 +987,7 @@ export function LogSightingForm() {
       setRatCount(1);
       setFilmPct(50);
       setSpoiler(false);
+      setSightingImages([]);
       setDescriptionMode("write");
       clearMovie();
       router.replace({ pathname: "/", params: { success: "1" } });
@@ -795,7 +997,8 @@ export function LogSightingForm() {
       setSubmitting(false);
     }
   }, [
-    validate,
+    submitting,
+    validateFields,
     movieTitleResolved,
     imdbId,
     movieYear,
@@ -807,6 +1010,7 @@ export function LogSightingForm() {
     submitterEmail,
     ratCount,
     spoiler,
+    sightingImages,
     clearMovie,
   ]);
 
@@ -860,13 +1064,21 @@ export function LogSightingForm() {
         <Text style={styles.formIntroBody}>
           Capture where it appears and what happens on screen. Every submission is reviewed before it goes live.
         </Text>
+        <Text style={styles.requiredLegend}>* = required</Text>
       </View>
       <View style={styles.formStartDivider} />
 
       <View style={styles.formSection}>
         {!(imdbId && selectedHit) ? (
           <View style={styles.fieldGroup}>
-            <Text style={styles.fieldLabel}>Search for a title…</Text>
+            <Text style={styles.fieldLabel}>
+              Search for a title… <Text style={{ color: requiredAsteriskColor }}>*</Text>
+            </Text>
+            {fieldErrors.movieSelection ? (
+              <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+                {fieldErrors.movieSelection}
+              </Text>
+            ) : null}
             {searchNotice && searchHits.length === 0 ? (
               <Text style={styles.movieMeta}>{searchNotice}</Text>
             ) : null}
@@ -877,6 +1089,7 @@ export function LogSightingForm() {
               disabled={submitting}
               onChangeText={(t) => {
                 setMovieQuery(t);
+                clearFieldError("movieSelection");
                 if (imdbId) {
                   setImdbId("");
                   setMovieTitleResolved("");
@@ -888,6 +1101,8 @@ export function LogSightingForm() {
               autoCorrect={false}
               autoCapitalize="words"
               accessibilityLabel="Search for a title"
+              invalid={Boolean(fieldErrors.movieSelection)}
+              invalidBorderColor={inlineErrorColor}
               returnKeyType="next"
               onSubmitEditing={() => titleInputRef.current?.focus()}
               {...iosAccessoryProps}
@@ -990,13 +1205,25 @@ export function LogSightingForm() {
 
       <View style={styles.formSection}>
         <View style={styles.fieldGroup}>
-          <Text style={styles.fieldLabel}>Sighting title</Text>
+          <Text style={styles.fieldLabel}>
+            Sighting title <Text style={{ color: requiredAsteriskColor }}>*</Text>
+          </Text>
+          {fieldErrors.sightingTitle ? (
+            <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+              {fieldErrors.sightingTitle}
+            </Text>
+          ) : null}
           <AppTextInput
             ref={titleInputRef}
             placeholder="Short headline for this appearance"
             value={sightingTitle}
             disabled={submitting}
-            onChangeText={setSightingTitle}
+            onChangeText={(t) => {
+              setSightingTitle(t);
+              clearFieldError("sightingTitle");
+            }}
+            invalid={Boolean(fieldErrors.sightingTitle)}
+            invalidBorderColor={inlineErrorColor}
             accessibilityLabel="Sighting title"
             returnKeyType="next"
             onSubmitEditing={focusAfterTitle}
@@ -1006,8 +1233,14 @@ export function LogSightingForm() {
 
         <View style={styles.fieldGroup}>
           <Text style={styles.fieldLabel}>
-            How far into the film did you spot the rat(s)?
+            How far into the film did you spot the rat(s)?{" "}
+            <Text style={{ color: requiredAsteriskColor }}>*</Text>
           </Text>
+          {fieldErrors.timestamp ? (
+            <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+              {fieldErrors.timestamp}
+            </Text>
+          ) : null}
           <View style={styles.filmSliderRow}>
             <Slider
               style={styles.filmSlider}
@@ -1015,7 +1248,10 @@ export function LogSightingForm() {
               maximumValue={100}
               step={1}
               value={filmPct}
-              onValueChange={(v) => setFilmPct(Math.round(v))}
+              onValueChange={(v) => {
+                setFilmPct(Math.round(v));
+                clearFieldError("timestamp");
+              }}
               minimumTrackTintColor={filmTrackMin}
               maximumTrackTintColor={filmTrackMax}
               thumbTintColor={filmThumbTint}
@@ -1025,10 +1261,6 @@ export function LogSightingForm() {
             <View style={styles.filmPctInline} pointerEvents="none">
               <Text style={styles.filmPctBig}>{filmPct}%</Text>
             </View>
-          </View>
-          <View style={styles.sliderEndLabels}>
-            <Text style={styles.sliderEndLabel}>Opening</Text>
-            <Text style={styles.sliderEndLabel}>Ending</Text>
           </View>
         </View>
 
@@ -1073,10 +1305,14 @@ export function LogSightingForm() {
         </View>
 
         <View style={styles.fieldGroup}>
-          <Text style={styles.fieldLabel}>Description</Text>
-          <Text style={styles.helper}>
-            Markdown-friendly (bold, lists, links). Moderators review every submission before it ships.
+          <Text style={styles.fieldLabel}>
+            Description <Text style={{ color: requiredAsteriskColor }}>*</Text>
           </Text>
+          {fieldErrors.description ? (
+            <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+              {fieldErrors.description}
+            </Text>
+          ) : null}
           <View style={styles.descModeRow}>
             <Pressable
               onPress={() => setDescriptionMode("write")}
@@ -1127,8 +1363,13 @@ export function LogSightingForm() {
               placeholder="Where on screen? What happens? What does the rat do?"
               value={description}
               disabled={submitting}
-              onChangeText={setDescription}
+              onChangeText={(t) => {
+                setDescription(t);
+                clearFieldError("description");
+              }}
               style={styles.textarea}
+              invalid={Boolean(fieldErrors.description)}
+              invalidBorderColor={inlineErrorColor}
               accessibilityLabel="Sighting description"
               blurOnSubmit={false}
               {...iosAccessoryProps}
@@ -1147,13 +1388,25 @@ export function LogSightingForm() {
 
       <View style={styles.formSection}>
         <View style={styles.fieldGroup}>
-          <Text style={styles.fieldLabel}>Your Name</Text>
+          <Text style={styles.fieldLabel}>
+            Your Name <Text style={{ color: requiredAsteriskColor }}>*</Text>
+          </Text>
+          {fieldErrors.submitterName ? (
+            <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+              {fieldErrors.submitterName}
+            </Text>
+          ) : null}
           <AppTextInput
             ref={nameInputRef}
             placeholder="Displayed with the listing if accepted"
             value={submitterName}
             disabled={submitting}
-            onChangeText={setSubmitterName}
+            onChangeText={(t) => {
+              setSubmitterName(t);
+              clearFieldError("submitterName");
+            }}
+            invalid={Boolean(fieldErrors.submitterName)}
+            invalidBorderColor={inlineErrorColor}
             autoComplete="name"
             accessibilityLabel="Your name"
             returnKeyType="next"
@@ -1163,12 +1416,22 @@ export function LogSightingForm() {
         </View>
         <View style={styles.fieldGroup}>
           <Text style={styles.fieldLabel}>Your Email (optional)</Text>
+          {fieldErrors.submitterEmail ? (
+            <Text style={[styles.fieldErrorText, { color: inlineErrorColor }]}>
+              {fieldErrors.submitterEmail}
+            </Text>
+          ) : null}
           <AppTextInput
             ref={emailInputRef}
             placeholder="moderators-only follow-up"
             value={submitterEmail}
             disabled={submitting}
-            onChangeText={setSubmitterEmail}
+            onChangeText={(t) => {
+              setSubmitterEmail(t);
+              clearFieldError("submitterEmail");
+            }}
+            invalid={Boolean(fieldErrors.submitterEmail)}
+            invalidBorderColor={inlineErrorColor}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
@@ -1180,7 +1443,79 @@ export function LogSightingForm() {
         </View>
       </View>
 
+      <View style={styles.formSection}>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.fieldLabel}>Sighting images (optional, max {MAX_SIGHTING_IMAGES})</Text>
+          <View style={styles.uploadCard}>
+            <View style={[styles.uploadBtnRow, sightingImages.length > 0 && styles.uploadBtnRowCompact]}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.uploadBtn,
+                  sightingImages.length > 0 && styles.uploadBtnCompact,
+                  submitting && styles.uploadBtnDisabled,
+                  pressed && !submitting && { opacity: 0.88 },
+                ]}
+                onPress={() => void pickImagesFromLibrary()}
+                disabled={submitting}
+                accessibilityRole="button"
+                accessibilityLabel="Choose images from your photo library"
+              >
+                <View style={styles.uploadBtnInner}>
+                  <Ionicons name="images-outline" size={15} color="#ffffff" />
+                  <Text style={styles.uploadBtnText}>Choose photos</Text>
+                </View>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.uploadBtn,
+                  sightingImages.length > 0 && styles.uploadBtnCompact,
+                  submitting && styles.uploadBtnDisabled,
+                  pressed && !submitting && { opacity: 0.88 },
+                ]}
+                onPress={() => void takePhotoForSighting()}
+                disabled={submitting}
+                accessibilityRole="button"
+                accessibilityLabel="Take a photo with the camera"
+              >
+                <View style={styles.uploadBtnInner}>
+                  <Ionicons name="camera-outline" size={15} color="#ffffff" />
+                  <Text style={styles.uploadBtnText}>Take photo</Text>
+                </View>
+              </Pressable>
+            </View>
+            {sightingImages.length ? (
+              <View style={styles.selectedImagesWrap}>
+                {sightingImages.map((img) => (
+                  <View key={img.uri} style={styles.selectedImageRow}>
+                    <Image source={{ uri: img.uri }} style={styles.selectedImageThumb} contentFit="cover" />
+                    <View style={styles.selectedImageMeta}>
+                      <Text style={styles.selectedImageName} numberOfLines={1}>
+                        {img.fileName}
+                      </Text>
+                      <Text style={styles.selectedImageDetail}>{friendlyImageSize(img.fileSize)}</Text>
+                    </View>
+                    <Pressable
+                      style={styles.selectedImageRemoveBtn}
+                      onPress={() => removeSightingImage(img.uri)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Remove ${img.fileName}`}
+                      disabled={submitting}
+                    >
+                      <Text style={styles.selectedImageRemoveText}>Remove</Text>
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+            <Text style={styles.helper}>
+              JPEG, PNG, WebP, or GIF. Up to 5 images, 8 MB each.
+            </Text>
+          </View>
+        </View>
+      </View>
+
       <View style={[styles.formSection, styles.spoilerSection]}>
+        <View style={styles.spoilerDivider} />
         <View style={styles.toggleRow}>
           <View style={styles.toggleLabelStack}>
             <Text style={styles.fieldLabel}>Contains plot spoilers</Text>
@@ -1220,13 +1555,13 @@ export function LogSightingForm() {
             (!formComplete || submitting) && styles.primaryBtnDisabled,
           ]}
           onPress={() => void onSubmit()}
-          disabled={!formComplete || submitting}
+          disabled={submitting}
           accessibilityRole="button"
-          accessibilityState={{ disabled: !formComplete || submitting }}
+          accessibilityState={{ disabled: submitting }}
           accessibilityLabel="Submit sighting for review"
         >
           {submitting ? (
-            <ActivityIndicator color={colors.retryOnAccent} />
+            <ActivityIndicator color="#ffffff" />
           ) : (
             <Text style={styles.primaryBtnText}>Submit for review</Text>
           )}

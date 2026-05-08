@@ -137,7 +137,7 @@ export default async function Home({
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <h1
             className="tracking-normal text-stone-950 dark:text-[#fff8ec]"
-            style={{ fontFamily: "var(--font-hero)", fontSize: "clamp(1.5rem, 3.5vw, 3rem)" }}
+            style={{ fontFamily: "var(--font-hero)", fontSize: "clamp(2.2rem, 6.8vw, 4.1rem)" }}
           >
             An obsessive guide to{" "}
             <span className="inline-block -scale-x-100">🐀</span> on film.

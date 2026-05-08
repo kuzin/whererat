@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Markdown from "react-native-markdown-display";
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -44,6 +45,24 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
       alignItems: "center",
       gap: 6,
       pointerEvents: "none",
+    },
+    previewBtnWrap: {
+      position: "absolute",
+      right: 10,
+      bottom: 10,
+    },
+    previewBtn: {
+      borderRadius: 999,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      backgroundColor: colors.overlayScrim,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+    },
+    previewBtnText: {
+      color: colors.onScrimText,
+      fontSize: 12,
+      fontWeight: "800",
     },
     dot: {
       width: 7,
@@ -133,6 +152,29 @@ function createSightingStyles(colors: ThemeColors, surfaceColor?: string) {
     ratMeterGlyphOff: { opacity: 0.2 },
     desc: { color: colors.text, fontSize: 15, lineHeight: 22 },
     submitter: { color: colors.textMuted, fontSize: 12, fontStyle: "italic", marginTop: 6 },
+    curatorNoteCard: {
+      marginTop: 6,
+      borderRadius: 10,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: dividerBorder,
+      backgroundColor: colors.panelMuted,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      gap: 6,
+    },
+    curatorNoteLabel: {
+      color: colors.textMuted,
+      fontSize: 10.5,
+      fontWeight: "800",
+      textTransform: "uppercase",
+      letterSpacing: 0.6,
+    },
+    curatorNoteText: {
+      color: colors.text,
+      fontSize: 13,
+      lineHeight: 19,
+      fontWeight: "500",
+    },
     contentBlock: {
       paddingTop: 2,
       gap: 4,
@@ -156,6 +198,7 @@ type Props = {
   sighting: SightingPublic;
   surfaceColor?: string;
   showSpoilers?: boolean;
+  onOpenImagePreview?: (slides: { url: string; alt?: string }[], startIndex: number) => void;
 };
 
 const PLACEHOLDER_STILL_PATTERN = /placehold\.co\//i;
@@ -214,7 +257,12 @@ function parseTimestampPercent(timestamp: string): number | null {
   return Math.max(0, Math.min(100, parsed));
 }
 
-export function SightingCard({ sighting, surfaceColor, showSpoilers = false }: Props) {
+export function SightingCard({
+  sighting,
+  surfaceColor,
+  showSpoilers = false,
+  onOpenImagePreview,
+}: Props) {
   const { colors } = useTheme();
   const styles = useMemo(() => createSightingStyles(colors, surfaceColor), [colors, surfaceColor]);
   const { width: viewportWidth } = useWindowDimensions();
@@ -275,6 +323,7 @@ export function SightingCard({ sighting, surfaceColor, showSpoilers = false }: P
     }),
     [colors],
   );
+  const curatorNote = sighting.curatorNote?.trim() || "";
 
   useEffect(() => {
     setActiveImageIndex(0);
@@ -348,6 +397,18 @@ export function SightingCard({ sighting, surfaceColor, showSpoilers = false }: P
               ))}
             </View>
           ) : null}
+          {!spoilerHidden && slides.length > 0 && onOpenImagePreview ? (
+            <View style={styles.previewBtnWrap}>
+              <Pressable
+                style={({ pressed }) => [styles.previewBtn, pressed && { opacity: 0.9 }]}
+                onPress={() => onOpenImagePreview(slides, activeImageIndex)}
+                accessibilityRole="button"
+                accessibilityLabel="Open image preview"
+              >
+                <Text style={styles.previewBtnText}>View image</Text>
+              </Pressable>
+            </View>
+          ) : null}
           {spoilerHidden ? (
             <View style={styles.spoilerImageOverlay} pointerEvents="none">
               <View style={styles.spoilerImageTextWrap}>
@@ -402,6 +463,12 @@ export function SightingCard({ sighting, surfaceColor, showSpoilers = false }: P
           </View>
           {sighting.submitterName ? (
             <Text style={styles.submitter}>Submitted by {sighting.submitterName}</Text>
+          ) : null}
+          {curatorNote ? (
+            <View style={styles.curatorNoteCard}>
+              <Text style={styles.curatorNoteLabel}>Curator note</Text>
+              <Text style={styles.curatorNoteText}>{curatorNote}</Text>
+            </View>
           ) : null}
         </View>
       </View>

@@ -11,6 +11,8 @@ import { useTheme } from "../lib/theme";
 export type AppTextInputProps = Omit<TextInputProps, "editable"> & {
   disabled?: boolean;
   editable?: boolean;
+  invalid?: boolean;
+  invalidBorderColor?: string;
 };
 
 /**
@@ -20,6 +22,8 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(function Ap
   {
     disabled = false,
     editable = true,
+    invalid = false,
+    invalidBorderColor,
     style,
     placeholderTextColor,
     onFocus,
@@ -55,9 +59,11 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(function Ap
       ? colors.inputBorderDisabled
       : focused
         ? colors.inputBorderFocused
-        : colors.inputBorder;
+        : invalid
+          ? invalidBorderColor ?? colors.dangerText
+          : colors.inputBorder;
     return {
-      borderWidth: StyleSheet.hairlineWidth,
+      borderWidth: 2,
       borderColor,
       borderRadius: 10,
       backgroundColor: isDisabled ? colors.inputBackgroundDisabled : colors.panel,
@@ -66,7 +72,7 @@ export const AppTextInput = forwardRef<TextInput, AppTextInputProps>(function Ap
       fontSize: 16,
       color: isDisabled ? colors.textMuted : colors.text,
     } as const;
-  }, [colors, focused, isDisabled]);
+  }, [colors, focused, invalid, invalidBorderColor, isDisabled]);
 
   return (
     <TextInput

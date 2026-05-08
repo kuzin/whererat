@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
@@ -6,7 +7,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Keyboard,
   Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Platform,
   Pressable,
   RefreshControl,
@@ -44,10 +48,13 @@ const SPACE_Y = 12;
 const CATALOG_SEARCH_TO_FILTERS_GAP = 8;
 const CARD_GAP = SPACE_Y;
 const CATALOG_CONTENT_INSET_X = 20;
+const CATALOG_PREFS_KEY = "whererat.mobile.catalogPrefs.v1";
 /** Tighter horizontal inset for list rows than the card grid */
 const CATALOG_LIST_INSET_X = 14;
 /** Extra inset below catalog scroll plus safe-area (pager sits above home indicator). */
 const SCROLL_BOTTOM_EXTRA = 28;
+const CATALOG_REFRESH_OFFSET = 56;
+const IOS_PULL_REFRESH_TRIGGER = -88;
 function gridPosterWidthPx(screenWidth: number): number {
   return (screenWidth - CATALOG_CONTENT_INSET_X * 2 - CARD_GAP * (CARD_COLS - 1)) / CARD_COLS;
 }
@@ -84,12 +91,20 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
       paddingHorizontal: INSET_X,
       gap: CATALOG_SEARCH_TO_FILTERS_GAP,
     },
+    refreshNativeLikeWrap: {
+      alignSelf: "stretch",
+      minHeight: 30,
+      justifyContent: "center",
+      marginTop: 10,
+      marginBottom: 8,
+      alignItems: "center",
+    },
     searchFieldOuter: {
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: colors.panel,
       borderRadius: 10,
-      borderWidth: StyleSheet.hairlineWidth,
+      borderWidth: 2,
       borderColor: colors.inputBorder,
       overflow: "hidden",
       position: "relative",
@@ -148,24 +163,24 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
       alignItems: "center",
       backgroundColor: colors.panel,
       borderRadius: 10,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: warmLineSoft,
-      padding: 3,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
+      padding: 2,
       flexShrink: 0,
       gap: 3,
-      minHeight: 44,
+      height: 44,
     },
     layoutToggleBtn: {
       paddingHorizontal: 11,
-      paddingVertical: 8,
+      height: 36,
       borderRadius: 7,
       justifyContent: "center",
       alignItems: "center",
     },
     layoutToggleBtnOn: {
-      backgroundColor: colors.chipActive,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.chipActiveOutline,
+      backgroundColor: colors.accent,
+      borderWidth: 0,
+      borderColor: "transparent",
     },
     select: {
       flexDirection: "row",
@@ -174,8 +189,8 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
       minHeight: 44,
       backgroundColor: colors.panel,
       borderRadius: 10,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: warmLineSoft,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
       paddingHorizontal: 11,
       paddingVertical: 0,
       justifyContent: "center",
@@ -204,8 +219,8 @@ function createCatalogStyles(colors: ThemeColors, scrollBottomPad: number) {
     sheetCard: {
       backgroundColor: colors.panel,
       borderRadius: 14,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: warmLineSoft,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
       paddingTop: SPACE_Y,
       paddingBottom: SPACE_Y,
       maxHeight: 420,
@@ -526,6 +541,7 @@ export default function CatalogScreen() {
   const [catalogSearchFocused, setCatalogSearchFocused] = useState(false);
   const lastMovieNavAtRef = useRef(0);
   const [successPreviewOpen, setSuccessPreviewOpen] = useState(false);
+  const catalogPrefsHydratedRef = useRef(false);
 
   /**
    * Guard against accidental double-taps that push the same route twice.
@@ -537,6 +553,54 @@ export default function CatalogScreen() {
     lastMovieNavAtRef.current = now;
     router.push(`/movie/${encodeURIComponent(slug)}`);
   }, []);
+
+  useEffect(() => {
+    let canceled = false;
+    void (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(CATALOG_PREFS_KEY);
+        if (!raw || canceled) return;
+        const parsed = JSON.parse(raw) as {
+          genre?: string;
+          sort?: CatalogSort;
+          layoutMode?: CatalogLayoutMode;
+        };
+        if (typeof parsed.genre === "string" && parsed.genre.trim()) {
+          setGenre(parsed.genre.trim());
+        }
+        if (
+          parsed.sort === "latest-added-title" ||
+          parsed.sort === "latest-sighting" ||
+          parsed.sort === "most-rats-logged" ||
+          parsed.sort === "total-sightings"
+        ) {
+          setSort(parsed.sort);
+        }
+        if (parsed.layoutMode === "list" || parsed.layoutMode === "card") {
+          setLayoutMode(parsed.layoutMode);
+        }
+      } catch {
+        // Ignore preference hydration errors; keep defaults.
+      } finally {
+        if (!canceled) catalogPrefsHydratedRef.current = true;
+      }
+    })();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!catalogPrefsHydratedRef.current) return;
+    void AsyncStorage.setItem(
+      CATALOG_PREFS_KEY,
+      JSON.stringify({
+        genre,
+        sort,
+        layoutMode,
+      }),
+    );
+  }, [genre, sort, layoutMode]);
 
   useEffect(() => {
     const t = setTimeout(() => setQueryApplied(queryInput.trim()), 380);
@@ -589,6 +653,17 @@ export default function CatalogScreen() {
       setRefreshing(false);
     }
   }, [load]);
+
+  const onCatalogScrollEndDrag = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (Platform.OS !== "ios") return;
+      if (refreshing) return;
+      if (event.nativeEvent.contentOffset.y <= IOS_PULL_REFRESH_TRIGGER) {
+        void onRefresh();
+      }
+    },
+    [onRefresh, refreshing],
+  );
 
   const resetCatalogFilters = useCallback(() => {
     setQueryInput("");
@@ -644,6 +719,11 @@ export default function CatalogScreen() {
               selectionColor={colors.accent}
               onFocus={() => setCatalogSearchFocused(true)}
               onBlur={() => setCatalogSearchFocused(false)}
+              returnKeyType="search"
+              onSubmitEditing={() => {
+                setCatalogSearchFocused(false);
+                Keyboard.dismiss();
+              }}
               {...(Platform.OS === "android" ? { cursorColor: colors.accent } : {})}
             />
             {catalogSearchHasText ? (
@@ -690,7 +770,7 @@ export default function CatalogScreen() {
                 accessibilityState={{ selected: layoutMode === "list" }}
                 accessibilityLabel="List view"
               >
-                <Ionicons name="list" size={22} color={layoutMode === "list" ? colors.text : colors.textMuted} />
+                <Ionicons name="list" size={22} color={layoutMode === "list" ? "#ffffff" : colors.textMuted} />
               </Pressable>
               <Pressable
                 onPress={() => setLayoutMode("card")}
@@ -699,7 +779,7 @@ export default function CatalogScreen() {
                 accessibilityState={{ selected: layoutMode === "card" }}
                 accessibilityLabel="Card view"
               >
-                <Ionicons name="grid" size={20} color={layoutMode === "card" ? colors.text : colors.textMuted} />
+                <Ionicons name="grid" size={20} color={layoutMode === "card" ? "#ffffff" : colors.textMuted} />
               </Pressable>
             </View>
           </View>
@@ -772,15 +852,18 @@ export default function CatalogScreen() {
         numColumns={layoutMode === "card" ? CARD_COLS : 1}
         columnWrapperStyle={layoutMode === "card" ? styles.cardGridRow : undefined}
         refreshControl={
-          <RefreshControl
-            key={`catalog-refresh-${colors.mode}-${isFocused ? "focused" : "blurred"}`}
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.accent}
-            colors={[colors.accent]}
-            progressBackgroundColor={colors.formCanvas}
-            titleColor={colors.accent}
-          />
+          Platform.OS === "ios" ? undefined : (
+            <RefreshControl
+              key={`catalog-refresh-${colors.mode}-${isFocused ? "focused" : "blurred"}`}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              progressViewOffset={CATALOG_REFRESH_OFFSET}
+              tintColor={colors.mode === "dark" ? "#f8fafc" : colors.accent}
+              colors={[colors.mode === "dark" ? "#f8fafc" : colors.accent]}
+              progressBackgroundColor={colors.mode === "dark" ? "#334155" : colors.formCanvas}
+              titleColor={colors.mode === "dark" ? "#f8fafc" : colors.accent}
+            />
+          )
         }
         renderItem={({ item }) =>
           layoutMode === "list" ? (
@@ -813,6 +896,21 @@ export default function CatalogScreen() {
           styles.catalogScrollContentBase,
           layoutMode === "list" ? styles.catalogScrollContentList : styles.catalogScrollContentCard,
         ]}
+        ListHeaderComponent={
+          refreshing ? (
+            <View style={styles.refreshNativeLikeWrap} pointerEvents="none">
+              <ActivityIndicator
+                size="small"
+                color={colors.mode === "dark" ? "#f8fafc" : colors.accent}
+              />
+            </View>
+          ) : undefined
+        }
+        onScrollBeginDrag={() => {
+          setCatalogSearchFocused(false);
+          Keyboard.dismiss();
+        }}
+        onScrollEndDrag={onCatalogScrollEndDrag}
       />
       )}
 
@@ -837,7 +935,6 @@ export default function CatalogScreen() {
           </Pressable>
         </View>
       ) : null}
-
       <AppToast
         message={error}
         onDismiss={() => setError(null)}

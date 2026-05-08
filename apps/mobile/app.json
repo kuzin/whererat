@@ -17,7 +17,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.whererat.app",
       "infoPlist": {
-        "UIViewControllerBasedStatusBarAppearance": true
+        "UIViewControllerBasedStatusBarAppearance": true,
+        "NSPhotoLibraryUsageDescription": "Allow WhereRat to choose images for sightings.",
+        "NSCameraUsageDescription": "Allow WhereRat to take photos for sightings."
       }
     },
     "android": {
@@ -29,7 +31,16 @@
       "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "resize"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow WhereRat to choose images for sightings.",
+          "cameraPermission": "Allow WhereRat to take photos for sightings."
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }

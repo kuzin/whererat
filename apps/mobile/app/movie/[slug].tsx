@@ -1,5 +1,6 @@
 import { openURL } from "expo-linking";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { HeaderHeightContext } from "@react-navigation/elements";
@@ -10,12 +11,15 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type Dispatch,
 } from "react";
 import {
   ActivityIndicator,
   Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Platform,
   Pressable,
   RefreshControl,
@@ -37,6 +41,7 @@ import {
   contrastingForeground,
   mixTowardHex,
   posterToneToHex,
+  relativeLuminance,
   statusBarStyleForBackground,
 } from "../../lib/posterTone";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -130,12 +135,28 @@ const MEDIA_LIGHTBOX = {
 
 /** iOS movie hero: fixed inset below transparent header (long-standing catalog layout feel). */
 const IOS_MOVIE_HERO_TOP_INSET_PX = 136;
+const MOVIE_PREFS_KEY = "whererat.mobile.moviePrefs.v1";
 
 /** Android only — gap under toolbar when deriving inset from measured bar height + safe area. */
 const HERO_UNDER_TOOLBAR_GAP_ANDROID_PX = 28;
 
 /** Android only — min toolbar height when measurement missing or unreliable. */
 const HERO_MIN_TOOLBAR_FALLBACK_ANDROID_PX = 58;
+const MOVIE_REFRESH_OFFSET = 56;
+const IOS_PULL_REFRESH_TRIGGER = -88;
+
+function liftDarkCustomColor(hex: string, minLuminance: number): string {
+  const normalized = hex.trim();
+  if (!/^#?[0-9a-f]{6}$/i.test(normalized)) return hex;
+  const withHash = normalized.startsWith("#") ? normalized : `#${normalized}`;
+  if (relativeLuminance(withHash) >= minLuminance) return withHash;
+  let mixed = withHash;
+  for (let i = 0; i < 8; i++) {
+    mixed = mixTowardHex(mixed, "#ffffff", 0.12);
+    if (relativeLuminance(mixed) >= minLuminance) break;
+  }
+  return mixed;
+}
 
 function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
   const surface = colors.headerBg;
@@ -369,16 +390,16 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
     },
     filterSortBtn: {
       borderRadius: 9,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
       backgroundColor: colors.panel,
       paddingHorizontal: 10,
-      paddingVertical: 7,
+      paddingVertical: 8,
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
       flex: 1,
-      minHeight: 36,
+      minHeight: 44,
     },
     /** Label + current value flex; chevron aligns trailing (matches catalog `chevron-down`). */
     filterSortBtnMain: {
@@ -398,8 +419,8 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
       maxWidth: "75%",
       backgroundColor: colors.panel,
       borderRadius: 9,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
       paddingHorizontal: 11,
       paddingVertical: 9,
       gap: 8,
@@ -417,6 +438,20 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
       alignItems: "center",
       justifyContent: "center",
     },
+    loadingCenterWrap: {
+      flex: 1,
+      minHeight: 220,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    refreshNativeLikeWrap: {
+      alignSelf: "stretch",
+      minHeight: 30,
+      justifyContent: "center",
+      marginTop: 10,
+      marginBottom: 8,
+      alignItems: "center",
+    },
     sheetBackdrop: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: colors.overlayScrim,
@@ -430,8 +465,8 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
     sheetCard: {
       backgroundColor: colors.panel,
       borderRadius: 12,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
       paddingVertical: 8,
       pointerEvents: "auto",
       overflow: "hidden",
@@ -558,8 +593,8 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
     mediaSegmentBar: {
       flexDirection: "row",
       borderRadius: 10,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
+      borderWidth: 2,
+      borderColor: colors.inputBorder,
       overflow: "hidden",
       alignSelf: "stretch",
     },
@@ -570,9 +605,9 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
       justifyContent: "center",
       backgroundColor: colors.panelMuted,
     },
-    mediaSegmentSlotOn: { backgroundColor: colors.chipActive },
+    mediaSegmentSlotOn: { backgroundColor: colors.accent },
     mediaSegmentSlotText: { fontSize: 14, fontWeight: "600", color: colors.textMuted },
-    mediaSegmentSlotTextOn: { fontWeight: "800", color: fgOnChip },
+    mediaSegmentSlotTextOn: { fontWeight: "800", color: "#ffffff" },
     mediaStillsColumn: {
       alignSelf: "stretch",
       gap: 12,
@@ -615,30 +650,45 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
       lineHeight: 21,
       textAlign: "center",
     },
+    mediaLightboxNavBtn: {
+      position: "absolute",
+      marginTop: -22,
+      zIndex: 2,
+      width: 44,
+      height: 44,
+      borderRadius: 999,
+      backgroundColor: "rgba(12,10,9,0.7)",
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: "rgba(254,243,199,0.28)",
+    },
+    mediaLightboxNavBtnLeft: { left: 12 },
+    mediaLightboxNavBtnRight: { right: 12 },
     metaRow: {
       flexDirection: "row",
-      alignItems: "flex-start",
+      alignItems: "center",
       justifyContent: "space-between",
       gap: 12,
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
-      paddingTop: 10,
+      paddingTop: 5,
       paddingBottom: 15,
     },
-    metaLabel: { color: colors.textMuted, fontSize: 12.5, fontWeight: "600", width: 112 },
+    metaLabel: { color: colors.textMuted, fontSize: 13.5, fontWeight: "700", width: 118, lineHeight: 20 },
     metaValue: {
       color: colors.text,
-      fontSize: 13.5,
-      fontWeight: "500",
+      fontSize: 14.5,
+      fontWeight: "600",
       flex: 1,
       textAlign: "right",
-      lineHeight: 19,
+      lineHeight: 21,
     },
     metaLink: { color: colors.accent, fontSize: 14, fontWeight: "700" },
     metaSynopsisWrap: {
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
-      paddingTop: 10,
+      paddingTop: 5,
       paddingBottom: 15,
       gap: 6,
     },
@@ -655,18 +705,17 @@ function createMovieStyles(colors: ThemeColors, heroTopInset: number) {
       gap: 5,
       flex: 1,
     },
-    metaPersonChip: {
-      borderRadius: 999,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
-      backgroundColor: colors.panel,
-      paddingHorizontal: 7,
-      paddingVertical: 6,
+    metaPersonLink: {
+      paddingVertical: 4,
+      paddingHorizontal: 2,
     },
     metaPersonText: {
       color: colors.accent,
-      fontSize: 11.5,
-      fontWeight: "600",
+      fontSize: 13.5,
+      fontWeight: "700",
+      lineHeight: 20,
+      textDecorationLine: "underline",
+      textDecorationStyle: "dotted",
     },
   });
 }
@@ -1063,6 +1112,7 @@ function MediaSegmentStickyChrome({
 
 function SightingsSection({
   sightings,
+  loadingInitial,
   loadingMore,
   sortOptions,
   activeSort,
@@ -1070,11 +1120,13 @@ function SightingsSection({
   isSortOpen,
   setSortOpen,
   showSpoilers,
+  onOpenImagePreview,
   sightingCardSurface,
   themeColors,
   styles,
 }: {
   sightings: SightingPublic[];
+  loadingInitial: boolean;
   loadingMore: boolean;
   sortOptions: { value: MovieSightingsSort; label: string }[];
   activeSort: MovieSightingsSort;
@@ -1082,13 +1134,18 @@ function SightingsSection({
   isSortOpen: boolean;
   setSortOpen: Dispatch<boolean>;
   showSpoilers: boolean;
+  onOpenImagePreview: (slides: { url: string; alt?: string }[], startIndex: number) => void;
   sightingCardSurface?: string;
   themeColors: ThemeColors;
   styles: MovieStyles;
 }) {
   return (
     <View style={styles.sightingsSection}>
-      {sightings.length === 0 ? (
+      {loadingInitial && sightings.length === 0 ? (
+        <View style={styles.loadingCenterWrap}>
+          <ActivityIndicator size="small" color={themeColors.accent} />
+        </View>
+      ) : sightings.length === 0 ? (
         <EmptyStateCard
           colors={themeColors}
           title="No sightings yet for this title."
@@ -1102,6 +1159,7 @@ function SightingsSection({
               sighting={s}
               surfaceColor={sightingCardSurface}
               showSpoilers={showSpoilers}
+              onOpenImagePreview={onOpenImagePreview}
             />
           ))}
         </View>
@@ -1145,6 +1203,7 @@ export default function MovieScreen() {
   const [showSpoilers, setShowSpoilers] = useState(false);
   const [sightings, setSightings] = useState<SightingPublic[]>([]);
   const [sightPageMeta, setSightPageMeta] = useState({ page: 1, pageCount: 1, totalCount: 0 });
+  const [loadingSightings, setLoadingSightings] = useState(false);
   const [loadingMoreSightings, setLoadingMoreSightings] = useState(false);
 
   const [data, setData] = useState<MovieDetailResponse | null>(null);
@@ -1154,18 +1213,84 @@ export default function MovieScreen() {
 
   const movie = data?.movie;
 
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const measuredHeaderHeight = useContext(HeaderHeightContext);
   const [mediaSegment, setMediaSegment] = useState<"stills" | "videos">("stills");
   const [mediaLightboxIndex, setMediaLightboxIndex] = useState<number | null>(null);
+  const [mediaLightboxSlides, setMediaLightboxSlides] = useState<
+    { id: string; url: string; caption?: string }[]
+  >([]);
+  const moviePrefsHydratedRef = useRef(false);
+
+  useEffect(() => {
+    let canceled = false;
+    void (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(MOVIE_PREFS_KEY);
+        if (!raw || canceled) return;
+        const parsed = JSON.parse(raw) as {
+          sightSort?: MovieSightingsSort;
+          reviewSort?: ReviewSortKey;
+          reviewsRatOnly?: boolean;
+          showSpoilers?: boolean;
+        };
+        if (
+          parsed.sightSort === "newest" ||
+          parsed.sightSort === "rats" ||
+          parsed.sightSort === "appearance-early" ||
+          parsed.sightSort === "appearance-late"
+        ) {
+          setSightSort(parsed.sightSort);
+        }
+        if (
+          parsed.reviewSort === "latest" ||
+          parsed.reviewSort === "highest" ||
+          parsed.reviewSort === "lowest"
+        ) {
+          setReviewSort(parsed.reviewSort);
+        }
+        if (typeof parsed.reviewsRatOnly === "boolean") {
+          setReviewsRatOnly(parsed.reviewsRatOnly);
+        }
+        if (typeof parsed.showSpoilers === "boolean") {
+          setShowSpoilers(parsed.showSpoilers);
+        }
+      } catch {
+        // Ignore preference hydration errors and keep defaults.
+      } finally {
+        if (!canceled) moviePrefsHydratedRef.current = true;
+      }
+    })();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!moviePrefsHydratedRef.current) return;
+    void AsyncStorage.setItem(
+      MOVIE_PREFS_KEY,
+      JSON.stringify({
+        sightSort,
+        reviewSort,
+        reviewsRatOnly,
+        showSpoilers,
+      }),
+    );
+  }, [sightSort, reviewSort, reviewsRatOnly, showSpoilers]);
 
   const apiChromeFallback = useMemo(() => {
     if (!movie) return colors.headerBg;
     const paletteForMode = colors.mode === "dark" ? movie.pagePaletteDark : movie.pagePalette;
     const apiPaletteChrome =
       typeof paletteForMode?.heroBloom === "string" ? paletteForMode.heroBloom.trim() : "";
-    if (apiPaletteChrome) return apiPaletteChrome;
+    if (apiPaletteChrome) {
+      return liftDarkCustomColor(
+        apiPaletteChrome,
+        colors.mode === "dark" ? 0.1 : 0.16,
+      );
+    }
     return posterToneToHex(movie.posterTone, colors.headerBg);
   }, [movie, colors.headerBg, colors.mode]);
 
@@ -1204,7 +1329,10 @@ export default function MovieScreen() {
 
   const movieThemeColors = useMemo(() => {
     const p = colors.mode === "dark" ? movie?.pagePaletteDark : movie?.pagePalette;
-    const accent = typeof p?.accent === "string" ? p.accent.trim() : "";
+    const rawAccent = typeof p?.accent === "string" ? p.accent.trim() : "";
+    const accent = rawAccent
+      ? liftDarkCustomColor(rawAccent, colors.mode === "dark" ? 0.2 : 0.16)
+      : "";
     if (!p || !accent) return colors;
     /** Segment / sheet-selected surfaces follow poster accent instead of global `chipActive`. */
     const chipActive =
@@ -1281,6 +1409,7 @@ export default function MovieScreen() {
     const sortSnap = sightSort;
     const pageSnap = 1;
     setError(null);
+    setLoadingSightings(true);
     try {
       const res = await fetchMovieDetail({
         slug,
@@ -1314,6 +1443,9 @@ export default function MovieScreen() {
       }
     } finally {
       if (decodeURIComponent(slug).trim() === slugSnap && sightSort === sortSnap) {
+        setLoadingSightings(false);
+      }
+      if (decodeURIComponent(slug).trim() === slugSnap && sightSort === sortSnap) {
         setLoading(false);
       }
     }
@@ -1333,6 +1465,7 @@ export default function MovieScreen() {
   useLayoutEffect(() => {
     setSightings([]);
     setSightPageMeta({ page: 1, pageCount: 1, totalCount: 0 });
+    setLoadingSightings(true);
   }, [sightSort]);
 
   useEffect(() => {
@@ -1348,6 +1481,17 @@ export default function MovieScreen() {
     }
   }, [load]);
 
+  const onMovieScrollEndDrag = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (Platform.OS !== "ios") return;
+      if (refreshing) return;
+      if (event.nativeEvent.contentOffset.y <= IOS_PULL_REFRESH_TRIGGER) {
+        void onRefresh();
+      }
+    },
+    [onRefresh, refreshing],
+  );
+
   const featured = data?.featuredRats;
   const tabs = data?.tabs;
   const heroBannerUrl = movie ? resolveHeaderBannerUrl(movie) : "";
@@ -1362,7 +1506,14 @@ export default function MovieScreen() {
 
   const mediaImgsLen = tabs?.images?.length ?? 0;
   const mediaVidsLen = tabs?.videos?.length ?? 0;
-  const lightboxImages = tabs?.images ?? [];
+  const lightboxImages = mediaLightboxSlides;
+  const lightboxCaptionHeight = insets.bottom + 42;
+  const lightboxImageTopInset = insets.top + 44;
+  const lightboxImageAreaHeight = Math.max(
+    120,
+    windowHeight - lightboxImageTopInset - lightboxCaptionHeight,
+  );
+  const lightboxNavTop = lightboxImageTopInset + lightboxImageAreaHeight / 2;
   const stickySightingsChrome = Boolean(featured && tab === "sightings");
   const stickyReviewsChrome = tab === "reviews" && (tabs?.reviews?.length ?? 0) > 0;
   const stickyMediaChrome = tab === "media" && mediaImgsLen > 0 && mediaVidsLen > 0;
@@ -1408,10 +1559,14 @@ export default function MovieScreen() {
 
   useEffect(() => {
     setMediaLightboxIndex(null);
+    setMediaLightboxSlides([]);
   }, [slug]);
 
   useEffect(() => {
-    if (tab !== "media") setMediaLightboxIndex(null);
+    if (tab !== "media") {
+      setMediaLightboxIndex(null);
+      setMediaLightboxSlides([]);
+    }
   }, [tab]);
 
   useEffect(() => {
@@ -1508,14 +1663,21 @@ export default function MovieScreen() {
 
             <ScrollView
               refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  tintColor={movieThemeColors.accent}
-                  colors={[movieThemeColors.accent]}
-                  progressBackgroundColor={movieThemeColors.panel}
-                  titleColor={movieThemeColors.accent}
-                />
+                Platform.OS === "ios" ? undefined : (
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    progressViewOffset={MOVIE_REFRESH_OFFSET}
+                    tintColor={movieThemeColors.mode === "dark" ? "#f8fafc" : movieThemeColors.accent}
+                    colors={[movieThemeColors.mode === "dark" ? "#f8fafc" : movieThemeColors.accent]}
+                    progressBackgroundColor={
+                      movieThemeColors.mode === "dark"
+                        ? "#334155"
+                        : movieThemeColors.panel
+                    }
+                    titleColor={movieThemeColors.mode === "dark" ? "#f8fafc" : movieThemeColors.accent}
+                  />
+                )
               }
               style={styles.scroll}
               contentContainerStyle={styles.scrollContent}
@@ -1523,13 +1685,23 @@ export default function MovieScreen() {
               scrollEventThrottle={16}
               bounces
               alwaysBounceVertical
+              onScrollEndDrag={onMovieScrollEndDrag}
             >
+              {refreshing ? (
+                <View style={styles.refreshNativeLikeWrap} pointerEvents="none">
+                  <ActivityIndicator
+                    size="small"
+                    color={movieThemeColors.mode === "dark" ? "#f8fafc" : movieThemeColors.accent}
+                  />
+                </View>
+              ) : null}
               <View
                 style={[styles.scrollBodyPanel, tabStickyChromeVisible && styles.scrollBodyPanelTightTop]}
               >
               {tab === "sightings" && featured ? (
                 <SightingsSection
                   sightings={sightings}
+                  loadingInitial={loadingSightings}
                   loadingMore={loadingMoreSightings}
                   sortOptions={sortOptions}
                   activeSort={sightSort}
@@ -1537,6 +1709,17 @@ export default function MovieScreen() {
                   isSortOpen={isSortOpen}
                   setSortOpen={setSortOpen}
                   showSpoilers={showSpoilers}
+                  onOpenImagePreview={(slides, startIndex) => {
+                    const mapped = slides.map((slide, idx) => ({
+                      id: `sighting:${idx}:${slide.url}`,
+                      url: slide.url,
+                      caption: slide.alt,
+                    }));
+                    setMediaLightboxSlides(mapped);
+                    setMediaLightboxIndex(
+                      Math.max(0, Math.min(mapped.length - 1, startIndex)),
+                    );
+                  }}
                   sightingCardSurface={sightingCardSurface}
                   themeColors={movieThemeColors}
                   styles={styles}
@@ -1610,7 +1793,7 @@ export default function MovieScreen() {
                           {row.names.map((name) => (
                             <Pressable
                               key={`${row.label}:${name}`}
-                              style={styles.metaPersonChip}
+                              style={styles.metaPersonLink}
                               onPress={() => void openURL(getImdbNameSearchUrl(name))}
                             >
                               <Text style={styles.metaPersonText}>{name}</Text>
@@ -1821,9 +2004,18 @@ export default function MovieScreen() {
                             <Pressable
                               key={im.id}
                               style={styles.mediaStillCard}
-                              onPress={() =>
-                                setMediaLightboxIndex(Math.max(0, imgs.findIndex((x) => x.id === im.id)))
-                              }
+                              onPress={() => {
+                                setMediaLightboxSlides(
+                                  imgs.map((x) => ({
+                                    id: x.id,
+                                    url: x.url,
+                                    caption: x.caption,
+                                  })),
+                                );
+                                setMediaLightboxIndex(
+                                  Math.max(0, imgs.findIndex((x) => x.id === im.id)),
+                                );
+                              }}
                             >
                               <View
                                 style={{
@@ -1889,7 +2081,6 @@ export default function MovieScreen() {
           </View>
         </View>
       ) : null}
-
       <Modal
         visible={mediaLightboxIndex !== null}
         animationType="fade"
@@ -1909,36 +2100,70 @@ export default function MovieScreen() {
           </Pressable>
           <View style={[styles.mediaLightboxImageSlot, { paddingTop: insets.top + 44 }]}>
             {lightboxImages.length > 0 && mediaLightboxIndex !== null ? (
-              <ScrollView
-                key={`lightbox:${movie?.id ?? "movie"}:${mediaLightboxIndex}`}
-                horizontal
-                pagingEnabled
-                style={styles.mediaLightboxPager}
-                showsHorizontalScrollIndicator={false}
-                contentOffset={{ x: mediaLightboxIndex * windowWidth, y: 0 }}
-                onMomentumScrollEnd={(event) => {
-                  const x = event.nativeEvent.contentOffset.x;
-                  const idx = Math.round(x / Math.max(1, windowWidth));
-                  const safe = Math.max(0, Math.min(lightboxImages.length - 1, idx));
-                  setMediaLightboxIndex(safe);
-                }}
-              >
-                {lightboxImages.map((im) => (
-                  <View key={`lightbox-slide:${im.id}`} style={[styles.mediaLightboxSlide, { width: windowWidth }]}>
-                    <Image
-                      source={{ uri: im.url }}
-                      style={{ width: windowWidth, flex: 1 }}
-                      contentFit="contain"
-                      recyclingKey={`lightbox:${im.id}:${im.url}`}
-                    />
-                  </View>
-                ))}
-              </ScrollView>
+              <>
+                <ScrollView
+                  key={`lightbox:${movie?.id ?? "movie"}:${mediaLightboxIndex}`}
+                  horizontal
+                  pagingEnabled
+                  style={styles.mediaLightboxPager}
+                  showsHorizontalScrollIndicator={false}
+                  contentOffset={{ x: mediaLightboxIndex * windowWidth, y: 0 }}
+                  onMomentumScrollEnd={(event) => {
+                    const x = event.nativeEvent.contentOffset.x;
+                    const idx = Math.round(x / Math.max(1, windowWidth));
+                    const safe = Math.max(0, Math.min(lightboxImages.length - 1, idx));
+                    setMediaLightboxIndex(safe);
+                  }}
+                >
+                  {lightboxImages.map((im) => (
+                    <View key={`lightbox-slide:${im.id}`} style={[styles.mediaLightboxSlide, { width: windowWidth }]}>
+                      <Image
+                        source={{ uri: im.url }}
+                        style={{ width: windowWidth, flex: 1 }}
+                        contentFit="contain"
+                        recyclingKey={`lightbox:${im.id}:${im.url}`}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
+                {lightboxImages.length > 1 ? (
+                  <>
+                    <Pressable
+                      style={[styles.mediaLightboxNavBtn, styles.mediaLightboxNavBtnLeft, { top: lightboxNavTop }]}
+                      onPress={() =>
+                        setMediaLightboxIndex((prev) => {
+                          if (prev === null) return 0;
+                          return prev <= 0 ? lightboxImages.length - 1 : prev - 1;
+                        })
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel="Previous image"
+                    >
+                      <Ionicons name="chevron-back" size={24} color={MEDIA_LIGHTBOX.closeIcon} />
+                    </Pressable>
+                    <Pressable
+                      style={[styles.mediaLightboxNavBtn, styles.mediaLightboxNavBtnRight, { top: lightboxNavTop }]}
+                      onPress={() =>
+                        setMediaLightboxIndex((prev) => {
+                          if (prev === null) return 0;
+                          return prev >= lightboxImages.length - 1 ? 0 : prev + 1;
+                        })
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel="Next image"
+                    >
+                      <Ionicons name="chevron-forward" size={24} color={MEDIA_LIGHTBOX.closeIcon} />
+                    </Pressable>
+                  </>
+                ) : null}
+              </>
             ) : null}
           </View>
           <View style={styles.mediaLightboxCaptionWrap}>
             <Text style={styles.mediaLightboxCaption}>
-              {mediaLightboxIndex !== null ? lightboxImages[mediaLightboxIndex]?.caption?.trim() || " " : " "}
+              {mediaLightboxIndex !== null
+                ? `${mediaLightboxIndex + 1}/${Math.max(1, lightboxImages.length)}${lightboxImages[mediaLightboxIndex]?.caption?.trim() ? ` · ${lightboxImages[mediaLightboxIndex]?.caption?.trim()}` : ""}`
+                : " "}
             </Text>
           </View>
         </View>

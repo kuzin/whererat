@@ -11,7 +11,7 @@
 import Link from "next/link";
 import type { ModeratorSession } from "@/lib/auth";
 import { NavLinks } from "@/app/nav-links";
-import { ThemeDevToggle } from "@/app/theme-dev-toggle";
+import { CaitlinEasterEggToggle } from "./caitlin-easter-egg-toggle";
 
 type SiteMastheadProps = {
   session?: ModeratorSession;
@@ -32,7 +32,7 @@ export function SiteMasthead({ session }: SiteMastheadProps) {
               className="wr-brand-wordmark h-5 w-auto max-w-[min(100%,11rem)] shrink-0 sm:h-7 sm:max-w-[14rem] md:h-8 md:max-w-[16rem]"
             />
           </Link>
-          <ThemeDevToggle className="z-20 ml-[5px] shrink-0" />
+          <CaitlinEasterEggToggle className="shrink-0" />
         </div>
         <NavLinks session={session} />
       </nav>

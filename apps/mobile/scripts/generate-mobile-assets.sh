@@ -12,6 +12,10 @@ BRAND_ORANGE_BG='#ea580c'
 RAT_SRC="${REPO_ROOT}/public/brand/rat.svg"
 ICON_OUT="${MOBILE_DIR}/assets/icon.png"
 SPLASH_OUT="${MOBILE_DIR}/assets/splash.png"
+IOS_ICON_OUT="${MOBILE_DIR}/ios/WhereRat/Images.xcassets/AppIcon.appiconset/App-Icon-1024x1024@1x.png"
+IOS_SPLASH_1X_OUT="${MOBILE_DIR}/ios/WhereRat/Images.xcassets/SplashScreenLegacy.imageset/image.png"
+IOS_SPLASH_2X_OUT="${MOBILE_DIR}/ios/WhereRat/Images.xcassets/SplashScreenLegacy.imageset/image@2x.png"
+IOS_SPLASH_3X_OUT="${MOBILE_DIR}/ios/WhereRat/Images.xcassets/SplashScreenLegacy.imageset/image@3x.png"
 # Cheese texture (source file in repo) — see assets/splash-source/SPLASH_IMAGE_LICENSE.txt
 SPLASH_SRC_JPEG="${MOBILE_DIR}/assets/splash-source/cheese-texture-shutterstock.jpg"
 
@@ -59,17 +63,25 @@ PY
 magick -density 360 -background none "$COMPOSITE_SVG" -resize 1024x1024 PNG32:"$ICON_OUT"
 
 echo "Splash from cheese texture JPEG → 1284×2778 (cover + brand tint)…"
-# Landscape photo → portrait splash: fill frame, center-crop; light colorize toward brand orange.
+# Make texture much finer: shrink source, then tile across splash canvas.
 magick "$SPLASH_SRC_JPEG" \
   -strip \
   -colorspace sRGB \
   -filter Lanczos \
-  -resize '1284x2778^' \
-  -gravity center \
-  -extent 1284x2778 \
+  -resize 22% \
+  -write mpr:cheese_small +delete \
+  -size 1284x2778 tile:mpr:cheese_small \
   -fill "${BRAND_ORANGE_BG}" \
   -colorize 20 \
   PNG24:"$SPLASH_OUT"
 
 magick identify "$ICON_OUT" "$SPLASH_OUT"
+
+echo "Syncing generated assets into native iOS asset catalog…"
+cp "$ICON_OUT" "$IOS_ICON_OUT"
+cp "$SPLASH_OUT" "$IOS_SPLASH_1X_OUT"
+cp "$SPLASH_OUT" "$IOS_SPLASH_2X_OUT"
+cp "$SPLASH_OUT" "$IOS_SPLASH_3X_OUT"
+
+magick identify "$IOS_ICON_OUT" "$IOS_SPLASH_1X_OUT"
 echo "Done."

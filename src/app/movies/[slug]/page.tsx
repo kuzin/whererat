@@ -303,7 +303,7 @@ export default async function MoviePage({
             href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
             className={`inline-flex items-center gap-1.5 text-sm ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
           >
-            + Submit<span className="hidden sm:inline"> a {movie.title}</span> Sighting
+            Submit a Sighting
           </Link>
         </div>
       </div>

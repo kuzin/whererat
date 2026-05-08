@@ -45,6 +45,10 @@
       <key>NSAllowsLocalNetworking</key>
       <true/>
     </dict>
+    <key>NSCameraUsageDescription</key>
+    <string>Allow WhereRat to take photos for sightings.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow WhereRat to choose images for sightings.</string>
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
