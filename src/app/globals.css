@@ -219,13 +219,13 @@ body {
 
 /* Brand logos in header: CSS-masked SVG fills follow --wr-brand-* */
 .wr-brand-mark {
-  aspect-ratio: 353.26 / 311.52;
+  aspect-ratio: 293.29 / 252.34;
   background-color: var(--wr-brand-mark);
-  mask-image: url("/brand/mark.svg");
+  mask-image: url("/brand/rat.svg");
   mask-size: contain;
   mask-position: center;
   mask-repeat: no-repeat;
-  -webkit-mask-image: url("/brand/mark.svg");
+  -webkit-mask-image: url("/brand/rat.svg");
   -webkit-mask-size: contain;
   -webkit-mask-position: center;
   -webkit-mask-repeat: no-repeat;

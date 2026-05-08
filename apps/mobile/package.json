@@ -9,6 +9,12 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "generate-assets": "bash scripts/generate-mobile-assets.sh",
+    "eas": "npx eas-cli@latest",
+    "eas:login": "npx eas-cli@latest login",
+    "eas:whoami": "npx eas-cli@latest whoami",
+    "eas:build:android": "npx eas-cli@latest build --platform android --profile production",
+    "eas:build:ios": "npx eas-cli@latest build --platform ios --profile production",
+    "eas:submit:android": "npx eas-cli@latest submit --platform android --latest",
     "deploy": "npx expo export -p web && npx eas-cli@latest deploy",
     "postinstall": "patch-package"
   },

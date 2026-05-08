@@ -33,10 +33,12 @@ function RoundMinimalHeaderBack({
 }) {
   const { direction } = useLocale();
   const { colors } = useTheme();
-  const tint =
-    colors.mode === "light"
-      ? colors.headerToolbarIcon
-      : incoming.tintColor ?? colors.headerToolbarIcon;
+  /** Respect `headerTintColor` whenever the stack passes it (e.g. movie hero over poster). */
+  const tintFromStack =
+    typeof incoming.tintColor === "string" && incoming.tintColor.length > 0
+      ? incoming.tintColor
+      : undefined;
+  const tint = tintFromStack ?? colors.headerToolbarIcon;
 
   const isIos = Platform.OS === "ios";
   const outer = HEADER_TOOLBAR_HIT_PX;

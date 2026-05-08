@@ -86,7 +86,7 @@ function RootNavigator() {
       /** Per-screen (native stack) — required when UIViewControllerBasedStatusBarAppearance is YES. */
       statusBarStyle: colors.statusBarStyle,
       headerStyle: { backgroundColor: colors.headerBg },
-      headerTintColor: colors.accent,
+      headerTintColor: colors.headerText,
       headerTitleStyle: { fontWeight: "700" as const },
       headerShadowVisible: false,
       headerTitleAlign: "center" as const,

@@ -231,7 +231,7 @@ function ReviewCard({
     <article
       className={`${className} ${
         highlight
-          ? "ring-2 ring-amber-400/65 ring-offset-2 ring-offset-transparent dark:ring-amber-300/55"
+          ? "ring-2 ring-inset ring-amber-400/35 dark:ring-amber-300/30"
           : ""
       }`}
     >

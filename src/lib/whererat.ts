@@ -1,3 +1,5 @@
+import { catalogSeedMovies, catalogSeedSightings } from "./catalog-seed";
+
 export type ImdbReview = {
   id: string;
   author: string;
@@ -494,7 +496,7 @@ export function getSubmissionSightingTitle(submission: Submission): string {
   return firstMeaningfulLine(submission.description) || "Sighting";
 }
 
-const moviesCatalogSeed: Movie[] = [];
+const moviesCatalogSeed: Movie[] = catalogSeedMovies;
 
 export const sources: Source[] = [
   {
@@ -534,7 +536,7 @@ export const sources: Source[] = [
   },
 ];
 
-const sightingsCatalogSeed: Sighting[] = [];
+const sightingsCatalogSeed: Sighting[] = catalogSeedSightings;
 
 export const submissions: Submission[] = [];
 

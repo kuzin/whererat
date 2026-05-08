@@ -1,0 +1,24 @@
+{
+  "slides": [
+    {
+      "file": "01-home.png",
+      "title": "Rat on screen? Find the film.",
+      "subtitle": "Search, sort, and filter a spoiler-aware catalog the community keeps growing."
+    },
+    {
+      "file": "02-movie.png",
+      "title": "Pause—there’s the rat.",
+      "subtitle": "Jump to the moment with timestamps, notes, and labels on every title page."
+    },
+    {
+      "file": "03-submit.png",
+      "title": "Spotted one? Log it.",
+      "subtitle": "Send a sighting with context; moderators wire the best ones into the catalog."
+    },
+    {
+      "file": "04-info.png",
+      "title": "Rated for curious viewers",
+      "subtitle": "Ratings, spoiler rules, privacy, and moderation—spelled out inside the app."
+    }
+  ]
+}

@@ -5,13 +5,917 @@
       "username": "admin",
       "display_name": "Admin",
       "email": "admin@whererat.local",
-      "avatar_url": "https://placehold.co/160x160/292524/fef3c7/png?text=Admin",
+      "avatar_url": "/favicon.svg",
       "role": "owner",
       "password_hash": "ratpack"
     }
   ],
-  "movies": [],
-  "sightings": [],
+  "movies": [
+    {
+      "id": "movie-tt0382932",
+      "slug": "ratatouille",
+      "title": "Ratatouille",
+      "release_year": 2007,
+      "runtime_minutes": 111,
+      "genres": [
+        "Animation",
+        "Adventure",
+        "Comedy",
+        "Family"
+      ],
+      "poster_tone": "bg-orange-900",
+      "poster_url": "https://placehold.co/600x900/ea580c/fef3c7/png?text=Ratatouille+%282007%29",
+      "backdrop_url": "https://placehold.co/1200x600/7c2d12/fef3c7/png?text=Ratatouille",
+      "poster_alt": "Ratatouille (2007) placeholder poster",
+      "imdb_id": "tt0382932",
+      "tmdb_id": "1918",
+      "summary": "A rat who can cook forms an unlikely partnership with a clumsy kitchen helper at a famous Paris restaurant.",
+      "metadata": {
+        "tagline": "He's dying to become a chef.",
+        "rating": "G",
+        "director": "Brad Bird, Jan Pinkava",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08",
+        "ratFacts": [
+          "Pixar’s lead animators studied live rats to nail Remy’s gait and whisker acting."
+        ]
+      }
+    },
+    {
+      "id": "movie-tt0093779",
+      "slug": "the-princess-bride",
+      "title": "The Princess Bride",
+      "release_year": 1987,
+      "runtime_minutes": 98,
+      "genres": [
+        "Adventure",
+        "Comedy",
+        "Family",
+        "Fantasy"
+      ],
+      "poster_tone": "bg-rose-950",
+      "poster_url": "https://placehold.co/600x900/be123c/fef3c7/png?text=The+Princess+Bride",
+      "backdrop_url": "https://placehold.co/1200x600/451a03/fef3c7/png?text=Fire+Swamp",
+      "poster_alt": "The Princess Bride (1987) placeholder poster",
+      "imdb_id": "tt0093779",
+      "tmdb_id": "2493",
+      "summary": "A farmhand turned pirate pursues his true love alongside a giant, a swordsman, and a vengeful Spaniard.",
+      "metadata": {
+        "tagline": "The story of a man and his will to survive.",
+        "rating": "PG",
+        "director": "Rob Reiner",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0097576",
+      "slug": "indiana-jones-and-the-last-crusade",
+      "title": "Indiana Jones and the Last Crusade",
+      "release_year": 1989,
+      "runtime_minutes": 127,
+      "genres": [
+        "Action",
+        "Adventure"
+      ],
+      "poster_tone": "bg-stone-600",
+      "poster_url": "https://placehold.co/600x900/44403c/fef3c7/png?text=Last+Crusade",
+      "backdrop_url": "https://placehold.co/1200x600/292524/fef3c7/png?text=Indiana+Jones",
+      "poster_alt": "Indiana Jones and the Last Crusade (1989) placeholder poster",
+      "imdb_id": "tt0097576",
+      "tmdb_id": "89",
+      "summary": "Indiana Jones and his father chase Nazi agents to recover the Holy Grail before it falls into the wrong hands.",
+      "metadata": {
+        "tagline": "Have the adventure of your life keeping up with the Joneses.",
+        "rating": "PG-13",
+        "director": "Steven Spielberg",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0407887",
+      "slug": "the-departed",
+      "title": "The Departed",
+      "release_year": 2006,
+      "runtime_minutes": 151,
+      "genres": [
+        "Crime",
+        "Drama",
+        "Thriller"
+      ],
+      "poster_tone": "bg-red-900",
+      "poster_url": "https://placehold.co/600x900/450a0a/fef3c7/png?text=The+Departed",
+      "backdrop_url": "https://placehold.co/1200x600/1c1917/fef3c7/png?text=Boston",
+      "poster_alt": "The Departed (2006) placeholder poster",
+      "imdb_id": "tt0407887",
+      "tmdb_id": "1422",
+      "summary": "An undercover cop and a mole in the police infiltrate an Irish gang in Boston.",
+      "metadata": {
+        "tagline": "Lies. Betrayal. Sacrifice. How far will you take it?",
+        "rating": "R",
+        "director": "Martin Scorsese",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0318916",
+      "slug": "willard",
+      "title": "Willard",
+      "release_year": 2003,
+      "runtime_minutes": 100,
+      "genres": [
+        "Drama",
+        "Horror"
+      ],
+      "poster_tone": "bg-neutral-800",
+      "poster_url": "https://placehold.co/600x900/171717/fef3c7/png?text=Willard",
+      "backdrop_url": "https://placehold.co/1200x600/0a0a0a/fef3c7/png?text=Rats",
+      "poster_alt": "Willard (2003) placeholder poster",
+      "imdb_id": "tt0318916",
+      "tmdb_id": "10875",
+      "summary": "A lonely man trains an army of rats to exact revenge on his cruel boss—and things spiral out of control.",
+      "metadata": {
+        "tagline": "Where your problems disappear.",
+        "rating": "PG-13",
+        "director": "Glen Morgan",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States",
+          "Canada"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0084649",
+      "slug": "the-secret-of-nimh",
+      "title": "The Secret of NIMH",
+      "release_year": 1982,
+      "runtime_minutes": 82,
+      "genres": [
+        "Animation",
+        "Adventure",
+        "Drama"
+      ],
+      "poster_tone": "bg-slate-800",
+      "poster_url": "https://placehold.co/600x900/5b21b6/fef3c7/png?text=NIMH",
+      "backdrop_url": "https://placehold.co/1200x600/1e1b4b/fef3c7/png?text=NIMH",
+      "poster_alt": "The Secret of NIMH (1982) placeholder poster",
+      "imdb_id": "tt0084649",
+      "tmdb_id": "11774",
+      "summary": "A field mouse must save her sick son with help from a society of genetically enhanced rats.",
+      "metadata": {
+        "tagline": "Right before your eyes and beyond your wildest dreams.",
+        "rating": "G",
+        "director": "Don Bluth",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0424095",
+      "slug": "flushed-away",
+      "title": "Flushed Away",
+      "release_year": 2006,
+      "runtime_minutes": 85,
+      "genres": [
+        "Animation",
+        "Action",
+        "Adventure",
+        "Comedy"
+      ],
+      "poster_tone": "bg-slate-900",
+      "poster_url": "https://placehold.co/600x900/1e293b/fef3c7/png?text=Flushed+Away",
+      "backdrop_url": "https://placehold.co/1200x600/0f172a/fef3c7/png?text=Sewer+Rats",
+      "poster_alt": "Flushed Away (2006) placeholder poster",
+      "imdb_id": "tt0424095",
+      "tmdb_id": "11765",
+      "summary": "A pampered pet rat is flushed into the London sewers and teams up with scavenger rats to face a toad kingpin.",
+      "metadata": {
+        "tagline": "Someone's going to pay...",
+        "rating": "PG",
+        "director": "Sam Fell, David Bowers",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States",
+          "United Kingdom"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0090633",
+      "slug": "an-american-tail",
+      "title": "An American Tail",
+      "release_year": 1986,
+      "runtime_minutes": 80,
+      "genres": [
+        "Animation",
+        "Adventure",
+        "Comedy",
+        "Drama"
+      ],
+      "poster_tone": "bg-amber-950",
+      "poster_url": "https://placehold.co/600x900/78350f/fef3c7/png?text=Fievel",
+      "backdrop_url": "https://placehold.co/1200x600/451a03/fef3c7/png?text=America",
+      "poster_alt": "An American Tail (1986) placeholder poster",
+      "imdb_id": "tt0090633",
+      "tmdb_id": "11003",
+      "summary": "A young mouse emigrates from Russia to New York and searches for his family with help from other downtrodden rodents.",
+      "metadata": {
+        "tagline": "Meet Fievel. In his search to find his family, he discovered America.",
+        "rating": "G",
+        "director": "Don Bluth",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0091149",
+      "slug": "the-great-mouse-detective",
+      "title": "The Great Mouse Detective",
+      "release_year": 1986,
+      "runtime_minutes": 74,
+      "genres": [
+        "Animation",
+        "Adventure",
+        "Family"
+      ],
+      "poster_tone": "bg-stone-800",
+      "poster_url": "https://placehold.co/600x900/292524/fef3c7/png?text=Basil",
+      "backdrop_url": "https://placehold.co/1200x600/1c1917/fef3c7/png?text=London",
+      "poster_alt": "The Great Mouse Detective (1986) placeholder poster",
+      "imdb_id": "tt0091149",
+      "tmdb_id": "10534",
+      "summary": "Mouse sleuth Basil of Baker Street hunts a peg-legged bat and a ratty crime boss under the streets of Victorian London.",
+      "metadata": {
+        "tagline": "The world's greatest mouse detective!",
+        "rating": "G",
+        "director": "John Musker, Ron Clements, Dave Michener, Burny Mattinson",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0119715",
+      "slug": "mousehunt",
+      "title": "Mousehunt",
+      "release_year": 1997,
+      "runtime_minutes": 99,
+      "genres": [
+        "Comedy",
+        "Family"
+      ],
+      "poster_tone": "bg-stone-600",
+      "poster_url": "https://placehold.co/600x900/78716c/fef3c7/png?text=Mousehunt",
+      "backdrop_url": "https://placehold.co/1200x600/44403c/fef3c7/png?text=Mansion",
+      "poster_alt": "Mousehunt (1997) placeholder poster",
+      "imdb_id": "tt0119715",
+      "tmdb_id": "10510",
+      "summary": "Two luckless brothers inherit a decrepit mansion and wage an escalating war with a single crafty mouse.",
+      "metadata": {
+        "tagline": "Who's hunting who?",
+        "rating": "PG",
+        "director": "Gore Verbinski",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    },
+    {
+      "id": "movie-tt0120595",
+      "slug": "stuart-little",
+      "title": "Stuart Little",
+      "release_year": 1999,
+      "runtime_minutes": 84,
+      "genres": [
+        "Adventure",
+        "Comedy",
+        "Family",
+        "Fantasy"
+      ],
+      "poster_tone": "bg-slate-800",
+      "poster_url": "https://placehold.co/600x900/292524/fef3c7/png?text=Stuart+Little",
+      "backdrop_url": "https://placehold.co/1200x600/1e293b/fef3c7/png?text=NYC",
+      "poster_alt": "Stuart Little (1999) placeholder poster",
+      "imdb_id": "tt0120595",
+      "tmdb_id": "10068",
+      "summary": "The Little family adopts a modestly sophisticated mouse—but their wary cat refuses to coexist peacefully.",
+      "metadata": {
+        "tagline": "The Little family just got bigger.",
+        "rating": "PG",
+        "director": "Rob Minkoff",
+        "originalLanguage": "English",
+        "productionCountries": [
+          "Germany",
+          "United States"
+        ],
+        "metadataProvider": "IMDb seed",
+        "lastSyncedAt": "2026-05-08"
+      }
+    }
+  ],
+  "sightings": [
+    {
+      "id": "sighting-tt0382932-remy-intro",
+      "movie_id": "movie-tt0382932",
+      "timestamp_code": "4%",
+      "title": "Remy surfaces in Gusteau’s skylight fantasy",
+      "description": "Remy scouts the rooftop and Paris skyline—our first prolonged look at the hero rat before kitchen chaos kicks in.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed",
+        "screening-note"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0382932-rat-swarm-exit",
+      "movie_id": "movie-tt0382932",
+      "timestamp_code": "11%",
+      "title": "Whole clan bolts from the shotgun cottage",
+      "description": "The colony scatters Remy-forward through planks and netting—crowd choreography that reads as a swarm early on.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 12
+    },
+    {
+      "id": "sighting-tt0382932-finale-tasting",
+      "movie_id": "movie-tt0382932",
+      "timestamp_code": "94%",
+      "title": "Rémy team serves the unknowing critic",
+      "description": "The rat-guided service peaks as ratatouille is plated; Remy directs from concealment—a finale beat built around rodents in the workflow.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": true,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "curator_note": "Spoiler-flagged ending kitchen beat.",
+      "approximate_rat_count": 2
+    },
+    {
+      "id": "sighting-tt0093779-fire-swamp-rous",
+      "movie_id": "movie-tt0093779",
+      "timestamp_code": "48%",
+      "title": "Rodents Of Unusual Size in the Fire Swamp",
+      "description": "Wesley tussles with a ROUS in the mud pits—explicit rat-adjacent creature design called out by name on screen.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed",
+        "quoted-dialogue"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0093779-more-rusi",
+      "movie_id": "movie-tt0093779",
+      "timestamp_code": "50%",
+      "title": "Follow-up scramble in thickets",
+      "description": "Buttercup and Wesley are still dealing with swamp predators right after the first ROUS—brief additional creature beats.",
+      "prominence": "blink-and-miss",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 2
+    },
+    {
+      "id": "sighting-tt0093779-rus-namedrop",
+      "movie_id": "movie-tt0093779",
+      "timestamp_code": "44%",
+      "title": "\"Rodents Of Unusual Size? I don't think they exist.\"",
+      "description": "Dialog setup immediately before Fire Swamp action—bookmark moment for rewatches.",
+      "prominence": "background",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "curator_note": "No rats on-screen yet—dialog-only beat leading into ROUS scenes."
+    },
+    {
+      "id": "sighting-tt0097576-catacombs-flood",
+      "movie_id": "movie-tt0097576",
+      "timestamp_code": "38%",
+      "title": "Flooded crypt rat surge",
+      "description": "Indy and Elsa hurry through Byzantine tunnels while countless rats skim the oily water—it’s swarm-level coverage.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 30
+    },
+    {
+      "id": "sighting-tt0097576-vertical-climb",
+      "movie_id": "movie-tt0097576",
+      "timestamp_code": "40%",
+      "title": "Rats pour past the grate climb",
+      "description": "The heroes ascend a shaft as rats tumble around them mid-escape—the beat continues the catacombs choreography.",
+      "prominence": "background",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 20
+    },
+    {
+      "id": "sighting-tt0097576-henry-snark",
+      "movie_id": "movie-tt0097576",
+      "timestamp_code": "36%",
+      "title": "Henry fumes about rodents before the scramble",
+      "description": "Prefatory hallway banter tees up rats as an environmental hazard—not on-screen rats yet.",
+      "prominence": "background",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ]
+    },
+    {
+      "id": "sighting-tt0407887-finale-balcony",
+      "movie_id": "movie-tt0407887",
+      "timestamp_code": "99%",
+      "title": "Final balcony rat symbolism",
+      "description": "Scorsese famously holds on a rodent crossing sunlight after the climax—explicit rat punctuation shot.",
+      "prominence": "scene-stealer",
+      "scene_type": "symbolic",
+      "spoiler": true,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0407887-micro-rat-snippet",
+      "movie_id": "movie-tt0407887",
+      "timestamp_code": "18%",
+      "title": "Alley grime beat (blink-and-miss)",
+      "description": "Urban texture shots occasionally catch vermin ambience while Boston surveillance threads move—thin but catalogued for rewind hunters.",
+      "prominence": "blink-and-miss",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "needs-source",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog (needs rewatch confirmation)",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0407887-wiretap-montage",
+      "movie_id": "movie-tt0407887",
+      "timestamp_code": "52%",
+      "title": "Warehouse rat during tech sweep",
+      "description": "Crew anecdotes flag a fleeting rat silhouette during cramped stakeout setups—moderators can downgrade if rewatches disagree.",
+      "prominence": "blink-and-miss",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "community-citation"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0318916-office-invasion",
+      "movie_id": "movie-tt0318916",
+      "timestamp_code": "33%",
+      "title": "Rat army storms the bullpen",
+      "description": "Willard unleashes coordinated swarms indoors—crowd CGI + animatronics with dozens of villains on desktops.",
+      "prominence": "scene-stealer",
+      "scene_type": "swarm",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 40
+    },
+    {
+      "id": "sighting-tt0318916-ben-buddy",
+      "movie_id": "movie-tt0318916",
+      "timestamp_code": "8%",
+      "title": "Ben earns the spotlight",
+      "description": "Willard nurses the white rat’s bond—solo close-ups used for marketing beats and meme stills alike.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0318916-basement",
+      "movie_id": "movie-tt0318916",
+      "timestamp_code": "20%",
+      "title": "Colony rehearsals below the stairs",
+      "description": "Basement cages overflow as Willard inventories growing numbers—a mid-film escalation before office chaos.",
+      "prominence": "background",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 15
+    },
+    {
+      "id": "sighting-tt0084649-moving-the-brick",
+      "movie_id": "movie-tt0084649",
+      "timestamp_code": "15%",
+      "title": "Council of uplifted rats",
+      "description": "Nicodemus faction debates moving the Fitzgibbon homestead—crowded rat parliament blocking shots.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 18
+    },
+    {
+      "id": "sighting-tt0084649-dragon-threat",
+      "movie_id": "movie-tt0084649",
+      "timestamp_code": "28%",
+      "title": "Dragon the cat hunts Mrs. Brisby",
+      "description": "Domestic showdown where rodent heroine navigates predator territory—stress scene with repeated rat silhouettes.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0084649-machinery-finale",
+      "movie_id": "movie-tt0084649",
+      "timestamp_code": "86%",
+      "title": "Pulleys, chains, rats everywhere",
+      "description": "Finale hoist sequence strings dozens of cooperating rats hauling concrete—crowd choreography capstone.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 35
+    },
+    {
+      "id": "sighting-tt0424095-sewer-clan",
+      "movie_id": "movie-tt0424095",
+      "timestamp_code": "12%",
+      "title": "Jammy Dodgers in the borough",
+      "description": "Scavenger sewer rats bustle through their tube-and-tinsel city—establishing rodents as the backbone of the underworld.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 25
+    },
+    {
+      "id": "sighting-tt0424095-speedboat-chase",
+      "movie_id": "movie-tt0424095",
+      "timestamp_code": "55%",
+      "title": "Soap-dish boat siege",
+      "description": "Rodent sailors race sluice currents with dozens aboard makeshift decking—crowd shots full of scrambling rats.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 18
+    },
+    {
+      "id": "sighting-tt0424095-toad-hideout",
+      "movie_id": "movie-tt0424095",
+      "timestamp_code": "70%",
+      "title": "Throngs under the amphibian tyrant",
+      "description": "The toad’s court keeps rat gangs in frame as muscle during the climax—heavy rodent choreography in the showdown.",
+      "prominence": "background",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 12
+    },
+    {
+      "id": "sighting-tt0090633-warren-t-intro",
+      "movie_id": "movie-tt0090633",
+      "timestamp_code": "22%",
+      "title": "Warren T. Rat’s alley scheme",
+      "description": "The con-artist antagonist—a rat disguised among mice—sets up alley swindles; extended close-ups confirm species.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0090633-mouse-market",
+      "movie_id": "movie-tt0090633",
+      "timestamp_code": "30%",
+      "title": "Crowded immigrant rodents",
+      "description": "Mice pack tenements and docks; swarms lend rat-adjacent coverage even when hero mice dominate the frame.",
+      "prominence": "background",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "likely",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 35
+    },
+    {
+      "id": "sighting-tt0090633-sewer-tunnel",
+      "movie_id": "movie-tt0090633",
+      "timestamp_code": "45%",
+      "title": "Storm-drain scramble",
+      "description": "Fievel threads storm pipes where mixed rodent casts push through waterlogged tunnels—crowd silhouettes abound.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 8
+    },
+    {
+      "id": "sighting-tt0091149-ratigan-intro",
+      "movie_id": "movie-tt0091149",
+      "timestamp_code": "18%",
+      "title": "Professor Ratigan takes center stage",
+      "description": "The Napoleon of crime is an anthropomorphic rat—large-scale villain beats keep him on-camera throughout.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0091149-bar-song",
+      "movie_id": "movie-tt0091149",
+      "timestamp_code": "32%",
+      "title": "Ratigan’s musical riot",
+      "description": "Thug rodents back Ratigan during the villain song—chorus choreography packed with hench-rats.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 16
+    },
+    {
+      "id": "sighting-tt0091149-clocktower-finale",
+      "movie_id": "movie-tt0091149",
+      "timestamp_code": "88%",
+      "title": "Clock-tower showdown crowd",
+      "description": "Basil battles Ratigan atop Big Ben with rat gangs swarming gears—crowd peril capstone.",
+      "prominence": "scene-stealer",
+      "scene_type": "animated",
+      "spoiler": true,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "curator_note": "Spoiler: climax atop the clock tower.",
+      "approximate_rat_count": 12
+    },
+    {
+      "id": "sighting-tt0119715-string-cheese-trap",
+      "movie_id": "movie-tt0119715",
+      "timestamp_code": "15%",
+      "title": "Industrial mouse trap escalation",
+      "description": "The sole mouse dominates slapstick—but every contraption gag keeps the rodent in hero close-up.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0119715-chase-mansion",
+      "movie_id": "movie-tt0119715",
+      "timestamp_code": "40%",
+      "title": "Mansion chase choreography",
+      "description": "Brothers Vs. mouse through parquet and pipes—animal performer shots are unmistakable rewinds.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0119715-table-finale",
+      "movie_id": "movie-tt0119715",
+      "timestamp_code": "92%",
+      "title": "Formal dinner chaos",
+      "description": "The mouse hijacks centerpiece service—table-wide gag coverage with tactile rodent antics.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0120595-family-photo",
+      "movie_id": "movie-tt0120595",
+      "timestamp_code": "10%",
+      "title": "Tiny brother joins the portrait",
+      "description": "Stuart settles into the Manhattan brownstone—the mouse protagonist is framed like a sibling in montage beats.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0120595-cat-confront",
+      "movie_id": "movie-tt0120595",
+      "timestamp_code": "42%",
+      "title": "Snowbell stalks Stuart",
+      "description": "Housecat rivalries hinge on spotting the mouse indoors—stalking choreography through ductwork.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    },
+    {
+      "id": "sighting-tt0120595-boat-race",
+      "movie_id": "movie-tt0120595",
+      "timestamp_code": "75%",
+      "title": "Central Park model-boat derby",
+      "description": "Stuart crews a miniature schooner amid crowds—the set piece keeps puppet/CGI rodent foregrounded.",
+      "prominence": "scene-stealer",
+      "scene_type": "live-action",
+      "spoiler": false,
+      "confidence": "verified",
+      "verification_state": "verified",
+      "verified_by": "WhereRat seed catalog",
+      "source_ids": [
+        "imdb-seed"
+      ],
+      "approximate_rat_count": 1
+    }
+  ],
   "sighting_images": [],
   "submissions": [],
   "submission_images": [],

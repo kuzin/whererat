@@ -39,10 +39,10 @@ import { stackMinimalHeaderLeft } from "../../lib/stackMinimalHeaderLeft";
 import { extractChromeFromPosterUri } from "../../lib/posterChromeFromImage";
 import {
   contrastingForeground,
+  movieHeroHeaderChrome,
   mixTowardHex,
   posterToneToHex,
   relativeLuminance,
-  statusBarStyleForBackground,
 } from "../../lib/posterTone";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { type ThemeColors, useTheme } from "../../lib/theme";
@@ -1375,12 +1375,9 @@ export default function MovieScreen() {
   const movieBar = useMemo(() => {
     if (!movie) return null;
     const bg = posterChromeHex ?? apiChromeFallback;
-    return {
-      bg,
-      fg: contrastingForeground(bg),
-      status: statusBarStyleForBackground(bg),
-    };
-  }, [movie, posterChromeHex, apiChromeFallback]);
+    const { fg, statusBar } = movieHeroHeaderChrome(bg, colors.mode);
+    return { bg, fg, status: statusBar };
+  }, [movie, posterChromeHex, apiChromeFallback, colors.mode]);
 
   const movieThemeColors = useMemo(() => {
     const p = colors.mode === "dark" ? movie?.pagePaletteDark : movie?.pagePalette;
@@ -1409,10 +1406,11 @@ export default function MovieScreen() {
     const next: NativeStackNavigationOptions = {
       title: movie?.title ?? "Movie",
       headerTitleAlign: "center",
-      headerTitle: () => <HeaderThemeWordmark wordmarkColor={movieBar?.fg} />,
+      headerTitle: () => <HeaderThemeWordmark wordmarkColor={fgChrome} />,
       headerStyle: { backgroundColor: "transparent" },
       headerTransparent: true,
-      headerTintColor: fgChrome,
+      /** Toolbar/back tint; wordmark stays `fgChrome` for contrast on the poster. */
+      headerTintColor: movieThemeColors.headerToolbarIcon,
       headerShadowVisible: false,
       headerBackButtonDisplayMode: "minimal",
       headerLeft: stackMinimalHeaderLeft(() => navigation.goBack()),
@@ -1435,6 +1433,7 @@ export default function MovieScreen() {
     movieBar,
     movieThemeColors.headerBg,
     movieThemeColors.accent,
+    movieThemeColors.headerToolbarIcon,
     movieThemeColors.statusBarStyle,
   ]);
 
@@ -1678,7 +1677,7 @@ export default function MovieScreen() {
           <HeroBlock
             movie={movie}
             imdbTitleUrl={data.links.imdbTitle}
-            heroFg={movieBar?.fg ?? movieThemeColors.text}
+            heroFg={movieBar?.fg ?? contrastingForeground(movieBar?.bg ?? apiChromeFallback)}
             heroAccent={movieThemeColors.accent}
             styles={styles}
           />

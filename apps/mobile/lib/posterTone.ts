@@ -3,6 +3,8 @@
  * Map known classes to hex for React Native; unknown → fallback.
  */
 
+import { Platform } from "react-native";
+
 const TAILWIND_BG_HEX: Record<string, string> = {
   // stone
   "bg-stone-50": "#fafaf9",
@@ -127,6 +129,35 @@ export function contrastingForeground(bgHex: string): string {
   if (rd >= aa) return FG_ON_LIGHT_BG;
   if (rl >= aa) return FG_ON_DARK_BG;
   return rd >= rl ? FG_ON_LIGHT_BG : FG_ON_DARK_BG;
+}
+
+/**
+ * Wordmark/back/title treatment for the transparent native header + hero strip.
+ *
+ * Android + light: sampled poster chrome reads **brighter** than the actual stack (blur + scrim tint
+ * over hero art). We darken a copy for WCAG picks so white/cream wins on cinematic keys.
+ */
+export function movieHeroHeaderChrome(
+  posterChromeBgHex: string,
+  mode: "light" | "dark",
+): { fg: string; statusBar: "light" | "dark" } {
+  if (Platform.OS !== "android" || mode !== "light") {
+    return {
+      fg: contrastingForeground(posterChromeBgHex),
+      statusBar: statusBarStyleForBackground(posterChromeBgHex),
+    };
+  }
+  /** Stronger than the raw sample: blurred hero reads darker than centroid/extracted chrome. */
+  const contrastBg = mixTowardHex(posterChromeBgHex, "#0c0a09", 0.72);
+  const candidates = ["#ffffff", "#fef3c7", "#fafaf9"] as const;
+  let fg = contrastingForeground(contrastBg);
+  for (const ink of candidates) {
+    if (wcagContrastRatio(ink, contrastBg) >= 4.5) {
+      fg = ink;
+      break;
+    }
+  }
+  return { fg, statusBar: statusBarStyleForBackground(contrastBg) };
 }
 
 /** Expo / native-stack status bar style for text/icons over `bgHex`. */

@@ -104,7 +104,7 @@ More database notes: [`db/README.md`](db/README.md).
 | `src/app/` | Routes, layouts, server actions |
 | `src/components/site-masthead.tsx` | Sticky header (brand + nav) — primary place to tweak masthead markup |
 | `src/app/globals.css` | Theme tokens incl. masthead (`--wr-header-*`, `--wr-brand-*`) |
-| `public/brand/` | Header logo SVGs (`mark.svg`, `wordmark` uses `logo.svg`) |
+| `public/brand/` | Header logo SVGs (`rat.svg` mark, `logo.svg` wordmark) |
 | `src/lib/` | Domain helpers, catalog types, DB, auth |
 | `db/schema.sql`, `db/seed.json` | Postgres schema + generated seed payload |
 
@@ -115,7 +115,7 @@ Iterating on the **top bar** is easiest here:
 1. **`src/components/site-masthead.tsx`** — Structure, Tailwind classes for the bar (`sticky`, padding, blur), brand link hit area, top nav theme toggle placement.
 2. **`src/app/globals.css`** — Masthead chrome: `--wr-header-bg`, `--wr-header-border`, and logo mask colors `--wr-brand-mark`, `--wr-brand-wordmark` (both light `:root` and `.dark`).
 3. **`src/app/nav-links.tsx`** — Catalog / Submit / Moderate / Profile links and mobile drawer.
-4. **`public/brand/mark.svg`** & **`public/brand/logo.svg`** — Assets behind the CSS masks (see `.wr-brand-mark` / `.wr-brand-wordmark` in `globals.css`). Paths are exported from `src/lib/brand.ts` if you rename files.
+4. **`public/brand/rat.svg`** & **`public/brand/logo.svg`** — Assets behind the CSS masks (see `.wr-brand-mark` / `.wr-brand-wordmark` in `globals.css`). Paths are exported from `src/lib/brand.ts` if you rename files.
 
 Icons / PWA: favicon + manifest icons use **`SEEDED_MODERATOR_AVATAR_URL`** (`src/lib/auth.ts`) plus `src/app/manifest.ts`.
 

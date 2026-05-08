@@ -5,7 +5,7 @@
  * - **Layout / spacing:** edit the `className`s on `<header>`, inner `<nav>`, and the brand `<Link>` below.
  * - **Bar surface & border:** `--wr-header-bg`, `--wr-header-border` in `src/app/globals.css` (`:root` and `.dark`).
  * - **Logo tint (mask fill):** `--wr-brand-mark`, `--wr-brand-wordmark` in the same file.
- * - **SVG assets:** replace `public/brand/mark.svg` and `public/brand/logo.svg` (paths: `BRAND_MARK_SRC` / `BRAND_LOGO_SRC` in `src/lib/brand.ts`). Masks are defined on `.wr-brand-mark` / `.wr-brand-wordmark` in `globals.css`.
+ * - **SVG assets:** replace `public/brand/rat.svg` and `public/brand/logo.svg` (paths: `BRAND_MARK_SRC` / `BRAND_LOGO_SRC` in `src/lib/brand.ts`). Masks are defined on `.wr-brand-mark` / `.wr-brand-wordmark` in `globals.css`.
  * - **Nav labels & mobile menu:** `src/app/nav-links.tsx`
  */
 import Link from "next/link";

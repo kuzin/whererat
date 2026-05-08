@@ -49,7 +49,7 @@ function single(value: string | string[] | undefined) {
 const HISTORY_PAGE_SIZE = 20;
 
 function fallbackAvatarUrl(_name: string) {
-  return "/brand/mark.svg";
+  return "/brand/rat.svg";
 }
 
 export default async function ModerationPage({

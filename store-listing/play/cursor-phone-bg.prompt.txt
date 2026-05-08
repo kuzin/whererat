@@ -1,0 +1,21 @@
+Use Cursor image generation from this workspace. Produce exactly one PNG for the WhereRat Play Store screenshot frame background.
+
+TECHNICAL
+- Aspect ratio portrait 9:16. Target dimensions 1080 wide x 1920 tall (exact if the tool allows; otherwise we will normalize in Sharp).
+- No text, no letters, no numbers, no logos, no watermark, no UI chrome, no phone frame, no app screenshots.
+
+ART DIRECTION
+- Premium mobile app listing backdrop: playful but tasteful “rat / cheese / cinema night” vibes without being cluttered.
+- Color: warm creams and amber, accents in orange near #ea580c; avoid neon; avoid muddy brown monochrome.
+- Style: cohesive illustration or soft poster art—not a cluttered photo collage, not hyperrealistic rats.
+- Abstract cheese-hole shapes ok as motifs; subtle film/light-leak softness ok; generous negative space in the upper third (headline overlays later).
+- Matte, readable under bold orange Fredoka typography later—not busy behind small UI screenshots.
+
+SAVE IN REPO AFTER GENERATING (required path)
+save as: store-listing/play/ai-phone-bg.png
+
+If you exported elsewhere first, normalize with:
+npm run store:play:backdrop -- path/to/export.png
+
+Then composite phone shots:
+npm run store:play:screenshots
