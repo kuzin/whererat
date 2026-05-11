@@ -19,6 +19,7 @@ import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { AccentColorField } from "@/components/accent-color-field";
 import { ResyncButton } from "@/components/resync-button";
+import { EditSightingForm } from "./edit-sighting-form";
 import {
   deleteMovie,
   deleteSighting,
@@ -987,113 +988,33 @@ export default async function MoviePage({
           <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
+                <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">Edit sighting</p>
+                <h2 className="mt-1 text-xl font-bold text-stone-950 dark:text-stone-100">
                   {editingSighting.title}
                 </h2>
-                <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
+                <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
                   {movie.title}
                 </p>
               </div>
               <Link
                 href={sightingsBasePath}
-                className="rounded-lg border border-stone-900/25 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-white/18 dark:text-stone-200 dark:hover:bg-stone-800"
+                className="wr-btn-ghost inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0"
+                aria-label="Close"
+                title="Close"
               >
-                Close
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4" aria-hidden="true">
+                  <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+                </svg>
               </Link>
             </div>
-
-            <form action={updateSightingInfo} className="mt-6 grid gap-4">
-              <input type="hidden" name="slug" value={slug} />
-              <input type="hidden" name="sightingId" value={editingSighting.id} />
-              <input type="hidden" name="returnTo" value={sightingsBasePath} />
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Sighting title
-                <input name="title" required defaultValue={editingSighting.title} className="wr-input" />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. point in movie
-                <input
-                  name="timestamp"
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  defaultValue={getSightingTimestampPercent(editingSighting.timestamp) ?? 50}
-                  className="accent-amber-700 dark:accent-amber-400"
-                />
-                <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Stored as a percentage into the {isSeriesTitle ? "episode" : "movie"}.
-                </p>
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. rats
-                <input
-                  name="approximateRatCount"
-                  type="number"
-                  min={1}
-                  max={999}
-                  required
-                  defaultValue={editingSighting.approximateRatCount}
-                  className="wr-input tabular-nums"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Description
-                <textarea
-                  name="description"
-                  rows={4}
-                  required
-                  defaultValue={editingSighting.description}
-                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
-                />
-                <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Markdown is supported (bold, lists, links, headings). It renders on movie pages.
-                </span>
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Curator message
-                <textarea
-                  name="curatorNote"
-                  rows={3}
-                  defaultValue={editingSighting.curatorNote ?? ""}
-                  placeholder="Optional note shown with the published sighting."
-                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
-                />
-              </label>
-              <EditableSightingImagesField initialImages={editingSightingImages} />
-              <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-900/12 bg-stone-50 px-3 py-2.5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/10 dark:bg-stone-900/50 dark:text-stone-100 dark:hover:bg-white/5">
-                <span>Contains spoilers</span>
-                <span className="relative inline-flex shrink-0 items-center">
-                  <input
-                    name="spoiler"
-                    type="checkbox"
-                    defaultChecked={editingSighting.spoiler}
-                    className="peer sr-only"
-                  />
-                  <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
-                  <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
-                </span>
-              </label>
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <ConfirmSubmitButton
-                  confirmMessage="Delete this sighting? This cannot be undone."
-                  type="submit"
-                  formAction={deleteSighting}
-                  className="wr-btn bg-red-100 text-red-900 dark:border-red-400/20 dark:bg-red-950/40 dark:text-red-100"
-                >
-                  Delete sighting
-                </ConfirmSubmitButton>
-                <Link
-                  href={sightingsBasePath}
-                  className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
-                >
-                  Cancel
-                </Link>
-                <button type="submit" className="wr-btn-primary">
-                  Save sighting
-                </button>
-              </div>
-            </form>
+            <EditSightingForm
+              sighting={editingSighting}
+              slug={slug}
+              returnTo={sightingsBasePath}
+              isSeriesTitle={isSeriesTitle}
+              updateAction={updateSightingInfo}
+              deleteAction={deleteSighting}
+            />
           </div>
         </div>
       ) : null}

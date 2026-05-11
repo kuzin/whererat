@@ -1,8 +1,13 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { normalizeImdbId } from "@/lib/whererat";
-import { SightingMarkdown } from "@/components/sighting-markdown";
+import {
+  SwarmSignal,
+  SightingTimestampField,
+  SightingRatCountField,
+  SightingDescriptionField,
+} from "@/components/sighting-fields";
 import { MovieSearchField } from "./movie-search-field";
 import { SightingImageUpload } from "./sighting-image-upload";
 
@@ -11,36 +16,6 @@ function RequiredMarker() {
     <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">
       *
     </span>
-  );
-}
-
-function SwarmSignal({ count }: { count: number }) {
-  const { label, sublabel, fill } = (() => {
-    if (count === 1) return { label: "Lone scout", sublabel: "A solitary rat. Brave.", fill: 1 };
-    if (count <= 3) return { label: "Small pack", sublabel: "A couple of friends.", fill: 2 };
-    if (count <= 7) return { label: "Growing colony", sublabel: "Things are getting ratty.", fill: 3 };
-    if (count <= 15) return { label: "Swarm forming", sublabel: "Someone call an exterminator.", fill: 4 };
-    if (count <= 40) return { label: "Full swarm", sublabel: "Absolute chaos.", fill: 5 };
-    return { label: "Rat apocalypse", sublabel: "We bow to our new overlords.", fill: 6 };
-  })();
-
-  const maxFill = 6;
-  const displayRats = Math.min(fill, maxFill);
-
-  return (
-    <div className="flex flex-1 items-center gap-3 rounded-lg border border-stone-900/8 bg-stone-50/80 px-3 py-2 dark:border-white/8 dark:bg-stone-900/40">
-      <div className="flex gap-0.5 text-base leading-none" aria-hidden>
-        {Array.from({ length: maxFill }).map((_, i) => (
-          <span key={i} className={`transition-all duration-200 ${i < displayRats ? "opacity-100" : "opacity-15 grayscale"}`}>
-            🐀
-          </span>
-        ))}
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs font-bold text-stone-700 dark:text-stone-200">{label}</p>
-        <p className="text-xs text-stone-500 dark:text-stone-400">{sublabel}</p>
-      </div>
-    </div>
   );
 }
 
@@ -81,11 +56,6 @@ export function SubmitForm({
   );
   const [errors, setErrors] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [sightingPercent, setSightingPercent] = useState(50);
-  const [ratCount, setRatCount] = useState(1);
-  const [descriptionDraft, setDescriptionDraft] = useState("");
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const previewRegionId = useId();
 
   const inputErrorClass =
     "border-red-700/70 focus-visible:border-red-700 dark:border-red-400/65 dark:focus-visible:border-red-400";
@@ -239,151 +209,14 @@ export function SubmitForm({
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="flex w-full flex-col gap-2" data-field="timestamp">
-          <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
-            Approx. point in {selectedImdbKind === "series" ? "episode" : "movie"}
-            <RequiredMarker />
-          </p>
-          <div className="pt-1">
-            <div className="mt-2 flex items-center gap-3">
-              <div className="relative flex-1">
-              <div className="h-5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700">
-                <div
-                  className="h-full rounded-full bg-amber-500 transition-all duration-100"
-                  style={{ width: `${sightingPercent}%` }}
-                />
-              </div>
-              {/* thumb indicator */}
-              <div
-                className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-7 w-7 rounded-full border-2 border-amber-600 bg-white shadow-md transition-all duration-100 dark:border-amber-400 dark:bg-stone-100 flex items-center justify-center gap-[3px]"
-                style={{ left: `${sightingPercent}%` }}
-              >
-                <span className="block h-3 w-px rounded-full bg-amber-500 dark:bg-amber-400" />
-                <span className="block h-3 w-px rounded-full bg-amber-500 dark:bg-amber-400" />
-                <span className="block h-3 w-px rounded-full bg-amber-500 dark:bg-amber-400" />
-              </div>
-              <input
-                name="timestamp"
-                required
-                type="range"
-                min={0}
-                max={100}
-                step={1}
-                value={sightingPercent}
-                onChange={(event) =>
-                  setSightingPercent(Number.parseInt(event.currentTarget.value, 10) || 0)
-                }
-                aria-invalid={Boolean(errorFor("timestamp"))}
-                aria-label="How far into the film did you spot the rat(s)?"
-                className="absolute inset-0 h-full w-full cursor-grab active:cursor-grabbing opacity-0"
-              />
-              </div>
-              <div className="shrink-0 text-right">
-                <span className="text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">
-                  {sightingPercent}%
-                </span>
-              </div>
-            </div>
-          </div>
-          {errorFor("timestamp") ? (
-            <span className="text-xs font-semibold text-red-700 dark:text-red-300">
-              {errorFor("timestamp")}
-            </span>
-          ) : null}
-        </div>
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Approx. rats on screen</p>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center rounded-xl border-2 border-stone-900/12 bg-white dark:border-white/12 dark:bg-stone-900">
-              <button
-                type="button"
-                onClick={() => setRatCount((c) => Math.max(1, c - 1))}
-                className="flex h-10 w-10 items-center justify-center text-xl font-bold text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800 rounded-l-[10px] dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
-                aria-label="Decrease rat count"
-              >−</button>
-              <input
-                name="approximateRatCount"
-                type="number"
-                min={1}
-                max={999}
-                value={ratCount}
-                onChange={(e) => setRatCount(Math.max(1, Number.parseInt(e.currentTarget.value, 10) || 1))}
-                className="w-12 border-x-2 border-stone-900/12 bg-transparent py-2 text-center text-base font-bold tabular-nums text-stone-900 outline-none dark:border-white/12 dark:text-stone-50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-              />
-              <button
-                type="button"
-                onClick={() => setRatCount((c) => Math.min(999, c + 1))}
-                className="flex h-10 w-10 items-center justify-center text-xl font-bold text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800 rounded-r-[10px] dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
-                aria-label="Increase rat count"
-              >+</button>
-            </div>
-            <SwarmSignal count={ratCount} />
-          </div>
-        </div>
+        <SightingTimestampField
+          label={`Approx. point in ${selectedImdbKind === "series" ? "episode" : "movie"}`}
+          errorMessage={errorFor("timestamp")}
+        />
+        <SightingRatCountField />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-          <span>
-            Description
-            <RequiredMarker />
-          </span>
-          <textarea
-            data-field="description"
-            name="description"
-            required
-            rows={6}
-            value={descriptionDraft}
-            onChange={(event) => setDescriptionDraft(event.currentTarget.value)}
-            placeholder="Describe exactly where the rat appears and what it is doing."
-            aria-invalid={Boolean(errorFor("description"))}
-            className={`wr-input h-auto min-h-36 resize-y py-3 ${errorFor("description") ? inputErrorClass : ""}`}
-          />
-          <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-            <p className="max-w-prose text-xs leading-relaxed text-stone-500 dark:text-stone-400">
-              You can use{" "}
-              <span className="font-semibold text-stone-600 dark:text-stone-300">
-                Markdown
-              </span>{" "}
-              for emphasis, lists, and links. Open preview to check formatting—it updates as you
-              type while visible.
-            </p>
-            <button
-              type="button"
-              onClick={() => setPreviewOpen((open) => !open)}
-              aria-expanded={previewOpen}
-              aria-controls={previewRegionId}
-              aria-label={
-                previewOpen ? "Hide markdown preview" : "Show markdown preview"
-              }
-              className="wr-btn-ghost shrink-0 self-start text-xs"
-            >
-              {previewOpen ? "Hide preview" : "Show preview"}
-            </button>
-          </div>
-          {errorFor("description") ? (
-            <span className="text-xs font-semibold text-red-700 dark:text-red-300">
-              {errorFor("description")}
-            </span>
-          ) : null}
-        </label>
-        {previewOpen ? (
-          <div
-            id={previewRegionId}
-            className="rounded-xl border border-stone-900/12 bg-stone-50/90 p-4 shadow-sm sm:p-5 dark:border-white/12 dark:bg-stone-950/45"
-            role="region"
-            aria-label="Markdown preview"
-          >
-            {descriptionDraft.trim() ? (
-              <SightingMarkdown markdown={descriptionDraft} />
-            ) : (
-              <p className="text-sm italic text-stone-500 dark:text-stone-500">
-                Start typing above—formatted output appears here.
-              </p>
-            )}
-          </div>
-        ) : null}
-      </div>
+      <SightingDescriptionField required errorMessage={errorFor("description")} />
 
       <div className="grid gap-4">
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
