@@ -162,7 +162,7 @@ export function MovieTabsShell({
        *  the seam between tab button and content is guaranteed flush.      */}
       <div className={`grid gap-10 p-6 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-10 lg:p-10 ${activeBg}`}>
         <aside
-          className={`order-2 flex min-w-0 flex-col gap-8 lg:order-none lg:border-r lg:pr-11 lg:pt-0.5 ${
+          className={`order-2 flex min-w-0 flex-col gap-8 lg:order-none lg:border-r lg:pr-11 lg:pt-0.5 lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100svh-3rem)] lg:overflow-y-auto lg:pb-4 ${
             palette
               ? "lg:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(120_113_108/0.85))] dark:lg:border-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(245_240_232/0.28))]"
               : "lg:border-stone-900/22 dark:lg:border-white/18"

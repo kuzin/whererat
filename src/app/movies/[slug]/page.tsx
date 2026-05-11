@@ -18,6 +18,7 @@ import { EditableSightingImagesField } from "@/components/editable-sighting-imag
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { AccentColorField } from "@/components/accent-color-field";
+import { ResyncButton } from "@/components/resync-button";
 import {
   deleteMovie,
   deleteSighting,
@@ -357,14 +358,7 @@ export default async function MoviePage({
             <div className="flex items-center gap-1.5">
               <form action={resyncMovieFromImdb}>
                 <input type="hidden" name="slug" value={slug} />
-                <button
-                  type="submit"
-                  aria-label="Resync from IMDb"
-                  title="Resync from IMDb"
-                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
-                >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-                </button>
+                <ResyncButton />
               </form>
               <form action={deleteMovie}>
                 <input type="hidden" name="slug" value={slug} />
@@ -441,6 +435,17 @@ export default async function MoviePage({
           ) : (
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/75 to-stone-950/25" />
           )}
+          {/* Mini poster — anchored bottom-right inside the hero, hidden on mobile */}
+          <div className="absolute bottom-0 right-6 hidden translate-y-[30%] sm:block lg:right-10">
+            <Image
+              src={movie.posterUrl}
+              alt=""
+              aria-hidden="true"
+              width={120}
+              height={180}
+              className="h-auto w-[88px] rounded-lg object-cover shadow-[0_8px_32px_-4px_rgb(0_0_0/0.55)] lg:w-[108px]"
+            />
+          </div>
           <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
             <div className="flex max-w-3xl flex-col gap-6">
               <div className="flex flex-col gap-2 sm:gap-3">
@@ -476,90 +481,53 @@ export default async function MoviePage({
                   &quot;{movie.metadata.tagline.trim()}&quot;
                 </p>
               ) : null}
-              <dl className="flex flex-wrap gap-3">
-                <div
-                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
-                    palette
-                      ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                      : "border-white/22 bg-black/42"
-                  }`}
-                >
-                  <dt
-                    className={
-                      palette
-                        ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
-                        : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78"
-                    }
-                  >
-                    Sightings
-                  </dt>
-                  <dd
-                    className={`wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
-                      palette
-                        ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                        : "text-amber-50"
-                    }`}
-                  >
-                    {movieSightings.length}
-                  </dd>
-                </div>
-                <div
-                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
-                    palette
-                      ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                      : "border-white/22 bg-black/42"
-                  }`}
-                >
-                  <dt
-                    className={
-                      palette
-                        ? "max-w-[10rem] text-[0.65rem] font-bold uppercase leading-snug tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
-                        : "max-w-[10rem] text-[0.65rem] font-bold uppercase leading-snug tracking-[0.18em] text-amber-200/78"
-                    }
-                  >
-                    Total rats
-                  </dt>
-                  <dd
-                    className={`wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
-                      palette
-                        ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                        : "text-amber-50"
-                    }`}
-                  >
-                    {approxRatsInMovie}
-                  </dd>
-                </div>
-                {imdbRating ? (
-                  <div
-                    className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
-                      palette
-                        ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                        : "border-white/22 bg-black/42"
-                    }`}
-                  >
-                    <dt
-                      className={
-                        palette
-                          ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
-                          : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78"
-                      }
-                    >
-                      IMDb rating
-                    </dt>
-                    <dd
-                      className={`wr-display mt-1 flex items-baseline gap-1.5 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
-                        palette
-                          ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                          : "text-amber-50"
-                      }`}
-                    >
-                      <span className="text-amber-400">★</span>
-                      {imdbRating}
-                      <span className="text-base font-normal opacity-60">/10</span>
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
+              {(movieSightings.length > 0 || imdbRating) ? (() => {
+                const chipWrap = `rounded-xl border px-4 py-2.5 backdrop-blur-md ${
+                  palette
+                    ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
+                    : "border-white/22 bg-black/42"
+                }`;
+                const chipDt = palette
+                  ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
+                  : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78";
+                const chipDd = `wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
+                  palette
+                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
+                    : "text-amber-50"
+                }`;
+                return (
+                  <dl className="flex flex-wrap gap-3">
+                    {movieSightings.length > 0 ? (
+                      <div className={chipWrap}>
+                        <dt className={chipDt}>Sightings</dt>
+                        <dd className={chipDd}>{movieSightings.length}</dd>
+                      </div>
+                    ) : null}
+                    {approxRatsInMovie > 0 ? (
+                      <div className={chipWrap}>
+                        <dt className={chipDt}>Total rats</dt>
+                        <dd className={chipDd}>{approxRatsInMovie}</dd>
+                      </div>
+                    ) : null}
+                    {movieSpoilerCount > 0 ? (
+                      <div className="rounded-xl border px-4 py-2.5 backdrop-blur-md border-amber-400/40 bg-[rgb(0_0_0/0.48)]">
+                        <dt className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-300/90">Spoilers</dt>
+                        <dd className={chipDd}>{movieSpoilerCount}</dd>
+                      </div>
+                    ) : null}
+                    {imdbRating ? (
+                      <div className={chipWrap}>
+                        <dt className={chipDt}>IMDb</dt>
+                        <dd className={`${chipDd} flex items-baseline gap-1.5`}>
+                          <span className="text-amber-400">★</span>
+                          {imdbRating}
+                          <span className="text-base font-normal opacity-60">/10</span>
+                        </dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                );
+              })() : null}
             </div>
           </div>
         </div>
@@ -703,8 +671,17 @@ export default async function MoviePage({
                     {awards ? (
                       <div>
                         <dt className={sidebarDtClass}>Honors</dt>
-                        <dd className="mt-1 text-sm italic leading-snug text-stone-600 dark:text-stone-400">
-                          {awards}
+                        <dd className="mt-2">
+                          <span
+                            className={`inline-flex items-start gap-1.5 rounded-lg border px-2.5 py-2 text-xs leading-snug ${
+                              palette
+                                ? "border-[color-mix(in_srgb,var(--movie-accent)_30%,rgb(120_113_108/0.6))] bg-[color-mix(in_srgb,var(--movie-column-wash)_70%,white)] text-stone-700 dark:border-amber-400/25 dark:bg-stone-900/60 dark:text-stone-300"
+                                : "border-amber-600/25 bg-amber-50 text-stone-700 dark:border-amber-500/20 dark:bg-stone-900/60 dark:text-stone-300"
+                            }`}
+                          >
+                            <span aria-hidden className="mt-px shrink-0 text-[0.85em]">🏆</span>
+                            {awards}
+                          </span>
                         </dd>
                       </div>
                     ) : null}
