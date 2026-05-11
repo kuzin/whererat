@@ -37,13 +37,18 @@ async function resolveTmdbMovieId({
   imdbId,
   headers,
   cache,
+  forceRefresh,
 }: {
   tmdbId?: string;
   imdbId?: string;
   headers: HeadersInit;
   cache: { next: { revalidate: number } } | { cache: "no-store" };
+  forceRefresh?: boolean;
 }) {
-  if (tmdbId?.trim()) return tmdbId.trim();
+  // When forcing a refresh, always re-resolve via IMDb ID to avoid using a
+  // stale or incorrect stored TMDB ID. Only use the stored tmdbId as a
+  // cache shortcut during normal (non-forced) renders.
+  if (tmdbId?.trim() && !forceRefresh) return tmdbId.trim();
   const normalizedImdbId = normalizeImdbId(imdbId);
   if (!normalizedImdbId) return null;
 
@@ -89,6 +94,7 @@ export async function getTmdbBackdropUrl({
     imdbId,
     headers,
     cache,
+    forceRefresh,
   });
   if (!resolvedTmdbId) return null;
 
