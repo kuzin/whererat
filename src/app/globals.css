@@ -336,6 +336,11 @@ body {
   background-color: var(--wr-btn-ghost-active);
 }
 
+/* Icon-only square variant — zero out the padding so the SVG fills the fixed h-11 w-11 box */
+@utility wr-btn-icon {
+  padding: 0;
+}
+
 @utility wr-input {
   @apply h-11 rounded-xl border px-4 text-sm font-medium outline-none transition-[background-color,border-color,box-shadow,color] placeholder:font-medium;
   background-color: var(--wr-input-bg);
