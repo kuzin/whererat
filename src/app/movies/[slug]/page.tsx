@@ -709,12 +709,12 @@ export default async function MoviePage({
                       : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
                   }`}
                 >
-                  <p className="wr-display text-lg font-bold text-stone-800 dark:text-stone-100">
-                    No sightings yet for this title.
+                  <p className="text-5xl leading-none" aria-hidden>🐀</p>
+                  <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
+                    No rat sightings catalogued yet
                   </p>
-                  <p className="mx-auto mt-2 max-w-md text-sm text-stone-600 dark:text-stone-400">
-                    Catalog curators haven&apos;t published rat cameos here. Check
-                    back after the queue catches up—or submit what you spotted.
+                  <p className="mx-auto mt-2 max-w-sm text-sm text-stone-600 dark:text-stone-400">
+                    Be the first to document a rat in this title — your sighting goes into review and gets published when approved.
                   </p>
                   <Link
                     href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}

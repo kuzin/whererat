@@ -41,6 +41,7 @@ type SubmissionEdits = Partial<
     | "submittedBy"
     | "submitterEmail"
     | "curatorNote"
+    | "contentWarnings"
   >
 >;
 
@@ -75,6 +76,7 @@ function toDbSubmission(row: {
   duplicate_hint: string | null;
   movie_poster_url: string | null;
   images_json: unknown;
+  content_warnings: string[] | null;
 }): Submission {
   const images = Array.isArray(row.images_json)
     ? row.images_json
@@ -121,6 +123,7 @@ function toDbSubmission(row: {
     imageUrl: leadImage?.url,
     imageAlt: leadImage?.alt,
     images,
+    contentWarnings: (row.content_warnings?.length ? row.content_warnings : undefined) as string[] | undefined,
   };
 }
 
@@ -241,6 +244,7 @@ export async function readModerationStore() {
       duplicate_hint: string | null;
       movie_poster_url: string | null;
       images_json: unknown;
+      content_warnings: string[] | null;
     }>(
       `select s.*,
               (
@@ -294,8 +298,8 @@ export async function addSubmission(
   };
   await pool.query(
     `insert into submissions
-      (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
+      (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url, content_warnings)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`,
     [
       nextSubmission.id,
       nextSubmission.movieTitle,
@@ -316,6 +320,7 @@ export async function addSubmission(
       nextSubmission.curatorNote ?? null,
       nextSubmission.duplicateHint ?? null,
       nextSubmission.moviePosterUrl ?? null,
+      nextSubmission.contentWarnings ?? [],
     ],
   );
   for (const [index, slot] of (nextSubmission.images ?? []).entries()) {
@@ -382,6 +387,7 @@ async function submissionToSyntheticSighting(
     seasonNumber: submission.seasonNumber,
     episodeNumber: submission.episodeNumber,
     episodeTitle: submission.episodeTitle,
+    contentWarnings: submission.contentWarnings,
   };
 }
 
@@ -415,8 +421,9 @@ export async function getMergedSightingsForMovie(movieId: string): Promise<Sight
         approximate_rat_count: number | null;
         submitter_name: string | null;
         submission_reviewed_at: string | null;
+        content_warnings: string[] | null;
       }>(
-        `select id, movie_id, timestamp_code, title, description, prominence, scene_type, spoiler, confidence, verification_state, verified_by, source_ids, curator_note, approximate_rat_count, submitter_name, submission_reviewed_at
+        `select id, movie_id, timestamp_code, title, description, prominence, scene_type, spoiler, confidence, verification_state, verified_by, source_ids, curator_note, approximate_rat_count, submitter_name, submission_reviewed_at, content_warnings
          from sightings
          where movie_id = $1 and is_deleted = false`,
         [movieId],
@@ -441,6 +448,7 @@ export async function getMergedSightingsForMovie(movieId: string): Promise<Sight
     approximateRatCount: row.approximate_rat_count ?? undefined,
     submitterName: row.submitter_name ?? undefined,
     submissionReviewedAtISO: row.submission_reviewed_at ?? undefined,
+    contentWarnings: (row.content_warnings?.length ? row.content_warnings : undefined),
   }));
 
   const queueCandidates = storedSubs.filter((s) => s.status === "approved");
@@ -548,6 +556,7 @@ export async function reviewSubmission({
             curator_note = $17,
             duplicate_hint = $18,
             movie_poster_url = $19,
+            content_warnings = $20,
             updated_at = now()
       where id = $1`,
     [
@@ -570,6 +579,7 @@ export async function reviewSubmission({
       reviewedSubmission.curatorNote ?? null,
       reviewedSubmission.duplicateHint ?? null,
       reviewedSubmission.moviePosterUrl ?? null,
+      reviewedSubmission.contentWarnings ?? [],
     ],
   );
   await pool.query(

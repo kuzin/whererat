@@ -10,6 +10,7 @@ import {
   formatSightingStartingTimeDisplay,
   getSightingCardHeadline,
   getSightingImageRefs,
+  CONTENT_WARNING_OPTIONS,
   type Sighting,
 } from "@/lib/whererat";
 import { SightingMarkdown } from "@/components/sighting-markdown";
@@ -373,39 +374,62 @@ export function MovieSightingsCards({
                       </>
                     )}
                   </div>
+                  {/* Content warnings */}
+                  {sighting.contentWarnings && sighting.contentWarnings.length > 0 ? (
+                    <details className="w-full rounded-lg border border-amber-800/25 bg-amber-50/60 px-3 py-2 text-xs dark:border-amber-400/25 dark:bg-amber-950/30">
+                      <summary className="cursor-pointer select-none font-semibold text-amber-900 dark:text-amber-200">
+                        ⚠️ Content warnings
+                      </summary>
+                      <ul className="mt-1.5 space-y-0.5 pl-1">
+                        {sighting.contentWarnings.map((id) => {
+                          const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
+                          return opt ? (
+                            <li key={id} className="text-amber-800 dark:text-amber-300">
+                              {opt.emoji} {opt.label}
+                            </li>
+                          ) : null;
+                        })}
+                      </ul>
+                    </details>
+                  ) : null}
                   {/* Footer bar */}
-                  <div className="flex w-full flex-wrap items-center gap-2 border-t border-stone-900/10 pt-4 pb-1 dark:border-white/10">
-                    <p
-                      className="inline-flex h-9 items-center gap-x-1 rounded-lg border border-orange-800/25 bg-orange-50 px-3 text-sm tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
-                      title={isSeries ? "Position in episode" : "Position in film"}
-                      aria-label={`Sighting at ${startingTimeLabel} into the ${isSeries ? "episode" : "film"}`}
-                    >
-                      <span className="font-bold tabular-nums">{startingTimeLabel}</span>
-                      <span className="font-medium opacity-70">
-                        {isSeries ? "into episode" : "into film"}
-                      </span>
-                    </p>
-                    {episodeContext ? (
-                      <span className="inline-flex h-9 items-center rounded-lg border border-sky-800/25 bg-sky-50 px-3 text-xs font-semibold tracking-tight text-sky-950 dark:border-sky-400/35 dark:bg-sky-950/45 dark:text-sky-100">
-                        {episodeContext}
-                      </span>
-                    ) : null}
-                    {sighting.spoiler && !showSpoilers ? (
-                      <span className="inline-flex h-9 items-center rounded-lg border border-red-800/30 bg-[#fecaca] px-3 text-xs font-semibold text-red-950 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
-                        Spoiler
-                      </span>
-                    ) : null}
-                    <span
-                      className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-900/25 bg-amber-50 px-2.5 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
-                      title="Estimated rats on screen for this moment"
-                    >
-                      <SightingRatPresenceVisual
-                        estimatedCount={ratEstimate}
-                        palette={palette}
-                        className="-mx-0.5"
-                      />
-                      <span>{formatApproximateRatLine(ratEstimate)}</span>
-                    </span>
+                  <div className="border-t border-stone-900/10 pt-4 pb-1 dark:border-white/10">
+                    <div className="relative -mx-5 sm:-mx-6 md:-mx-7">
+                      <div className="flex items-center gap-2 overflow-x-auto px-5 pb-1 sm:px-6 md:px-7 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                        {episodeContext ? (
+                          <span className="inline-flex h-9 shrink-0 items-center rounded-lg border border-sky-800/25 bg-sky-50 px-3 text-xs font-semibold tracking-tight text-sky-950 dark:border-sky-400/35 dark:bg-sky-950/45 dark:text-sky-100">
+                            {episodeContext}
+                          </span>
+                        ) : null}
+                        <p
+                          className="inline-flex h-9 shrink-0 items-center gap-x-1 rounded-lg border border-orange-800/25 bg-orange-50 px-3 text-sm tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
+                          title={isSeries ? "Position in episode" : "Position in film"}
+                          aria-label={`Sighting at ${startingTimeLabel} into the ${isSeries ? "episode" : "film"}`}
+                        >
+                          <span className="font-bold tabular-nums">{startingTimeLabel}</span>
+                          <span className="font-medium opacity-70">
+                            {isSeries ? "into episode" : "into film"}
+                          </span>
+                        </p>
+                        {sighting.spoiler && !showSpoilers ? (
+                          <span className="inline-flex h-9 shrink-0 items-center rounded-lg border border-red-800/30 bg-[#fecaca] px-3 text-xs font-semibold text-red-950 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
+                            Spoiler
+                          </span>
+                        ) : null}
+                        <span
+                          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-amber-900/25 bg-amber-50 px-2.5 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
+                          title="Estimated rats on screen for this moment"
+                        >
+                          <SightingRatPresenceVisual
+                            estimatedCount={ratEstimate}
+                            palette={palette}
+                            className="-mx-0.5"
+                          />
+                          <span>{formatApproximateRatLine(ratEstimate)}</span>
+                        </span>
+                      </div>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[inherit]" />
+                    </div>
                   </div>
                   {curatorNote ? (
                     <div className={`mt-1 border-l-2 pl-3.5 ${palette ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(214_211_209))]" : "border-amber-400/70 dark:border-amber-500/50"}`}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { normalizeImdbId } from "@/lib/whererat";
+import { normalizeImdbId, CONTENT_WARNING_OPTIONS } from "@/lib/whererat";
 import {
   SwarmSignal,
   SightingTimestampField,
@@ -218,6 +218,12 @@ export function SubmitForm({
 
       <SightingDescriptionField required errorMessage={errorFor("description")} />
 
+      <hr className="border-stone-900/10 dark:border-white/10" />
+
+      <div>
+        <h2 className="text-sm font-bold text-stone-500 dark:text-stone-400 uppercase tracking-widest">About you</h2>
+      </div>
+
       <div className="grid gap-4">
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
           <span>
@@ -284,6 +290,24 @@ export function SubmitForm({
             <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
           </span>
         </label>
+
+        <div className="mx-3 border-t border-stone-900/8 dark:border-white/8" />
+        <div className="px-3 py-1.5">
+          <p className="mb-2 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wide">Content warnings (optional)</p>
+          <div className="grid gap-1.5">
+            {CONTENT_WARNING_OPTIONS.map((option) => (
+              <label key={option.id} className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-white/5">
+                <input
+                  type="checkbox"
+                  name="contentWarnings"
+                  value={option.id}
+                  className="h-4 w-4 rounded border-stone-300 accent-amber-500 dark:border-stone-600"
+                />
+                <span>{option.emoji} {option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
 
         {canAutoApprove ? (
           <>

@@ -54,6 +54,15 @@ export type VerificationState = "verified" | "pending" | "rejected";
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 export type ImdbTitleKind = "movie" | "series";
 
+export const CONTENT_WARNING_OPTIONS = [
+  { id: "rat-dies",       emoji: "💀", label: "Rat dies" },
+  { id: "rat-harmed",     emoji: "🩹", label: "Rat is harmed" },
+  { id: "rat-trap",       emoji: "🪤", label: "Rat caught in trap" },
+  { id: "rat-experiment", emoji: "🔬", label: "Lab / experiment context" },
+  { id: "jump-scare",     emoji: "😱", label: "Jump scare" },
+] as const;
+export type ContentWarningId = (typeof CONTENT_WARNING_OPTIONS)[number]["id"];
+
 export const MOVIE_SIGHTINGS_PAGE_SIZE = 10;
 
 export const movieSightingsSortOptions = [
@@ -212,6 +221,7 @@ export type Sighting = {
   seasonNumber?: number;
   episodeNumber?: number;
   episodeTitle?: string;
+  contentWarnings?: string[];
 };
 
 export function clampApproximateRatCount(value: unknown): number {
@@ -254,6 +264,7 @@ export type Submission = {
   /** Up to five queued images (URLs after upload). First also mirrored to `imageUrl` for moderation thumb. */
   images?: SightingImageSlot[];
   moviePosterUrl?: string;
+  contentWarnings?: string[];
 };
 
 export function formatSubmissionEpisodeContext(submission: Pick<

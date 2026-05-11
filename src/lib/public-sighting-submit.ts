@@ -100,6 +100,9 @@ export async function executePublicSightingSubmit(
     const submitterEmail = normalizeOptionalSubmitterEmail(formData.get("submitterEmail"));
     const spoiler = formData.get("spoiler") === "on";
     const approximateRatCount = clampApproximateRatCount(formData.get("approximateRatCount"));
+    const contentWarnings = formData.getAll("contentWarnings")
+      .map((v) => String(v).trim())
+      .filter(Boolean);
 
     if (!movieTitle || !sightingTitle || !timestamp || !description || !submitterName) {
       return { ok: false, code: "missing" };
@@ -151,6 +154,7 @@ export async function executePublicSightingSubmit(
       images: sightingImages.length ? sightingImages : undefined,
       imageUrl: firstImage?.url,
       imageAlt: firstImage?.alt,
+      contentWarnings: contentWarnings.length ? contentWarnings : undefined,
     });
 
     return {
