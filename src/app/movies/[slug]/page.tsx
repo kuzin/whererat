@@ -175,10 +175,6 @@ function movieHeroMetaLine(movie: Movie, isSeriesTitle: boolean): string | null 
   return parts.join(" · ");
 }
 
-const sidebarSectionTitleClass =
-  "text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500";
-const sidebarDtClass =
-  "text-xs font-medium text-stone-500 dark:text-stone-400";
 
 function ImdbCreditsInline({ line }: { line: string }) {
   const segments = splitImdbCreditSegments(line);
@@ -305,6 +301,14 @@ export default async function MoviePage({
           darkPalette?.heroBloom ?? palette.heroBloom,
       } as CSSProperties)
     : undefined;
+
+  // Sidebar label classes — mix accent colour in on palette pages for better readability
+  const sidebarSectionTitleClass = palette
+    ? "text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(120_113_108))] dark:text-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(168_162_158))]"
+    : "text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500";
+  const sidebarDtClass = palette
+    ? "text-xs font-medium text-[color-mix(in_srgb,var(--movie-accent)_40%,rgb(120_113_108))] dark:text-[color-mix(in_srgb,var(--movie-accent)_35%,rgb(161_155_150))]"
+    : "text-xs font-medium text-stone-500 dark:text-stone-400";
 
   const director = trimMeta(movie.metadata.director);
   const originalLanguage = trimMeta(movie.metadata.originalLanguage);
@@ -496,12 +500,6 @@ export default async function MoviePage({
                       <div className={chipWrap}>
                         <dt className={chipDt}>Total rats</dt>
                         <dd className={chipDd}>{approxRatsInMovie}</dd>
-                      </div>
-                    ) : null}
-                    {movieSpoilerCount > 0 ? (
-                      <div className="rounded-xl border px-4 py-2.5 backdrop-blur-md border-amber-400/40 bg-[rgb(0_0_0/0.48)]">
-                        <dt className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-300/90">Spoilers</dt>
-                        <dd className={chipDd}>{movieSpoilerCount}</dd>
                       </div>
                     ) : null}
                     {imdbRating ? (

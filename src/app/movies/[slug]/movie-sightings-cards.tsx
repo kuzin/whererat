@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useId, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
@@ -97,10 +98,14 @@ function canvasWrapLineWidths(text: string, font: string, maxWidthPx: number): n
   return widths;
 }
 
+// palette-aware: passed as inline style so we can use CSS vars
+const spoilerBarStyle = {
+  backgroundColor: "color-mix(in srgb, var(--movie-accent, rgb(120 113 108)) 18%, rgb(120 113 108 / 0.45))",
+} as React.CSSProperties;
 const bodyLineClass =
-  "h-[0.55em] min-h-[11px] max-h-[17px] shrink-0 rounded-full bg-stone-600/55 dark:bg-stone-700/85";
+  "h-[0.55em] min-h-[11px] max-h-[17px] shrink-0 rounded-full";
 const headlineRowClass =
-  "h-[0.76em] min-h-[1.0625rem] max-h-[1.5rem] shrink-0 rounded-full bg-stone-600/55 dark:bg-stone-700/85";
+  "h-[0.76em] min-h-[1.0625rem] max-h-[1.5rem] shrink-0 rounded-full";
 
 /** Solid pill bars sized to approximate real headline + description line lengths. */
 function SpoilerPlaceholderCopy({
@@ -183,11 +188,12 @@ function SpoilerPlaceholderCopy({
             <div
               key={`h-${i}`}
               className={headlineRowClass}
-              style={
-                w != null
+              style={{
+                ...spoilerBarStyle,
+                ...(w != null
                   ? { width: `${Math.round(w)}px`, maxWidth: "100%" }
-                  : { width: `${fallbackHeadCh}ch`, maxWidth: "100%" }
-              }
+                  : { width: `${fallbackHeadCh}ch`, maxWidth: "100%" }),
+              }}
             />
           ))}
         </div>
@@ -198,8 +204,9 @@ function SpoilerPlaceholderCopy({
               <div
                 key={`b-${i}`}
                 className={bodyLineClass}
-                style={
-                  w != null
+                style={{
+                  ...spoilerBarStyle,
+                  ...(w != null
                     ? { width: `${Math.round(w)}px`, maxWidth: "100%" }
                     : {
                         width:
@@ -207,8 +214,8 @@ function SpoilerPlaceholderCopy({
                             ? `min(100%, ${Math.max(14, Math.round(fallbackBodyCh * 0.62))}ch)`
                             : `min(100%, ${fallbackBodyCh}ch)`,
                         maxWidth: "100%",
-                      }
-                }
+                      }),
+                }}
               />
             ))}
           </div>
@@ -251,53 +258,37 @@ export function MovieSightingsCards({
     <>
       {showSpoilerToggle ? (
         <div
-          className={`my-6 flex flex-col gap-4 rounded-xl border-2 px-4 py-3.5 sm:px-5 md:flex-row md:items-center md:justify-between md:gap-5 md:py-4 ${toggleSkin}`}
+          className={`my-6 flex items-center justify-between gap-4 rounded-xl border-2 px-4 py-3.5 sm:px-5 ${toggleSkin}`}
         >
-          <div className="min-w-0 flex-1 space-y-1">
-            <p className="wr-display text-lg font-bold leading-snug text-stone-950 sm:text-xl dark:text-stone-50">
-              This title has spoilers.
+          <div className="min-w-0 space-y-0.5">
+            <p className="text-sm font-semibold text-stone-800 dark:text-stone-200">
+              {spoilerCountMovie === 1 ? "1 sighting" : `${spoilerCountMovie} sightings`} contain spoilers
             </p>
-            <p className="text-sm leading-snug text-stone-700 dark:text-stone-300">
-              <span className="tabular-nums font-semibold text-stone-800 dark:text-stone-200">
-                {spoilerCountMovie}
-              </span>{" "}
-              {spoilerCountMovie === 1
-                ? "sighting hides its title, description, and images"
-                : "sightings hide their titles, descriptions, and images"}{" "}
-              until you turn on the switch.
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              Titles, descriptions, and images are hidden until you reveal them.
             </p>
           </div>
-          <div className="flex w-full shrink-0 flex-row items-center justify-between gap-3 border-t border-stone-800/10 pt-3.5 dark:border-white/10 sm:gap-4 md:w-auto md:justify-end md:border-t-0 md:border-l-2 md:border-stone-800/12 md:pt-0 md:pl-5 md:dark:border-white/12 lg:border-l-0 lg:pl-0 lg:gap-3">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={showSpoilers}
+            aria-label={showSpoilers ? "Hide spoilers" : "Show spoilers"}
+            onClick={() => setShowSpoilers((prev) => !prev)}
+            className={`relative inline-flex h-8 w-[3.25rem] shrink-0 items-center rounded-full border-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out active:scale-[0.94] motion-reduce:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 ${
+              showSpoilers
+                ? "border-amber-700 bg-amber-500 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)] dark:border-amber-500 dark:bg-amber-600"
+                : "border-stone-700/80 bg-[color-mix(in_srgb,rgb(120_113_108)_22%,rgb(255_253_248))] dark:border-white/25 dark:bg-stone-700"
+            }`}
+          >
             <span
-              id={spoilerToggleLabelId}
-              className="text-sm font-bold text-stone-800 dark:text-stone-200"
-            >
-              Show spoilers
-            </span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={showSpoilers}
-              aria-labelledby={spoilerToggleLabelId}
-              onClick={() => setShowSpoilers((prev) => !prev)}
-              className={`relative inline-flex h-8 w-[3.25rem] shrink-0 items-center rounded-full border-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out active:scale-[0.94] motion-reduce:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 ${
-                showSpoilers
-                  ? "border-amber-700 bg-amber-500 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)] dark:border-amber-500 dark:bg-amber-600"
-                  : "border-stone-700/80 bg-[color-mix(in_srgb,rgb(120_113_108)_22%,rgb(255_253_248))] dark:border-white/25 dark:bg-stone-700"
+              className={`pointer-events-none absolute top-1 left-1 size-5 rounded-full bg-white shadow-md ring-1 ring-stone-900/10 will-change-transform motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.34,1.28,0.64,1)] motion-reduce:duration-150 dark:ring-white/10 ${
+                showSpoilers ? "translate-x-[1.35rem]" : "translate-x-0"
               }`}
-            >
-              <span
-                className={`pointer-events-none absolute top-1 left-1 size-5 rounded-full bg-white shadow-md ring-1 ring-stone-900/10 will-change-transform motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.34,1.28,0.64,1)] motion-reduce:duration-150 dark:ring-white/10 ${
-                  showSpoilers ? "translate-x-[1.35rem]" : "translate-x-0"
-                }`}
-              />
-              <span className="sr-only">
-                {showSpoilers
-                  ? "Spoilers visible; press to hide."
-                  : "Spoilers hidden; press to show."}
-              </span>
-            </button>
-          </div>
+            />
+            <span className="sr-only">
+              {showSpoilers ? "Spoilers visible; press to hide." : "Spoilers hidden; press to show."}
+            </span>
+          </button>
         </div>
       ) : null}
 
@@ -313,9 +304,9 @@ export function MovieSightingsCards({
           const episodeContext = formatSightingEpisodeContext(sighting);
           const submitterCredit = trimNote(sighting.submitterName);
           const submittedByLine = submitterCredit ? (
-            <p className="pt-1 text-left text-sm italic leading-relaxed text-stone-600/75 dark:text-stone-400/70">
-              <span className="font-semibold">Submitted by </span>
-              {submitterCredit}
+            <p className="pt-0.5 text-left text-xs text-stone-500 dark:text-stone-400">
+              Submitted by{" "}
+              <span className="font-semibold text-stone-700 dark:text-stone-300">{submitterCredit}</span>
             </p>
           ) : null;
           const editHref =
@@ -341,11 +332,11 @@ export function MovieSightingsCards({
                   {editHref ? (
                     <Link
                       href={editHref}
-                      className="wr-btn-ghost absolute right-0 top-0 inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
+                      className="wr-btn-ghost absolute right-0 top-0 inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0"
                       aria-label="Edit sighting"
                       title="Edit sighting"
                     >
-                      ✎
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </Link>
                   ) : null}
                   {/* Content */}
@@ -399,7 +390,7 @@ export function MovieSightingsCards({
                         {episodeContext}
                       </span>
                     ) : null}
-                    {sighting.spoiler ? (
+                    {sighting.spoiler && !showSpoilers ? (
                       <span className="inline-flex h-9 items-center rounded-lg border border-red-800/30 bg-[#fecaca] px-3 text-xs font-semibold text-red-950 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
                         Spoiler
                       </span>
@@ -417,11 +408,9 @@ export function MovieSightingsCards({
                     </span>
                   </div>
                   {curatorNote ? (
-                    <div className="border-t border-stone-900/10 pt-3 dark:border-white/10">
-                      <p className="text-sm italic leading-relaxed text-stone-800 dark:text-stone-300">
-                        <span className="font-bold">From the curator: </span>
-                        {curatorNote}
-                      </p>
+                    <div className={`mt-1 border-l-2 pl-3.5 ${palette ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(214_211_209))]" : "border-amber-400/70 dark:border-amber-500/50"}`}>
+                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">Curator note</p>
+                      <p className="mt-1 text-sm leading-relaxed text-stone-700 dark:text-stone-300">{curatorNote}</p>
                     </div>
                   ) : null}
                 </div>
