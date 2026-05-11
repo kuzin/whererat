@@ -17,6 +17,7 @@ import { MovieSightingsPagingBar, MovieSightingsSortControl } from "./movie-sigh
 import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { ImdbLinkButton } from "@/components/imdb-link-button";
+import { AccentColorField } from "@/components/accent-color-field";
 import {
   deleteMovie,
   deleteSighting,
@@ -916,26 +917,13 @@ export default async function MoviePage({
                 Tagline
                 <input name="tagline" defaultValue={movie.metadata.tagline} className="wr-input" />
               </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+              <div className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Accent color
-                <div className="flex items-center gap-2">
-                  <div
-                    className="h-9 w-9 shrink-0 rounded-lg border border-stone-300 dark:border-stone-600"
-                    style={{ backgroundColor: visuals.syncedPalette?.accent ?? "#b45309" }}
-                    title={`Auto-derived: ${visuals.syncedPalette?.accent ?? "none"}`}
-                  />
-                  <input
-                    name="overrideAccent"
-                    type="text"
-                    placeholder={`Auto (${visuals.syncedPalette?.accent ?? "#b45309"})`}
-                    defaultValue={movie.metadata.overrideAccent ?? ""}
-                    className="wr-input font-mono"
-                  />
-                </div>
-                <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
-                  Hex color, e.g. {visuals.syncedPalette?.accent ?? "#b45309"}. Leave blank to use auto-derived.
-                </span>
-              </label>
+                <AccentColorField
+                  autoAccent={visuals.syncedPalette?.accent ?? "#b45309"}
+                  currentOverride={movie.metadata.overrideAccent ?? ""}
+                />
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   Certificate
