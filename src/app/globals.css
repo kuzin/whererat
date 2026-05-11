@@ -119,6 +119,15 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+a,
+button,
+[role="button"],
+select,
+label[for],
+summary {
+  cursor: pointer;
+}
+
 .wr-shell {
   position: relative;
   background: var(--background);
