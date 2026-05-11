@@ -174,9 +174,9 @@ function movieHeroMetaLine(movie: Movie, isSeriesTitle: boolean): string | null 
 }
 
 const sidebarSectionTitleClass =
-  "wr-display text-[0.9375rem] font-bold uppercase tracking-[0.36em] text-stone-600 dark:text-stone-300 sm:text-base";
+  "text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500";
 const sidebarDtClass =
-  "text-xs font-bold uppercase tracking-[0.11em] text-stone-600 dark:text-stone-300 sm:text-[0.8125rem]";
+  "text-xs font-medium text-stone-500 dark:text-stone-400";
 
 function ImdbCreditsInline({ line }: { line: string }) {
   const segments = splitImdbCreditSegments(line);
@@ -285,7 +285,6 @@ export default async function MoviePage({
   const visuals = await getMoviePageVisuals(movie);
   const palette = visuals.palette;
   const heroMetaLine = movieHeroMetaLine(movie, isSeriesTitle);
-  const manualPalette = movie.metadata.pagePalette;
   const manualPaletteDark = movie.metadata.pagePaletteDark;
   const darkPalette = manualPaletteDark ?? visuals.paletteDark;
 
@@ -343,23 +342,27 @@ export default async function MoviePage({
       style={rootStyle}
       className="wr-page-shell py-8 sm:py-10"
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         <Link
           href="/#catalog"
-          className="wr-btn-ghost inline-flex h-11 items-center px-4 text-xs font-semibold uppercase tracking-[0.16em]"
+          aria-label="Back to catalog"
+          title="Back to catalog"
+          className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
         >
-          ← Back to catalog
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {canEditMovie ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <form action={resyncMovieFromImdb}>
                 <input type="hidden" name="slug" value={slug} />
                 <button
                   type="submit"
-                  className="wr-btn-ghost inline-flex h-11 items-center px-3 text-xs font-semibold uppercase tracking-[0.12em]"
+                  aria-label="Resync from IMDb"
+                  title="Resync from IMDb"
+                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
                 >
-                  Resync
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
                 </button>
               </form>
               <form action={deleteMovie}>
@@ -367,26 +370,42 @@ export default async function MoviePage({
                 <ConfirmSubmitButton
                   confirmMessage="Delete this movie? This cannot be undone."
                   type="submit"
-                  className="wr-btn-ghost inline-flex h-11 items-center px-3 text-xs font-semibold uppercase tracking-[0.12em] text-red-800 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/35"
+                  aria-label="Delete movie"
+                  title="Delete movie"
+                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/35"
                 >
-                  Delete
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                 </ConfirmSubmitButton>
               </form>
               <Link
                 href={`/movies/${slug}?editMovie=1`}
-                className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 text-lg"
                 aria-label="Edit movie information"
                 title="Edit movie information"
+                className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
               >
-                ✎
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </Link>
             </div>
           ) : null}
+          {imdbTitleUrlResolved ? (
+            <a
+              href={imdbTitleUrlResolved}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open on IMDb"
+              title="Open on IMDb"
+              className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+          ) : null}
           <Link
             href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
-            className={`inline-flex h-11 items-center gap-1.5 text-sm ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
+            className={`inline-flex h-11 items-center gap-2 px-4 text-sm font-semibold ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
           >
-            Submit a Sighting
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            <span className="hidden sm:inline">Submit a Sighting</span>
+            <span className="sm:hidden">Submit</span>
           </Link>
         </div>
       </div>
@@ -421,7 +440,7 @@ export default async function MoviePage({
           ) : (
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/75 to-stone-950/25" />
           )}
-          <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 sm:min-h-80 lg:p-10">
+          <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
             <div className="flex max-w-3xl flex-col gap-6">
               <div className="flex flex-col gap-2 sm:gap-3">
                 <h1
@@ -458,7 +477,7 @@ export default async function MoviePage({
               ) : null}
               <dl className="flex flex-wrap gap-3">
                 <div
-                  className={`border px-4 py-2.5 backdrop-blur-md ${
+                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
                     palette
                       ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
                       : "border-white/22 bg-black/42"
@@ -484,7 +503,7 @@ export default async function MoviePage({
                   </dd>
                 </div>
                 <div
-                  className={`border px-4 py-2.5 backdrop-blur-md ${
+                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
                     palette
                       ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
                       : "border-white/22 bg-black/42"
@@ -511,7 +530,7 @@ export default async function MoviePage({
                 </div>
                 {imdbRating ? (
                   <div
-                    className={`border px-4 py-2.5 backdrop-blur-md ${
+                    className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
                       palette
                         ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
                         : "border-white/22 bg-black/42"
@@ -540,18 +559,6 @@ export default async function MoviePage({
                   </div>
                 ) : null}
               </dl>
-              <a
-                href={getImdbTitleUrl(movie.externalIds.imdb)}
-                target="_blank"
-                rel="noreferrer"
-                className={`inline-flex w-fit items-center justify-center rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition hover:brightness-[1.06] active:brightness-[0.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                  palette
-                    ? "border border-transparent bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_50%,rgb(17_15_14_/_0.92))] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_4%,rgb(255_253_246))] focus-visible:outline-[color-mix(in_srgb,var(--movie-accent,#ea580c)_60%,rgb(251_191_36))]"
-                    : "border-2 border-stone-950/90 bg-[rgb(253_224_71)] text-stone-950 dark:border-amber-200/40 focus-visible:outline-amber-400"
-                }`}
-              >
-                Open on IMDb
-              </a>
             </div>
           </div>
         </div>
@@ -572,7 +579,7 @@ export default async function MoviePage({
                 alt={movie.posterAlt}
                 width={480}
                 height={720}
-                className={`aspect-[2/3] w-full max-w-[18rem] self-center shrink-0 rounded-xl object-cover ring-2 lg:max-w-full dark:ring-white/12 ${palette ? "ring-[color-mix(in_srgb,var(--movie-accent)_22%,transparent)]" : "ring-stone-950/10"}`}
+                className="aspect-[2/3] w-full max-w-[18rem] self-center shrink-0 rounded-xl object-cover shadow-[0_6px_28px_-4px_rgb(0_0_0/0.22)] dark:shadow-[0_6px_28px_-4px_rgb(0_0_0/0.55)] lg:max-w-full"
               />
               <section className="space-y-2.5">
                 <h2 className={sidebarSectionTitleClass}>Synopsis</h2>
@@ -711,7 +718,7 @@ export default async function MoviePage({
             <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
               <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="wr-display shrink-0 text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                  Featured Rats:
+                  Featured Rats
                 </h2>
                 {movieSightings.length > 0 ? (
                   <MovieSightingsSortControl
@@ -791,7 +798,7 @@ export default async function MoviePage({
               <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
                 <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                    Rat Facts:
+                    Rat Facts
                   </h2>
                   <ImdbLinkButton
                     href={`https://www.imdb.com/title/${movie.externalIds.imdb}/trivia/`}
@@ -802,8 +809,8 @@ export default async function MoviePage({
               <div className="space-y-4">
                 {ratFacts.map((fact, i) => (
                   <div key={i} className={tabCardClass(Boolean(palette))}>
-                    <p className="wr-display mb-3 text-base font-black uppercase tracking-widest text-stone-600 dark:text-stone-300">
-                      Rat Fact #{i + 1}
+                    <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
+                      Rat Fact {i + 1}
                     </p>
                     <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
                       {fact}
@@ -858,6 +865,9 @@ export default async function MoviePage({
               </Link>
             </div>
 
+            {(() => {
+              const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
+              return (
             <form action={updateMovieInfo} className="mt-6 grid gap-4">
               <input type="hidden" name="slug" value={slug} />
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
@@ -872,66 +882,13 @@ export default async function MoviePage({
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   Runtime (minutes)
                   <input name="runtimeMinutes" type="number" defaultValue={movie.runtimeMinutes} className="wr-input" />
-                </label>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Dark wash
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteWashDark"
-                      type="color"
-                      defaultValue={manualPaletteDark?.wash ?? visuals.syncedPaletteDark?.wash ?? "#110e0c"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPaletteDark?.wash ?? visuals.syncedPaletteDark?.wash ?? "#110e0c"}
-                    </span>
-                  </div>
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Dark column wash
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteColumnWashDark"
-                      type="color"
-                      defaultValue={manualPaletteDark?.columnWash ?? visuals.syncedPaletteDark?.columnWash ?? "#0c0a09"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPaletteDark?.columnWash ?? visuals.syncedPaletteDark?.columnWash ?? "#0c0a09"}
-                    </span>
-                  </div>
-                </label>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Dark accent
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteAccentDark"
-                      type="color"
-                      defaultValue={manualPaletteDark?.accent ?? visuals.syncedPaletteDark?.accent ?? "#a16207"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPaletteDark?.accent ?? visuals.syncedPaletteDark?.accent ?? "#a16207"}
-                    </span>
-                  </div>
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Dark hero bloom
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteHeroBloomDark"
-                      type="color"
-                      defaultValue={manualPaletteDark?.heroBloom ?? visuals.syncedPaletteDark?.heroBloom ?? "#080706"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPaletteDark?.heroBloom ?? visuals.syncedPaletteDark?.heroBloom ?? "#080706"}
-                    </span>
-                  </div>
+                  {(() => {
+                    const syncedVal = String(syncSnapshot?.runtimeMinutes ?? "").trim();
+                    const currentVal = String(movie.runtimeMinutes ?? "");
+                    return syncedVal && syncedVal !== currentVal ? (
+                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                    ) : null;
+                  })()}
                 </label>
               </div>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
@@ -940,104 +897,104 @@ export default async function MoviePage({
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Summary
-                <textarea name="summary" rows={4} defaultValue={movie.summary} className="wr-input" />
+                <textarea name="summary" rows={4} defaultValue={movie.summary} className="wr-input h-auto min-h-[7rem]" />
               </label>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Poster image URL
                 <input name="posterUrl" defaultValue={movie.posterUrl} className="wr-input" />
               </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+              <div className="flex flex-col gap-1 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Current hero banner URL
-                <input value={visuals.bannerUrl} readOnly className="wr-input opacity-80" />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Palette wash
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteWash"
-                      type="color"
-                      defaultValue={manualPalette?.wash ?? visuals.syncedPalette?.wash ?? "#fffbeb"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPalette?.wash ?? visuals.syncedPalette?.wash ?? "#fffbeb"}
-                    </span>
-                  </div>
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Palette column wash
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteColumnWash"
-                      type="color"
-                      defaultValue={manualPalette?.columnWash ?? visuals.syncedPalette?.columnWash ?? "#fffdf6"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPalette?.columnWash ?? visuals.syncedPalette?.columnWash ?? "#fffdf6"}
-                    </span>
-                  </div>
-                </label>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Palette accent
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteAccent"
-                      type="color"
-                      defaultValue={manualPalette?.accent ?? visuals.syncedPalette?.accent ?? "#b45309"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPalette?.accent ?? visuals.syncedPalette?.accent ?? "#b45309"}
-                    </span>
-                  </div>
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Palette hero bloom
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="paletteHeroBloom"
-                      type="color"
-                      defaultValue={manualPalette?.heroBloom ?? visuals.syncedPalette?.heroBloom ?? "#2b2118"}
-                      className="h-10 w-14 cursor-pointer rounded border border-stone-300 bg-transparent p-1 dark:border-stone-700"
-                    />
-                    <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-                      {manualPalette?.heroBloom ?? visuals.syncedPalette?.heroBloom ?? "#2b2118"}
-                    </span>
-                  </div>
-                </label>
+                <p className="break-all rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-normal text-stone-600 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300">
+                  {visuals.bannerUrl}
+                </p>
+                <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
+                  Resynced {movie.metadata.lastSyncedAt ?? "never"}
+                </span>
               </div>
               <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Tagline
                 <input name="tagline" defaultValue={movie.metadata.tagline} className="wr-input" />
               </label>
+              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                Accent color
+                <div className="flex items-center gap-2">
+                  <div
+                    className="h-9 w-9 shrink-0 rounded-lg border border-stone-300 dark:border-stone-600"
+                    style={{ backgroundColor: visuals.syncedPalette?.accent ?? "#b45309" }}
+                    title={`Auto-derived: ${visuals.syncedPalette?.accent ?? "none"}`}
+                  />
+                  <input
+                    name="overrideAccent"
+                    type="text"
+                    placeholder={`Auto (${visuals.syncedPalette?.accent ?? "#b45309"})`}
+                    defaultValue={movie.metadata.overrideAccent ?? ""}
+                    className="wr-input font-mono"
+                  />
+                </div>
+                <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
+                  Hex color, e.g. {visuals.syncedPalette?.accent ?? "#b45309"}. Leave blank to use auto-derived.
+                </span>
+              </label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   Certificate
                   <input name="rating" defaultValue={movie.metadata.rating} className="wr-input" />
+                  {(() => {
+                    const syncedVal = String(syncSnapshot?.rating ?? "").trim();
+                    const currentVal = String(movie.metadata.rating ?? "").trim();
+                    return syncedVal && syncedVal !== currentVal ? (
+                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                    ) : null;
+                  })()}
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   Director
                   <input name="director" defaultValue={movie.metadata.director} className="wr-input" />
+                  {(() => {
+                    const syncedVal = String(syncSnapshot?.director ?? "").trim();
+                    const currentVal = String(movie.metadata.director ?? "").trim();
+                    return syncedVal && syncedVal !== currentVal ? (
+                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                    ) : null;
+                  })()}
                 </label>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   Writers
                   <input name="writers" defaultValue={movie.metadata.writers} className="wr-input" />
+                  {(() => {
+                    const syncedVal = String(syncSnapshot?.writers ?? "").trim();
+                    const currentVal = String(movie.metadata.writers ?? "").trim();
+                    return syncedVal && syncedVal !== currentVal ? (
+                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                    ) : null;
+                  })()}
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Cast
+                  Cast (top billed)
                   <input name="cast" defaultValue={movie.metadata.cast} className="wr-input" />
+                  {(() => {
+                    const syncedVal = String(syncSnapshot?.cast ?? "").trim();
+                    const currentVal = String(movie.metadata.cast ?? "").trim();
+                    return syncedVal && syncedVal !== currentVal ? (
+                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                    ) : null;
+                  })()}
                 </label>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   IMDb score
                   <input name="imdbRating" defaultValue={movie.metadata.imdbRating} className="wr-input" />
+                  {(() => {
+                    const syncedVal = String(syncSnapshot?.imdbRating ?? "").trim();
+                    const currentVal = String(movie.metadata.imdbRating ?? "").trim();
+                    return syncedVal && syncedVal !== currentVal ? (
+                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                    ) : null;
+                  })()}
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   IMDb votes
@@ -1077,6 +1034,8 @@ export default async function MoviePage({
                 </button>
               </div>
             </form>
+              );
+            })()}
           </div>
         </div>
       ) : null}

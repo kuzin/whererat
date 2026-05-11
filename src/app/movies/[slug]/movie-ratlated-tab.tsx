@@ -90,7 +90,7 @@ export function MovieRatlatedTab({ titles, imdbId, palette }: Props) {
       <header className={`mb-6 border-b pb-4 ${headerBorder}`}>
         <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-            Related:
+            Related
           </h2>
           <ImdbLinkButton
             href={`https://www.imdb.com/title/${imdbId}/recommendations/`}

@@ -227,7 +227,7 @@ export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const headerBorder = tabHeaderBorderClass(palette);
-  const sectionTitle = "wr-display mb-4 text-lg font-black uppercase tracking-widest text-stone-600 dark:text-stone-300";
+  const sectionTitle = "wr-display mb-4 text-xl font-bold tracking-tight text-stone-950 dark:text-stone-50";
   const divider = `my-8 border-t ${headerBorder}`;
   const hasContent = videos.length > 0 || images.length > 0;
 
@@ -240,7 +240,7 @@ export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
       <header className={`mb-6 border-b pb-4 ${headerBorder}`}>
         <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-            Media:
+            Media
           </h2>
           <ImdbLinkButton
             href={`https://www.imdb.com/title/${imdbId}/mediaindex`}

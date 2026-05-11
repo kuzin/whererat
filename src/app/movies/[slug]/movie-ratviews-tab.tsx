@@ -118,7 +118,7 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
       <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(palette)}`}>
         <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-            Reviews:
+            Reviews
           </h2>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             {/* Rat-only toggle */}

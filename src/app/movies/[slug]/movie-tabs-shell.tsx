@@ -78,7 +78,7 @@ export function MovieTabsShell({
        *  with the tab bottoms flush against the hero's border-b-2.
        *  The active tab's invisible bottom border covers that 2px seam.
        * ──────────────────────────────────────────────────────────────────*/}
-      <div className="relative z-10 -mt-[52px] hidden items-end justify-end px-6 sm:flex lg:px-10">
+      <div className="relative z-10 -mt-[52px] hidden items-end justify-center px-6 sm:flex lg:justify-end lg:px-10">
         <div className="flex items-end gap-2" role="tablist">
           {tabs.map((tab, i) => {
             const isActive = i === activeIdx;

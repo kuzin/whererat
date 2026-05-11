@@ -29,12 +29,6 @@ import { getTmdbBackdropUrl } from "@/lib/tmdb-banner";
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 const HEX_COLOR_RE = /^#?[0-9a-fA-F]{6}$/;
 
-function normalizeHexColor(input: FormDataEntryValue | null): string | undefined {
-  const value = String(input ?? "").trim();
-  if (!value || !HEX_COLOR_RE.test(value)) return undefined;
-  return value.startsWith("#") ? value.toLowerCase() : `#${value.toLowerCase()}`;
-}
-
 async function requireModerator() {
   const cookieStore = await cookies();
   const session = parseModeratorSession(
@@ -63,19 +57,9 @@ export async function updateMovieInfo(formData: FormData) {
 
   const genresRaw = String(formData.get("genres") ?? "").trim();
   const countriesRaw = String(formData.get("countries") ?? "").trim();
-  const wash = normalizeHexColor(formData.get("paletteWash"));
-  const columnWash = normalizeHexColor(formData.get("paletteColumnWash"));
-  const accent = normalizeHexColor(formData.get("paletteAccent"));
-  const heroBloom = normalizeHexColor(formData.get("paletteHeroBloom"));
-  const washDark = normalizeHexColor(formData.get("paletteWashDark"));
-  const columnWashDark = normalizeHexColor(formData.get("paletteColumnWashDark"));
-  const accentDark = normalizeHexColor(formData.get("paletteAccentDark"));
-  const heroBloomDark = normalizeHexColor(formData.get("paletteHeroBloomDark"));
-  const pagePalette = wash && columnWash && accent && heroBloom
-    ? { wash, columnWash, accent, heroBloom }
-    : undefined;
-  const pagePaletteDark = washDark && columnWashDark && accentDark && heroBloomDark
-    ? { wash: washDark, columnWash: columnWashDark, accent: accentDark, heroBloom: heroBloomDark }
+  const overrideAccentRaw = String(formData.get("overrideAccent") ?? "").trim();
+  const overrideAccent = overrideAccentRaw && HEX_COLOR_RE.test(overrideAccentRaw)
+    ? (overrideAccentRaw.startsWith("#") ? overrideAccentRaw.toLowerCase() : `#${overrideAccentRaw.toLowerCase()}`)
     : undefined;
 
   await updateMovieOverride(movie.id, {
@@ -102,8 +86,9 @@ export async function updateMovieInfo(formData: FormData) {
       productionCountries: countriesRaw
         ? countriesRaw.split(",").map((item) => item.trim()).filter(Boolean)
         : movie.metadata.productionCountries,
-      ...(pagePalette ? { pagePalette } : { pagePalette: undefined }),
-      ...(pagePaletteDark ? { pagePaletteDark } : { pagePaletteDark: undefined }),
+      overrideAccent,
+      pagePalette: undefined,
+      pagePaletteDark: undefined,
     },
   });
 
@@ -363,6 +348,7 @@ export async function resyncMovieFromImdb(formData: FormData) {
   const tmdbBackdrop = await getTmdbBackdropUrl({
     tmdbId: movie.externalIds.tmdb,
     imdbId,
+    forceRefresh: true,
   });
   const hasTmdbToken = Boolean(
     process.env.TMDB_READ_ACCESS_TOKEN?.trim() ||
@@ -373,7 +359,7 @@ export async function resyncMovieFromImdb(formData: FormData) {
   const syncedVisuals = await getSyncedMoviePageVisuals({
     ...movie,
     ...(posterUrl ? { posterUrl } : {}),
-  });
+  }, { forceRefresh: true });
   const nextSyncSnapshot: Record<string, unknown> = {
     title: omdb.Title,
     Year: omdb.Year,
