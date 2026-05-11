@@ -116,11 +116,23 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
   return (
     <div>
       <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(palette)}`}>
-        <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-            Reviews
-          </h2>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          {/* Title + count summary */}
+          <div>
+            <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+              Reviews
+            </h2>
+            {reviews.length > 0 ? (
+              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+                {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
+                {ratCount > 0 ? (
+                  <> · <span className="text-amber-600 dark:text-amber-400 font-semibold">{ratCount} mention rats 🐀</span></>
+                ) : null}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             {/* Rat-only toggle */}
             {ratCount > 0 ? (
               <label className="flex cursor-pointer items-center gap-2 select-none">

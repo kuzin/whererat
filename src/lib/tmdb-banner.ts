@@ -19,6 +19,13 @@ type TmdbFindResponse = {
   movie_results?: Array<{ id?: number }>;
 };
 
+type TmdbVideoResult = {
+  key?: string;
+  site?: string;
+  type?: string;
+  official?: boolean;
+};
+
 function bearerHeaders(): HeadersInit | null {
   const token =
     process.env.TMDB_READ_ACCESS_TOKEN?.trim() ||
@@ -154,5 +161,50 @@ export async function getTmdbBackdropUrl({
     return best?.file_path ? `https://image.tmdb.org/t/p/w1280${best.file_path}` : null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Fetch the primary official YouTube trailer key for a movie from TMDB.
+ * Returns undefined when TMDB creds are absent or no trailer is found.
+ */
+export async function fetchTmdbYoutubeTrailerKey({
+  imdbId,
+  tmdbId,
+  forceRefresh,
+}: {
+  imdbId: string | undefined;
+  tmdbId: string | undefined;
+  forceRefresh?: boolean;
+}): Promise<string | undefined> {
+  const headers = bearerHeaders();
+  if (!headers) return undefined;
+
+  const cache = forceRefresh
+    ? ({ cache: "no-store" } as const)
+    : ({ next: { revalidate: 86400 } } as const);
+
+  const resolvedTmdbId = await resolveTmdbMovieId({ imdbId, tmdbId, headers, cache, forceRefresh });
+  if (!resolvedTmdbId) return undefined;
+
+  try {
+    const res = await fetch(`${TMDB_API}/movie/${encodeURIComponent(resolvedTmdbId)}/videos`, {
+      headers: { Accept: "application/json", ...headers },
+      ...cache,
+    });
+    if (!res.ok) return undefined;
+    const json = (await res.json()) as { results?: TmdbVideoResult[] };
+    const results = json.results ?? [];
+
+    // Prefer: official Trailer on YouTube → any Trailer → any Teaser
+    const pick = (
+      results.find((v) => v.site === "YouTube" && v.type === "Trailer" && v.official) ??
+      results.find((v) => v.site === "YouTube" && v.type === "Trailer") ??
+      results.find((v) => v.site === "YouTube" && v.type === "Teaser" && v.official) ??
+      results.find((v) => v.site === "YouTube")
+    );
+    return pick?.key ?? undefined;
+  } catch {
+    return undefined;
   }
 }

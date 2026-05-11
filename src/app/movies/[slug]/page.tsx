@@ -327,6 +327,7 @@ export default async function MoviePage({
   const imdbRelated = movie.metadata.imdbRelated ?? [];
   const imdbVideos = movie.metadata.imdbVideos ?? [];
   const imdbImages = movie.metadata.imdbImages ?? [];
+  const youtubeTrailerKey = typeof movie.metadata.youtubeTrailerKey === "string" ? movie.metadata.youtubeTrailerKey : undefined;
   const imdbRating = trimMeta(movie.metadata.imdbRating);
   const imdbVotes = trimMeta(movie.metadata.imdbVotes);
   const metascore = trimMeta(movie.metadata.metascore);
@@ -753,27 +754,27 @@ export default async function MoviePage({
           {ratFacts.length > 0 ? (
             <div>
               <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
-                <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                    Rat Facts
-                  </h2>
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+                      Rat Facts
+                    </h2>
+                    <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+                      {ratFacts.length} {ratFacts.length === 1 ? "trivia entry" : "trivia entries"} mentioning rats · sourced from IMDb
+                    </p>
+                  </div>
                   <ImdbLinkButton
                     href={`https://www.imdb.com/title/${movie.externalIds.imdb}/trivia/`}
                     label="All trivia on IMDb"
                   />
                 </div>
               </header>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {ratFacts.map((fact, i) => (
-                  <div key={i} className={tabCardClass(Boolean(palette))}>
-                    <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
-                      Rat Fact {i + 1}
-                    </p>
+                  <div key={i} className={`${tabCardClass(Boolean(palette))} flex gap-4`}>
+                    <span className="mt-0.5 shrink-0 text-xl leading-none" aria-hidden>🐀</span>
                     <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
                       {fact}
-                    </p>
-                    <p className="mt-3 text-xs text-stone-400 dark:text-stone-500">
-                      Source: IMDb trivia
                     </p>
                   </div>
                 ))}
@@ -792,6 +793,7 @@ export default async function MoviePage({
           <MovieRatMediaTab
             videos={imdbVideos}
             images={imdbImages}
+            youtubeTrailerKey={youtubeTrailerKey}
             imdbId={movie.externalIds.imdb}
             palette={Boolean(palette)}
           />

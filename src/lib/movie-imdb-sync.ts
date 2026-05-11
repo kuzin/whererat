@@ -1,5 +1,6 @@
 import { updateMovieOverride } from "@/lib/movie-edit-store";
 import { getCatalogMovies } from "@/lib/movie-catalog";
+import { fetchTmdbYoutubeTrailerKey } from "@/lib/tmdb-banner";
 import type { ImdbImage, ImdbRelatedTitle, ImdbReview, ImdbVideo, Movie } from "@/lib/whererat";
 
 // ---------------------------------------------------------------------------
@@ -428,12 +429,13 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
   const apiKey = process.env.OMDB_API_KEY;
 
   // Run all fetches in parallel
-  const [omdb, triviaEdges, reviewEdges, imdbRelated, imdbMedia] = await Promise.all([
+  const [omdb, triviaEdges, reviewEdges, imdbRelated, imdbMedia, youtubeTrailerKey] = await Promise.all([
     apiKey ? fetchOmdbData(imdbId, apiKey) : Promise.resolve(undefined),
     fetchImdbTrivia(imdbId),
     fetchImdbReviews(imdbId),
     fetchImdbRelated(imdbId),
     fetchImdbMedia(imdbId),
+    fetchTmdbYoutubeTrailerKey({ imdbId, tmdbId: movie.externalIds.tmdb }),
   ]);
 
   const ratFacts = extractRatFacts(triviaEdges);
@@ -497,6 +499,7 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
       ...(imdbRelated.length > 0 ? { imdbRelated } : {}),
       ...(imdbMedia.videos.length > 0 ? { imdbVideos: imdbMedia.videos } : {}),
       ...(imdbMedia.images.length > 0 ? { imdbImages: imdbMedia.images } : {}),
+      ...(youtubeTrailerKey ? { youtubeTrailerKey } : {}),
     },
   });
 }

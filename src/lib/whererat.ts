@@ -154,6 +154,8 @@ export type Movie = {
     imdbVideos?: ImdbVideo[];
     /** Production stills / photos listed on the IMDb title page (up to 24). */
     imdbImages?: ImdbImage[];
+    /** YouTube video key for the primary official trailer, sourced from TMDB. */
+    youtubeTrailerKey?: string;
   };
   summary: string;
 };

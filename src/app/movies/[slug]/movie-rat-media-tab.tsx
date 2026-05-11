@@ -214,22 +214,76 @@ function ImageCard({
   );
 }
 
+// ── YouTube trailer embed ─────────────────────────────────────────────────────
+
+function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  const thumbUrl = `https://img.youtube.com/vi/${videoKey}/maxresdefault.jpg`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoKey}?autoplay=1&rel=0&modestbranding=1`;
+
+  const cardBase = tabMediaCardClass(palette);
+
+  return (
+    <div className={`${cardBase} overflow-hidden`}>
+      {loaded ? (
+        <div className="relative aspect-video w-full">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <iframe
+            src={embedUrl}
+            title="Movie trailer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full border-0"
+          />
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setLoaded(true)}
+          className="group relative flex aspect-video w-full items-center justify-center overflow-hidden bg-stone-900"
+          aria-label="Play trailer"
+        >
+          {/* Thumbnail */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={thumbUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+          {/* Dark scrim */}
+          <div className="absolute inset-0 bg-black/30 transition-opacity duration-200 group-hover:bg-black/20" />
+          {/* Play button */}
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-[0_4px_24px_rgb(0_0_0/0.6)] transition-transform duration-200 group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="ml-1 size-8">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+          <span className="absolute bottom-3 left-3 rounded bg-black/70 px-2 py-0.5 text-xs font-bold text-white">
+            Official Trailer
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ── Main tab component ────────────────────────────────────────────────────────
 
 type Props = {
   videos: ImdbVideo[];
   images: ImdbImage[];
   imdbId: string;
+  youtubeTrailerKey?: string;
   palette: boolean;
 };
 
-export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
+export function MovieRatMediaTab({ videos, images, imdbId, youtubeTrailerKey, palette }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const headerBorder = tabHeaderBorderClass(palette);
   const sectionTitle = "wr-display mb-4 text-xl font-bold tracking-tight text-stone-950 dark:text-stone-50";
   const divider = `my-8 border-t ${headerBorder}`;
-  const hasContent = videos.length > 0 || images.length > 0;
+  const hasContent = youtubeTrailerKey || videos.length > 0 || images.length > 0;
 
   return (
     <div>
@@ -238,7 +292,7 @@ export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
       ) : null}
 
       <header className={`mb-6 border-b pb-4 ${headerBorder}`}>
-        <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-h-12 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
             Media
           </h2>
@@ -261,6 +315,18 @@ export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
         </div>
       ) : (
         <div>
+          {/* YouTube trailer — shown inline when available */}
+          {youtubeTrailerKey ? (
+            <section className={videos.length > 0 || images.length > 0 ? "mb-8" : ""}>
+              <p className={sectionTitle}>Trailer</p>
+              <YoutubeTrailerEmbed videoKey={youtubeTrailerKey} palette={palette} />
+            </section>
+          ) : null}
+
+          {youtubeTrailerKey && (videos.length > 0 || images.length > 0) ? (
+            <div className={divider} />
+          ) : null}
+
           {videos.length > 0 ? (
             <section>
               <p className={sectionTitle}>Videos ({videos.length})</p>
