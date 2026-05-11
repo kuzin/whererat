@@ -435,18 +435,7 @@ export default async function MoviePage({
           ) : (
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/75 to-stone-950/25" />
           )}
-          {/* Mini poster — anchored bottom-right inside the hero, hidden on mobile */}
-          <div className="absolute bottom-0 right-6 hidden translate-y-[30%] sm:block lg:right-10">
-            <Image
-              src={movie.posterUrl}
-              alt=""
-              aria-hidden="true"
-              width={120}
-              height={180}
-              className="h-auto w-[88px] rounded-lg object-cover shadow-[0_8px_32px_-4px_rgb(0_0_0/0.55)] lg:w-[108px]"
-            />
-          </div>
-          <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
+<div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
             <div className="flex max-w-3xl flex-col gap-6">
               <div className="flex flex-col gap-2 sm:gap-3">
                 <h1
@@ -671,17 +660,8 @@ export default async function MoviePage({
                     {awards ? (
                       <div>
                         <dt className={sidebarDtClass}>Honors</dt>
-                        <dd className="mt-2">
-                          <span
-                            className={`inline-flex items-start gap-1.5 rounded-lg border px-2.5 py-2 text-xs leading-snug ${
-                              palette
-                                ? "border-[color-mix(in_srgb,var(--movie-accent)_30%,rgb(120_113_108/0.6))] bg-[color-mix(in_srgb,var(--movie-column-wash)_70%,white)] text-stone-700 dark:border-amber-400/25 dark:bg-stone-900/60 dark:text-stone-300"
-                                : "border-amber-600/25 bg-amber-50 text-stone-700 dark:border-amber-500/20 dark:bg-stone-900/60 dark:text-stone-300"
-                            }`}
-                          >
-                            <span aria-hidden className="mt-px shrink-0 text-[0.85em]">🏆</span>
-                            {awards}
-                          </span>
+                        <dd className="mt-1 text-sm italic leading-snug text-stone-600 dark:text-stone-400">
+                          {awards}
                         </dd>
                       </div>
                     ) : null}
