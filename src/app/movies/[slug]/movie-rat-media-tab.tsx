@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import type { ImdbImage, ImdbVideo } from "@/lib/whererat";
-import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
 
 function formatDuration(seconds: number): string {
@@ -272,12 +271,11 @@ function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette:
 type Props = {
   videos: ImdbVideo[];
   images: ImdbImage[];
-  imdbId: string;
   youtubeTrailerKey?: string;
   palette: boolean;
 };
 
-export function MovieRatMediaTab({ videos, images, imdbId, youtubeTrailerKey, palette }: Props) {
+export function MovieRatMediaTab({ videos, images, youtubeTrailerKey, palette }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const headerBorder = tabHeaderBorderClass(palette);
@@ -292,15 +290,9 @@ export function MovieRatMediaTab({ videos, images, imdbId, youtubeTrailerKey, pa
       ) : null}
 
       <header className={`mb-6 border-b pb-4 ${headerBorder}`}>
-        <div className="flex min-h-12 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-            Media
-          </h2>
-          <ImdbLinkButton
-            href={`https://www.imdb.com/title/${imdbId}/mediaindex`}
-            label="Full gallery on IMDb"
-          />
-        </div>
+        <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+          Media
+        </h2>
       </header>
 
       {!hasContent ? (

@@ -16,7 +16,6 @@ import { tabCardClass, tabHeaderBorderClass } from "./movie-tab-classes";
 import { MovieSightingsPagingBar, MovieSightingsSortControl } from "./movie-sightings-toolbar";
 import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
-import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { AccentColorField } from "@/components/accent-color-field";
 import { ResyncButton } from "@/components/resync-button";
 import { EditSightingForm } from "./edit-sighting-form";
@@ -754,20 +753,12 @@ export default async function MoviePage({
           {ratFacts.length > 0 ? (
             <div>
               <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                      Rat Facts
-                    </h2>
-                    <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                      {ratFacts.length} {ratFacts.length === 1 ? "trivia entry" : "trivia entries"} mentioning rats · sourced from IMDb
-                    </p>
-                  </div>
-                  <ImdbLinkButton
-                    href={`https://www.imdb.com/title/${movie.externalIds.imdb}/trivia/`}
-                    label="All trivia on IMDb"
-                  />
-                </div>
+                <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+                  Rat Facts
+                </h2>
+                <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+                  {ratFacts.length} {ratFacts.length === 1 ? "trivia entry" : "trivia entries"} mentioning rats · sourced from IMDb
+                </p>
               </header>
               <div className="space-y-3">
                 {ratFacts.map((fact, i) => (
@@ -785,7 +776,6 @@ export default async function MoviePage({
           {/* Panel 2 — Reviews */}
           <MovieRatviewsTab
             reviews={imdbReviews}
-            imdbId={movie.externalIds.imdb}
             palette={Boolean(palette)}
           />
 
@@ -794,14 +784,12 @@ export default async function MoviePage({
             videos={imdbVideos}
             images={imdbImages}
             youtubeTrailerKey={youtubeTrailerKey}
-            imdbId={movie.externalIds.imdb}
             palette={Boolean(palette)}
           />
 
           {/* Panel 4 — Related */}
           <MovieRatlatedTab
             titles={imdbRelated}
-            imdbId={movie.externalIds.imdb}
             palette={Boolean(palette)}
           />
         </MovieTabsShell>

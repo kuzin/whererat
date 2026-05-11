@@ -133,7 +133,7 @@ summary {
   background: var(--background);
 }
 
-.wr-shell > * {
+.wr-shell > :not(header) {
   position: relative;
 }
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import type { ImdbReview } from "@/lib/whererat";
-import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { tabCardClass, tabCardColors, tabHeaderBorderClass } from "./movie-tab-classes";
 
 type SortKey = "latest" | "lowest" | "highest";
@@ -54,7 +53,6 @@ function ReviewDate({ date }: { date: string }) {
 
 type Props = {
   reviews: ImdbReview[];
-  imdbId: string;
   palette: boolean;
 };
 
@@ -85,7 +83,7 @@ function sortReviews(reviews: ImdbReview[], sort: SortKey): ImdbReview[] {
   });
 }
 
-export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
+export function MovieRatviewsTab({ reviews, palette }: Props) {
   const [sort, setSort] = useState<SortKey>("latest");
   const [onlyRats, setOnlyRats] = useState(false);
   const [listFlash, setListFlash] = useState(false);
@@ -116,14 +114,13 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
   return (
     <div>
       <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(palette)}`}>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          {/* Title + count summary */}
-          <div>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
             <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
               Reviews
             </h2>
             {reviews.length > 0 ? (
-              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+              <p className="text-xs text-stone-500 dark:text-stone-400">
                 {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
                 {ratCount > 0 ? (
                   <> · <span className="text-amber-600 dark:text-amber-400 font-semibold">{ratCount} mention rats 🐀</span></>
@@ -184,10 +181,6 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
               </select>
             </label>
 
-            <ImdbLinkButton
-              href={`https://www.imdb.com/title/${imdbId}/reviews/`}
-              label="All reviews on IMDb"
-            />
           </div>
         </div>
       </header>
