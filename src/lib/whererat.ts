@@ -110,6 +110,8 @@ export type Movie = {
     lastSyncedAt: string;
     /** Last banner URL resolved during sync (used as stable default hero source). */
     syncedHeaderBannerUrl?: string;
+    /** Single accent color override — palette is auto-derived from this. */
+    overrideAccent?: string;
     /** Optional manual page color overrides used by the movie page. */
     pagePalette?: {
       wash: string;

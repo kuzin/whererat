@@ -128,112 +128,73 @@ export default async function RootLayout({
             <SiteMasthead session={session} />
             <div className="relative flex min-h-0 flex-1 flex-col">
               <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-              <footer className="relative z-0 mt-0 border-t-2 border-[var(--wr-footer-rule)] bg-[var(--wr-footer-bg)] text-[var(--wr-footer-fg)] transition-colors duration-150">
-                <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-center text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-left lg:px-8">
-                  <div className="py-1 sm:py-2">
-                    <div className="mb-3 flex flex-wrap items-center justify-center gap-2.5 sm:justify-start">
-                      <a
-                        href="https://www.linkedin.com/in/mikekuzin"
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="LinkedIn"
-                        title="LinkedIn"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/35 bg-white/10 text-xs font-bold text-amber-50 transition hover:bg-white/15"
-                      >
-                        in
-                      </a>
-                      <a
-                        href="https://x.com/kuzin"
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="X"
-                        title="X"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/35 bg-white/10 text-sm font-bold text-amber-50 transition hover:bg-white/15"
-                      >
-                        X
-                      </a>
-                      <a
-                        href="https://instagram.com/kuzin"
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="Instagram"
-                        title="Instagram"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/35 bg-white/10 text-[0.62rem] font-bold text-amber-50 transition hover:bg-white/15"
-                      >
-                        IG
-                      </a>
-                      <a
-                        href="https://dribbble.com/kuzin"
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="Dribbble"
-                        title="Dribbble"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/35 bg-white/10 text-[0.6rem] font-bold text-amber-50 transition hover:bg-white/15"
-                      >
-                        DB
-                      </a>
-                      <a
-                        href="https://github.com/kuzin"
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label="GitHub"
-                        title="GitHub"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/35 bg-white/10 text-[0.6rem] font-bold text-amber-50 transition hover:bg-white/15"
-                      >
-                        GH
-                      </a>
+              <footer className="relative z-0 border-t-2 border-[var(--wr-footer-rule)] bg-[var(--wr-footer-bg)] text-[var(--wr-footer-fg)] transition-colors duration-150">
+                <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                  <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+
+                    {/* Brand + social */}
+                    <div className="flex flex-col gap-5">
+                      <div>
+                        <p className="text-lg font-bold tracking-tight text-amber-50">WhereRat</p>
+                        <p className="mt-0.5 text-sm text-amber-100/50">An obsessive guide to 🐀 on film.</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { label: "LinkedIn", short: "in", href: "https://www.linkedin.com/in/mikekuzin" },
+                          { label: "X", short: "X", href: "https://x.com/kuzin" },
+                          { label: "Instagram", short: "IG", href: "https://instagram.com/kuzin" },
+                          { label: "Dribbble", short: "DB", href: "https://dribbble.com/kuzin" },
+                          { label: "GitHub", short: "GH", href: "https://github.com/kuzin" },
+                        ].map(({ label, short, href }) => (
+                          <a
+                            key={label}
+                            href={href}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={label}
+                            title={label}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/20 bg-white/8 text-[0.65rem] font-bold text-amber-100/70 transition hover:border-amber-100/40 hover:bg-white/14 hover:text-amber-50"
+                          >
+                            {short}
+                          </a>
+                        ))}
+                      </div>
+                      <p className="text-xs text-amber-100/40">
+                        © 2026{" "}
+                        <a href="https://kuzn.me" target="_blank" rel="noreferrer" className="underline decoration-amber-100/25 underline-offset-2 hover:decoration-amber-100/60">
+                          kuz
+                        </a>
+                        {" "}· For Kaitlyn. ❤️
+                      </p>
                     </div>
-                    <p className="max-w-xl leading-relaxed text-amber-100/95">
-                      © 2026. Design by{" "}
-                      <a
-                        href="https://kuzn.me"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-semibold underline decoration-amber-100/45 underline-offset-2 hover:decoration-amber-100"
-                      >
-                        kuz
-                      </a>
-                      .
-                    </p>
-                    <p className="mt-1 max-w-xl leading-relaxed text-amber-100/95">All rights reserved.</p>
-                    <p className="mt-3 text-sm italic text-amber-100/55">For Kaitlyn. ❤️</p>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
-                    <Link
-                      className="inline-flex w-fit items-center rounded-lg border-2 border-amber-200/35 bg-white/10 px-4 py-2 text-sm font-bold text-amber-50 outline-none ring-offset-2 transition hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-amber-300 dark:border-white/25 dark:bg-white/10 dark:text-amber-100 dark:ring-offset-stone-900 dark:hover:bg-white/15"
-                      href="/about"
-                    >
-                      About
-                    </Link>
-                    <Link
-                      className="inline-flex w-fit items-center rounded-lg border-2 border-amber-200/35 bg-white/10 px-4 py-2 text-sm font-bold text-amber-50 outline-none ring-offset-2 transition hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-amber-300 dark:border-white/25 dark:bg-white/10 dark:text-amber-100 dark:ring-offset-stone-900 dark:hover:bg-white/15"
-                      href="/guidelines"
-                    >
-                      Guidelines
-                    </Link>
-                    <Link
-                      className="inline-flex w-fit items-center rounded-lg border-2 border-amber-200/35 bg-white/10 px-4 py-2 text-sm font-bold text-amber-50 outline-none ring-offset-2 transition hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-amber-300 dark:border-white/25 dark:bg-white/10 dark:text-amber-100 dark:ring-offset-stone-900 dark:hover:bg-white/15"
-                      href="/privacy"
-                    >
-                      Privacy
-                    </Link>
-                    {session ? (
-                      <form action={logoutModerator}>
-                        <button
-                          type="submit"
-                          className="inline-flex w-fit items-center rounded-lg border-2 border-red-300/45 bg-red-500/20 px-4 py-2 text-sm font-bold text-red-50 outline-none ring-offset-2 transition hover:bg-red-500/28 focus-visible:ring-2 focus-visible:ring-red-300 dark:border-red-300/45 dark:bg-red-700/30 dark:text-red-100 dark:ring-offset-stone-900 dark:hover:bg-red-700/38"
+
+                    {/* Nav */}
+                    <nav className="flex flex-col gap-2 sm:items-end" aria-label="Footer navigation">
+                      {[
+                        { label: "About", href: "/about" },
+                        { label: "Guidelines", href: "/guidelines" },
+                        { label: "Privacy", href: "/privacy" },
+                      ].map(({ label, href }) => (
+                        <Link
+                          key={label}
+                          href={href}
+                          className="text-sm font-semibold text-amber-100/60 transition hover:text-amber-50"
                         >
-                          Log out
-                        </button>
-                      </form>
-                    ) : (
-                      <Link
-                        className="inline-flex w-fit items-center rounded-lg border-2 border-amber-200/35 bg-white/10 px-4 py-2 text-sm font-bold text-amber-50 outline-none ring-offset-2 transition hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-amber-300 dark:border-white/25 dark:bg-white/10 dark:text-amber-100 dark:ring-offset-stone-900 dark:hover:bg-white/15"
-                        href="/login"
-                      >
-                        Login
-                      </Link>
-                    )}
+                          {label}
+                        </Link>
+                      ))}
+                      {session ? (
+                        <form action={logoutModerator}>
+                          <button type="submit" className="text-sm font-semibold text-red-300/60 transition hover:text-red-200">
+                            Log out
+                          </button>
+                        </form>
+                      ) : (
+                        <Link href="/login" className="text-sm font-semibold text-amber-100/60 transition hover:text-amber-50">
+                          Login
+                        </Link>
+                      )}
+                    </nav>
                   </div>
                 </div>
               </footer>

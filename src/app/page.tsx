@@ -11,7 +11,14 @@ import {
   getCatalogStatsWithCommunity,
 } from "@/lib/movie-catalog";
 import { getMergedSightingsForMovie } from "@/lib/moderation-store";
-import { CatalogFilters, CatalogPagination, type CatalogSortOption } from "./catalog-filters";
+import {
+  CatalogFilters,
+  CatalogPagination,
+  CatalogPendingProvider,
+  CatalogResultsWrapper,
+  type CatalogSortOption,
+  type CatalogView,
+} from "./catalog-filters";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -77,6 +84,7 @@ export default async function Home({
   const query = single(params.q) ?? "";
   const genre = single(params.genre) ?? "all";
   const sort = parseCatalogSort(single(params.sort));
+  const view: CatalogView = single(params.view) === "card" ? "card" : "list";
   const rawPage = parseInt(single(params.page) ?? "1", 10);
   const currentPage = Number.isFinite(rawPage) && rawPage >= 1 ? rawPage : 1;
   const deletedMovieIds = await getDeletedMovieIds();
@@ -159,79 +167,115 @@ export default async function Home({
         className="mx-auto max-w-7xl px-4 pt-0 pb-20 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
       >
         <div className="wr-card bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
+          <CatalogPendingProvider>
           <CatalogFilters
             availableGenres={availableGenres}
             defaultQuery={query}
             defaultGenre={genre}
             defaultSort={sort}
+            defaultView={view}
+            totalResults={totalResults}
+            totalCatalog={catalogMovies.length}
           />
 
+          <CatalogResultsWrapper>
           {totalResults > 0 ? (
-            <div className="mt-10 grid gap-5 lg:grid-cols-2">
-              {results.map((movie) => {
-                const sightingCount = sightingCountByMovie.get(movie.id) ?? 0;
-                const sightings = sightingsByMovie.get(movie.id) ?? [];
-                const isSeriesTitle = sightings.some((sighting) => sighting.imdbKind === "series");
-                const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
-                const seriesYearRange = readSeriesYearRange(syncSnapshot);
-                const totalSeasons = readSeriesTotalSeasons(syncSnapshot);
-                const totalEpisodes = readSeriesTotalEpisodes(syncSnapshot);
-                const seriesMetaLine = [
-                  seriesYearRange ?? String(movie.releaseYear),
-                  totalSeasons
-                    ? `${totalSeasons} ${totalSeasons === 1 ? "season" : "seasons"}`
-                    : undefined,
-                  totalEpisodes
-                    ? `${totalEpisodes} ${totalEpisodes === 1 ? "episode" : "episodes"}`
-                    : undefined,
-                  movie.metadata.rating || undefined,
-                ]
-                  .filter(Boolean)
-                  .join(" · ");
-                const movieMetaLine = `${movie.releaseYear} · ${movie.runtimeMinutes} min · ${movie.metadata.rating}`;
+            view === "card" ? (
+              <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                {results.map((movie) => {
+                  const sightingCount = sightingCountByMovie.get(movie.id) ?? 0;
+                  return (
+                    <Link
+                      key={movie.id}
+                      href={`/movies/${movie.slug}`}
+                      className="group relative overflow-hidden rounded-xl border-2 border-stone-950/90 bg-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] outline-none transition hover:border-stone-950 focus-visible:ring-2 focus-visible:ring-amber-600/35 dark:border-white/14 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40"
+                    >
+                      <div className="relative aspect-[2/3] overflow-hidden">
+                        <Image
+                          src={movie.posterUrl}
+                          alt={movie.posterAlt}
+                          width={280}
+                          height={420}
+                          className="h-full w-full object-cover transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 group-hover:opacity-90"
+                        />
+                        {sightingCount > 0 && (
+                          <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-full bg-orange-600/90 px-2 py-0.5 text-xs font-bold text-white shadow backdrop-blur-[2px] dark:bg-stone-900/80 dark:text-amber-300">
+                            {sightingCount} {sightingCount === 1 ? "sighting" : "sightings"}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="grid gap-5 lg:grid-cols-2">
+                {results.map((movie) => {
+                  const sightingCount = sightingCountByMovie.get(movie.id) ?? 0;
+                  const sightings = sightingsByMovie.get(movie.id) ?? [];
+                  const isSeriesTitle = sightings.some((sighting) => sighting.imdbKind === "series");
+                  const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
+                  const seriesYearRange = readSeriesYearRange(syncSnapshot);
+                  const totalSeasons = readSeriesTotalSeasons(syncSnapshot);
+                  const totalEpisodes = readSeriesTotalEpisodes(syncSnapshot);
+                  const seriesMetaLine = [
+                    seriesYearRange ?? String(movie.releaseYear),
+                    totalSeasons
+                      ? `${totalSeasons} ${totalSeasons === 1 ? "season" : "seasons"}`
+                      : undefined,
+                    totalEpisodes
+                      ? `${totalEpisodes} ${totalEpisodes === 1 ? "episode" : "episodes"}`
+                      : undefined,
+                    movie.metadata.rating || undefined,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ");
+                  const movieMetaLine = `${movie.releaseYear} · ${movie.runtimeMinutes} min · ${movie.metadata.rating}`;
 
-                return (
-                  <Link
-                    key={movie.id}
-                    href={`/movies/${movie.slug}`}
-                    className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
-                  >
-                    <div className="relative min-h-48 overflow-hidden border-b-2 border-stone-950/90 bg-stone-900 sm:min-h-0 sm:border-r-2 sm:border-b-0 dark:border-white/14">
-                      <Image
-                        src={movie.posterUrl}
-                        alt={movie.posterAlt}
-                        width={280}
-                        height={420}
-                        className="h-full min-h-48 w-full scale-[1.04] object-cover transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-95 sm:min-h-full"
-                      />
-                      <span className="pointer-events-none absolute bottom-3 left-3 z-[1] max-w-[calc(100%-1.25rem)] truncate rounded-lg border-2 border-stone-950/90 bg-[color-mix(in_srgb,var(--wr-cheese)_92%,transparent)] px-2 py-0.5 text-left text-[0.65rem] font-bold whitespace-nowrap text-stone-950 tabular-nums shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] backdrop-blur-[1px] sm:bottom-2.5 sm:left-2.5 sm:text-xs dark:border-white/20 dark:bg-[color-mix(in_srgb,var(--wr-cheese)_56%,rgb(41_37_33))] dark:text-stone-50 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.42)]">
-                        {sightingCount} sighting
-                        {sightingCount === 1 ? "" : "s"}
-                      </span>
-                      <div
-                        className={`absolute inset-x-0 bottom-0 h-1.5 ${movie.posterTone}`}
-                      />
-                    </div>
-                    <div className="flex flex-col justify-center gap-3 p-4 sm:p-5">
-                      <div className="min-w-0">
-                        <h3 className="wr-display text-xl font-bold leading-snug tracking-tight text-stone-950 group-hover:text-stone-800 dark:text-stone-50 dark:group-hover:text-amber-50 sm:text-2xl">
-                          {movie.title}
-                        </h3>
-                        <p className="mt-1 text-sm font-semibold text-stone-600 dark:text-stone-400">
-                          {isSeriesTitle ? seriesMetaLine : movieMetaLine}
+                  return (
+                    <Link
+                      key={movie.id}
+                      href={`/movies/${movie.slug}`}
+                      className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
+                    >
+                      <div className="relative h-40 overflow-hidden border-stone-950/90 bg-stone-900 sm:h-auto sm:border-r-2 dark:border-white/14">
+                        <Image
+                          src={movie.posterUrl}
+                          alt={movie.posterAlt}
+                          width={280}
+                          height={420}
+                          className="h-full w-full scale-[1.04] object-cover object-top transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-95 sm:min-h-full sm:object-center"
+                        />
+                        <div className={`absolute inset-x-0 bottom-0 h-1.5 ${movie.posterTone}`} />
+                      </div>
+                      <div className="flex flex-col justify-center gap-3 p-4 sm:p-5">
+                        <div className="min-w-0">
+                          <h3 className="wr-display text-xl font-bold leading-snug tracking-tight text-stone-950 group-hover:text-stone-800 dark:text-stone-50 dark:group-hover:text-amber-50 sm:text-2xl">
+                            {movie.title}
+                          </h3>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <p className="text-sm font-semibold text-stone-600 dark:text-stone-400">
+                              {isSeriesTitle ? seriesMetaLine : movieMetaLine}
+                            </p>
+                            {sightingCount > 0 && (
+                              <span className="inline-flex items-center rounded-full bg-orange-600 px-2 py-0.5 text-xs font-bold text-white dark:bg-stone-700 dark:text-amber-300">
+                                {sightingCount} {sightingCount === 1 ? "sighting" : "sightings"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <p className="line-clamp-2 text-sm leading-relaxed text-stone-700 dark:text-stone-400">
+                          {movie.summary}
+                        </p>
+                        <p className="text-xs font-semibold text-stone-500 dark:text-stone-500">
+                          {movie.genres.join(" · ")}
                         </p>
                       </div>
-                      <p className="line-clamp-2 text-sm leading-relaxed text-stone-700 dark:text-stone-400">
-                        {movie.summary}
-                      </p>
-                      <p className="text-xs font-semibold text-stone-500 dark:text-stone-500">
-                        {movie.genres.join(" · ")}
-                      </p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )
           ) : null}
 
           {totalResults > 0 && (
@@ -264,8 +308,17 @@ export default async function Home({
               ) : null}
             </div>
           ) : null}
+          </CatalogResultsWrapper>
+          </CatalogPendingProvider>
         </div>
       </section>
+      <section aria-hidden className="py-6 text-center select-none">
+        <p className="text-5xl" title="🐀">🐀</p>
+        <p className="mt-3 text-sm font-medium text-stone-400 dark:text-stone-600">
+          {ratsTallied.toLocaleString()} rats catalogued. Still scurrying.
+        </p>
+      </section>
+
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-[var(--background)]"

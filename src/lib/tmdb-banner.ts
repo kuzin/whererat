@@ -41,7 +41,7 @@ async function resolveTmdbMovieId({
   tmdbId?: string;
   imdbId?: string;
   headers: HeadersInit;
-  cache: { next: { revalidate: number } };
+  cache: { next: { revalidate: number } } | { cache: "no-store" };
 }) {
   if (tmdbId?.trim()) return tmdbId.trim();
   const normalizedImdbId = normalizeImdbId(imdbId);
@@ -68,9 +68,11 @@ async function resolveTmdbMovieId({
 export async function getTmdbBackdropUrl({
   tmdbId,
   imdbId,
+  forceRefresh,
 }: {
   tmdbId?: string;
   imdbId?: string;
+  forceRefresh?: boolean;
 }) {
   if (!tmdbId?.trim() && !imdbId?.trim()) return null;
 
@@ -79,7 +81,9 @@ export async function getTmdbBackdropUrl({
     return null;
   }
 
-  const cache = { next: { revalidate: 86400 } } as const;
+  const cache = forceRefresh
+    ? ({ cache: "no-store" } as const)
+    : ({ next: { revalidate: 86400 } } as const);
   const resolvedTmdbId = await resolveTmdbMovieId({
     tmdbId,
     imdbId,

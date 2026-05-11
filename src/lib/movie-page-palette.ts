@@ -49,6 +49,23 @@ function mixToward(
   );
 }
 
+/** Build a full palette from a single accent hex color (e.g. from `overrideAccent`). */
+export function buildPaletteFromAccent(accentHex: string): MoviePagePalette | null {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(accentHex.trim());
+  if (!m) return null;
+  const r = Number.parseInt(m[1], 16);
+  const g = Number.parseInt(m[2], 16);
+  const b = Number.parseInt(m[3], 16);
+  const rgb: [number, number, number] = [r, g, b];
+  const accent = `#${m[1].toLowerCase()}${m[2].toLowerCase()}${m[3].toLowerCase()}`;
+  return {
+    accent,
+    wash: mixToward(rgb, [255, 249, 235], 0.68),
+    columnWash: mixToward(rgb, [255, 253, 246], 0.78),
+    heroBloom: mixToward(rgb, [15, 12, 10], 0.58),
+  };
+}
+
 /** Weighted-ish dominant non-muted color ~32-pixel bucket grid */
 function dominantFromRgb(rgb: Buffer, width: number, height: number) {
   const buckets = new Map<string, { r: number; g: number; b: number; w: number }>();

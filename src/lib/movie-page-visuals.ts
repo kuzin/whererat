@@ -1,6 +1,7 @@
 import { upsizeAmazonPosterUrl } from "@/lib/amazon-poster-url";
 import type { Movie } from "@/lib/whererat";
 import {
+  buildPaletteFromAccent,
   deriveDarkMoviePagePalette,
   extractMoviePagePalette,
   type MoviePagePalette,
@@ -20,11 +21,19 @@ export type MoviePageVisuals = {
   syncedPaletteDark: MoviePagePalette | null;
   usingManualPalette: boolean;
   usingManualPaletteDark: boolean;
+  usingOverrideAccent: boolean;
 };
 
-function parseManualPalette(movie: Movie): MoviePagePalette | null {
+function parseManualPalette(movie: Movie): { palette: MoviePagePalette | null; usingOverrideAccent: boolean } {
+  // Check overrideAccent first
+  const overrideAccent = typeof movie.metadata.overrideAccent === "string" ? movie.metadata.overrideAccent : undefined;
+  if (overrideAccent) {
+    const palette = buildPaletteFromAccent(overrideAccent);
+    if (palette) return { palette, usingOverrideAccent: true };
+  }
+  // Fall back to pagePalette
   const raw = movie.metadata.pagePalette;
-  return parsePaletteObject(raw);
+  return { palette: parsePaletteObject(raw), usingOverrideAccent: false };
 }
 
 function parseManualDarkPalette(movie: Movie): MoviePagePalette | null {
@@ -49,7 +58,7 @@ function parsePaletteObject(raw: unknown): MoviePagePalette | null {
   return { wash, columnWash, accent, heroBloom };
 }
 
-export async function getSyncedMoviePageVisuals(movie: Movie): Promise<{
+export async function getSyncedMoviePageVisuals(movie: Movie, { forceRefresh }: { forceRefresh?: boolean } = {}): Promise<{
   bannerUrl: string;
   bannerIsWidescreen: boolean;
   palette: MoviePagePalette | null;
@@ -59,6 +68,7 @@ export async function getSyncedMoviePageVisuals(movie: Movie): Promise<{
   const tmdbBackdrop = await getTmdbBackdropUrl({
     tmdbId: movie.externalIds.tmdb,
     imdbId: movie.externalIds.imdb,
+    forceRefresh,
   });
   const posterCandidate = enlargedPoster || movie.posterUrl;
   const movieTitlePlaceholder = `https://placehold.co/1200x600/292524/fef3c7/png?text=${encodeURIComponent(movie.title)}`;
@@ -80,12 +90,19 @@ export async function getSyncedMoviePageVisuals(movie: Movie): Promise<{
 
 export async function getMoviePageVisuals(movie: Movie): Promise<MoviePageVisuals> {
   const synced = await getSyncedMoviePageVisuals(movie);
-  const manualPalette = parseManualPalette(movie);
+  const { palette: manualPalette, usingOverrideAccent } = parseManualPalette(movie);
   const manualPaletteDark = parseManualDarkPalette(movie);
 
+  // Use the stored synced banner URL if available, to avoid re-fetching potentially cached wrong TMDB image.
+  const storedBannerUrl = typeof movie.metadata.syncedHeaderBannerUrl === "string" && movie.metadata.syncedHeaderBannerUrl
+    ? movie.metadata.syncedHeaderBannerUrl
+    : null;
+  const bannerUrl = storedBannerUrl ?? synced.bannerUrl;
+  const bannerIsWidescreen = storedBannerUrl ? true : synced.bannerIsWidescreen;
+
   return {
-    bannerUrl: synced.bannerUrl,
-    bannerIsWidescreen: synced.bannerIsWidescreen,
+    bannerUrl,
+    bannerIsWidescreen,
     palette: manualPalette ?? synced.palette,
     paletteDark: manualPaletteDark ?? synced.paletteDark,
     syncedBannerUrl: synced.bannerUrl,
@@ -94,5 +111,6 @@ export async function getMoviePageVisuals(movie: Movie): Promise<MoviePageVisual
     syncedPaletteDark: synced.paletteDark,
     usingManualPalette: Boolean(manualPalette),
     usingManualPaletteDark: Boolean(manualPaletteDark),
+    usingOverrideAccent,
   };
 }

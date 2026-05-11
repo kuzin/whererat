@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type ToastTone = "success" | "error" | "info";
@@ -163,64 +163,16 @@ export function ToastNotifications() {
       // Metadata
       if (searchParams.get("meta") === "1") lines.push("Metadata updated from OMDb");
 
-      // Rat facts / trivia
-      const facts = searchParams.get("facts");
-      const triviaStatus = searchParams.get("trivia");
-      if (facts !== null) {
-        const n = Number(facts);
-        lines.push(n > 0 ? `${n} rat ${n === 1 ? "fact" : "facts"} from IMDb trivia` : "No rat trivia entries found");
-      } else if (triviaStatus === "error") {
-        lines.push("Trivia unavailable (IMDb API error)");
-      }
-
-      // Reviews
-      const reviews = searchParams.get("reviews");
-      if (reviews !== null) {
-        const r = Number(reviews);
-        if (r > 0) {
-          const rr = Number(searchParams.get("ratreviews") ?? 0);
-          lines.push(
-            `${r} ${r === 1 ? "review" : "reviews"} pulled` +
-            (rr > 0 ? ` · ${rr} mention rats 🐀` : "")
-          );
-        } else {
-          lines.push("No reviews found on IMDb");
-        }
-      }
-
-      // Related titles
-      const related = searchParams.get("related");
-      if (related !== null) {
-        const n = Number(related);
-        lines.push(n > 0 ? `${n} related title${n === 1 ? "" : "s"} (Ratlated)` : "No related titles found");
-      }
-
-      // Media
-      const videos = searchParams.get("videos");
-      const images = searchParams.get("images");
-      if (videos !== null || images !== null) {
-        const v = Number(videos ?? 0);
-        const im = Number(images ?? 0);
-        if (v > 0 || im > 0) {
-          const parts: string[] = [];
-          if (v > 0) parts.push(`${v} ${v === 1 ? "video" : "videos"}`);
-          if (im > 0) parts.push(`${im} ${im === 1 ? "photo" : "photos"}`);
-          lines.push(`Media: ${parts.join(", ")}`);
-        } else {
-          lines.push("No media found on IMDb");
-        }
-      }
+      // TMDB banner
       const tmdbBannerStatus = searchParams.get("tmdbbanner");
       let tmdbWarning = false;
       if (tmdbBannerStatus === "ok") {
-        lines.push("TMDB banner synced");
-      } else if (tmdbBannerStatus === "failed") {
+        lines.push("Banner synced from TMDB");
+      } else if (tmdbBannerStatus === "failed" || tmdbBannerStatus === "not-configured") {
         tmdbWarning = true;
-        lines.push("TMDB banner not found. Fallback image will be used.");
-      } else if (tmdbBannerStatus === "not-configured") {
-        tmdbWarning = true;
-        lines.push("TMDB banner lookup not configured. Fallback image will be used.");
+        lines.push("No TMDB banner found — using poster");
       }
+
       return {
         ...base,
         tone: tmdbWarning ? "info" : base.tone,
@@ -231,6 +183,28 @@ export function ToastNotifications() {
     return base;
   }, [toastKey, searchParams]);
 
+  const dismiss = useCallback(() => {
+    setIsVisible(false);
+    const next = new URLSearchParams(searchParams.toString());
+    next.delete("toast");
+    next.delete("status");
+    next.delete("error");
+    next.delete("facts");
+    next.delete("trivia");
+    next.delete("meta");
+    next.delete("reviews");
+    next.delete("ratreviews");
+    next.delete("related");
+    next.delete("videos");
+    next.delete("images");
+    next.delete("synced");
+    next.delete("errors");
+    next.delete("tmdbbanner");
+    next.delete("changed");
+    const query = next.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [searchParams, router, pathname]);
+
   useEffect(() => {
     if (!toast) {
       setIsVisible(false);
@@ -239,29 +213,10 @@ export function ToastNotifications() {
 
     setIsVisible(true);
 
-    const timeout = window.setTimeout(() => {
-      setIsVisible(false);
-      const next = new URLSearchParams(searchParams.toString());
-      next.delete("toast");
-      next.delete("status");
-      next.delete("error");
-      next.delete("facts");
-      next.delete("trivia");
-      next.delete("meta");
-      next.delete("reviews");
-      next.delete("ratreviews");
-      next.delete("related");
-      next.delete("videos");
-      next.delete("images");
-      next.delete("synced");
-      next.delete("errors");
-      next.delete("tmdbbanner");
-      const query = next.toString();
-      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-    }, 4500);
+    const timeout = window.setTimeout(dismiss, 5500);
 
     return () => window.clearTimeout(timeout);
-  }, [toast, pathname, router, searchParams]);
+  }, [toast, dismiss]);
 
   if (!toast || !isVisible) {
     return null;
@@ -283,28 +238,7 @@ export function ToastNotifications() {
           </div>
           <button
             type="button"
-            onClick={() => {
-              setIsVisible(false);
-              const next = new URLSearchParams(searchParams.toString());
-              next.delete("toast");
-              next.delete("status");
-              next.delete("error");
-              next.delete("facts");
-              next.delete("trivia");
-              next.delete("meta");
-              next.delete("reviews");
-              next.delete("ratreviews");
-              next.delete("related");
-              next.delete("videos");
-              next.delete("images");
-              next.delete("synced");
-              next.delete("errors");
-              next.delete("tmdbbanner");
-              const query = next.toString();
-              router.replace(query ? `${pathname}?${query}` : pathname, {
-                scroll: false,
-              });
-            }}
+            onClick={dismiss}
             className="mt-0.5 shrink-0 text-stone-400 transition-colors hover:text-stone-700 dark:text-stone-500 dark:hover:text-stone-200"
             aria-label="Dismiss notification"
           >
