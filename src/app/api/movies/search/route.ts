@@ -89,16 +89,28 @@ function searchSeedCatalog(
   catalogMovies: Movie[],
 ): MovieSearchResult[] {
   const normalizedQuery = normalizeSearchTerm(query);
+  const queryTokens = normalizedQuery.split(" ").filter(Boolean);
 
-  return catalogMovies
+  const scored = catalogMovies
     .filter((movie) => !deletedMovieIds.has(movie.id))
-    .filter((movie) => {
-      const label = `${movie.title} ${movie.releaseYear} ${movie.externalIds.imdb}`;
-      const normalizedLabel = normalizeSearchTerm(label);
-      return normalizedLabel.includes(normalizedQuery);
-    })
-    .slice(0, 8)
     .map((movie) => {
+      const score = scoreTitleByQuery(movie.title, query);
+      // Also match on IMDb ID
+      const imdbMatch = movie.externalIds.imdb.toLowerCase().includes(normalizedQuery) ? 10 : 0;
+      return { movie, score: score + imdbMatch };
+    })
+    .filter(({ score, movie }) => {
+      if (score > 0) return true;
+      // Fallback: any query token appears anywhere in title/year/imdbId
+      const label = normalizeSearchTerm(
+        `${movie.title} ${movie.releaseYear} ${movie.externalIds.imdb}`,
+      );
+      return queryTokens.some((t) => label.includes(t));
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8);
+
+  return scored.map(({ movie }) => {
       const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
       const typeRaw =
         typeof syncSnapshot?.Type === "string"
@@ -156,24 +168,30 @@ async function fetchOmdbSearch(query: string, apiKey: string, page = 1) {
   return (await response.json()) as OmdbSearchPayload;
 }
 
-function scoreTitleByQuery(title: string, query: string) {
-  const queryTokens = normalizeSearchTerm(query).split(" ").filter(Boolean);
-  const titleTokens = normalizeSearchTerm(title).split(" ").filter(Boolean);
+function scoreTitleByQuery(title: string, query: string): number {
+  const normalizedTitle = normalizeSearchTerm(title);
+  const normalizedQuery = normalizeSearchTerm(query);
+
+  // Exact match
+  if (normalizedTitle === normalizedQuery) return 100;
+
+  const queryTokens = normalizedQuery.split(" ").filter(Boolean);
+  const titleTokens = normalizedTitle.split(" ").filter(Boolean);
   let score = 0;
 
   for (const queryToken of queryTokens) {
     if (titleTokens.some((token) => token === queryToken)) {
       score += 4;
-      continue;
-    }
-    if (titleTokens.some((token) => token.startsWith(queryToken))) {
+    } else if (titleTokens.some((token) => token.startsWith(queryToken))) {
       score += 3;
-      continue;
-    }
-    if (normalizeSearchTerm(title).includes(queryToken)) {
+    } else if (normalizedTitle.includes(queryToken)) {
       score += 1;
     }
   }
+
+  // Penalise titles with many extra words beyond the query (reduces noise)
+  const extraWords = Math.max(0, titleTokens.length - queryTokens.length);
+  score -= extraWords * 0.5;
 
   return score;
 }
@@ -244,13 +262,7 @@ export async function GET(request: Request) {
     gotNetworkResponse = true;
     searchError = payload.Error ?? searchError;
     if (payload.Response === "True" && payload.Search?.length) {
-      searchItems = payload.Search
-        .slice()
-        .sort(
-          (a, b) =>
-            scoreTitleByQuery(b.Title, normalizedQuery) -
-            scoreTitleByQuery(a.Title, normalizedQuery),
-        );
+      searchItems = payload.Search.slice();
       searchError = undefined;
       break;
     }
@@ -261,6 +273,24 @@ export async function GET(request: Request) {
       { configured: true, error: "Movie search failed.", results: [] },
       { status: 502 },
     );
+  }
+
+  // Boost results that are already in our catalog — they're more relevant to sighting submitters
+  if (searchItems) {
+    const catalogImdbIds = new Set(
+      catalogMovies
+        .filter((m) => !deletedMovieIds.has(m.id))
+        .map((m) => m.externalIds.imdb.toLowerCase()),
+    );
+    searchItems = searchItems
+      .map((item) => ({
+        item,
+        score:
+          scoreTitleByQuery(item.Title, normalizedQuery) +
+          (catalogImdbIds.has(item.imdbID.toLowerCase()) ? 20 : 0),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .map(({ item }) => item);
   }
 
   if (!searchItems) {

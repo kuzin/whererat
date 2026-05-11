@@ -91,6 +91,9 @@ async function fetchOmdbData(
   }
 }
 
+// Cap per-season lookups so a long-running series doesn't make hundreds of OMDb calls
+const MAX_SEASONS_TO_COUNT = 20;
+
 async function fetchOmdbTotalEpisodeCount(params: {
   imdbId: string;
   apiKey: string;
@@ -98,7 +101,7 @@ async function fetchOmdbTotalEpisodeCount(params: {
 }): Promise<number | undefined> {
   const totalSeasons = Number.parseInt(params.totalSeasonsRaw ?? "", 10);
   if (!Number.isFinite(totalSeasons) || totalSeasons < 1) return undefined;
-  const cappedSeasons = Math.min(200, totalSeasons);
+  const cappedSeasons = Math.min(MAX_SEASONS_TO_COUNT, totalSeasons);
   let totalEpisodes = 0;
 
   for (let season = 1; season <= cappedSeasons; season++) {
@@ -504,11 +507,31 @@ export type ResyncAllCatalogMoviesOptions = {
    * still completes with partial progress; omit for a full synchronous run.
    */
   maxDurationMs?: number;
-  /** Rotate iteration order so each shortened run advances through the catalog. */
+  /**
+   * Rotate iteration order so each shortened run advances through the catalog.
+   * Ignored when staleness sorting is active (movies with oldest/missing sync go first).
+   */
   rotationSeed?: number;
+  /**
+   * Number of movies to sync in parallel. Defaults to 1 (sequential).
+   * Keep low (2–3) to stay within OMDb rate limits.
+   */
+  concurrency?: number;
 };
 
-/** Sequentially resync catalog titles from OMDb/IMDb (moderation owner action + cron). */
+function getLastSyncedAt(movie: { metadata: Record<string, unknown> }): number {
+  const raw = movie.metadata.lastSyncedAt;
+  if (typeof raw !== "string") return 0;
+  const ms = Date.parse(raw);
+  return Number.isFinite(ms) ? ms : 0;
+}
+
+/** Sort movies so never-synced titles go first, then oldest-synced first. */
+function sortByStaleFirst(movies: Movie[]): Movie[] {
+  return [...movies].sort((a, b) => getLastSyncedAt(a) - getLastSyncedAt(b));
+}
+
+/** Resync catalog titles from OMDb/IMDb (moderation owner action + cron). */
 export async function resyncAllCatalogMoviesFromImdb(
   opts?: ResyncAllCatalogMoviesOptions,
 ): Promise<{
@@ -519,12 +542,21 @@ export async function resyncAllCatalogMoviesFromImdb(
 }> {
   const movies = await getCatalogMovies();
   const total = movies.length;
-  let order = movies;
-  const seed = opts?.rotationSeed;
-  if (typeof seed === "number" && Number.isFinite(seed) && movies.length > 0) {
-    const rot = ((Math.floor(seed) % movies.length) + movies.length) % movies.length;
-    order = [...movies.slice(rot), ...movies.slice(0, rot)];
+
+  // Stale-first: movies never synced or synced longest ago go first.
+  // Fall back to rotation seed only when all movies have a sync timestamp.
+  let order = sortByStaleFirst(movies);
+  const allHaveSyncedAt = order.every((m) => getLastSyncedAt(m) > 0);
+  if (allHaveSyncedAt) {
+    // All caught up — use rotation seed to vary which stale movies we hit
+    const seed = opts?.rotationSeed;
+    if (typeof seed === "number" && Number.isFinite(seed) && order.length > 0) {
+      const rot = ((Math.floor(seed) % order.length) + order.length) % order.length;
+      order = [...order.slice(rot), ...order.slice(0, rot)];
+    }
   }
+
+  const concurrency = Math.max(1, Math.min(opts?.concurrency ?? 1, 5));
   let synced = 0;
   let errors = 0;
   const deadlineMs = opts?.maxDurationMs;
@@ -534,16 +566,19 @@ export async function resyncAllCatalogMoviesFromImdb(
       : null;
   let truncated = false;
 
-  for (const movie of order) {
+  for (let i = 0; i < order.length; i += concurrency) {
     if (deadline != null && Date.now() >= deadline) {
       truncated = true;
       break;
     }
-    try {
-      await syncMovieFromImdb(movie);
-      synced++;
-    } catch {
-      errors++;
+    const batch = order.slice(i, i + concurrency);
+    const results = await Promise.allSettled(batch.map((movie) => syncMovieFromImdb(movie)));
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        synced++;
+      } else {
+        errors++;
+      }
     }
   }
 
