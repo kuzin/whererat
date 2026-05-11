@@ -2,6 +2,7 @@
 -- Keeps current app concepts but normalizes into relational tables.
 
 create extension if not exists pgcrypto;
+create extension if not exists pg_trgm;
 
 create table if not exists accounts (
   id text primary key,
@@ -37,6 +38,10 @@ create table if not exists movies (
 
 create index if not exists movies_title_idx on movies using gin (to_tsvector('simple', title));
 create index if not exists movies_genres_idx on movies using gin (genres);
+-- Full-text search on title + summary (English stemming for better recall)
+create index if not exists movies_fts_idx on movies using gin (to_tsvector('english', title || ' ' || summary));
+-- Trigram index on title for fuzzy/typo-tolerant matching
+create index if not exists movies_title_trgm_idx on movies using gin (title gin_trgm_ops);
 
 create table if not exists sightings (
   id text primary key,
@@ -62,6 +67,10 @@ create table if not exists sightings (
 
 create index if not exists sightings_movie_id_idx on sightings(movie_id);
 create index if not exists sightings_timestamp_code_idx on sightings(timestamp_code);
+-- Full-text search on sighting title + description for catalog content search
+create index if not exists sightings_fts_idx on sightings using gin (
+  to_tsvector('english', coalesce(title, '') || ' ' || description)
+);
 
 create table if not exists movie_overrides (
   movie_id text primary key references movies(id) on delete cascade,

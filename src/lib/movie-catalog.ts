@@ -82,19 +82,71 @@ export async function getCatalogMovieByImdbId(imdbIdOrUrl: string) {
 }
 
 export async function getCatalogMovieByTitleSearch(title: string) {
-  const normalizedTitle = title.trim().toLowerCase();
-  if (!normalizedTitle) return undefined;
-  const allMovies = await getCatalogMovies();
-  return allMovies.find((movie) => {
-    const movieLabel = `${movie.title} ${movie.releaseYear}`.toLowerCase();
-    return (
-      movie.title.toLowerCase() === normalizedTitle ||
-      movieLabel === normalizedTitle ||
-      movie.title.toLowerCase().includes(normalizedTitle) ||
-      normalizedTitle.includes(movie.title.toLowerCase())
-    );
-  });
+  const results = await searchCatalogMovies({ query: title });
+  return results[0];
 }
+
+// SQL for catalog search with pg_trgm fuzzy matching + sighting content
+const SQL_SEARCH_WITH_TRGM = `
+  SELECT m.id,
+    GREATEST(
+      COALESCE(ts_rank(to_tsvector('english', m.title), plainto_tsquery('english', $1)) * 3.0, 0.0),
+      COALESCE(ts_rank(to_tsvector('english', m.title || ' ' || m.summary), plainto_tsquery('english', $1)), 0.0),
+      CASE WHEN m.title % $1 THEN similarity(m.title, $1) * 2.0 ELSE 0.0 END,
+      COALESCE((
+        SELECT MAX(ts_rank(
+          to_tsvector('english', coalesce(s.title, '') || ' ' || s.description),
+          plainto_tsquery('english', $1)
+        ))
+        FROM sightings s
+        WHERE s.movie_id = m.id AND s.is_deleted = false
+          AND to_tsvector('english', coalesce(s.title, '') || ' ' || s.description)
+              @@ plainto_tsquery('english', $1)
+      ), 0.0)
+    ) AS rank
+  FROM movies m
+  WHERE m.is_deleted = false
+    AND (
+      to_tsvector('english', m.title || ' ' || m.summary) @@ plainto_tsquery('english', $1)
+      OR m.title % $1
+      OR m.imdb_id ilike $1
+      OR EXISTS (
+        SELECT 1 FROM sightings s
+        WHERE s.movie_id = m.id AND s.is_deleted = false
+          AND to_tsvector('english', coalesce(s.title, '') || ' ' || s.description)
+              @@ plainto_tsquery('english', $1)
+      )
+    )`;
+
+// Fallback SQL without pg_trgm (FTS + IMDb ID only)
+const SQL_SEARCH_NO_TRGM = `
+  SELECT m.id,
+    GREATEST(
+      COALESCE(ts_rank(to_tsvector('english', m.title), plainto_tsquery('english', $1)) * 3.0, 0.0),
+      COALESCE(ts_rank(to_tsvector('english', m.title || ' ' || m.summary), plainto_tsquery('english', $1)), 0.0),
+      COALESCE((
+        SELECT MAX(ts_rank(
+          to_tsvector('english', coalesce(s.title, '') || ' ' || s.description),
+          plainto_tsquery('english', $1)
+        ))
+        FROM sightings s
+        WHERE s.movie_id = m.id AND s.is_deleted = false
+          AND to_tsvector('english', coalesce(s.title, '') || ' ' || s.description)
+              @@ plainto_tsquery('english', $1)
+      ), 0.0)
+    ) AS rank
+  FROM movies m
+  WHERE m.is_deleted = false
+    AND (
+      to_tsvector('english', m.title || ' ' || m.summary) @@ plainto_tsquery('english', $1)
+      OR m.imdb_id ilike $1
+      OR EXISTS (
+        SELECT 1 FROM sightings s
+        WHERE s.movie_id = m.id AND s.is_deleted = false
+          AND to_tsvector('english', coalesce(s.title, '') || ' ' || s.description)
+              @@ plainto_tsquery('english', $1)
+      )
+    )`;
 
 export async function searchCatalogMovies({
   query,
@@ -102,18 +154,53 @@ export async function searchCatalogMovies({
 }: {
   query?: string;
   genre?: string;
-}) {
-  const normalizedQuery = query?.trim().toLowerCase();
+}): Promise<Movie[]> {
   const allMovies = await getCatalogMovies();
-  return allMovies.filter((movie) => {
-    const matchesQuery =
-      !normalizedQuery ||
-      movie.title.toLowerCase().includes(normalizedQuery) ||
-      movie.summary.toLowerCase().includes(normalizedQuery) ||
-      movie.externalIds.imdb.toLowerCase().includes(normalizedQuery);
-    const matchesGenre = !genre || genre === "all" || movie.genres.includes(genre);
-    return matchesQuery && matchesGenre;
-  });
+  const normalizedQuery = query?.trim();
+
+  // Apply genre filter on overridden movie data
+  const genreFiltered =
+    !genre || genre === "all" ? allMovies : allMovies.filter((m) => m.genres.includes(genre));
+
+  if (!normalizedQuery) return genreFiltered;
+
+  // Fast path: IMDb ID lookup
+  if (/^tt\d+$/i.test(normalizedQuery)) {
+    return genreFiltered.filter(
+      (m) => m.externalIds.imdb.toLowerCase() === normalizedQuery.toLowerCase(),
+    );
+  }
+
+  const pool = getDbPool();
+  let rows: Array<{ id: string; rank: number }>;
+
+  try {
+    const result = await pool.query<{ id: string; rank: number }>(SQL_SEARCH_WITH_TRGM, [
+      normalizedQuery,
+    ]);
+    rows = result.rows;
+  } catch {
+    // pg_trgm not installed — fall back to FTS-only
+    try {
+      const result = await pool.query<{ id: string; rank: number }>(SQL_SEARCH_NO_TRGM, [
+        normalizedQuery,
+      ]);
+      rows = result.rows;
+    } catch {
+      // SQL search unavailable — fall back to in-memory substring match
+      return genreFiltered.filter(
+        (m) =>
+          m.title.toLowerCase().includes(normalizedQuery.toLowerCase()) ||
+          m.summary.toLowerCase().includes(normalizedQuery.toLowerCase()),
+      );
+    }
+  }
+
+  const rankByMovieId = new Map(rows.map((r) => [r.id, Number(r.rank)]));
+
+  return genreFiltered
+    .filter((m) => rankByMovieId.has(m.id))
+    .sort((a, b) => (rankByMovieId.get(b.id) ?? 0) - (rankByMovieId.get(a.id) ?? 0));
 }
 
 export async function getCatalogGenres() {

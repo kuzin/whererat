@@ -13,13 +13,11 @@
     "imdb:resync": "tsx scripts/imdb-resync-all.ts",
     "db:bootstrap": "npm run seed:postgres:export && npm run db:schema:apply && npm run db:seed",
     "db:clear:content": "tsx scripts/db-clear-content.ts",
-    "media:migrate:uploads-to-s3": "tsx scripts/migrate-local-uploads-to-s3.ts",
-    "store:play:graphics": "tsx scripts/generate-play-store-graphics.ts",
+"store:play:graphics": "tsx scripts/generate-play-store-graphics.ts",
     "store:play:backdrop": "tsx scripts/play-phone-backdrop.ts",
     "store:play:screenshots": "tsx scripts/generate-play-phone-screenshots.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1042.0",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@vercel/blob": "^2.3.3",
     "next": "16.2.4",
