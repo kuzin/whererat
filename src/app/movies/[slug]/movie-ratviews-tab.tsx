@@ -1,8 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { ImdbReview } from "@/lib/whererat";
 import { tabCardClass, tabCardColors, tabHeaderBorderClass } from "./movie-tab-classes";
+
+const RODENT_RE =
+  /\b(rats?|ratty|rat-like|ratcatcher|mice|mouse|rodents?|gerbils?|hamsters?|squirrels?|voles?|beavers?|marmots?|guinea\s+pigs?|murine|vermin)\b/gi;
+
+function highlightRodentWords(text: string): ReactNode {
+  const parts: ReactNode[] = [];
+  let last = 0;
+  RODENT_RE.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = RODENT_RE.exec(text)) !== null) {
+    if (match.index > last) parts.push(text.slice(last, match.index));
+    parts.push(
+      <mark
+        key={match.index}
+        className="rounded-sm bg-amber-200/70 px-0.5 text-amber-950 not-italic dark:bg-amber-500/30 dark:text-amber-200"
+      >
+        {match[0]}
+      </mark>,
+    );
+    last = match.index + match[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length > 0 ? parts : text;
+}
 
 type SortKey = "latest" | "lowest" | "highest";
 
@@ -124,13 +148,13 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
             {ratCount > 0 ? (
               <label className="flex cursor-pointer items-center gap-2 select-none">
                 <span className="whitespace-nowrap text-sm font-bold leading-none text-stone-800 dark:text-stone-200">
-                  Rat filter:
+                  Rodent filter:
                 </span>
                 <button
                   type="button"
                   role="switch"
                   aria-checked={onlyRats}
-                  aria-label="Show only reviews that mention rats"
+                  aria-label="Show only reviews that mention rodents"
                   onClick={() => setOnlyRats((v) => !v)}
                   className={[
                     "relative inline-flex h-9 w-[3.75rem] shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors duration-200",
@@ -256,7 +280,7 @@ function ReviewCard({
       {/* Summary (title of the review) */}
       {review.summary ? (
         <p className="mb-1.5 text-base font-bold leading-snug text-stone-900 dark:text-stone-100">
-          {review.summary}
+          {highlightRodentWords(review.summary)}
         </p>
       ) : null}
 
@@ -270,7 +294,7 @@ function ReviewCard({
               {/* Closed view */}
               <div className="group-open:hidden">
                 <p className="line-clamp-3 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-                  {review.text}
+                  {highlightRodentWords(review.text)}
                 </p>
                 <span className="mt-1 inline-block text-xs font-semibold text-stone-500 dark:text-stone-400">
                   Read more ↓
@@ -279,7 +303,7 @@ function ReviewCard({
               {/* Open view */}
               <div className="hidden group-open:block">
                 <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-                  {review.text}
+                  {highlightRodentWords(review.text)}
                 </p>
                 <span className="mt-1 inline-block text-xs font-semibold text-stone-500 dark:text-stone-400">
                   Show less ↑
@@ -289,7 +313,7 @@ function ReviewCard({
           </details>
         ) : (
           <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-            {review.text}
+            {highlightRodentWords(review.text)}
           </p>
         )
       ) : null}
