@@ -12,7 +12,7 @@ import { SubmitForm } from "./submit-form";
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export const metadata: Metadata = {
-  title: "Submit a Sighting",
+  title: "Submit a Rodent Sighting",
   description:
     "Submit a new rat sighting with movie match, timestamp, spoiler flag, and optional screenshot.",
   alternates: {
@@ -96,14 +96,14 @@ export default async function SubmitPage({
   return (
     <main className="wr-page-shell py-10">
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
+        <aside className="self-start rounded-2xl wr-panel-warm p-8">
           <div className="text-4xl leading-none sm:text-5xl">
             <span aria-hidden>🐀</span>
           </div>
           <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
-            Submit a rat sighting
+            Submit a rodent sighting
           </h1>
-          <p className="mt-5 leading-relaxed text-orange-950">
+          <p className="mt-5 leading-relaxed text-stone-800 dark:text-amber-100/90">
             Pick the movie, mark where it happens, and describe what you saw. Moderators review every
             submission before it goes live.{" "}
             <a

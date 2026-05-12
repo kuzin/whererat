@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { RODENT_TYPE_OPTIONS } from "@/lib/whererat";
 
 export const catalogSortOptions = [
   "latest-added-title",
@@ -15,7 +16,7 @@ export type CatalogView = "list" | "card";
 export const catalogSortLabels: Record<CatalogSortOption, string> = {
   "latest-added-title": "Latest Added Title",
   "latest-sighting": "Latest Sighting",
-  "most-rats-logged": "Most Rats Logged",
+  "most-rats-logged": "Most Rodents Logged",
   "total-sightings": "Total Sightings",
 };
 
@@ -48,8 +49,10 @@ export function CatalogResultsWrapper({ children }: { children: React.ReactNode 
 
 type Props = {
   availableGenres: string[];
+  availableRodentTypes: string[];
   defaultQuery: string;
   defaultGenre: string;
+  defaultRodentType: string;
   defaultSort: CatalogSortOption;
   defaultView: CatalogView;
   totalResults: number;
@@ -58,8 +61,10 @@ type Props = {
 
 export function CatalogFilters({
   availableGenres,
+  availableRodentTypes,
   defaultQuery,
   defaultGenre,
+  defaultRodentType,
   defaultSort,
   defaultView,
   totalResults,
@@ -69,6 +74,7 @@ export function CatalogFilters({
   const { isPending, startTransition } = useContext(PendingContext);
   const [query, setQuery] = useState(defaultQuery);
   const [genre, setGenre] = useState(defaultGenre);
+  const [rodentType, setRodentType] = useState(defaultRodentType);
   const [sort, setSort] = useState<CatalogSortOption>(defaultSort);
   const [view, setView] = useState<CatalogView>(defaultView);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -78,13 +84,15 @@ export function CatalogFilters({
   // would overwrite whatever they're currently typing.
   useEffect(() => { if (!debounceRef.current) setQuery(defaultQuery); }, [defaultQuery]);
   useEffect(() => { setGenre(defaultGenre); }, [defaultGenre]);
+  useEffect(() => { setRodentType(defaultRodentType); }, [defaultRodentType]);
   useEffect(() => { setSort(defaultSort); }, [defaultSort]);
   useEffect(() => { setView(defaultView); }, [defaultView]);
 
-  const navigate = (q: string, g: string, s: CatalogSortOption, v: CatalogView) => {
+  const navigate = (q: string, g: string, r: string, s: CatalogSortOption, v: CatalogView) => {
     const urlParams = new URLSearchParams();
     if (q.trim()) urlParams.set("q", q.trim());
     if (g !== "all") urlParams.set("genre", g);
+    if (r !== "all") urlParams.set("rodent", r);
     if (s !== "latest-added-title") urlParams.set("sort", s);
     if (v !== "list") urlParams.set("view", v);
     const search = urlParams.toString();
@@ -95,34 +103,40 @@ export function CatalogFilters({
   const handleQueryChange = (value: string) => {
     setQuery(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => navigate(value, genre, sort, view), 350);
+    debounceRef.current = setTimeout(() => navigate(value, genre, rodentType, sort, view), 350);
   };
 
   const handleGenreChange = (value: string) => {
     setGenre(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    navigate(query, value, sort, view);
+    navigate(query, value, rodentType, sort, view);
+  };
+
+  const handleRodentTypeChange = (value: string) => {
+    setRodentType(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    navigate(query, genre, value, sort, view);
   };
 
   const handleSortChange = (value: CatalogSortOption) => {
     setSort(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    navigate(query, genre, value, view);
+    navigate(query, genre, rodentType, value, view);
   };
 
   const handleViewChange = (value: CatalogView) => {
     setView(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    navigate(query, genre, sort, value);
+    navigate(query, genre, rodentType, sort, value);
   };
 
-  const hasActiveFilters = genre !== "all" || sort !== "latest-added-title";
+  const hasActiveFilters = genre !== "all" || rodentType !== "all" || sort !== "latest-added-title";
   const countLabel = totalResults === 1 ? "1 movie" : `${totalResults} movies`;
   const countSuffix = totalResults < totalCatalog ? ` of ${totalCatalog} total` : "";
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-[1.4fr_1fr_1fr] md:gap-3">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-3">
         <label className="col-span-2 flex flex-col gap-1 text-sm font-bold text-stone-800 md:col-span-1 md:gap-2 dark:text-stone-300">
           <span className="flex items-center gap-2">
             Search
@@ -146,7 +160,7 @@ export function CatalogFilters({
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 if (debounceRef.current) clearTimeout(debounceRef.current);
-                navigate(query, genre, sort, view);
+                navigate(query, genre, rodentType, sort, view);
               }
             }}
             placeholder="Enter title or IMDb ID…"
@@ -168,6 +182,25 @@ export function CatalogFilters({
                 {item}
               </option>
             ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-bold text-stone-800 md:gap-2 dark:text-stone-300">
+          Rodent
+          <select
+            value={rodentType}
+            onChange={(e) => handleRodentTypeChange(e.target.value)}
+            className="wr-select h-9 md:h-11"
+            disabled={isPending}
+          >
+            <option value="all">All rodents</option>
+            {availableRodentTypes.map((id) => {
+              const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
+              return (
+                <option key={id} value={id}>
+                  {opt ? `${opt.emoji} ${opt.label}` : id}
+                </option>
+              );
+            })}
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm font-bold text-stone-800 md:gap-2 dark:text-stone-300">
@@ -196,6 +229,17 @@ export function CatalogFilters({
               className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
             >
               {genre}
+              <span aria-hidden="true" className="text-stone-400 dark:text-stone-400">×</span>
+            </button>
+          )}
+          {rodentType !== "all" && (
+            <button
+              type="button"
+              onClick={() => handleRodentTypeChange("all")}
+              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+            >
+              {RODENT_TYPE_OPTIONS.find((o) => o.id === rodentType)?.emoji}{" "}
+              {RODENT_TYPE_OPTIONS.find((o) => o.id === rodentType)?.label ?? rodentType}
               <span aria-hidden="true" className="text-stone-400 dark:text-stone-400">×</span>
             </button>
           )}

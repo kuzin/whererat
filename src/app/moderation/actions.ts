@@ -99,6 +99,11 @@ export async function moderateSubmission(formData: FormData) {
     return;
   }
 
+  const contentWarnings = formData.getAll("contentWarnings").map((v) => String(v).trim()).filter(Boolean);
+  const otherWarning = String(formData.get("contentWarningOther") ?? "").trim().slice(0, 200);
+  if (otherWarning) contentWarnings.push(otherWarning);
+  const rodentTypes = formData.getAll("rodentTypes").map((v) => String(v).trim()).filter(Boolean);
+
   const hasEditFields =
     formData.has("sightingTitle") ||
     formData.has("imdbKind") ||
@@ -136,6 +141,8 @@ export async function moderateSubmission(formData: FormData) {
         imageUrl: leadImage?.url,
         imageAlt: leadImage?.alt,
         curatorNote: curatorNote || undefined,
+        contentWarnings: contentWarnings.length ? contentWarnings : undefined,
+        rodentTypes: rodentTypes.length ? rodentTypes : undefined,
       }
     : curatorNote
       ? { curatorNote }

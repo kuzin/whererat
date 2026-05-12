@@ -6,16 +6,20 @@ import type { Metadata } from "next";
 import { ExternalLinkIcon } from "@/components/external-link-icon";
 import {
   formatSubmissionEpisodeContext,
+  formatApproximateRatLine,
+  formatContentWarningLabel,
   formatSightingMomentDisplay,
-  getSightingTimestampPercent,
   getImdbTitleUrl,
   getSubmissionImageRefs,
   getSubmissionSightingTitle,
+  CONTENT_WARNING_OPTIONS,
+  RODENT_TYPE_OPTIONS,
 } from "@/lib/whererat";
-import { SightingImageCarousel } from "@/app/movies/[slug]/sighting-image-carousel";
+import { ModerationEditModal } from "./moderation-edit-modal";
+import { InlineApproveForm } from "./inline-approve-form";
+import { HistorySection } from "./history-section";
+import { SubmissionImageThumbs } from "./submission-image-thumbs";
 import { SightingMarkdown } from "@/components/sighting-markdown";
-import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
-import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import {
   MODERATOR_SESSION_COOKIE,
   parseModeratorSession,
@@ -78,16 +82,6 @@ export default async function ModerationPage({
   );
   const params = searchParams ? await searchParams : {};
   const editingSubmissionId = single(params.edit);
-  const historyTabParam = single(params.historyTab);
-  const historyTab = historyTabParam === "denied" ? "denied" : "approved";
-  const historyPageRaw = Number.parseInt(String(single(params.historyPage) ?? "1"), 10);
-  const requestedHistoryPage =
-    Number.isFinite(historyPageRaw) && historyPageRaw > 0 ? Math.floor(historyPageRaw) : 1;
-  const historyItems = historyTab === "denied" ? deniedSubmissions : approvedSubmissions;
-  const historyPageCount = Math.max(1, Math.ceil(historyItems.length / HISTORY_PAGE_SIZE));
-  const safeHistoryPage = Math.min(requestedHistoryPage, historyPageCount);
-  const historyStart = (safeHistoryPage - 1) * HISTORY_PAGE_SIZE;
-  const historySlice = historyItems.slice(historyStart, historyStart + HISTORY_PAGE_SIZE);
   const pendingPageRaw = Number.parseInt(String(single(params.page) ?? "1"), 10);
   const requestedPendingPage =
     Number.isFinite(pendingPageRaw) && pendingPageRaw > 0 ? Math.floor(pendingPageRaw) : 1;
@@ -97,54 +91,56 @@ export default async function ModerationPage({
   const pendingSlice = pendingSubmissions.slice(pendingStart, pendingStart + HISTORY_PAGE_SIZE);
   const pendingPath = (page: number) =>
     page <= 1 ? "/moderation" : `/moderation?page=${page}`;
+
+  // Build reviewer lookup for all history items (both tabs)
+  const allHistorySubmissions = [...approvedSubmissions, ...deniedSubmissions];
   const historyReviewerBySubmissionId = new Map<string, string>();
-  const relevantHistoryActions =
-    historyTab === "approved"
-      ? new Set(["approved", "edited and approved"])
-      : new Set(["rejected"]);
-  for (const submission of historySlice) {
+  for (const submission of allHistorySubmissions) {
+    const isApproved = submission.status === "approved";
+    const relevantActions = new Set(
+      isApproved ? ["approved", "edited and approved"] : ["rejected"],
+    );
     const latestAction = store.reviewActions
       .filter(
         (action) =>
-          action.submissionId === submission.id &&
-          relevantHistoryActions.has(action.action),
+          action.submissionId === submission.id && relevantActions.has(action.action),
       )
       .sort(
-        (a, b) =>
-          new Date(b.reviewedAt).getTime() - new Date(a.reviewedAt).getTime(),
+        (a, b) => new Date(b.reviewedAt).getTime() - new Date(a.reviewedAt).getTime(),
       )[0];
     if (latestAction?.moderatorName) {
       historyReviewerBySubmissionId.set(submission.id, latestAction.moderatorName);
     }
   }
-  const approvedViewHrefBySubmissionId = new Map<string, string>();
-  if (historyTab === "approved") {
-    const approvedViewEntries = await Promise.all(
-      historySlice.map(async (submission) => {
-        const movie =
-          (submission.imdbId
-            ? await getCatalogMovieByImdbId(submission.imdbId)
-            : undefined) ?? (await getCatalogMovieByTitleSearch(submission.movieTitle));
-        return movie ? ([submission.id, `/movies/${movie.slug}`] as const) : undefined;
-      }),
-    );
-    for (const entry of approvedViewEntries) {
-      if (entry) approvedViewHrefBySubmissionId.set(entry[0], entry[1]);
-    }
-  }
-  const historyPath = (tab: "approved" | "denied", page: number) => {
-    const query = new URLSearchParams();
-    query.set("historyTab", tab);
-    if (page > 1) query.set("historyPage", String(page));
-    return `/moderation?${query.toString()}`;
-  };
+
+  // Build view hrefs for all approved submissions
+  const approvedViewEntries = await Promise.all(
+    approvedSubmissions.map(async (submission) => {
+      const movie =
+        (submission.imdbId
+          ? await getCatalogMovieByImdbId(submission.imdbId)
+          : undefined) ?? (await getCatalogMovieByTitleSearch(submission.movieTitle));
+      return movie ? ([submission.id, `/movies/${movie.slug}`] as const) : undefined;
+    }),
+  );
+  const approvedViewHrefBySubmissionId = new Map<string, string>(
+    approvedViewEntries.filter((e) => e !== undefined) as Array<readonly [string, string]>,
+  );
+
+  const approvedItems = approvedSubmissions.map((submission) => ({
+    submission,
+    reviewerName: historyReviewerBySubmissionId.get(submission.id),
+    viewHref: approvedViewHrefBySubmissionId.get(submission.id),
+  }));
+  const deniedItems = deniedSubmissions.map((submission) => ({
+    submission,
+    reviewerName: historyReviewerBySubmissionId.get(submission.id),
+  }));
+
   const editingSubmission =
     editingSubmissionId
       ? store.submissions.find((submission) => submission.id === editingSubmissionId)
       : undefined;
-  const editingAttachmentSlides = editingSubmission
-    ? getSubmissionImageRefs(editingSubmission)
-    : [];
   const pendingMovieEntries = await Promise.all(
     pendingSlice.map(async (submission) => {
       const movie =
@@ -227,14 +223,14 @@ export default async function ModerationPage({
 
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="contents lg:block lg:space-y-6">
-          <div className="order-1 self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
+          <div className="order-1 self-start rounded-2xl wr-panel-warm p-8">
             <div className="text-4xl leading-none sm:text-5xl">
               <span aria-hidden>🔍</span>
             </div>
             <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
               Moderation queue
             </h1>
-            <p className="mt-5 leading-relaxed text-orange-950">
+            <p className="mt-5 leading-relaxed text-stone-800 dark:text-amber-100/90">
               Triage sightings with approve, tighten-up edits, or gentle rejections
               that explain why Netflix might not need another duplicate starting time.
             </p>
@@ -397,7 +393,15 @@ export default async function ModerationPage({
                               {catalogMovie.metadata.imdbRating ? <span>★ {catalogMovie.metadata.imdbRating}</span> : null}
                             </p>
                           </div>
-                        ) : (
+                        ) : null}
+                        {/* ── Duplicate warning ── */}
+                        {catalogMovie ? (
+                          <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-amber-600/40 bg-amber-50 px-2.5 py-2 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200">
+                            <span aria-hidden className="mt-px shrink-0">⚠️</span>
+                            <span>Already in catalog — verify this isn&apos;t a duplicate sighting before approving.</span>
+                          </div>
+                        ) : null}
+                        {!catalogMovie ? (
                           <div className="mt-1 text-sm text-stone-600 dark:text-stone-400">
                             {submission.imdbId ? (
                               <a href={getImdbTitleUrl(submission.imdbId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200">
@@ -408,7 +412,7 @@ export default async function ModerationPage({
                               <span className="opacity-50">No IMDb match</span>
                             )}
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     </div>
 
@@ -426,8 +430,10 @@ export default async function ModerationPage({
                         Point in {isSeriesSubmission ? "episode" : "film"}
                       </dt>
                       <dd className="text-stone-700 dark:text-stone-200">{startingPretty.replace(" into movie", "")}</dd>
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">Approx. rats</dt>
-                      <dd className="text-stone-700 dark:text-stone-200">~{submission.approximateRatCount} {submission.approximateRatCount === 1 ? "rat" : "rats"}</dd>
+                      <dt className="font-bold text-stone-600 dark:text-stone-400">Count</dt>
+                      <dd className="text-stone-700 dark:text-stone-200">
+                        ~{formatApproximateRatLine(submission.approximateRatCount, submission.rodentTypes)}
+                      </dd>
                       {submission.imdbId ? (
                         <>
                           <dt className="font-bold text-stone-600 dark:text-stone-400">IMDb</dt>
@@ -437,12 +443,6 @@ export default async function ModerationPage({
                               <ExternalLinkIcon className="size-3 opacity-60" />
                             </a>
                           </dd>
-                        </>
-                      ) : null}
-                      {submission.spoiler ? (
-                        <>
-                          <dt className="font-bold text-stone-600 dark:text-stone-400">Spoiler</dt>
-                          <dd className="font-semibold text-red-700 dark:text-red-400">Yes</dd>
                         </>
                       ) : null}
                       <dt className="font-bold text-stone-600 dark:text-stone-400">Submitted by</dt>
@@ -463,6 +463,39 @@ export default async function ModerationPage({
                       <dt className="font-bold text-stone-600 dark:text-stone-400">Title</dt>
                       <dd className="text-stone-700 dark:text-stone-200">{sightingTitle}</dd>
                     </dl>
+                    {/* Tags row — rodent types, spoiler, content warnings */}
+                    {(() => {
+                      const rodentTypes = submission.rodentTypes ?? [];
+                      const warnings = submission.contentWarnings ?? [];
+                      if (!submission.spoiler && rodentTypes.length === 0 && warnings.length === 0) return null;
+                      return (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {rodentTypes.filter((id) => id !== "rat").map((id) => {
+                            const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
+                            return (
+                              <span key={id} className="inline-flex items-center gap-1 rounded-md border border-amber-800/20 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-900 dark:border-amber-400/25 dark:bg-amber-950/35 dark:text-amber-200">
+                                <span aria-hidden>{opt?.emoji ?? "🐾"}</span>
+                                {opt?.label ?? id}
+                              </span>
+                            );
+                          })}
+                          {submission.spoiler ? (
+                            <span className="inline-flex items-center rounded-md border border-red-800/25 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-900 dark:border-red-400/30 dark:bg-red-950/35 dark:text-red-200">
+                              Spoiler
+                            </span>
+                          ) : null}
+                          {warnings.map((id) => {
+                            const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
+                            return (
+                              <span key={id} className="inline-flex items-center gap-1 rounded-md border border-yellow-800/20 bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/35 dark:text-yellow-200">
+                                <span aria-hidden>{opt?.emoji ?? "⚠️"}</span>
+                                {formatContentWarningLabel(id, submission.rodentTypes)}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                     <div className="mt-3 border-t border-stone-950/8 pt-3 dark:border-white/8">
                       <p className="mb-1.5 text-sm font-bold text-stone-600 dark:text-stone-400">Description</p>
                       <SightingMarkdown markdown={submission.description} />
@@ -470,47 +503,16 @@ export default async function ModerationPage({
                 </div>
 
                 {attachmentSlides.length > 0 ? (
-                  <div className="mt-5 overflow-hidden rounded-2xl border border-stone-900/15 bg-stone-900/15 dark:border-white/14 dark:bg-stone-950/40">
-                    <SightingImageCarousel slides={attachmentSlides} />
-                    <p className="p-3 text-xs font-bold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400">
-                      Attached sighting image{attachmentSlides.length > 1 ? "s" : ""}{" "}
-                      ({attachmentSlides.length})
-                    </p>
+                  <div className="mt-4 overflow-hidden rounded-xl border border-stone-900/15 bg-stone-50 dark:border-white/12 dark:bg-stone-900/50">
+                    <SubmissionImageThumbs slides={attachmentSlides} />
                   </div>
                 ) : null}
 
-                <div className="mt-5 grid gap-3">
-                  <form action={moderateSubmission} className="grid gap-3">
-                    <input name="submissionId" type="hidden" value={submission.id} />
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Curator message
-                      <textarea
-                        name="curatorNote"
-                        rows={3}
-                        defaultValue={submission.curatorNote ?? ""}
-                        placeholder="Optional note shown with the published sighting."
-                        className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
-                      />
-                    </label>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <button
-                        type="submit"
-                        name="decision"
-                        value="approved"
-                        className="wr-btn w-full bg-green-700 text-white hover:bg-green-800 dark:bg-green-600 dark:hover:bg-green-500"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        type="submit"
-                        name="decision"
-                        value="rejected"
-                        className="wr-btn w-full bg-red-700 text-white hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-500"
-                      >
-                        Deny
-                      </button>
-                    </div>
-                  </form>
+                <div className="mt-5">
+                  <InlineApproveForm
+                    submissionId={submission.id}
+                    moderateAction={moderateSubmission}
+                  />
                 </div>
                 </div>
               </article>
@@ -540,283 +542,20 @@ export default async function ModerationPage({
             </div>
           ) : null}
 
-          <div className="mt-10 border-t border-stone-900/15 pt-8 dark:border-white/12">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-2xl font-black tracking-tight text-stone-950 dark:text-stone-100">
-                  {historyTab === "approved" ? "Approved sightings" : "Denied sightings"}
-                </h2>
-              </div>
-              <div className="inline-flex rounded-xl border border-stone-900/18 bg-white p-1 dark:border-white/12 dark:bg-stone-900/70">
-                <Link
-                  href={historyPath("approved", 1)}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-bold ${
-                    historyTab === "approved"
-                      ? "bg-stone-950 text-amber-100"
-                      : "text-stone-700 dark:text-stone-200"
-                  }`}
-                >
-                  Approved ({approvedSubmissions.length})
-                </Link>
-                <Link
-                  href={historyPath("denied", 1)}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-bold ${
-                    historyTab === "denied"
-                      ? "bg-stone-950 text-amber-100"
-                      : "text-stone-700 dark:text-stone-200"
-                  }`}
-                >
-                  Denied ({deniedSubmissions.length})
-                </Link>
-              </div>
-            </div>
-
-            {historySlice.length === 0 ? (
-              <div className="mt-5 rounded-2xl border border-dashed border-stone-500/75 bg-stone-100/90 p-8 text-center dark:border-white/20 dark:bg-stone-900/40">
-                <p className="text-sm text-stone-700 dark:text-stone-300">
-                  No {historyTab} sightings yet.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-5 space-y-3">
-                {historySlice.map((submission) => (
-                  <article
-                    key={submission.id}
-                    className="rounded-xl border border-stone-900/25 bg-stone-50 p-4 dark:border-white/12 dark:bg-stone-900/70"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
-                        <p className="text-lg font-black text-stone-950 dark:text-stone-100">
-                          {getSubmissionSightingTitle(submission)}
-                        </p>
-                        <p className="text-sm text-stone-600 dark:text-stone-300">
-                          {submission.movieTitle}
-                          {submission.movieYear ? ` (${submission.movieYear})` : ""}
-                          {formatSubmissionEpisodeContext(submission)
-                            ? ` · ${formatSubmissionEpisodeContext(submission)}`
-                            : ""}
-                        </p>
-                      </div>
-                      <p
-                        className={`rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-[0.14em] ${
-                          historyTab === "approved"
-                            ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/45 dark:text-emerald-100"
-                            : "bg-red-100 text-red-900 dark:bg-red-900/45 dark:text-red-100"
-                        }`}
-                      >
-                        {submission.status}
-                      </p>
-                    </div>
-                    <div className="mt-2 text-sm text-stone-700 dark:text-stone-300">
-                      <SightingMarkdown markdown={submission.description} />
-                    </div>
-                    <div className="mt-4 border-t border-stone-900/10 pt-3 dark:border-white/10">
-                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
-                        {historyTab === "approved" ? "Approved" : "Denied"} by{" "}
-                        {historyReviewerBySubmissionId.get(submission.id) ?? "Unknown"}
-                      </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      {historyTab === "approved" ? (
-                        approvedViewHrefBySubmissionId.get(submission.id) ? (
-                          <Link
-                            href={approvedViewHrefBySubmissionId.get(submission.id)!}
-                            className="wr-btn-ghost px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em]"
-                          >
-                            View
-                          </Link>
-                        ) : (
-                          <span className="rounded-md border border-stone-400/40 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-stone-500 dark:border-white/18 dark:text-stone-400">
-                            View unavailable
-                          </span>
-                        )
-                      ) : null}
-                      <Link
-                        href={`/moderation?edit=${submission.id}`}
-                        className="wr-btn-ghost px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em]"
-                      >
-                        Edit
-                      </Link>
-                      <form action={rereviewSubmission}>
-                        <input type="hidden" name="submissionId" value={submission.id} />
-                        <input
-                          type="hidden"
-                          name="returnTo"
-                          value={historyPath(historyTab, safeHistoryPage)}
-                        />
-                        <button
-                          type="submit"
-                          className="wr-btn-ghost border-emerald-700/35 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 dark:border-emerald-400/30 dark:bg-emerald-950/35 dark:text-emerald-200 dark:hover:bg-emerald-950/45 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em]"
-                        >
-                          Re-review
-                        </button>
-                      </form>
-                      <form action={removeSubmission}>
-                        <input type="hidden" name="submissionId" value={submission.id} />
-                        <input
-                          type="hidden"
-                          name="returnTo"
-                          value={historyPath(historyTab, safeHistoryPage)}
-                        />
-                        <ConfirmSubmitButton
-                          confirmMessage="Delete this submission permanently?"
-                          type="submit"
-                          className="wr-btn-ghost border-red-700/35 bg-red-50 text-red-800 hover:bg-red-100 dark:border-red-400/30 dark:bg-red-950/35 dark:text-red-200 dark:hover:bg-red-950/45 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.12em]"
-                        >
-                          Delete
-                        </ConfirmSubmitButton>
-                      </form>
-                    </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            {historyPageCount > 1 ? (
-              <div className="mt-5 flex items-center justify-between gap-3">
-                <Link
-                  href={historyPath(historyTab, Math.max(1, safeHistoryPage - 1))}
-                  className={`wr-btn ${
-                    safeHistoryPage === 1
-                      ? "pointer-events-none bg-stone-300 text-stone-500 dark:bg-stone-800 dark:text-stone-500"
-                      : "bg-stone-950 text-amber-100"
-                  }`}
-                >
-                  ← Previous
-                </Link>
-                <p className="text-sm font-semibold text-stone-600 dark:text-stone-300">
-                  Page {safeHistoryPage} of {historyPageCount}
-                </p>
-                <Link
-                  href={historyPath(historyTab, Math.min(historyPageCount, safeHistoryPage + 1))}
-                  className={`wr-btn ${
-                    safeHistoryPage === historyPageCount
-                      ? "pointer-events-none bg-stone-300 text-stone-500 dark:bg-stone-800 dark:text-stone-500"
-                      : "bg-stone-950 text-amber-100"
-                  }`}
-                >
-                  Next →
-                </Link>
-              </div>
-            ) : null}
-          </div>
+          <HistorySection
+            approvedItems={approvedItems}
+            deniedItems={deniedItems}
+            rereviewAction={rereviewSubmission}
+            removeAction={removeSubmission}
+          />
         </section>
       </section>
 
       {editingSubmission ? (
-        <div className="fixed inset-0 z-[220] flex items-start justify-center bg-black/55 px-4 py-8 sm:py-12">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
-                  {getSubmissionSightingTitle(editingSubmission)}
-                </h2>
-                <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
-                  {editingSubmission.movieTitle}
-                </p>
-              </div>
-              <Link
-                href="/moderation"
-                className="rounded-lg border border-stone-900/25 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-white/18 dark:text-stone-200 dark:hover:bg-stone-800"
-              >
-                Close
-              </Link>
-            </div>
-
-            <form action={moderateSubmission} className="mt-6 grid gap-4">
-              <input name="submissionId" type="hidden" value={editingSubmission.id} />
-              <input name="imdbKind" type="hidden" value={editingSubmission.imdbKind ?? "movie"} />
-              <input name="seasonNumber" type="hidden" value={editingSubmission.seasonNumber ?? ""} />
-              <input name="episodeNumber" type="hidden" value={editingSubmission.episodeNumber ?? ""} />
-              <input name="episodeTitle" type="hidden" value={editingSubmission.episodeTitle ?? ""} />
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Sighting title
-                <input
-                  name="sightingTitle"
-                  required
-                  defaultValue={getSubmissionSightingTitle(editingSubmission)}
-                  className="wr-input"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. point in {editingSubmission.imdbKind === "series" ? "episode" : "movie"}
-                <input
-                  name="timestamp"
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  defaultValue={getSightingTimestampPercent(editingSubmission.timestamp) ?? 50}
-                  className="accent-amber-700 dark:accent-amber-400"
-                />
-                <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Stored as a percentage into the {editingSubmission.imdbKind === "series" ? "episode" : "movie"}.
-                </p>
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. rats
-                <input
-                  name="approximateRatCount"
-                  type="number"
-                  min={1}
-                  max={999}
-                  required
-                  defaultValue={editingSubmission.approximateRatCount}
-                  className="wr-input tabular-nums"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Description
-                <textarea
-                  name="description"
-                  required
-                  rows={4}
-                  defaultValue={editingSubmission.description}
-                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
-                />
-                <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Markdown is supported (bold, lists, links, headings). It renders on movie pages.
-                </span>
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Curator message
-                <textarea
-                  name="curatorNote"
-                  rows={3}
-                  defaultValue={editingSubmission.curatorNote ?? ""}
-                  placeholder="Optional note shown with the published sighting."
-                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
-                />
-              </label>
-              <EditableSightingImagesField initialImages={editingAttachmentSlides} />
-              <label className="flex items-center gap-3 rounded-2xl bg-amber-100 p-4 text-sm font-bold text-stone-700 dark:bg-amber-900/45 dark:text-amber-100">
-                <input
-                  name="spoiler"
-                  type="checkbox"
-                  defaultChecked={editingSubmission.spoiler}
-                  className="h-5 w-5"
-                />
-                Contains spoilers
-              </label>
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <Link
-                  href="/moderation"
-                  className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
-                >
-                  Cancel
-                </Link>
-                <button
-                  type="submit"
-                  name="decision"
-                  value="edited"
-                  className="wr-btn-primary"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ModerationEditModal
+          submission={editingSubmission}
+          moderateAction={moderateSubmission}
+        />
       ) : null}
     </main>
   );

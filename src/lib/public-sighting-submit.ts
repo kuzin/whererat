@@ -103,6 +103,9 @@ export async function executePublicSightingSubmit(
     const contentWarnings = formData.getAll("contentWarnings")
       .map((v) => String(v).trim())
       .filter(Boolean);
+    const rodentTypes = formData.getAll("rodentTypes")
+      .map((v) => String(v).trim())
+      .filter(Boolean);
     const otherWarning = String(formData.get("contentWarningOther") ?? "").trim().slice(0, 200);
     if (otherWarning) contentWarnings.push(otherWarning);
 
@@ -157,6 +160,7 @@ export async function executePublicSightingSubmit(
       imageUrl: firstImage?.url,
       imageAlt: firstImage?.alt,
       contentWarnings: contentWarnings.length ? contentWarnings : undefined,
+      rodentTypes: rodentTypes.length ? rodentTypes : undefined,
     });
 
     return {

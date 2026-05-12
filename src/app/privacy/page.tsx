@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import { InfoPageShell, InfoHero, InfoSection, InfoNote } from "@/components/info-page";
 
 export const metadata: Metadata = {
   title: "Privacy",
   description: "How WhereRat handles data in the catalog, website, and native app.",
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
-const privacySections = [
+const sections = [
   {
     icon: "📱",
     title: "Native app (v1)",
@@ -41,45 +45,29 @@ const privacySections = [
     title: "Questions",
     body: "For moderation, legal, or data questions, use the public contact listed on WhereRat.com and your app-store support metadata.",
   },
-] as const;
+];
 
 export default function PrivacyPage() {
   return (
-    <main className="wr-page-shell py-10">
-      <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
-          <div className="text-4xl leading-none sm:text-5xl">
-            <span aria-hidden>🔒</span>
-          </div>
-          <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
-            Privacy
-          </h1>
-          <p className="mt-5 leading-relaxed text-orange-950">
-            How WhereRat handles data today, what third-party services may see, and what changes if we
-            expand beyond the current read-only mobile scope.
-          </p>
-        </aside>
+    <InfoPageShell
+      hero={
+        <InfoHero
+          icon="🔒"
+          title="Privacy"
+          description="How WhereRat handles data today, what third-party services may see, and what changes if we expand beyond the current read-only mobile scope."
+        />
+      }
+    >
+      {sections.map((s) => (
+        <InfoSection key={s.title} icon={s.icon} title={s.title}>
+          {s.body}
+        </InfoSection>
+      ))}
 
-        <section className="grid gap-4">
-          {privacySections.map((item) => (
-            <article
-              key={item.title}
-              className="rounded-2xl border border-stone-900/25 bg-stone-50 p-5 dark:border-white/12 dark:bg-stone-900/70"
-            >
-              <h2 className="wr-display flex items-center gap-2 text-2xl font-bold text-stone-950 dark:text-stone-100">
-                <span aria-hidden>{item.icon}</span>
-                <span>{item.title}</span>
-              </h2>
-              <p className="mt-3 leading-relaxed text-stone-700 dark:text-stone-300">{item.body}</p>
-            </article>
-          ))}
-
-          <p className="rounded-2xl border border-stone-900/15 bg-amber-50/60 p-5 text-sm text-stone-700 dark:border-white/12 dark:bg-amber-950/20 dark:text-stone-300">
-            This page reflects the current v1 behavior and should be updated when new features are added
-            (accounts, app submissions, analytics providers, or additional data retention).
-          </p>
-        </section>
-      </section>
-    </main>
+      <InfoNote>
+        This page reflects the current v1 behavior and should be updated when new features are added
+        (accounts, app submissions, analytics providers, or additional data retention).
+      </InfoNote>
+    </InfoPageShell>
   );
 }
