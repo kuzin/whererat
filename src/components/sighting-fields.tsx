@@ -233,8 +233,15 @@ export function SightingDescriptionField({
  */
 export function SightingContentWarningsField({
   initialWarnings,
+  embedded = false,
 }: {
   initialWarnings?: string[];
+  /**
+   * When true, renders without the outer rounded-border wrapper so the field
+   * can be embedded inside an existing card (e.g. the spoiler toggle card).
+   * The toggle row gets a top border to visually separate from the row above.
+   */
+  embedded?: boolean;
 }) {
   const knownIds = CONTENT_WARNING_OPTIONS.map((o) => o.id) as string[];
   const initialKnown = (initialWarnings ?? []).filter((w) => knownIds.includes(w));
@@ -245,7 +252,7 @@ export function SightingContentWarningsField({
   const [checked, setChecked] = useState<Set<string>>(new Set(initialKnown));
   const [otherOn, setOtherOn] = useState(Boolean(initialOther));
   const [otherText, setOtherText] = useState(initialOther);
-  const otherInputRef = useRef<HTMLInputElement>(null);
+  const otherTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   function toggleChip(id: string) {
     setChecked((prev) => {
@@ -258,7 +265,7 @@ export function SightingContentWarningsField({
 
   function handleToggleOther() {
     setOtherOn((v) => {
-      if (!v) requestAnimationFrame(() => otherInputRef.current?.focus());
+      if (!v) requestAnimationFrame(() => otherTextareaRef.current?.focus());
       return !v;
     });
   }
@@ -270,91 +277,111 @@ export function SightingContentWarningsField({
   const pillOn =
     "border-amber-500/70 bg-amber-50 text-amber-900 dark:border-amber-400/50 dark:bg-amber-900/30 dark:text-amber-200";
 
-  return (
-    <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">
-      {/* Toggle row */}
-      <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
-        <div className="min-w-0">
-          <span className="block">Contains content warnings</span>
-          <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
-            e.g. rat dies, harmed, or other disturbing content
-          </span>
-        </div>
-        <span className="relative inline-flex shrink-0 items-center">
-          <input
-            type="checkbox"
-            className="peer sr-only"
-            checked={enabled}
-            onChange={(e) => {
-              setEnabled(e.target.checked);
-              if (!e.target.checked) {
-                setChecked(new Set());
-                setOtherOn(false);
-                setOtherText("");
-              }
-            }}
-          />
-          <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
-          <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+  const toggleRow = (
+    <label
+      className={`flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5 ${
+        embedded ? "border-t border-stone-900/8 dark:border-white/8" : ""
+      }`}
+    >
+      <div className="min-w-0">
+        <span className="block">Contains content warnings</span>
+        <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
+          e.g. rat dies, harmed, or other disturbing content
         </span>
-      </label>
+      </div>
+      <span className="relative inline-flex shrink-0 items-center">
+        <input
+          type="checkbox"
+          className="peer sr-only"
+          checked={enabled}
+          onChange={(e) => {
+            setEnabled(e.target.checked);
+            if (!e.target.checked) {
+              setChecked(new Set());
+              setOtherOn(false);
+              setOtherText("");
+            }
+          }}
+        />
+        <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+        <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+      </span>
+    </label>
+  );
 
-      {/* Warning picker — revealed when toggled on */}
-      {enabled ? (
-        <div className="border-t border-stone-900/8 px-4 pb-4 pt-3 dark:border-white/8">
-          <p className="mb-3 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
-            Select all that apply
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {CONTENT_WARNING_OPTIONS.map((option) => {
-              const isOn = checked.has(option.id);
-              return (
-                <label key={option.id} className={`${pillBase} ${isOn ? pillOn : pillOff}`}>
-                  <input
-                    type="checkbox"
-                    name="contentWarnings"
-                    value={option.id}
-                    checked={isOn}
-                    onChange={() => toggleChip(option.id)}
-                    className="sr-only"
-                  />
-                  <span aria-hidden>{option.emoji}</span>
-                  {option.label}
-                </label>
-              );
-            })}
-
-            {/* Other chip */}
-            <label className={`${pillBase} ${otherOn ? pillOn : pillOff}`}>
+  const picker = enabled ? (
+    <div className="border-t border-stone-900/8 px-4 pb-4 pt-3 dark:border-white/8">
+      <p className="mb-3 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
+        Select all that apply
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {CONTENT_WARNING_OPTIONS.map((option) => {
+          const isOn = checked.has(option.id);
+          return (
+            <label key={option.id} className={`${pillBase} ${isOn ? pillOn : pillOff}`}>
               <input
                 type="checkbox"
-                checked={otherOn}
-                onChange={handleToggleOther}
+                name="contentWarnings"
+                value={option.id}
+                checked={isOn}
+                onChange={() => toggleChip(option.id)}
                 className="sr-only"
               />
-              <span aria-hidden>✏️</span>
-              Other
+              <span aria-hidden>{option.emoji}</span>
+              {option.label}
             </label>
-          </div>
+          );
+        })}
 
-          {otherOn ? (
-            <div className="mt-3">
-              <input
-                ref={otherInputRef}
-                type="text"
-                name="contentWarningOther"
-                value={otherText}
-                onChange={(e) => setOtherText(e.target.value)}
-                placeholder="Describe the content warning…"
-                maxLength={100}
-                className="wr-input text-sm"
-              />
-            </div>
-          ) : null}
+        {/* Other chip */}
+        <label className={`${pillBase} ${otherOn ? pillOn : pillOff}`}>
+          <input
+            type="checkbox"
+            checked={otherOn}
+            onChange={handleToggleOther}
+            className="sr-only"
+          />
+          <span aria-hidden>✏️</span>
+          Other
+        </label>
+      </div>
+
+      {otherOn ? (
+        <div className="mt-3">
+          <textarea
+            ref={otherTextareaRef}
+            name="contentWarningOther"
+            value={otherText}
+            onChange={(e) => setOtherText(e.target.value)}
+            placeholder="Describe the content warning…"
+            maxLength={200}
+            rows={2}
+            className="wr-input h-auto w-full resize-none py-2.5 text-sm leading-relaxed"
+          />
         </div>
       ) : null}
+    </div>
+  ) : null;
 
-      <input type="hidden" name="contentWarningEnabled" value={enabled ? "1" : "0"} />
+  const hiddenInput = (
+    <input type="hidden" name="contentWarningEnabled" value={enabled ? "1" : "0"} />
+  );
+
+  if (embedded) {
+    return (
+      <>
+        {toggleRow}
+        {picker}
+        {hiddenInput}
+      </>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">
+      {toggleRow}
+      {picker}
+      {hiddenInput}
     </div>
   );
 }

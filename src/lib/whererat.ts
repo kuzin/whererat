@@ -57,8 +57,11 @@ export type ImdbTitleKind = "movie" | "series";
 export const CONTENT_WARNING_OPTIONS = [
   { id: "rat-dies",       emoji: "💀", label: "Rat dies" },
   { id: "rat-harmed",     emoji: "🩹", label: "Rat is harmed" },
-  { id: "rat-trap",       emoji: "🪤", label: "Rat caught in trap" },
-  { id: "rat-experiment", emoji: "🔬", label: "Lab / experiment context" },
+  { id: "rat-eaten",      emoji: "🐍", label: "Eaten by predator" },
+  { id: "rat-poison",     emoji: "☠️", label: "Rat is poisoned" },
+  { id: "rat-trap",       emoji: "🪤", label: "Caught in trap" },
+  { id: "rat-experiment", emoji: "🔬", label: "Lab / experiment" },
+  { id: "graphic",        emoji: "🩸", label: "Graphic / disturbing" },
   { id: "jump-scare",     emoji: "😱", label: "Jump scare" },
 ] as const;
 export type ContentWarningId = (typeof CONTENT_WARNING_OPTIONS)[number]["id"];

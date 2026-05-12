@@ -282,8 +282,8 @@ export function SubmitForm({
 
       <SightingImageUpload />
 
-      <div className="grid gap-2 rounded-xl border border-stone-900/12 bg-stone-50 p-1 dark:border-white/10 dark:bg-stone-900/50">
-        <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
+      <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">
+        <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
           <span>Contains plot spoilers</span>
           <span className="relative inline-flex shrink-0 items-center">
             <input name="spoiler" type="checkbox" className="peer sr-only" />
@@ -292,27 +292,24 @@ export function SubmitForm({
           </span>
         </label>
 
+        <SightingContentWarningsField embedded />
+
         {canAutoApprove ? (
-          <>
-            <div className="mx-3 border-t border-stone-900/8 dark:border-white/8" />
-            <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg px-3 py-2.5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
-              <span>
-                <span className="block">Auto-approve this submission</span>
-                <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Signed in as {moderatorName} · skips the pending queue
-                </span>
+          <label className="flex cursor-pointer items-center justify-between gap-4 border-t border-stone-900/8 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/8 dark:text-stone-100 dark:hover:bg-white/5">
+            <span>
+              <span className="block">Auto-approve this submission</span>
+              <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
+                Signed in as {moderatorName} · skips the pending queue
               </span>
-              <span className="relative inline-flex shrink-0 items-center">
-                <input name="autoApprove" type="checkbox" className="peer sr-only" />
-                <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
-                <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
-              </span>
-            </label>
-          </>
+            </span>
+            <span className="relative inline-flex shrink-0 items-center">
+              <input name="autoApprove" type="checkbox" className="peer sr-only" />
+              <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+              <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+            </span>
+          </label>
         ) : null}
       </div>
-
-      <SightingContentWarningsField />
 
       <div>
         <button type="submit" className="wr-btn-primary w-full sm:w-auto">

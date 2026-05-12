@@ -376,16 +376,24 @@ export function MovieSightingsCards({
                   </div>
                   {/* Content warnings */}
                   {sighting.contentWarnings && sighting.contentWarnings.length > 0 ? (
-                    <details className="w-full rounded-lg border border-amber-800/25 bg-amber-50/60 px-3 py-2 text-xs dark:border-amber-400/25 dark:bg-amber-950/30">
-                      <summary className="cursor-pointer select-none font-semibold text-amber-900 dark:text-amber-200">
-                        ⚠️ Content warnings
+                    <details className="w-full overflow-hidden rounded-xl border border-amber-800/20 bg-amber-50/70 dark:border-amber-400/20 dark:bg-amber-950/25">
+                      <summary className="flex cursor-pointer select-none items-center gap-2 px-4 py-3 text-sm font-semibold text-amber-900 transition-colors hover:bg-amber-100/60 dark:text-amber-200 dark:hover:bg-amber-900/20">
+                        <span aria-hidden>⚠️</span>
+                        Content warnings
                       </summary>
-                      <ul className="mt-1.5 space-y-0.5 pl-1">
+                      <ul className="flex flex-wrap gap-2 border-t border-amber-800/12 px-4 pb-3.5 pt-3 dark:border-amber-400/12">
                         {sighting.contentWarnings.map((id) => {
                           const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
                           return (
-                            <li key={id} className="text-amber-800 dark:text-amber-300">
-                              {opt ? `${opt.emoji} ${opt.label}` : `⚠️ ${id}`}
+                            <li
+                              key={id}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-amber-800/20 bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:border-amber-400/25 dark:bg-amber-900/35 dark:text-amber-200"
+                            >
+                              {opt ? (
+                                <><span aria-hidden>{opt.emoji}</span>{opt.label}</>
+                              ) : (
+                                <><span aria-hidden>⚠️</span>{id}</>
+                              )}
                             </li>
                           );
                         })}
