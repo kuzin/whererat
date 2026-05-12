@@ -5,13 +5,13 @@ import {
   SightingTimestampField,
   SightingRatCountField,
   SightingDescriptionField,
+  SightingContentWarningsField,
 } from "@/components/sighting-fields";
 import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import {
   getSightingTimestampPercent,
   getSightingImageRefs,
-  CONTENT_WARNING_OPTIONS,
   type Sighting,
 } from "@/lib/whererat";
 
@@ -85,23 +85,7 @@ export function EditSightingForm({
       <EditableSightingImagesField initialImages={initialImages} />
 
       {/* Content warnings */}
-      <fieldset className="rounded-xl border border-stone-900/12 bg-stone-50 px-4 py-3 dark:border-white/10 dark:bg-stone-900/50">
-        <legend className="mb-2 text-sm font-bold text-stone-700 dark:text-stone-200">Content warnings</legend>
-        <div className="grid gap-2">
-          {CONTENT_WARNING_OPTIONS.map((option) => (
-            <label key={option.id} className="flex cursor-pointer items-center gap-3 rounded-lg px-1 py-1 text-sm font-medium text-stone-700 transition-colors hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-white/5">
-              <input
-                type="checkbox"
-                name="contentWarnings"
-                value={option.id}
-                defaultChecked={sighting.contentWarnings?.includes(option.id)}
-                className="h-4 w-4 rounded border-stone-300 accent-amber-500 dark:border-stone-600"
-              />
-              <span>{option.emoji} {option.label}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <SightingContentWarningsField initialWarnings={sighting.contentWarnings} />
 
       {/* Spoiler toggle */}
       <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-900/12 bg-stone-50 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/10 dark:bg-stone-900/50 dark:text-stone-100 dark:hover:bg-white/5">

@@ -383,11 +383,11 @@ export function MovieSightingsCards({
                       <ul className="mt-1.5 space-y-0.5 pl-1">
                         {sighting.contentWarnings.map((id) => {
                           const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
-                          return opt ? (
+                          return (
                             <li key={id} className="text-amber-800 dark:text-amber-300">
-                              {opt.emoji} {opt.label}
+                              {opt ? `${opt.emoji} ${opt.label}` : `⚠️ ${id}`}
                             </li>
-                          ) : null;
+                          );
                         })}
                       </ul>
                     </details>

@@ -5,8 +5,9 @@
  * moderator Edit Sighting modal. Any visual change here applies to both.
  */
 
-import { useState, useId } from "react";
+import { useState, useId, useRef } from "react";
 import { SightingMarkdown } from "@/components/sighting-markdown";
+import { CONTENT_WARNING_OPTIONS } from "@/lib/whererat";
 
 // ─── Swarm signal ────────────────────────────────────────────────────────────
 
@@ -217,6 +218,143 @@ export function SightingDescriptionField({
           )}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+// ─── Content warnings ─────────────────────────────────────────────────────────
+
+/**
+ * Toggle-gated content warning picker shared by the Submit form and Edit Sighting modal.
+ *
+ * - Off by default; checkboxes are hidden until the toggle is switched on.
+ * - Predefined options render as pill-style toggle chips.
+ * - "Other" chip reveals a text input for a custom warning string.
+ */
+export function SightingContentWarningsField({
+  initialWarnings,
+}: {
+  initialWarnings?: string[];
+}) {
+  const knownIds = CONTENT_WARNING_OPTIONS.map((o) => o.id) as string[];
+  const initialKnown = (initialWarnings ?? []).filter((w) => knownIds.includes(w));
+  const initialOther = (initialWarnings ?? []).find((w) => !knownIds.includes(w)) ?? "";
+
+  const hasInitial = (initialWarnings?.length ?? 0) > 0;
+  const [enabled, setEnabled] = useState(hasInitial);
+  const [checked, setChecked] = useState<Set<string>>(new Set(initialKnown));
+  const [otherOn, setOtherOn] = useState(Boolean(initialOther));
+  const [otherText, setOtherText] = useState(initialOther);
+  const otherInputRef = useRef<HTMLInputElement>(null);
+
+  function toggleChip(id: string) {
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function handleToggleOther() {
+    setOtherOn((v) => {
+      if (!v) requestAnimationFrame(() => otherInputRef.current?.focus());
+      return !v;
+    });
+  }
+
+  const pillBase =
+    "inline-flex cursor-pointer select-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-150";
+  const pillOff =
+    "border-stone-300/80 bg-white text-stone-600 hover:border-stone-400 hover:text-stone-800 dark:border-white/12 dark:bg-stone-800/60 dark:text-stone-400 dark:hover:border-white/25 dark:hover:text-stone-200";
+  const pillOn =
+    "border-amber-500/70 bg-amber-50 text-amber-900 dark:border-amber-400/50 dark:bg-amber-900/30 dark:text-amber-200";
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">
+      {/* Toggle row */}
+      <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
+        <div className="min-w-0">
+          <span className="block">Contains content warnings</span>
+          <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
+            e.g. rat dies, harmed, or other disturbing content
+          </span>
+        </div>
+        <span className="relative inline-flex shrink-0 items-center">
+          <input
+            type="checkbox"
+            className="peer sr-only"
+            checked={enabled}
+            onChange={(e) => {
+              setEnabled(e.target.checked);
+              if (!e.target.checked) {
+                setChecked(new Set());
+                setOtherOn(false);
+                setOtherText("");
+              }
+            }}
+          />
+          <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+          <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+        </span>
+      </label>
+
+      {/* Warning picker — revealed when toggled on */}
+      {enabled ? (
+        <div className="border-t border-stone-900/8 px-4 pb-4 pt-3 dark:border-white/8">
+          <p className="mb-3 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
+            Select all that apply
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {CONTENT_WARNING_OPTIONS.map((option) => {
+              const isOn = checked.has(option.id);
+              return (
+                <label key={option.id} className={`${pillBase} ${isOn ? pillOn : pillOff}`}>
+                  <input
+                    type="checkbox"
+                    name="contentWarnings"
+                    value={option.id}
+                    checked={isOn}
+                    onChange={() => toggleChip(option.id)}
+                    className="sr-only"
+                  />
+                  <span aria-hidden>{option.emoji}</span>
+                  {option.label}
+                </label>
+              );
+            })}
+
+            {/* Other chip */}
+            <label className={`${pillBase} ${otherOn ? pillOn : pillOff}`}>
+              <input
+                type="checkbox"
+                checked={otherOn}
+                onChange={handleToggleOther}
+                className="sr-only"
+              />
+              <span aria-hidden>✏️</span>
+              Other
+            </label>
+          </div>
+
+          {otherOn ? (
+            <div className="mt-3">
+              <input
+                ref={otherInputRef}
+                type="text"
+                name="contentWarningOther"
+                value={otherText}
+                onChange={(e) => setOtherText(e.target.value)}
+                placeholder="Describe the content warning…"
+                maxLength={100}
+                className="wr-input text-sm"
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      <input type="hidden" name="contentWarningEnabled" value={enabled ? "1" : "0"} />
     </div>
   );
 }

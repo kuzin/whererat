@@ -103,6 +103,8 @@ export async function executePublicSightingSubmit(
     const contentWarnings = formData.getAll("contentWarnings")
       .map((v) => String(v).trim())
       .filter(Boolean);
+    const otherWarning = String(formData.get("contentWarningOther") ?? "").trim().slice(0, 100);
+    if (otherWarning) contentWarnings.push(otherWarning);
 
     if (!movieTitle || !sightingTitle || !timestamp || !description || !submitterName) {
       return { ok: false, code: "missing" };
