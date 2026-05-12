@@ -376,7 +376,7 @@ export function MovieSightingsCards({
                   </div>
                   {/* Footer bar */}
                   <div className="border-t border-stone-900/10 pt-4 pb-1 dark:border-white/10">
-                    <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <div className="flex flex-wrap items-center gap-2">
                       {episodeContext ? (
                         <span className="inline-flex h-9 shrink-0 items-center rounded-lg border border-sky-800/25 bg-sky-50 px-3 text-xs font-semibold tracking-tight text-sky-950 dark:border-sky-400/35 dark:bg-sky-950/45 dark:text-sky-100">
                           {episodeContext}
