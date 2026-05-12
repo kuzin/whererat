@@ -374,32 +374,6 @@ export function MovieSightingsCards({
                       </>
                     )}
                   </div>
-                  {/* Content warnings */}
-                  {sighting.contentWarnings && sighting.contentWarnings.length > 0 ? (
-                    <details className="w-full overflow-hidden rounded-xl border border-amber-800/20 bg-amber-50/70 dark:border-amber-400/20 dark:bg-amber-950/25">
-                      <summary className="flex cursor-pointer select-none items-center gap-2 px-4 py-3 text-sm font-semibold text-amber-900 transition-colors hover:bg-amber-100/60 dark:text-amber-200 dark:hover:bg-amber-900/20">
-                        <span aria-hidden>⚠️</span>
-                        Content warnings
-                      </summary>
-                      <ul className="flex flex-wrap gap-2 border-t border-amber-800/12 px-4 pb-3.5 pt-3 dark:border-amber-400/12">
-                        {sighting.contentWarnings.map((id) => {
-                          const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
-                          return (
-                            <li
-                              key={id}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-amber-800/20 bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:border-amber-400/25 dark:bg-amber-900/35 dark:text-amber-200"
-                            >
-                              {opt ? (
-                                <><span aria-hidden>{opt.emoji}</span>{opt.label}</>
-                              ) : (
-                                <><span aria-hidden>⚠️</span>{id}</>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </details>
-                  ) : null}
                   {/* Footer bar */}
                   <div className="border-t border-stone-900/10 pt-4 pb-1 dark:border-white/10">
                     <div className="relative -mx-5 sm:-mx-6 md:-mx-7">
@@ -424,6 +398,18 @@ export function MovieSightingsCards({
                             Spoiler
                           </span>
                         ) : null}
+                        {(sighting.contentWarnings ?? []).map((id) => {
+                          const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
+                          return (
+                            <span
+                              key={id}
+                              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-yellow-800/20 bg-yellow-50 px-3 text-xs font-semibold text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/40 dark:text-yellow-200"
+                            >
+                              <span aria-hidden>{opt ? opt.emoji : "⚠️"}</span>
+                              {opt ? opt.label : id}
+                            </span>
+                          );
+                        })}
                         <span
                           className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-amber-900/25 bg-amber-50 px-2.5 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
                           title="Estimated rats on screen for this moment"
