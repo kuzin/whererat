@@ -7,29 +7,30 @@
 
 import { useState, useId, useRef } from "react";
 import { SightingMarkdown } from "@/components/sighting-markdown";
-import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, rodentCountFieldLabel } from "@/lib/whererat";
+import { RodentTypeIcon } from "@/components/rodent-type-icon";
+import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, rodentCountFieldLabel, formatPercentAsTimestamp } from "@/lib/whererat";
 
 // ─── Swarm signal ────────────────────────────────────────────────────────────
 
 function swarmLabel(count: number, noun = "Rat"): { label: string; sublabel: string; fill: number } {
-  if (count === 1) return { label: "Lone scout",    sublabel: "A solitary one. Brave.",      fill: 1 };
-  if (count <= 3) return { label: "Small pack",     sublabel: "A cozy little crew.",          fill: 2 };
-  if (count <= 7) return { label: "Growing colony", sublabel: "Now we're talking.",           fill: 3 };
-  if (count <= 15) return { label: "Swarm forming", sublabel: "A glorious gathering.",        fill: 4 };
-  if (count <= 40) return { label: "Full swarm",    sublabel: "An absolute delight.",         fill: 5 };
-  return { label: `${noun} apocalypse`,             sublabel: "We bow to our new overlords.", fill: 6 };
+  if (count === 1) return { label: "Lone scout", sublabel: "A solitary one. Brave.", fill: 1 };
+  if (count <= 3) return { label: "Small pack", sublabel: "A cozy little crew.", fill: 2 };
+  if (count <= 7) return { label: "Growing colony", sublabel: "Now we're talking.", fill: 3 };
+  if (count <= 15) return { label: "Swarm forming", sublabel: "A glorious gathering.", fill: 4 };
+  if (count <= 40) return { label: "Full swarm", sublabel: "An absolute delight.", fill: 5 };
+  return { label: `${noun} apocalypse`, sublabel: "We bow to our new overlords.", fill: 6 };
 }
 
 const MAX_SLOTS = 6;
 
-export function SwarmSignal({ count, emoji = "🐀", noun = "Rat" }: { count: number; emoji?: string; noun?: string }) {
+export function SwarmSignal({ count, openmojiCode = "1F400", rodentId, noun = "Rat" }: { count: number; openmojiCode?: string; rodentId?: string; noun?: string }) {
   const { label, sublabel, fill } = swarmLabel(count, noun);
   return (
     <div className="flex flex-1 items-center gap-3 rounded-lg border border-stone-900/8 bg-stone-50/80 px-3 py-2 dark:border-white/8 dark:bg-stone-900/40">
-      <div className="flex gap-0.5 text-base leading-none" aria-hidden>
+      <div className="flex gap-0.5 items-center leading-none" aria-hidden>
         {Array.from({ length: MAX_SLOTS }).map((_, i) => (
           <span key={i} className={`transition-all duration-200 ${i < fill ? "opacity-100" : "opacity-15 grayscale"}`}>
-            {emoji}
+            <RodentTypeIcon openmojiCode={openmojiCode} label="" rodentId={rodentId} size={18} />
           </span>
         ))}
       </div>
@@ -47,22 +48,30 @@ export function SightingTimestampField({
   defaultValue = 50,
   label = "Approx. point in movie",
   errorMessage,
+  runtimeMinutes,
 }: {
   defaultValue?: number;
   label?: string;
   errorMessage?: string;
+  runtimeMinutes?: number;
 }) {
   const [percent, setPercent] = useState(defaultValue);
+  const calculatedTimestamp = runtimeMinutes ? formatPercentAsTimestamp(`${percent}%`, runtimeMinutes) : null;
 
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm font-bold text-stone-700 dark:text-stone-200">{label}</p>
-      <div className="mt-1 flex items-center gap-3">
+      <div className="mt-1 flex items-center gap-6">
         <div className="relative flex-1">
           <div className="h-5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700">
             <div
-              className="h-full rounded-full bg-amber-500 transition-all duration-100"
-              style={{ width: `${percent}%` }}
+              className="h-full rounded-full bg-amber-500 transition-all duration-100 opacity-80"
+              style={{
+                width: `${percent}%`,
+                backgroundImage: "url('/brand/cheese-texture-shutterstock.jpg')",
+                backgroundSize: "120px",
+                backgroundPosition: "0 0"
+              }}
             />
           </div>
           {/* thumb */}
@@ -88,7 +97,7 @@ export function SightingTimestampField({
         </div>
         <div className="shrink-0 text-right">
           <span className="text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">
-            {percent}%
+            {percent}%{calculatedTimestamp && <span className="text-stone-500 dark:text-stone-400"> · {calculatedTimestamp}</span>}
           </span>
         </div>
       </div>
@@ -104,12 +113,14 @@ export function SightingTimestampField({
 export function SightingRatCountField({
   defaultValue = 1,
   label,
-  emoji,
+  openmojiCode,
+  rodentId,
   noun,
 }: {
   defaultValue?: number;
   label?: string;
-  emoji?: string;
+  openmojiCode?: string;
+  rodentId?: string;
   noun?: string;
 }) {
   const [count, setCount] = useState(Math.max(1, defaultValue));
@@ -145,7 +156,7 @@ export function SightingRatCountField({
             +
           </button>
         </div>
-        <SwarmSignal count={count} emoji={emoji} noun={noun} />
+        <SwarmSignal count={count} openmojiCode={openmojiCode} rodentId={rodentId} noun={noun} />
       </div>
     </div>
   );
@@ -285,9 +296,8 @@ export function SightingContentWarningsField({
 
   const toggleRow = (
     <label
-      className={`flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5 ${
-        embedded ? "border-t border-stone-900/8 dark:border-white/8" : ""
-      }`}
+      className={`flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5 ${embedded ? "border-t border-stone-900/8 dark:border-white/8" : ""
+        }`}
     >
       <div className="min-w-0">
         <span className="block">Contains content warnings</span>
@@ -333,7 +343,13 @@ export function SightingContentWarningsField({
                 onChange={() => toggleChip(option.id)}
                 className="sr-only"
               />
-              <span aria-hidden>{option.emoji}</span>
+              <img
+                src={`/openmoji/color/svg/${option.openmojiCode}.svg`}
+                alt=""
+                width={16}
+                height={16}
+                aria-hidden
+              />
               {option.label}
             </label>
           );
@@ -347,7 +363,7 @@ export function SightingContentWarningsField({
             onChange={handleToggleOther}
             className="sr-only"
           />
-          <span aria-hidden>✏️</span>
+          <span aria-hidden><img src="/openmoji/color/svg/270F.svg" alt="" width={16} height={16} style={{ display: "inline", verticalAlign: "middle" }} /></span>
           Other
         </label>
       </div>
@@ -446,7 +462,12 @@ export function SightingRodentTypesField({
                 onChange={() => toggle(option.id)}
                 className="sr-only"
               />
-              <span aria-hidden>{option.emoji}</span>
+              <RodentTypeIcon
+                openmojiCode={option.openmojiCode}
+                label={option.label}
+                rodentId={option.id}
+                size={20}
+              />
               {option.label}
             </label>
           );

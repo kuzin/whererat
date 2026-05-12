@@ -49,9 +49,6 @@ export function SubmissionImageThumbs({ slides }: { slides: SightingImageSlot[] 
             </span>
           </button>
         ))}
-        <p className="flex items-center text-xs font-semibold text-stone-400 dark:text-stone-500">
-          {slides.length === 1 ? "1 image" : `${slides.length} images`}
-        </p>
       </div>
 
       {/* Lightbox */}

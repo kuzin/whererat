@@ -79,27 +79,28 @@ function toDbSubmission(row: {
   images_json: unknown;
   content_warnings: string[] | null;
   rodent_types: string[] | null;
+  created_at: string | Date;
 }): Submission {
   const images = Array.isArray(row.images_json)
     ? row.images_json
-        .map((slot) => {
-          if (!slot || typeof slot !== "object") return undefined;
-          const rec = slot as { url?: unknown; alt?: unknown };
-          const url = String(rec.url ?? "").trim();
-          if (!url) return undefined;
-          return {
-            url,
-            alt: rec.alt ? String(rec.alt) : undefined,
-          };
-        })
-        .filter(
-          (
-            slot,
-          ): slot is {
-            url: string;
-            alt: string | undefined;
-          } => Boolean(slot),
-        )
+      .map((slot) => {
+        if (!slot || typeof slot !== "object") return undefined;
+        const rec = slot as { url?: unknown; alt?: unknown };
+        const url = String(rec.url ?? "").trim();
+        if (!url) return undefined;
+        return {
+          url,
+          alt: rec.alt ? String(rec.alt) : undefined,
+        };
+      })
+      .filter(
+        (
+          slot,
+        ): slot is {
+          url: string;
+          alt: string | undefined;
+        } => Boolean(slot),
+      )
     : undefined;
   const leadImage = images?.[0];
   return {
@@ -119,6 +120,7 @@ function toDbSubmission(row: {
     status: row.status,
     submittedBy: row.submitted_by,
     submitterEmail: row.submitter_email ?? undefined,
+    submittedAt: new Date(row.created_at),
     curatorNote: row.curator_note ?? undefined,
     duplicateHint: row.duplicate_hint ?? undefined,
     moviePosterUrl: row.movie_poster_url ?? undefined,
@@ -249,6 +251,7 @@ export async function readModerationStore() {
       images_json: unknown;
       content_warnings: string[] | null;
       rodent_types: string[] | null;
+      created_at: string;
     }>(
       `select s.*,
               (

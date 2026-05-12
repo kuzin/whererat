@@ -136,7 +136,7 @@ export default async function RootLayout({
                     <div className="flex flex-col gap-5">
                       <div>
                         <p className="text-lg font-bold tracking-tight text-amber-50">WhereRat</p>
-                        <p className="mt-0.5 text-sm text-amber-100/50">An obsessive guide to 🐀 on film.</p>
+                        <p className="mt-0.5 text-sm text-amber-100/50">An obsessive guide to <img src="/openmoji/color/svg/1F400.svg" alt="rats" width={16} height={16} style={{ display: "inline", verticalAlign: "middle" }} /> on film.</p>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {[

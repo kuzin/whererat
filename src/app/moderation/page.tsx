@@ -9,6 +9,8 @@ import {
   formatApproximateRatLine,
   formatContentWarningLabel,
   formatSightingMomentDisplay,
+  formatRuntimeMinutes,
+  formatPercentAsTimestamp,
   getImdbTitleUrl,
   getSubmissionImageRefs,
   getSubmissionSightingTitle,
@@ -224,9 +226,7 @@ export default async function ModerationPage({
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="contents lg:block lg:space-y-6">
           <div className="order-1 self-start rounded-2xl wr-panel-warm p-8">
-            <div className="text-4xl leading-none sm:text-5xl">
-              <span aria-hidden>🔍</span>
-            </div>
+            <img src="/openmoji/color/svg/1F50D.svg" alt="" width={56} height={56} aria-hidden />
             <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
               Moderation queue
             </h1>
@@ -320,7 +320,7 @@ export default async function ModerationPage({
           <div className="mt-6 space-y-5">
             {pendingSubmissions.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-stone-500/75 bg-stone-100/90 p-10 text-center dark:border-white/20 dark:bg-stone-900/40">
-                <p className="text-4xl">🕳️</p>
+                <img src="/openmoji/color/svg/1F573.svg" alt="" width={40} height={40} className="mx-auto" aria-hidden />
                 <h3 className="wr-display mt-3 text-2xl font-bold">
                   Quiet burrow. No crumbs.
                 </h3>
@@ -339,183 +339,224 @@ export default async function ModerationPage({
               const catalogMovie = catalogMovieBySubmissionId.get(submission.id);
               const posterUrl = catalogMovie?.posterUrl ?? submission.moviePosterUrl;
               return (
-              <article
-                key={submission.id}
-                className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[var(--wr-surface-cream)] dark:border-white/14 dark:bg-stone-900/70"
-              >
+                <article
+                  key={submission.id}
+                  className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[var(--wr-surface-cream)] dark:border-white/14 dark:bg-stone-900/70"
+                >
                   <div className="relative p-5">
-                <div className="pr-12">
-                    <Link
-                      href={`/moderation?edit=${submission.id}`}
-                      className="wr-btn-ghost absolute top-5 right-5 inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
-                      aria-label="Edit submission"
-                      title="Edit submission"
-                    >
-                      ✎
-                    </Link>
+                    <div className="pr-12">
+                      <Link
+                        href={`/moderation?edit=${submission.id}`}
+                        className="wr-btn-ghost absolute top-5 right-5 inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
+                        aria-label="Edit submission"
+                        title="Edit submission"
+                      >
+                        ✎
+                      </Link>
 
-                    {/* ── Movie block ── */}
-                    <div className="flex gap-4">
-                      {posterUrl ? (
-                        <Image
-                          src={posterUrl}
-                          alt={`${submission.movieTitle} poster`}
-                          width={80}
-                          height={120}
-                          className="w-14 shrink-0 self-center rounded-lg object-cover"
-                        />
-                      ) : null}
-                      <div className="min-w-0 self-center">
-                        <h3 className="text-xl font-black text-stone-950 dark:text-stone-100">
-                          {submission.movieTitle}
-                          {submission.movieYear ? (
-                            <span className="ml-1.5 text-base font-semibold text-stone-500 dark:text-stone-400">
-                              ({submission.movieYear})
-                            </span>
-                          ) : null}
-                        </h3>
-                        {episodeContext ? (
-                          <p className="mt-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
-                            {episodeContext}
-                          </p>
+                      {/* ── Movie block ── */}
+                      <div className="flex gap-4">
+                        {posterUrl ? (
+                          <Image
+                            src={posterUrl}
+                            alt={`${submission.movieTitle} poster`}
+                            width={80}
+                            height={120}
+                            className="w-14 shrink-0 self-center rounded-lg object-cover"
+                          />
                         ) : null}
-                        {catalogMovie ? (
-                          <div className="mt-1 space-y-0.5 text-sm text-stone-600 dark:text-stone-400">
-                            {catalogMovie.metadata.director ? (
-                              <p>Dir. <span className="font-medium text-stone-800 dark:text-stone-200">{catalogMovie.metadata.director}</span></p>
+                        <div className="min-w-0 self-center">
+                          <h3 className="text-xl font-black text-stone-950 dark:text-stone-100">
+                            {submission.movieTitle}
+                            {submission.movieYear ? (
+                              <span className="ml-1.5 text-base font-semibold text-stone-500 dark:text-stone-400">
+                                ({submission.movieYear})
+                              </span>
                             ) : null}
-                            {catalogMovie.genres.length > 0 ? (
-                              <p>{catalogMovie.genres.join(" · ")}</p>
-                            ) : null}
-                            <p className="flex flex-wrap gap-x-3">
-                              {catalogMovie.runtimeMinutes ? <span>{catalogMovie.runtimeMinutes} min</span> : null}
-                              {catalogMovie.metadata.rating ? <span>{catalogMovie.metadata.rating}</span> : null}
-                              {catalogMovie.metadata.imdbRating ? <span>★ {catalogMovie.metadata.imdbRating}</span> : null}
+                          </h3>
+                          {episodeContext ? (
+                            <p className="mt-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
+                              {episodeContext}
                             </p>
-                          </div>
+                          ) : null}
+                          {catalogMovie ? (
+                            <div className="mt-1 space-y-0.5 text-sm text-stone-600 dark:text-stone-400">
+                              {catalogMovie.metadata.director ? (
+                                <p>Dir. <span className="font-medium text-stone-800 dark:text-stone-200">{catalogMovie.metadata.director}</span></p>
+                              ) : null}
+                              {catalogMovie.genres.length > 0 ? (
+                                <p>{catalogMovie.genres.join(" · ")}</p>
+                              ) : null}
+                              <p className="flex flex-wrap gap-x-3">
+                                {catalogMovie.runtimeMinutes ? <span>{catalogMovie.runtimeMinutes} min</span> : null}
+                                {catalogMovie.metadata.rating ? <span>{catalogMovie.metadata.rating}</span> : null}
+                                {catalogMovie.metadata.imdbRating ? <span>★ {catalogMovie.metadata.imdbRating}</span> : null}
+                              </p>
+                            </div>
+                          ) : null}
+                          {/* ── Duplicate warning ── */}
+                          {catalogMovie ? (
+                            <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-amber-600/40 bg-amber-50 px-2.5 py-2 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200">
+                              <img src="/openmoji/color/svg/26A0.svg" alt="Warning" width={16} height={16} className="mt-px shrink-0" aria-hidden />
+                              <span>Already in catalog — verify this isn&apos;t a duplicate sighting before approving.</span>
+                            </div>
+                          ) : null}
+                          {!catalogMovie ? (
+                            <div className="mt-1 text-sm text-stone-600 dark:text-stone-400">
+                              {submission.imdbId ? (
+                                <a href={getImdbTitleUrl(submission.imdbId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200">
+                                  IMDb {submission.imdbId}
+                                  <ExternalLinkIcon className="size-3 opacity-60" />
+                                </a>
+                              ) : (
+                                <span className="opacity-50">No IMDb match</span>
+                              )}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 border-t border-stone-950/8 dark:border-white/8" />
+
+                      {/* ── Sighting block ── */}
+                      <dl className="mt-3 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1.5 text-sm">
+                        {episodeContext ? (
+                          <>
+                            <dt className="font-bold text-stone-600 dark:text-stone-400">Episode</dt>
+                            <dd className="text-stone-700 dark:text-stone-200">{episodeContext}</dd>
+                          </>
                         ) : null}
-                        {/* ── Duplicate warning ── */}
-                        {catalogMovie ? (
-                          <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-amber-600/40 bg-amber-50 px-2.5 py-2 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200">
-                            <span aria-hidden className="mt-px shrink-0">⚠️</span>
-                            <span>Already in catalog — verify this isn&apos;t a duplicate sighting before approving.</span>
-                          </div>
+                        <dt className="font-bold text-stone-600 dark:text-stone-400">
+                          Point in {isSeriesSubmission ? "episode" : "film"}
+                        </dt>
+                        <dd className="text-stone-700 dark:text-stone-200">
+                          {startingPretty.replace(" into movie", "")}
+                          {catalogMovie?.runtimeMinutes && (
+                            <>
+                              {" · "}
+                              <span className="text-stone-500 dark:text-stone-400">
+                                {formatPercentAsTimestamp(submission.timestamp, catalogMovie.runtimeMinutes) ?? "—"}
+                              </span>
+                            </>
+                          )}
+                        </dd>
+                        <dt className="font-bold text-stone-600 dark:text-stone-400">Count</dt>
+                        <dd className="text-stone-700 dark:text-stone-200">
+                          ~{formatApproximateRatLine(submission.approximateRatCount, submission.rodentTypes)}
+                        </dd>
+                        {catalogMovie?.runtimeMinutes ? (
+                          <>
+                            <dt className="font-bold text-stone-600 dark:text-stone-400">Duration</dt>
+                            <dd className="text-stone-700 dark:text-stone-200">{formatRuntimeMinutes(catalogMovie.runtimeMinutes)}</dd>
+                          </>
                         ) : null}
-                        {!catalogMovie ? (
-                          <div className="mt-1 text-sm text-stone-600 dark:text-stone-400">
-                            {submission.imdbId ? (
+                        {submission.imdbId ? (
+                          <>
+                            <dt className="font-bold text-stone-600 dark:text-stone-400">IMDb</dt>
+                            <dd>
                               <a href={getImdbTitleUrl(submission.imdbId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200">
-                                IMDb {submission.imdbId}
+                                {submission.imdbId}
                                 <ExternalLinkIcon className="size-3 opacity-60" />
                               </a>
-                            ) : (
-                              <span className="opacity-50">No IMDb match</span>
-                            )}
-                          </div>
+                            </dd>
+                          </>
                         ) : null}
+                        <dt className="font-bold text-stone-600 dark:text-stone-400">Submitted by</dt>
+                        <dd className="text-stone-700 dark:text-stone-200">
+                          {submission.submittedBy.trim()}
+                          {submission.submitterEmail ? (
+                            <>
+                              {" · "}
+                              <a
+                                href={`mailto:${submission.submitterEmail}`}
+                                className="font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200"
+                              >
+                                {submission.submitterEmail}
+                              </a>
+                            </>
+                          ) : null}
+                        </dd>
+                        <dt className="font-bold text-stone-600 dark:text-stone-400">Submitted</dt>
+                        <dd className="text-stone-700 dark:text-stone-200">
+                          <time dateTime={submission.submittedAt.toISOString()}>
+                            {submission.submittedAt.toLocaleString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              timeZoneName: "short",
+                            })}
+                          </time>
+                        </dd>
+                        {(() => {
+                          const rodentTypes = submission.rodentTypes ?? [];
+                          const warnings = submission.contentWarnings ?? [];
+                          if (!submission.spoiler && rodentTypes.length === 0 && warnings.length === 0) return null;
+                          return (
+                            <>
+                              <dt className="font-bold text-stone-600 dark:text-stone-400">Tags</dt>
+                              <dd className="col-span-1">
+                                <div className="flex flex-wrap gap-1.5">
+                                  {rodentTypes.map((id) => {
+                                    const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
+                                    return (
+                                      <span key={id} className="inline-flex items-center gap-1 rounded-md border border-amber-800/20 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-900 dark:border-amber-400/25 dark:bg-amber-950/35 dark:text-amber-200">
+                                        <img src={`/openmoji/color/svg/${opt?.openmojiCode ?? "26A0"}.svg`} alt="" width={14} height={14} aria-hidden />
+                                        {opt?.label ?? id}
+                                      </span>
+                                    );
+                                  })}
+                                  {submission.spoiler ? (
+                                    <span className="inline-flex items-center rounded-md border border-red-800/25 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-900 dark:border-red-400/30 dark:bg-red-950/35 dark:text-red-200">
+                                      Spoiler
+                                    </span>
+                                  ) : null}
+                                  {warnings.map((id) => {
+                                    const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
+                                    return (
+                                      <span key={id} className="inline-flex items-center gap-1 rounded-md border border-yellow-800/20 bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/35 dark:text-yellow-200">
+                                        <img src={`/openmoji/color/svg/${opt?.openmojiCode ?? "26A0"}.svg`} alt="" width={14} height={14} aria-hidden />
+                                        {formatContentWarningLabel(id, submission.rodentTypes)}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </dd>
+                            </>
+                          );
+                        })()}
+                      </dl>
+                      {!catalogMovie && submission.imdbId ? (
+                        <div className="mt-3 rounded-lg border border-stone-900/15 bg-stone-50 p-2.5 text-xs text-stone-700 dark:border-white/12 dark:bg-stone-900/30 dark:text-stone-300">
+                          <p className="leading-relaxed">
+                            <strong><img src="/openmoji/color/svg/1F4CC.svg" alt="" width={14} height={14} style={{ display: "inline", verticalAlign: "middle" }} aria-hidden /> Note:</strong> This film is not yet in the catalog. Runtime data will be available once synced with IMDb (timestamp conversion requires duration). Approve to add it to the catalog.
+                          </p>
+                        </div>
+                      ) : null}
+                      <div className="mt-3 border-t border-stone-950/8 pt-3 dark:border-white/8">
+                        <p className="mb-1.5 text-sm font-bold text-stone-600 dark:text-stone-400">Title</p>
+                        <p className="mb-3 text-sm text-stone-700 dark:text-stone-200">{sightingTitle}</p>
+                        <p className="mb-1.5 text-sm font-bold text-stone-600 dark:text-stone-400">Description</p>
+                        <SightingMarkdown markdown={submission.description} />
                       </div>
                     </div>
 
-                    <div className="mt-4 border-t border-stone-950/8 dark:border-white/8" />
+                    {attachmentSlides.length > 0 ? (
+                      <div className="mt-4 overflow-hidden rounded-xl border border-stone-900/15 bg-stone-50 dark:border-white/12 dark:bg-stone-900/50">
+                        <SubmissionImageThumbs slides={attachmentSlides} />
+                      </div>
+                    ) : null}
 
-                    {/* ── Sighting block ── */}
-                    <dl className="mt-3 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1.5 text-sm">
-                      {episodeContext ? (
-                        <>
-                          <dt className="font-bold text-stone-600 dark:text-stone-400">Episode</dt>
-                          <dd className="text-stone-700 dark:text-stone-200">{episodeContext}</dd>
-                        </>
-                      ) : null}
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">
-                        Point in {isSeriesSubmission ? "episode" : "film"}
-                      </dt>
-                      <dd className="text-stone-700 dark:text-stone-200">{startingPretty.replace(" into movie", "")}</dd>
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">Count</dt>
-                      <dd className="text-stone-700 dark:text-stone-200">
-                        ~{formatApproximateRatLine(submission.approximateRatCount, submission.rodentTypes)}
-                      </dd>
-                      {submission.imdbId ? (
-                        <>
-                          <dt className="font-bold text-stone-600 dark:text-stone-400">IMDb</dt>
-                          <dd>
-                            <a href={getImdbTitleUrl(submission.imdbId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200">
-                              {submission.imdbId}
-                              <ExternalLinkIcon className="size-3 opacity-60" />
-                            </a>
-                          </dd>
-                        </>
-                      ) : null}
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">Submitted by</dt>
-                      <dd className="text-stone-700 dark:text-stone-200">
-                        {submission.submittedBy.trim()}
-                        {submission.submitterEmail ? (
-                          <>
-                            {" · "}
-                            <a
-                              href={`mailto:${submission.submitterEmail}`}
-                              className="font-semibold text-orange-950 underline decoration-orange-900/35 underline-offset-2 hover:decoration-orange-950 dark:text-amber-200 dark:decoration-amber-200/35 dark:hover:decoration-amber-200"
-                            >
-                              {submission.submitterEmail}
-                            </a>
-                          </>
-                        ) : null}
-                      </dd>
-                      <dt className="font-bold text-stone-600 dark:text-stone-400">Title</dt>
-                      <dd className="text-stone-700 dark:text-stone-200">{sightingTitle}</dd>
-                    </dl>
-                    {/* Tags row — rodent types, spoiler, content warnings */}
-                    {(() => {
-                      const rodentTypes = submission.rodentTypes ?? [];
-                      const warnings = submission.contentWarnings ?? [];
-                      if (!submission.spoiler && rodentTypes.length === 0 && warnings.length === 0) return null;
-                      return (
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {rodentTypes.filter((id) => id !== "rat").map((id) => {
-                            const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
-                            return (
-                              <span key={id} className="inline-flex items-center gap-1 rounded-md border border-amber-800/20 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-900 dark:border-amber-400/25 dark:bg-amber-950/35 dark:text-amber-200">
-                                <span aria-hidden>{opt?.emoji ?? "🐾"}</span>
-                                {opt?.label ?? id}
-                              </span>
-                            );
-                          })}
-                          {submission.spoiler ? (
-                            <span className="inline-flex items-center rounded-md border border-red-800/25 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-900 dark:border-red-400/30 dark:bg-red-950/35 dark:text-red-200">
-                              Spoiler
-                            </span>
-                          ) : null}
-                          {warnings.map((id) => {
-                            const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
-                            return (
-                              <span key={id} className="inline-flex items-center gap-1 rounded-md border border-yellow-800/20 bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/35 dark:text-yellow-200">
-                                <span aria-hidden>{opt?.emoji ?? "⚠️"}</span>
-                                {formatContentWarningLabel(id, submission.rodentTypes)}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      );
-                    })()}
-                    <div className="mt-3 border-t border-stone-950/8 pt-3 dark:border-white/8">
-                      <p className="mb-1.5 text-sm font-bold text-stone-600 dark:text-stone-400">Description</p>
-                      <SightingMarkdown markdown={submission.description} />
+                    <div className="mt-5">
+                      <InlineApproveForm
+                        submissionId={submission.id}
+                        moderateAction={moderateSubmission}
+                      />
                     </div>
-                </div>
-
-                {attachmentSlides.length > 0 ? (
-                  <div className="mt-4 overflow-hidden rounded-xl border border-stone-900/15 bg-stone-50 dark:border-white/12 dark:bg-stone-900/50">
-                    <SubmissionImageThumbs slides={attachmentSlides} />
                   </div>
-                ) : null}
-
-                <div className="mt-5">
-                  <InlineApproveForm
-                    submissionId={submission.id}
-                    moderateAction={moderateSubmission}
-                  />
-                </div>
-                </div>
-              </article>
+                </article>
               );
             })}
           </div>

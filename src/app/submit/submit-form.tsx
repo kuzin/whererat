@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useFormStatus } from "react-dom";
-import { normalizeImdbId, RODENT_TYPE_OPTIONS, rodentCountFieldLabel, rodentSwarmNoun } from "@/lib/whererat";
+import { normalizeImdbId, RODENT_TYPE_OPTIONS, rodentCountFieldLabel, rodentSwarmNoun, formatPercentAsTimestamp } from "@/lib/whererat";
 import {
   SightingTimestampField,
   SightingRatCountField,
@@ -115,6 +115,7 @@ export function SubmitForm({
   const [selectedImdbKind, setSelectedImdbKind] = useState<"movie" | "series" | undefined>(
     initialMovie?.kind,
   );
+  const [selectedMovie, setSelectedMovie] = useState<{ runtime?: string } | undefined>(initialMovie);
   const [selectedRodentTypes, setSelectedRodentTypes] = useState<string[]>(["rat"]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -194,7 +195,7 @@ export function SubmitForm({
       {/* Error summary — click each item to jump to the field */}
       {orderedErrors.length > 0 ? (
         <div className="rounded-xl border border-red-800/35 bg-red-50 p-4 text-sm text-red-900 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
-          <p className="font-bold">⚠️ Please fix the following:</p>
+          <p className="font-bold flex items-center gap-1.5"><img src="/openmoji/color/svg/26A0.svg" alt="Warning" width={16} height={16} /> Please fix the following:</p>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             {orderedErrors.map(({ field, message }) => (
               <li key={field}>
@@ -217,6 +218,7 @@ export function SubmitForm({
         <MovieSearchField
           fieldErrors={fieldErrors}
           onKindChange={setSelectedImdbKind}
+          onMovieSelect={setSelectedMovie}
           initialMovie={
             initialMovie
               ? { ...initialMovie, genre: undefined, plot: undefined, source: "Seed" }
@@ -260,12 +262,14 @@ export function SubmitForm({
         <SightingTimestampField
           label={`When in the ${selectedImdbKind === "series" ? "episode" : "movie"}?`}
           errorMessage={errorFor("timestamp")}
+          runtimeMinutes={selectedMovie?.runtime ? Number.parseInt(selectedMovie.runtime, 10) : undefined}
         />
 
         {/* Rat count */}
         <SightingRatCountField
           label={rodentCountFieldLabel(selectedRodentTypes)}
-          emoji={selectedRodentTypes.length === 1 ? (RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.emoji ?? "🐀") : "🐀"}
+          openmojiCode={selectedRodentTypes.length === 1 ? (RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.openmojiCode ?? "1F400") : "1F400"}
+          rodentId={selectedRodentTypes.length === 1 ? selectedRodentTypes[0] : undefined}
           noun={rodentSwarmNoun(selectedRodentTypes)}
         />
 
@@ -280,72 +284,73 @@ export function SubmitForm({
       <div className="grid gap-4">
         <SectionHeader title="Credit yourself" />
 
-          <div className="grid gap-4">
-            <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-              <span>
-                Your name
-                <RequiredMarker />
+        <div className="grid gap-4">
+          <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+            <span>
+              Your name
+              <RequiredMarker />
+            </span>
+            {lockedSubmitterFields ? (
+              <input name="submitterName" type="hidden" value={loggedInName} />
+            ) : null}
+            <input
+              data-field="submitterName"
+              name={lockedSubmitterFields ? "submitterNameDisplay" : "submitterName"}
+              required
+              autoComplete="name"
+              placeholder="e.g. Jane Smith"
+              defaultValue={lockedSubmitterFields ? loggedInName : undefined}
+              disabled={lockedSubmitterFields}
+              readOnly={lockedSubmitterFields}
+              aria-invalid={Boolean(errorFor("submitterName"))}
+              className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterName") ? inputErrorClass : ""}`}
+            />
+            <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              Your name appears on the published sighting as the finder.
+            </p>
+            {errorFor("submitterName") ? (
+              <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+                {errorFor("submitterName")}
               </span>
-              {lockedSubmitterFields ? (
-                <input name="submitterName" type="hidden" value={loggedInName} />
-              ) : null}
-              <input
-                data-field="submitterName"
-                name={lockedSubmitterFields ? "submitterNameDisplay" : "submitterName"}
-                required
-                autoComplete="name"
-                placeholder="e.g. Jane Smith"
-                defaultValue={lockedSubmitterFields ? loggedInName : undefined}
-                disabled={lockedSubmitterFields}
-                readOnly={lockedSubmitterFields}
-                aria-invalid={Boolean(errorFor("submitterName"))}
-                className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterName") ? inputErrorClass : ""}`}
-              />
-              <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                Your name appears on the published sighting as the finder.
-              </p>
-              {errorFor("submitterName") ? (
-                <span className="text-xs font-semibold text-red-700 dark:text-red-300">
-                  {errorFor("submitterName")}
-                </span>
-              ) : null}
-            </label>
+            ) : null}
+          </label>
 
-            <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-              <span className="flex items-baseline justify-between">
-                Email{" "}
-                <span className="text-xs font-medium text-stone-400 dark:text-stone-500">
-                  (optional)
-                </span>
+          <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+            <span className="flex items-baseline justify-between">
+              Email{" "}
+              <span className="text-xs font-medium text-stone-400 dark:text-stone-500">
+                (optional)
               </span>
-              {lockedSubmitterFields ? (
-                <input name="submitterEmail" type="hidden" value={loggedInEmail} />
-              ) : null}
-              <input
-                data-field="submitterEmail"
-                name={lockedSubmitterFields ? "submitterEmailDisplay" : "submitterEmail"}
-                type="email"
-                autoComplete="email"
-                inputMode="email"
-                placeholder="you@example.com"
-                defaultValue={lockedSubmitterFields ? loggedInEmail : undefined}
-                disabled={lockedSubmitterFields}
-                readOnly={lockedSubmitterFields}
-                aria-invalid={Boolean(errorFor("submitterEmail"))}
-                className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterEmail") ? inputErrorClass : ""}`}
-              />
-              <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                Only used if a moderator needs to follow up — never shown publicly.
-              </p>
-              {errorFor("submitterEmail") ? (
-                <span className="text-xs font-semibold text-red-700 dark:text-red-300">
-                  {errorFor("submitterEmail")}
-                </span>
-              ) : null}
-            </label>
-          </div>
+            </span>
+            {lockedSubmitterFields ? (
+              <input name="submitterEmail" type="hidden" value={loggedInEmail} />
+            ) : null}
+            <input
+              data-field="submitterEmail"
+              name={lockedSubmitterFields ? "submitterEmailDisplay" : "submitterEmail"}
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              placeholder="you@example.com"
+              defaultValue={lockedSubmitterFields ? loggedInEmail : undefined}
+              disabled={lockedSubmitterFields}
+              readOnly={lockedSubmitterFields}
+              aria-invalid={Boolean(errorFor("submitterEmail"))}
+              className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterEmail") ? inputErrorClass : ""}`}
+            />
+            <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              Only used if a moderator needs to follow up — never shown publicly.
+            </p>
+            {errorFor("submitterEmail") ? (
+              <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+                {errorFor("submitterEmail")}
+              </span>
+            ) : null}
+          </label>
+        </div>
 
-          {/* Flags */}
+        <div className="grid gap-4 mt-12">
+          <SectionHeader title="Other settings" />
           <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">
             <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
               <span>Contains plot spoilers</span>
@@ -374,6 +379,7 @@ export function SubmitForm({
               </label>
             ) : null}
           </div>
+        </div>
 
         <div>
           <SubmitButton />

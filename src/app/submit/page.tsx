@@ -69,22 +69,22 @@ export default async function SubmitPage({
     syncSnapshot.Type.trim().toLowerCase() === "series";
   const initialMovie = forImdbId
     ? {
-        imdbId: forImdbId,
-        title: catalogMovie?.title ?? forTitle ?? "",
-        year: String(catalogMovie?.releaseYear ?? forYear ?? ""),
-        yearRange: isCatalogSeries ? readSeriesYearRange(syncSnapshot) : undefined,
-        posterUrl: catalogMovie?.posterUrl ?? forPoster ?? "",
-        kind: isCatalogSeries ? ("series" as const) : ("movie" as const),
-        runtime: isCatalogSeries
-          ? undefined
-          : catalogMovie?.runtimeMinutes
-            ? `${catalogMovie.runtimeMinutes} min`
-            : undefined,
-        rating: catalogMovie?.metadata.rating || undefined,
-        imdbRating: catalogMovie?.metadata.imdbRating || undefined,
-        totalSeasons: isCatalogSeries ? readSeriesTotalSeasons(syncSnapshot) : undefined,
-        totalEpisodes: isCatalogSeries ? readSeriesTotalEpisodes(syncSnapshot) : undefined,
-      }
+      imdbId: forImdbId,
+      title: catalogMovie?.title ?? forTitle ?? "",
+      year: String(catalogMovie?.releaseYear ?? forYear ?? ""),
+      yearRange: isCatalogSeries ? readSeriesYearRange(syncSnapshot) : undefined,
+      posterUrl: catalogMovie?.posterUrl ?? forPoster ?? "",
+      kind: isCatalogSeries ? ("series" as const) : ("movie" as const),
+      runtime: isCatalogSeries
+        ? undefined
+        : catalogMovie?.runtimeMinutes
+          ? `${catalogMovie.runtimeMinutes} min`
+          : undefined,
+      rating: catalogMovie?.metadata.rating || undefined,
+      imdbRating: catalogMovie?.metadata.imdbRating || undefined,
+      totalSeasons: isCatalogSeries ? readSeriesTotalSeasons(syncSnapshot) : undefined,
+      totalEpisodes: isCatalogSeries ? readSeriesTotalEpisodes(syncSnapshot) : undefined,
+    }
     : undefined;
 
   const cookieStore = await cookies();
@@ -98,7 +98,7 @@ export default async function SubmitPage({
       <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="self-start rounded-2xl wr-panel-warm p-8">
           <div className="text-4xl leading-none sm:text-5xl">
-            <span aria-hidden>🐀</span>
+            <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={56} height={56} />
           </div>
           <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
             Submit a rodent sighting

@@ -312,18 +312,18 @@ export default async function MoviePage({
 
   const rootStyle: CSSProperties | undefined = palette
     ? ({
-        "--movie-wash": palette.wash,
-        "--movie-column-wash": palette.columnWash,
-        "--movie-accent": palette.accent,
-        "--movie-accent-ink": pickReadableInk(palette.accent),
-        "--movie-hero-bloom": palette.heroBloom,
-        "--movie-wash-dark": darkPalette?.wash ?? palette.wash,
-        "--movie-column-wash-dark": darkPalette?.columnWash ?? palette.columnWash,
-        "--movie-accent-dark": darkPalette?.accent ?? palette.accent,
-        "--movie-accent-ink-dark": pickReadableInk(darkPalette?.accent ?? palette.accent),
-        "--movie-hero-bloom-dark":
-          darkPalette?.heroBloom ?? palette.heroBloom,
-      } as CSSProperties)
+      "--movie-wash": palette.wash,
+      "--movie-column-wash": palette.columnWash,
+      "--movie-accent": palette.accent,
+      "--movie-accent-ink": pickReadableInk(palette.accent),
+      "--movie-hero-bloom": palette.heroBloom,
+      "--movie-wash-dark": darkPalette?.wash ?? palette.wash,
+      "--movie-column-wash-dark": darkPalette?.columnWash ?? palette.columnWash,
+      "--movie-accent-dark": darkPalette?.accent ?? palette.accent,
+      "--movie-accent-ink-dark": pickReadableInk(darkPalette?.accent ?? palette.accent),
+      "--movie-hero-bloom-dark":
+        darkPalette?.heroBloom ?? palette.heroBloom,
+    } as CSSProperties)
     : undefined;
 
   // Sidebar label classes — mix accent colour in on palette pages for better readability
@@ -357,15 +357,15 @@ export default async function MoviePage({
   const imdbTitleUrlResolved = getImdbTitleUrl(movie.externalIds.imdb);
   const hasDetailsSection = Boolean(
     runtimeLabel ||
-      certificate ||
-      imdbRating ||
-      metascore ||
-      writers ||
-      director ||
-      cast ||
-      originalLanguage ||
-      countriesLine ||
-      awards,
+    certificate ||
+    imdbRating ||
+    metascore ||
+    writers ||
+    director ||
+    cast ||
+    originalLanguage ||
+    countriesLine ||
+    awards,
   );
 
   return (
@@ -380,7 +380,7 @@ export default async function MoviePage({
           title="Back to catalog"
           className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
         </Link>
         <div className="flex items-center gap-1.5">
           {canEditMovie ? (
@@ -398,7 +398,7 @@ export default async function MoviePage({
                   title="Delete movie"
                   className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0 text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/35"
                 >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" /></svg>
                 </ConfirmSubmitButton>
               </form>
               <Link
@@ -407,7 +407,7 @@ export default async function MoviePage({
                 title="Edit movie information"
                 className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
               >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
               </Link>
             </div>
           ) : null}
@@ -420,14 +420,14 @@ export default async function MoviePage({
               title="Open on IMDb"
               className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
             </a>
           ) : null}
           <Link
             href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
             className={`inline-flex h-11 items-center gap-2 px-4 text-sm font-semibold ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             <span className="hidden sm:inline">Submit a Sighting</span>
             <span className="sm:hidden">Submit</span>
           </Link>
@@ -464,25 +464,23 @@ export default async function MoviePage({
           ) : (
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/75 to-stone-950/25" />
           )}
-<div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
+          <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
             <div className="flex max-w-3xl flex-col gap-6">
               <div className="flex flex-col gap-2 sm:gap-3">
                 <h1
-                  className={`wr-display max-w-3xl text-[clamp(1.5rem,5.5vw,2.25rem)] font-bold leading-[1.05] tracking-tight sm:text-4xl sm:leading-[1.04] lg:text-5xl lg:leading-[1.03] ${
-                    palette
+                  className={`wr-display max-w-3xl text-[clamp(1.5rem,5.5vw,2.25rem)] font-bold leading-[1.05] tracking-tight sm:text-4xl sm:leading-[1.04] lg:text-5xl lg:leading-[1.03] ${palette
                       ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_5%,rgb(255_253_249))]"
                       : "text-amber-50"
-                  }`}
+                    }`}
                 >
                   {movie.title}
                 </h1>
                 {heroMetaLine ? (
                   <p
-                    className={`text-sm font-semibold ${
-                      palette
+                    className={`text-sm font-semibold ${palette
                         ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_35%,rgb(254_246_229_/_0.92))]"
                         : "text-amber-200/90"
-                    }`}
+                      }`}
                   >
                     {heroMetaLine}
                   </p>
@@ -490,29 +488,26 @@ export default async function MoviePage({
               </div>
               {trimMeta(movie.metadata.tagline) ? (
                 <p
-                  className={`max-w-2xl text-base font-medium italic leading-relaxed sm:text-lg ${
-                    palette
+                  className={`max-w-2xl text-base font-medium italic leading-relaxed sm:text-lg ${palette
                       ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_18%,rgb(255_251_246_/_0.96))]"
                       : "text-amber-100/95"
-                  }`}
+                    }`}
                 >
                   &quot;{movie.metadata.tagline.trim()}&quot;
                 </p>
               ) : null}
               {(movieSightings.length > 0 || imdbRating) ? (() => {
-                const chipWrap = `rounded-xl border px-4 py-2.5 backdrop-blur-md ${
-                  palette
+                const chipWrap = `rounded-xl border px-4 py-2.5 backdrop-blur-md ${palette
                     ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
                     : "border-white/22 bg-black/42"
-                }`;
+                  }`;
                 const chipDt = palette
                   ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
                   : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78";
-                const chipDd = `wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
-                  palette
+                const chipDd = `wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${palette
                     ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
                     : "text-amber-50"
-                }`;
+                  }`;
                 return (
                   <dl className="flex flex-wrap gap-3">
                     {movieSightings.length > 0 ? (
@@ -574,11 +569,10 @@ export default async function MoviePage({
                   {movie.genres.map((genre) => (
                     <li key={genre}>
                       <span
-                        className={`inline-flex rounded-lg border px-2.5 py-1.5 text-xs font-semibold leading-none shadow-[1px_1px_0_0_rgb(28_25_23/0.12)] dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.35)] ${
-                          palette
+                        className={`inline-flex rounded-lg border px-2.5 py-1.5 text-xs font-semibold leading-none shadow-[1px_1px_0_0_rgb(28_25_23/0.12)] dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.35)] ${palette
                             ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_88%,white)] text-stone-900 dark:border-amber-400/45 dark:bg-stone-900 dark:text-amber-100"
                             : "border-stone-400/65 bg-white text-stone-900 dark:border-amber-500/40 dark:bg-stone-800 dark:text-amber-100"
-                        }`}
+                          }`}
                       >
                         {genre}
                       </span>
@@ -588,11 +582,10 @@ export default async function MoviePage({
               </section>
               {hasDetailsSection ? (
                 <section
-                  className={`space-y-5 border-t pt-8 ${
-                    palette
+                  className={`space-y-5 border-t pt-8 ${palette
                       ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.7))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
                       : "border-stone-900/18 dark:border-white/14"
-                  }`}
+                    }`}
                 >
                   <h2 className={sidebarSectionTitleClass}>Details</h2>
                   <dl className="space-y-5 text-sm text-stone-800 dark:text-stone-100">
@@ -726,13 +719,12 @@ export default async function MoviePage({
             <div className="space-y-4">
               {movieSightings.length === 0 ? (
                 <div
-                  className={`mt-6 rounded-2xl border-2 border-dashed px-6 py-14 text-center dark:border-white/18 ${
-                    palette
+                  className={`mt-6 rounded-2xl border-2 border-dashed px-6 py-14 text-center dark:border-white/18 ${palette
                       ? "border-[color-mix(in_srgb,var(--movie-accent)_25%,rgb(214_211_209))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,white)] dark:bg-[rgb(34_29_25/0.65)]"
                       : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
-                  }`}
+                    }`}
                 >
-                  <p className="text-5xl leading-none" aria-hidden>🐀</p>
+                  <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={48} height={48} className="mx-auto" aria-hidden />
                   <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
                     No rat sightings catalogued yet
                   </p>
@@ -837,159 +829,159 @@ export default async function MoviePage({
             {(() => {
               const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
               return (
-            <form action={updateMovieInfo} className="mt-6 grid gap-4">
-              <input type="hidden" name="slug" value={slug} />
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Title
-                <input name="title" required defaultValue={movie.title} className="wr-input" />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Release year
-                  <input name="releaseYear" type="number" defaultValue={movie.releaseYear} className="wr-input" />
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Runtime (minutes)
-                  <input name="runtimeMinutes" type="number" defaultValue={movie.runtimeMinutes} className="wr-input" />
-                  {(() => {
-                    const syncedVal = String(syncSnapshot?.runtimeMinutes ?? "").trim();
-                    const currentVal = String(movie.runtimeMinutes ?? "");
-                    return syncedVal && syncedVal !== currentVal ? (
-                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                    ) : null;
-                  })()}
-                </label>
-              </div>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Genres (comma-separated)
-                <input name="genres" defaultValue={movie.genres.join(", ")} className="wr-input" />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Summary
-                <textarea name="summary" rows={4} defaultValue={movie.summary} className="wr-input h-auto min-h-[7rem]" />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Poster image URL
-                <input name="posterUrl" defaultValue={movie.posterUrl} className="wr-input" />
-              </label>
-              <div className="flex flex-col gap-1 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Current hero banner URL
-                <p className="break-all rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-normal text-stone-600 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300">
-                  {visuals.bannerUrl}
-                </p>
-                <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
-                  Resynced {movie.metadata.lastSyncedAt ?? "never"}
-                </span>
-              </div>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Tagline
-                <input name="tagline" defaultValue={movie.metadata.tagline} className="wr-input" />
-              </label>
-              <div className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Accent color
-                <AccentColorField
-                  autoAccent={visuals.syncedPalette?.accent ?? "#b45309"}
-                  currentOverride={movie.metadata.overrideAccent ?? ""}
-                />
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Certificate
-                  <input name="rating" defaultValue={movie.metadata.rating} className="wr-input" />
-                  {(() => {
-                    const syncedVal = String(syncSnapshot?.rating ?? "").trim();
-                    const currentVal = String(movie.metadata.rating ?? "").trim();
-                    return syncedVal && syncedVal !== currentVal ? (
-                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                    ) : null;
-                  })()}
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Director
-                  <input name="director" defaultValue={movie.metadata.director} className="wr-input" />
-                  {(() => {
-                    const syncedVal = String(syncSnapshot?.director ?? "").trim();
-                    const currentVal = String(movie.metadata.director ?? "").trim();
-                    return syncedVal && syncedVal !== currentVal ? (
-                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                    ) : null;
-                  })()}
-                </label>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Writers
-                  <input name="writers" defaultValue={movie.metadata.writers} className="wr-input" />
-                  {(() => {
-                    const syncedVal = String(syncSnapshot?.writers ?? "").trim();
-                    const currentVal = String(movie.metadata.writers ?? "").trim();
-                    return syncedVal && syncedVal !== currentVal ? (
-                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                    ) : null;
-                  })()}
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Cast (top billed)
-                  <input name="cast" defaultValue={movie.metadata.cast} className="wr-input" />
-                  {(() => {
-                    const syncedVal = String(syncSnapshot?.cast ?? "").trim();
-                    const currentVal = String(movie.metadata.cast ?? "").trim();
-                    return syncedVal && syncedVal !== currentVal ? (
-                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                    ) : null;
-                  })()}
-                </label>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  IMDb score
-                  <input name="imdbRating" defaultValue={movie.metadata.imdbRating} className="wr-input" />
-                  {(() => {
-                    const syncedVal = String(syncSnapshot?.imdbRating ?? "").trim();
-                    const currentVal = String(movie.metadata.imdbRating ?? "").trim();
-                    return syncedVal && syncedVal !== currentVal ? (
-                      <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                    ) : null;
-                  })()}
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  IMDb votes
-                  <input name="imdbVotes" defaultValue={movie.metadata.imdbVotes} className="wr-input" />
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Metascore
-                  <input name="metascore" defaultValue={movie.metadata.metascore} className="wr-input" />
-                </label>
-              </div>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Awards / honors
-                <input name="awards" defaultValue={movie.metadata.awards} className="wr-input" />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Language
-                  <input name="originalLanguage" defaultValue={movie.metadata.originalLanguage} className="wr-input" />
-                </label>
-                <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                  Countries (comma-separated)
-                  <input name="countries" defaultValue={movie.metadata.productionCountries.join(", ")} className="wr-input" />
-                </label>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <Link
-                  href={`/movies/${slug}`}
-                  className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
-                >
-                  Cancel
-                </Link>
-                <button
-                  type="submit"
-                  className="wr-btn-primary"
-                >
-                  Save movie info
-                </button>
-              </div>
-            </form>
+                <form action={updateMovieInfo} className="mt-6 grid gap-4">
+                  <input type="hidden" name="slug" value={slug} />
+                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Title
+                    <input name="title" required defaultValue={movie.title} className="wr-input" />
+                  </label>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Release year
+                      <input name="releaseYear" type="number" defaultValue={movie.releaseYear} className="wr-input" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Runtime (minutes)
+                      <input name="runtimeMinutes" type="number" defaultValue={movie.runtimeMinutes} className="wr-input" />
+                      {(() => {
+                        const syncedVal = String(syncSnapshot?.runtimeMinutes ?? "").trim();
+                        const currentVal = String(movie.runtimeMinutes ?? "");
+                        return syncedVal && syncedVal !== currentVal ? (
+                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                        ) : null;
+                      })()}
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Genres (comma-separated)
+                    <input name="genres" defaultValue={movie.genres.join(", ")} className="wr-input" />
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Summary
+                    <textarea name="summary" rows={4} defaultValue={movie.summary} className="wr-input h-auto min-h-[7rem]" />
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Poster image URL
+                    <input name="posterUrl" defaultValue={movie.posterUrl} className="wr-input" />
+                  </label>
+                  <div className="flex flex-col gap-1 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Current hero banner URL
+                    <p className="break-all rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-normal text-stone-600 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300">
+                      {visuals.bannerUrl}
+                    </p>
+                    <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
+                      Resynced {movie.metadata.lastSyncedAt ?? "never"}
+                    </span>
+                  </div>
+                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Tagline
+                    <input name="tagline" defaultValue={movie.metadata.tagline} className="wr-input" />
+                  </label>
+                  <div className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Accent color
+                    <AccentColorField
+                      autoAccent={visuals.syncedPalette?.accent ?? "#b45309"}
+                      currentOverride={movie.metadata.overrideAccent ?? ""}
+                    />
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Certificate
+                      <input name="rating" defaultValue={movie.metadata.rating} className="wr-input" />
+                      {(() => {
+                        const syncedVal = String(syncSnapshot?.rating ?? "").trim();
+                        const currentVal = String(movie.metadata.rating ?? "").trim();
+                        return syncedVal && syncedVal !== currentVal ? (
+                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                        ) : null;
+                      })()}
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Director
+                      <input name="director" defaultValue={movie.metadata.director} className="wr-input" />
+                      {(() => {
+                        const syncedVal = String(syncSnapshot?.director ?? "").trim();
+                        const currentVal = String(movie.metadata.director ?? "").trim();
+                        return syncedVal && syncedVal !== currentVal ? (
+                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                        ) : null;
+                      })()}
+                    </label>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Writers
+                      <input name="writers" defaultValue={movie.metadata.writers} className="wr-input" />
+                      {(() => {
+                        const syncedVal = String(syncSnapshot?.writers ?? "").trim();
+                        const currentVal = String(movie.metadata.writers ?? "").trim();
+                        return syncedVal && syncedVal !== currentVal ? (
+                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                        ) : null;
+                      })()}
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Cast (top billed)
+                      <input name="cast" defaultValue={movie.metadata.cast} className="wr-input" />
+                      {(() => {
+                        const syncedVal = String(syncSnapshot?.cast ?? "").trim();
+                        const currentVal = String(movie.metadata.cast ?? "").trim();
+                        return syncedVal && syncedVal !== currentVal ? (
+                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                        ) : null;
+                      })()}
+                    </label>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      IMDb score
+                      <input name="imdbRating" defaultValue={movie.metadata.imdbRating} className="wr-input" />
+                      {(() => {
+                        const syncedVal = String(syncSnapshot?.imdbRating ?? "").trim();
+                        const currentVal = String(movie.metadata.imdbRating ?? "").trim();
+                        return syncedVal && syncedVal !== currentVal ? (
+                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                        ) : null;
+                      })()}
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      IMDb votes
+                      <input name="imdbVotes" defaultValue={movie.metadata.imdbVotes} className="wr-input" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Metascore
+                      <input name="metascore" defaultValue={movie.metadata.metascore} className="wr-input" />
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                    Awards / honors
+                    <input name="awards" defaultValue={movie.metadata.awards} className="wr-input" />
+                  </label>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Language
+                      <input name="originalLanguage" defaultValue={movie.metadata.originalLanguage} className="wr-input" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Countries (comma-separated)
+                      <input name="countries" defaultValue={movie.metadata.productionCountries.join(", ")} className="wr-input" />
+                    </label>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                    <Link
+                      href={`/movies/${slug}`}
+                      className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
+                    >
+                      Cancel
+                    </Link>
+                    <button
+                      type="submit"
+                      className="wr-btn-primary"
+                    >
+                      Save movie info
+                    </button>
+                  </div>
+                </form>
               );
             })()}
           </div>

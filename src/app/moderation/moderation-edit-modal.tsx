@@ -29,10 +29,10 @@ export function ModerationEditModal({
 }) {
   const initialRodentTypes = submission.rodentTypes ?? ["rat"];
   const [selectedRodentTypes, setSelectedRodentTypes] = useState<string[]>(initialRodentTypes);
-  const rodentEmoji =
+  const rodentOption =
     selectedRodentTypes.length === 1
-      ? (RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.emoji ?? "🐀")
-      : "🐀";
+      ? RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])
+      : undefined;
   const initialImages = getSubmissionImageRefs(submission);
   const initialPercent = getSightingTimestampPercent(submission.timestamp) ?? 50;
   const isSeriesTitle = submission.imdbKind === "series";
@@ -92,7 +92,8 @@ export function ModerationEditModal({
           <SightingRatCountField
             defaultValue={submission.approximateRatCount}
             label={rodentCountFieldLabel(selectedRodentTypes)}
-            emoji={rodentEmoji}
+            openmojiCode={rodentOption?.openmojiCode ?? "1F400"}
+            rodentId={rodentOption?.id}
             noun={rodentSwarmNoun(selectedRodentTypes)}
           />
 

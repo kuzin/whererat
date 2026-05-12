@@ -11,9 +11,7 @@ export default function GlobalError({
   return (
     <main className="wr-page-shell flex flex-1 flex-col items-center justify-center py-24 text-center">
       <div className="wr-cheese-panel wr-cheese-tile-cream w-full max-w-lg px-10 py-16">
-        <p className="wr-display text-[4rem] font-bold leading-none tracking-tight text-amber-700 dark:text-amber-400">
-          🐀
-        </p>
+        <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={64} height={64} className="mx-auto" />
         <h1 className="wr-display mt-4 text-3xl font-bold text-stone-950 dark:text-stone-50">
           Something went wrong.
         </h1>

@@ -124,10 +124,12 @@ export function MovieSearchField({
   fieldErrors = {},
   initialMovie,
   onKindChange,
+  onMovieSelect,
 }: {
   fieldErrors?: Record<string, string>;
   initialMovie?: MovieResult;
   onKindChange?: (kind: "movie" | "series" | undefined) => void;
+  onMovieSelect?: (movie: MovieResult | undefined) => void;
 }) {
   const [query, setQuery] = useState(
     initialMovie ? `${initialMovie.title} (${initialMovie.year})` : "",
@@ -147,6 +149,11 @@ export function MovieSearchField({
   const [seasonLookupError, setSeasonLookupError] = useState<string | undefined>();
   const [isEpisodeLoading, setIsEpisodeLoading] = useState(false);
   const helperId = useId();
+
+  const handleSelectMovie = (movie: MovieResult | undefined) => {
+    setSelectedMovie(movie);
+    onMovieSelect?.(movie);
+  };
 
   const canSearch = query.trim().length >= 2;
   const visibleResults = canSearch && !selectedMovie ? results : [];
@@ -297,17 +304,16 @@ export function MovieSearchField({
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
-              setSelectedMovie(undefined);
+              handleSelectMovie(undefined);
               setError(undefined);
             }}
             placeholder="Start typing: The Departed, Ratatouille..."
             aria-invalid={Boolean(fieldErrors.movieSelection)}
             aria-describedby={helperId}
-            className={`wr-input ${
-              fieldErrors.movieSelection
+            className={`wr-input ${fieldErrors.movieSelection
                 ? "border-red-700/70 focus-visible:border-red-700 dark:border-red-400/65 dark:focus-visible:border-red-400"
                 : ""
-            }`}
+              }`}
           />
           {fieldErrors.movieSelection ? (
             <span className="text-xs font-semibold text-red-700 dark:text-red-300">
@@ -372,7 +378,7 @@ export function MovieSearchField({
               <button
                 type="button"
                 onClick={() => {
-                  setSelectedMovie(undefined);
+                  handleSelectMovie(undefined);
                   setQuery("");
                   setSeasonNumber("");
                   setEpisodeNumber("");
@@ -538,12 +544,12 @@ export function MovieSearchField({
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedMovie(movie);
+                    handleSelectMovie(movie);
                     setQuery(`${movie.title} (${movie.year})`);
                     setError(undefined);
-                  setSeasonNumber("");
-                  setEpisodeNumber("");
-                  setEpisodeTitle("");
+                    setSeasonNumber("");
+                    setEpisodeNumber("");
+                    setEpisodeTitle("");
                     setEpisodes([]);
                     setSeasonLookupError(undefined);
                   }}

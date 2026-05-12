@@ -243,11 +243,10 @@ function VideoCard({ video, palette }: { video: ImdbVideo; palette: boolean }) {
         <div className="flex flex-col gap-1 p-3">
           {video.contentType ? (
             <span
-              className={`w-fit rounded px-1.5 py-0.5 text-[0.6rem] font-black uppercase tracking-wider ${
-                palette
+              className={`w-fit rounded px-1.5 py-0.5 text-[0.6rem] font-black uppercase tracking-wider ${palette
                   ? "bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(220_210_198))] text-stone-700 dark:bg-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(50_40_30))] dark:text-stone-200"
                   : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
-              }`}
+                }`}
             >
               {video.contentType}
             </span>
@@ -416,7 +415,7 @@ export function MovieRatMediaTab({ videos, images, youtubeTrailerKey, palette }:
 
       {!hasContent ? (
         <div className={`rounded-2xl border-2 border-dashed px-6 py-14 text-center ${tabCardColors(palette)}`}>
-          <p className="text-4xl leading-none" aria-hidden>📷</p>
+          <img src="/openmoji/color/svg/1F4F7.svg" alt="" width={40} height={40} className="mx-auto" aria-hidden />
           <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
             No media yet
           </p>

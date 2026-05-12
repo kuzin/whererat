@@ -1,6 +1,18 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+export function OM({ code, label, size = 48 }: { code: string; label: string; size?: number }) {
+  return (
+    <img
+      src={`/openmoji/color/svg/${code}.svg`}
+      alt={label}
+      width={size}
+      height={size}
+      aria-hidden
+    />
+  );
+}
+
 // ── Layout shell ─────────────────────────────────────────────────────────────
 
 export function InfoPageShell({
@@ -27,15 +39,15 @@ export function InfoHero({
   title,
   description,
 }: {
-  icon?: string;
+  icon?: ReactNode;
   title: string;
   description: string;
 }) {
   return (
     <div className="rounded-2xl wr-panel-warm p-8">
       {icon && (
-        <div className="text-4xl leading-none sm:text-5xl">
-          <span aria-hidden>{icon}</span>
+        <div className="leading-none">
+          {icon}
         </div>
       )}
       <h1 className={`wr-display text-4xl font-bold tracking-tight text-stone-950 dark:text-amber-50${icon ? " mt-4" : ""}`}>
@@ -53,14 +65,14 @@ export function InfoSection({
   title,
   children,
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   children: ReactNode;
 }) {
   return (
     <article className="rounded-2xl border border-stone-900/15 bg-white p-5 transition-colors hover:bg-amber-50/60 dark:border-white/12 dark:bg-stone-900/70 dark:hover:bg-stone-800/60">
       <h2 className="wr-display flex items-center gap-2 text-xl font-bold text-stone-950 dark:text-stone-100">
-        <span aria-hidden>{icon}</span>
+        {icon}
         <span>{title}</span>
       </h2>
       <p className="mt-3 leading-relaxed text-stone-700 dark:text-stone-300">{children}</p>

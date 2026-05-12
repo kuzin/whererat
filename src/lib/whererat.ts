@@ -55,26 +55,26 @@ export type SubmissionStatus = "pending" | "approved" | "rejected";
 export type ImdbTitleKind = "movie" | "series";
 
 export const RODENT_TYPE_OPTIONS = [
-  { id: "rat",        emoji: "🐀", label: "Rat",        plural: "rats" },
-  { id: "mouse",      emoji: "🐁", label: "Mouse",      plural: "mice" },
-  { id: "squirrel",   emoji: "🐿️", label: "Squirrel",   plural: "squirrels" },
-  { id: "hamster",    emoji: "🐹", label: "Hamster",    plural: "hamsters" },
-  { id: "guinea-pig", emoji: "🐾", label: "Guinea pig", plural: "guinea pigs" },
-  { id: "gerbil",     emoji: "🐾", label: "Gerbil",     plural: "gerbils" },
-  { id: "beaver",     emoji: "🦫", label: "Beaver",     plural: "beavers" },
-  { id: "chipmunk",   emoji: "🐿️", label: "Chipmunk",   plural: "chipmunks" },
+  { id: "rat", emoji: "🐀", label: "Rat", plural: "rats", openmojiCode: "1F400" },
+  { id: "mouse", emoji: "🐁", label: "Mouse", plural: "mice", openmojiCode: "1F401" },
+  { id: "squirrel", emoji: "🐿️", label: "Squirrel", plural: "squirrels", openmojiCode: "1F43F" },
+  { id: "hamster", emoji: "🐹", label: "Hamster", plural: "hamsters", openmojiCode: "1F439" },
+  { id: "guinea-pig", emoji: "🐭", label: "Guinea pig", plural: "guinea pigs", openmojiCode: "1F439" },
+  { id: "gerbil", emoji: "🐭", label: "Gerbil", plural: "gerbils", openmojiCode: "1F439" },
+  { id: "beaver", emoji: "🦫", label: "Beaver", plural: "beavers", openmojiCode: "1F9AB" },
+  { id: "chipmunk", emoji: "🐿️", label: "Chipmunk", plural: "chipmunks", openmojiCode: "1F43F" },
 ] as const;
 export type RodentTypeId = (typeof RODENT_TYPE_OPTIONS)[number]["id"];
 
 export const CONTENT_WARNING_OPTIONS = [
-  { id: "rat-dies",       emoji: "💀", label: "Rat dies" },
-  { id: "rat-harmed",     emoji: "🩹", label: "Rat is harmed" },
-  { id: "rat-eaten",      emoji: "🐍", label: "Eaten by predator" },
-  { id: "rat-poison",     emoji: "☠️", label: "Rat is poisoned" },
-  { id: "rat-trap",       emoji: "🪤", label: "Caught in trap" },
-  { id: "rat-experiment", emoji: "🔬", label: "Lab / experiment" },
-  { id: "graphic",        emoji: "🩸", label: "Graphic / disturbing" },
-  { id: "jump-scare",     emoji: "😱", label: "Jump scare" },
+  { id: "rat-dies", emoji: "💀", openmojiCode: "1F480", label: "Rat dies" },
+  { id: "rat-harmed", emoji: "🩹", openmojiCode: "1FA79", label: "Rat is harmed" },
+  { id: "rat-eaten", emoji: "🐍", openmojiCode: "1F40D", label: "Eaten by predator" },
+  { id: "rat-poison", emoji: "☠️", openmojiCode: "2620", label: "Rat is poisoned" },
+  { id: "rat-trap", emoji: "🪤", openmojiCode: "1FAA4", label: "Caught in trap" },
+  { id: "rat-experiment", emoji: "🔬", openmojiCode: "1F52C", label: "Lab / experiment" },
+  { id: "graphic", emoji: "🩸", openmojiCode: "1FA78", label: "Graphic / disturbing" },
+  { id: "jump-scare", emoji: "😱", openmojiCode: "1F631", label: "Jump scare" },
 ] as const;
 export type ContentWarningId = (typeof CONTENT_WARNING_OPTIONS)[number]["id"];
 
@@ -127,10 +127,10 @@ export type Movie = {
     originalLanguage: string;
     productionCountries: string[];
     metadataProvider:
-      | "IMDb seed"
-      | "OMDb via IMDb ID"
-      | "Licensed IMDb data"
-      | "TMDB keyword seed";
+    | "IMDb seed"
+    | "OMDb via IMDb ID"
+    | "Licensed IMDb data"
+    | "TMDB keyword seed";
     lastSyncedAt: string;
     /** Last banner URL resolved during sync (used as stable default hero source). */
     syncedHeaderBannerUrl?: string;
@@ -273,6 +273,8 @@ export type Submission = {
   submittedBy: string;
   /** Optional contact shared with moderators; not shown on public cards. */
   submitterEmail?: string;
+  /** ISO timestamp when submission was created. */
+  submittedAt: Date;
   /** Optional curator message shown on approved sightings. */
   curatorNote?: string;
   duplicateHint?: string;
@@ -491,6 +493,23 @@ function parsePercentIntoMovie(value: string): number | null {
 
 export function getSightingTimestampPercent(value: string): number | null {
   return parsePercentIntoMovie(value);
+}
+
+/**
+ * Convert a percentage + runtime to a human-readable timestamp.
+ * @param percentStr - A percentage string like "42%" or "42"
+ * @param runtimeMinutes - Movie runtime in minutes
+ * @returns A formatted timestamp like "56m 24s" or null if unable to parse
+ */
+export function formatPercentAsTimestamp(percentStr: string, runtimeMinutes?: number): string | null {
+  if (!runtimeMinutes || runtimeMinutes <= 0) return null;
+  const percent = parsePercentIntoMovie(percentStr);
+  if (percent === null) return null;
+  const totalSeconds = Math.round((percent / 100) * runtimeMinutes * 60);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return formatClockParts({ h: hours, m: minutes, s: seconds });
 }
 
 export function normalizeSightingTimestampInput(value: string): string {

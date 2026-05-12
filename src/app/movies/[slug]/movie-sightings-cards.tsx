@@ -211,12 +211,12 @@ function SpoilerPlaceholderCopy({
                   ...(w != null
                     ? { width: `${Math.round(w)}px`, maxWidth: "100%" }
                     : {
-                        width:
-                          i === 2
-                            ? `min(100%, ${Math.max(14, Math.round(fallbackBodyCh * 0.62))}ch)`
-                            : `min(100%, ${fallbackBodyCh}ch)`,
-                        maxWidth: "100%",
-                      }),
+                      width:
+                        i === 2
+                          ? `min(100%, ${Math.max(14, Math.round(fallbackBodyCh * 0.62))}ch)`
+                          : `min(100%, ${fallbackBodyCh}ch)`,
+                      maxWidth: "100%",
+                    }),
                 }}
               />
             ))}
@@ -276,16 +276,14 @@ export function MovieSightingsCards({
             aria-checked={showSpoilers}
             aria-label={showSpoilers ? "Hide spoilers" : "Show spoilers"}
             onClick={() => setShowSpoilers((prev) => !prev)}
-            className={`relative inline-flex h-8 w-[3.25rem] shrink-0 items-center rounded-full border-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out active:scale-[0.94] motion-reduce:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 ${
-              showSpoilers
+            className={`relative inline-flex h-8 w-[3.25rem] shrink-0 items-center rounded-full border-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out active:scale-[0.94] motion-reduce:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 ${showSpoilers
                 ? "border-amber-700 bg-amber-500 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)] dark:border-amber-500 dark:bg-amber-600"
                 : "border-stone-700/80 bg-[color-mix(in_srgb,rgb(120_113_108)_22%,rgb(255_253_248))] dark:border-white/25 dark:bg-stone-700"
-            }`}
+              }`}
           >
             <span
-              className={`pointer-events-none absolute top-1 left-1 size-5 rounded-full bg-white shadow-md ring-1 ring-stone-900/10 will-change-transform motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.34,1.28,0.64,1)] motion-reduce:duration-150 dark:ring-white/10 ${
-                showSpoilers ? "translate-x-[1.35rem]" : "translate-x-0"
-              }`}
+              className={`pointer-events-none absolute top-1 left-1 size-5 rounded-full bg-white shadow-md ring-1 ring-stone-900/10 will-change-transform motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.34,1.28,0.64,1)] motion-reduce:duration-150 dark:ring-white/10 ${showSpoilers ? "translate-x-[1.35rem]" : "translate-x-0"
+                }`}
             />
             <span className="sr-only">
               {showSpoilers ? "Spoilers visible; press to hide." : "Spoilers hidden; press to show."}
@@ -338,7 +336,7 @@ export function MovieSightingsCards({
                       aria-label="Edit sighting"
                       title="Edit sighting"
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                     </Link>
                   ) : null}
                   {/* Content */}
@@ -400,7 +398,7 @@ export function MovieSightingsCards({
                             key={id}
                             className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-yellow-800/20 bg-yellow-50 px-3 text-xs font-semibold tracking-tight text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/40 dark:text-yellow-200"
                           >
-                            <span aria-hidden>{opt ? opt.emoji : "⚠️"}</span>
+                            <img src={`/openmoji/color/svg/${opt ? opt.openmojiCode : "26A0"}.svg`} alt="" width={16} height={16} aria-hidden />
                             {formatContentWarningLabel(id, sighting.rodentTypes)}
                           </span>
                         );

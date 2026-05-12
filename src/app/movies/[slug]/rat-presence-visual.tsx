@@ -9,6 +9,7 @@ import {
   formatApproximateRatLine,
   getRatPresenceScale,
 } from "@/lib/whererat";
+import { RodentTypeIcon } from "@/components/rodent-type-icon";
 
 const MAX_SLOTS = 6;
 
@@ -39,7 +40,7 @@ export function SightingRatPresenceVisual({
                 aria-hidden
                 className={`transition-all duration-200 ${i < scale.slotsFilled ? "opacity-100" : "opacity-15 grayscale"}`}
               >
-                🐀
+                <RodentTypeIcon openmojiCode="1F400" label="Rat" size={20} />
               </span>
             ))}
           </button>

@@ -41,9 +41,9 @@ export function EditSightingForm({
   const initialPercent = getSightingTimestampPercent(sighting.timestamp) ?? 50;
   const initialRodentTypes = (sighting as { rodentTypes?: string[] }).rodentTypes ?? ["rat"];
   const [selectedRodentTypes, setSelectedRodentTypes] = useState<string[]>(initialRodentTypes);
-  const rodentEmoji = selectedRodentTypes.length === 1
-    ? (RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.emoji ?? "🐀")
-    : "🐀";
+  const rodentOption = selectedRodentTypes.length === 1
+    ? RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])
+    : undefined;
 
   return (
     <form action={updateAction} className="mt-6 grid gap-5">
@@ -81,7 +81,8 @@ export function EditSightingForm({
       <SightingRatCountField
         defaultValue={sighting.approximateRatCount}
         label={rodentCountFieldLabel(selectedRodentTypes)}
-        emoji={rodentEmoji}
+        openmojiCode={rodentOption?.openmojiCode ?? "1F400"}
+        rodentId={rodentOption?.id}
         noun={rodentSwarmNoun(selectedRodentTypes)}
       />
 

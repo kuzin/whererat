@@ -166,13 +166,13 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
                 >
                   <span
                     className={[
-                      "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-200 text-base leading-none",
+                      "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-200",
                       onlyRats
                         ? "translate-x-[1.75rem] bg-white shadow opacity-100"
                         : "translate-x-0.5 bg-white opacity-70",
                     ].join(" ")}
                   >
-                    🐀
+                    <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={18} height={18} />
                   </span>
                 </button>
               </label>
@@ -202,7 +202,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
 
       {reviews.length === 0 ? (
         <div className={`rounded-2xl border-2 border-dashed px-6 py-14 text-center ${tabCardColors(palette)}`}>
-          <p className="text-4xl leading-none" aria-hidden>📝</p>
+          <img src="/openmoji/color/svg/1F4DD.svg" alt="" width={40} height={40} className="mx-auto" aria-hidden />
           <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
             No reviews yet
           </p>
@@ -216,11 +216,10 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
             {rowMeta.map(({ review, collapsed, addMargin }) => (
               <div
                 key={review.id}
-                className={`overflow-hidden transition-all duration-300 ${
-                  collapsed
-                    ? "max-h-0 opacity-0"
-                    : `pb-[3px] pr-[3px] max-h-[2000px] opacity-100${addMargin ? " mt-4" : ""}`
-                }`}
+                className={`overflow-hidden transition-all duration-300 ${collapsed
+                  ? "max-h-0 opacity-0"
+                  : `pb-[3px] pr-[3px] max-h-[2000px] opacity-100${addMargin ? " mt-4" : ""}`
+                  }`}
               >
                 <ReviewCard
                   review={review}
@@ -249,11 +248,10 @@ function ReviewCard({
 
   return (
     <article
-      className={`${className} ${
-        highlight
-          ? "ring-2 ring-inset ring-amber-400/35 dark:ring-amber-300/30"
-          : ""
-      }`}
+      className={`${className} ${highlight
+        ? "ring-2 ring-inset ring-amber-400/35 dark:ring-amber-300/30"
+        : ""
+        }`}
     >
       {/* Top row: author + date, then rating on same line at sm+ */}
       <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-x-3">
@@ -268,10 +266,10 @@ function ReviewCard({
           {review.mentionsRat ? (
             <span
               aria-label="Mentions rats"
-              className="cursor-default text-base leading-none"
+              className="cursor-default leading-none"
               title="This review mentions rats!"
             >
-              🐀
+              <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={20} height={20} />
             </span>
           ) : null}
         </div>

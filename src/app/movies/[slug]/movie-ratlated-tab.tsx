@@ -35,7 +35,7 @@ function RelatedCard({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <span className="text-3xl opacity-30" aria-hidden>🎬</span>
+            <img src="/openmoji/color/svg/1F3AC.svg" alt="" width={36} height={36} className="opacity-30" aria-hidden />
           </div>
         )}
       </div>
@@ -95,7 +95,7 @@ export function MovieRatlatedTab({ titles, palette }: Props) {
 
       {titles.length === 0 ? (
         <div className={`rounded-2xl border-2 border-dashed px-6 py-14 text-center ${tabCardColors(palette)}`}>
-          <p className="text-4xl leading-none" aria-hidden>🎞️</p>
+          <img src="/openmoji/color/svg/1F39E.svg" alt="" width={40} height={40} className="mx-auto" aria-hidden />
           <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
             No related titles yet
           </p>
