@@ -216,20 +216,44 @@ function ImageCard({
   );
 }
 
-// ── YouTube trailer embed ─────────────────────────────────────────────────────
+// ── YouTube modal ─────────────────────────────────────────────────────────────
 
-function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette: boolean }) {
-  const [loaded, setLoaded] = useState(false);
-  const thumbUrl = `https://img.youtube.com/vi/${videoKey}/maxresdefault.jpg`;
+function YoutubeModal({ videoKey, onClose }: { videoKey: string; onClose: () => void }) {
   const embedUrl = `https://www.youtube-nocookie.com/embed/${videoKey}?autoplay=1&rel=0&modestbranding=1`;
 
-  const cardBase = tabMediaCardClass(palette);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
 
   return (
-    <div className={`${cardBase} overflow-hidden`}>
-      {loaded ? (
-        <div className="relative aspect-video w-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      {/* Close */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close video"
+        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/85"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5">
+          <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+        </svg>
+      </button>
+
+      {/* Player */}
+      <div
+        className="w-full max-w-4xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-[0_8px_48px_rgb(0_0_0/0.8)]">
           <iframe
             src={embedUrl}
             title="Movie trailer"
@@ -238,23 +262,35 @@ function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette:
             className="absolute inset-0 h-full w-full border-0"
           />
         </div>
-      ) : (
+      </div>
+    </div>
+  );
+}
+
+// ── YouTube trailer thumbnail ─────────────────────────────────────────────────
+
+function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette: boolean }) {
+  const [open, setOpen] = useState(false);
+  const thumbUrl = `https://img.youtube.com/vi/${videoKey}/maxresdefault.jpg`;
+  const cardBase = tabMediaCardClass(palette);
+
+  return (
+    <>
+      {open ? <YoutubeModal videoKey={videoKey} onClose={() => setOpen(false)} /> : null}
+      <div className={`${cardBase} overflow-hidden`}>
         <button
           type="button"
-          onClick={() => setLoaded(true)}
+          onClick={() => setOpen(true)}
           className="group relative flex aspect-video w-full items-center justify-center overflow-hidden bg-stone-900"
           aria-label="Play trailer"
         >
-          {/* Thumbnail */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={thumbUrl}
             alt=""
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
-          {/* Dark scrim */}
           <div className="absolute inset-0 bg-black/30 transition-opacity duration-200 group-hover:bg-black/20" />
-          {/* Play button */}
           <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-[0_4px_24px_rgb(0_0_0/0.6)] transition-transform duration-200 group-hover:scale-110">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="ml-1 size-8">
               <path d="M8 5v14l11-7z" />
@@ -264,8 +300,8 @@ function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette:
             Official Trailer
           </span>
         </button>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 
