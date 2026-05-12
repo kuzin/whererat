@@ -114,7 +114,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
   return (
     <div>
       <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(palette)}`}>
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
             Reviews
           </h2>

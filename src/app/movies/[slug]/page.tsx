@@ -777,9 +777,11 @@ export default async function MoviePage({
           {ratFacts.length > 0 ? (
             <div>
               <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
-                <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                  Rat Facts
-                </h2>
+                <div className="flex min-h-12 items-center">
+                  <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+                    Rat Facts
+                  </h2>
+                </div>
               </header>
               <div className="space-y-3">
                 {ratFacts.map((fact, i) => (

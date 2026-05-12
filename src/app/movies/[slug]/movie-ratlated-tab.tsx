@@ -86,9 +86,11 @@ export function MovieRatlatedTab({ titles, palette }: Props) {
   return (
     <div>
       <header className={`mb-6 border-b pb-4 ${headerBorder}`}>
-        <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-          Related
-        </h2>
+        <div className="flex min-h-12 items-center">
+          <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+            Related
+          </h2>
+        </div>
       </header>
 
       {titles.length === 0 ? (
