@@ -106,22 +106,25 @@ function ImageModal({
 
       {/* Image — stop click from bubbling to backdrop */}
       <div
-        className="relative max-h-[90vh] max-w-[80vw]"
+        className="flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={image.id}
-          src={imdbFull(image.url)}
-          alt={image.caption || "Production still"}
-          className="max-h-[85vh] max-w-[80vw] rounded-xl object-contain shadow-[0_8px_40px_rgb(0_0_0/0.7)]"
-        />
-        <div className="mt-3 flex items-center justify-center gap-4">
-          {image.caption ? (
-            <p className="text-center text-sm text-white/75">{image.caption}</p>
-          ) : null}
-          <p className="shrink-0 text-xs tabular-nums text-white/40">{idx + 1} / {images.length}</p>
+        {/* Image with counter overlaid bottom-right */}
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={image.id}
+            src={imdbFull(image.url)}
+            alt={image.caption || "Production still"}
+            className="block max-h-[85vh] max-w-[80vw] rounded-xl object-contain shadow-[0_8px_40px_rgb(0_0_0/0.7)]"
+          />
+          <p className="absolute right-2 bottom-2 rounded-md bg-black/50 px-2 py-0.5 text-xs tabular-nums text-white/70 backdrop-blur-sm">
+            {idx + 1} / {images.length}
+          </p>
         </div>
+        {image.caption ? (
+          <p className="mt-3 max-w-[80vw] text-center text-sm text-white/75">{image.caption}</p>
+        ) : null}
       </div>
     </div>
   );
