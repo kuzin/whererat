@@ -255,9 +255,9 @@ function ReviewCard({
           : ""
       }`}
     >
-      {/* Top row: author + date on left, rating + rat badge on right */}
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      {/* Top row: author + date, then rating on same line at sm+ */}
+      <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-x-3">
+        <div className="flex items-center gap-x-3">
           <span className="text-sm font-bold text-stone-800 dark:text-stone-200">
             {review.author}
           </span>

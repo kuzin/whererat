@@ -54,6 +54,18 @@ export type VerificationState = "verified" | "pending" | "rejected";
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 export type ImdbTitleKind = "movie" | "series";
 
+export const RODENT_TYPE_OPTIONS = [
+  { id: "rat",        emoji: "🐀", label: "Rat",        plural: "rats" },
+  { id: "mouse",      emoji: "🐁", label: "Mouse",      plural: "mice" },
+  { id: "squirrel",   emoji: "🐿️", label: "Squirrel",   plural: "squirrels" },
+  { id: "hamster",    emoji: "🐹", label: "Hamster",    plural: "hamsters" },
+  { id: "guinea-pig", emoji: "🐾", label: "Guinea pig", plural: "guinea pigs" },
+  { id: "gerbil",     emoji: "🐾", label: "Gerbil",     plural: "gerbils" },
+  { id: "beaver",     emoji: "🦫", label: "Beaver",     plural: "beavers" },
+  { id: "chipmunk",   emoji: "🐿️", label: "Chipmunk",   plural: "chipmunks" },
+] as const;
+export type RodentTypeId = (typeof RODENT_TYPE_OPTIONS)[number]["id"];
+
 export const CONTENT_WARNING_OPTIONS = [
   { id: "rat-dies",       emoji: "💀", label: "Rat dies" },
   { id: "rat-harmed",     emoji: "🩹", label: "Rat is harmed" },
@@ -225,6 +237,8 @@ export type Sighting = {
   episodeNumber?: number;
   episodeTitle?: string;
   contentWarnings?: string[];
+  /** One or more rodent type ids (from RODENT_TYPE_OPTIONS). Defaults to ["rat"] when absent. */
+  rodentTypes?: string[];
 };
 
 export function clampApproximateRatCount(value: unknown): number {
@@ -268,6 +282,7 @@ export type Submission = {
   images?: SightingImageSlot[];
   moviePosterUrl?: string;
   contentWarnings?: string[];
+  rodentTypes?: string[];
 };
 
 export function formatSubmissionEpisodeContext(submission: Pick<
@@ -399,9 +414,56 @@ export function getSubmissionImageRefs(submission: Submission): SightingImageSlo
 }
 
 /** Human line for on-card rat estimate. */
-export function formatApproximateRatLine(count: number): string {
+export function formatApproximateRatLine(count: number, rodentTypes?: string[]): string {
   const n = Math.max(1, Math.min(9999, Math.floor(Number(count))));
+  if (rodentTypes && rodentTypes.length === 1) {
+    const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === rodentTypes[0]);
+    const singular = opt?.label ?? "rat";
+    const plural = opt?.plural ?? "rats";
+    return n === 1 ? `Approx. 1 ${singular}` : `Approx. ${n} ${plural}`;
+  }
+  if (rodentTypes && rodentTypes.length >= 2) {
+    return n === 1 ? "Approx. 1 rodent" : `Approx. ${n} rodents`;
+  }
   return n === 1 ? "Approx. 1 rat" : `Approx. ${n} rats`;
+}
+
+/**
+ * Label for the count stepper in the submit/edit forms.
+ * "Mice on screen" for a single mouse selection, "Rodents on screen" for multi.
+ */
+export function rodentCountFieldLabel(rodentTypes?: string[]): string {
+  const types = rodentTypes && rodentTypes.length > 0 ? rodentTypes : ["rat"];
+  if (types.length === 1) {
+    const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === types[0]);
+    const plural = opt?.plural ?? "rats";
+    return `${plural.charAt(0).toUpperCase()}${plural.slice(1)} on screen`;
+  }
+  return "Rodents on screen";
+}
+
+/** Singular noun used for swarm signal labels ("Rat apocalypse", "Mouse apocalypse", "Rodent apocalypse"). */
+export function rodentSwarmNoun(rodentTypes?: string[]): string {
+  const types = rodentTypes && rodentTypes.length > 0 ? rodentTypes : ["rat"];
+  if (types.length === 1) {
+    const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === types[0]);
+    return opt?.label ?? "Rat";
+  }
+  return "Rodent";
+}
+
+/**
+ * Returns a content warning label adapted to the actual rodent type.
+ * Labels that contain "Rat" (e.g. "Rat dies", "Rat is harmed") are rewritten
+ * to match the sighting's rodent context ("Mouse dies", "Rodent is harmed", etc.).
+ * Generic labels ("Eaten by predator", "Jump scare") are returned unchanged.
+ */
+export function formatContentWarningLabel(id: string, rodentTypes?: string[]): string {
+  const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
+  const label = opt?.label ?? id;
+  if (!label.includes("Rat")) return label;
+  const noun = rodentSwarmNoun(rodentTypes);
+  return label.replace(/\bRat\b/g, noun);
 }
 
 function parseColonTimestamp(value: string): { h: number; m: number; s: number } | null {

@@ -6,6 +6,7 @@ import { getDeletedMovieIds } from "@/lib/movie-edit-store";
 import { estimateRatsForAppearance } from "@/lib/whererat";
 import {
   getCatalogGenres,
+  getCatalogRodentTypes,
   getCatalogMovies,
   searchCatalogMovies,
   getCatalogStatsWithCommunity,
@@ -83,6 +84,7 @@ export default async function Home({
   const params = searchParams ? await searchParams : {};
   const query = single(params.q) ?? "";
   const genre = single(params.genre) ?? "all";
+  const rodentType = single(params.rodent) ?? "all";
   const sort = parseCatalogSort(single(params.sort));
   const view: CatalogView = single(params.view) === "card" ? "card" : "list";
   const rawPage = parseInt(single(params.page) ?? "1", 10);
@@ -90,7 +92,7 @@ export default async function Home({
   const deletedMovieIds = await getDeletedMovieIds();
   const catalogMovies = await getCatalogMovies();
   const movieIndexById = new Map(catalogMovies.map((movie, index) => [movie.id, index]));
-  const filteredResults = (await searchCatalogMovies({ query, genre })).filter(
+  const filteredResults = (await searchCatalogMovies({ query, genre, rodentType })).filter(
     (movie) => !deletedMovieIds.has(movie.id),
   );
   const resultMetrics = await Promise.all(
@@ -142,14 +144,17 @@ export default async function Home({
     pagedMetrics.map((item) => [item.movie.id, item.sightings]),
   );
   const catalogFiltersActive =
-    query.trim().length > 0 || genre !== "all";
+    query.trim().length > 0 || genre !== "all" || rodentType !== "all";
   const stats = await getCatalogStatsWithCommunity();
   const approvedSubmissionRats = await getApprovedSubmissionRatTally();
   const ratsTallied = stats.ratsTallied + approvedSubmissionRats;
-  const availableGenres = await getCatalogGenres();
+  const [availableGenres, availableRodentTypes] = await Promise.all([
+    getCatalogGenres(),
+    getCatalogRodentTypes(),
+  ]);
 
   return (
-    <main className="relative">
+    <main className="relative flex flex-1 flex-col">
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <h1
@@ -164,14 +169,16 @@ export default async function Home({
 
       <section
         id="catalog"
-        className="mx-auto max-w-7xl px-4 pt-0 pb-20 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
+        className="mx-auto max-w-7xl px-4 pt-0 pb-0 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
       >
         <div className="wr-card bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
           <CatalogPendingProvider>
           <CatalogFilters
             availableGenres={availableGenres}
+            availableRodentTypes={availableRodentTypes}
             defaultQuery={query}
             defaultGenre={genre}
+            defaultRodentType={rodentType}
             defaultSort={sort}
             defaultView={view}
             totalResults={totalResults}
@@ -312,7 +319,7 @@ export default async function Home({
           </CatalogPendingProvider>
         </div>
       </section>
-      <section aria-hidden className="py-6 text-center select-none">
+      <section aria-hidden className="flex flex-1 flex-col items-center justify-center py-15 text-center select-none">
         <p className="text-5xl" title="🐀">🐀</p>
         <p className="mt-3 text-sm font-medium text-stone-400 dark:text-stone-600">
           {ratsTallied.toLocaleString()} rats catalogued. Still scurrying.

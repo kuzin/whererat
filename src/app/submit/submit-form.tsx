@@ -2,12 +2,13 @@
 
 import { useState, type FormEvent } from "react";
 import { useFormStatus } from "react-dom";
-import { normalizeImdbId } from "@/lib/whererat";
+import { normalizeImdbId, RODENT_TYPE_OPTIONS, rodentCountFieldLabel, rodentSwarmNoun } from "@/lib/whererat";
 import {
   SightingTimestampField,
   SightingRatCountField,
   SightingDescriptionField,
   SightingContentWarningsField,
+  SightingRodentTypesField,
 } from "@/components/sighting-fields";
 import { MovieSearchField } from "./movie-search-field";
 import { SightingImageUpload } from "./sighting-image-upload";
@@ -22,16 +23,13 @@ function RequiredMarker() {
   );
 }
 
-function SectionHeader({ step, title }: { step: string; title: string }) {
+function SectionHeader({ title }: { title: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-black text-white dark:bg-stone-100 dark:text-stone-900">
-        {step}
-      </span>
-      <span className="text-sm font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
+    <div className="flex items-center gap-3 mb-1">
+      <h2 className="wr-display text-2xl font-bold text-stone-900 dark:text-amber-50">
         {title}
-      </span>
-      <div className="h-px flex-1 bg-stone-900/10 dark:bg-white/10" />
+      </h2>
+      <div className="h-px flex-1 bg-amber-500/30 dark:bg-amber-500/20" />
     </div>
   );
 }
@@ -117,8 +115,7 @@ export function SubmitForm({
   const [selectedImdbKind, setSelectedImdbKind] = useState<"movie" | "series" | undefined>(
     initialMovie?.kind,
   );
-  // Once a movie has been selected at least once, reveal sighting + about sections
-  const [movieEverSelected, setMovieEverSelected] = useState(Boolean(initialMovie));
+  const [selectedRodentTypes, setSelectedRodentTypes] = useState<string[]>(["rat"]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const inputErrorClass =
@@ -192,7 +189,7 @@ export function SubmitForm({
   };
 
   return (
-    <form action={submitAction} noValidate onSubmit={onSubmit} className="grid gap-8">
+    <form action={submitAction} noValidate onSubmit={onSubmit} className="grid gap-12">
 
       {/* Error summary — click each item to jump to the field */}
       {orderedErrors.length > 0 ? (
@@ -214,15 +211,12 @@ export function SubmitForm({
         </div>
       ) : null}
 
-      {/* ── 01 · The Movie ─────────────────────────────────────────────────── */}
-      <div className="grid gap-5">
-        <SectionHeader step="01" title="The Movie" />
+      {/* ── 01 · Find the film ─────────────────────────────────────────────── */}
+      <div className="grid gap-4">
+        <SectionHeader title="Find the film" />
         <MovieSearchField
           fieldErrors={fieldErrors}
-          onKindChange={(kind) => {
-            setSelectedImdbKind(kind);
-            if (kind !== undefined) setMovieEverSelected(true);
-          }}
+          onKindChange={setSelectedImdbKind}
           initialMovie={
             initialMovie
               ? { ...initialMovie, genre: undefined, plot: undefined, source: "Seed" }
@@ -231,56 +225,60 @@ export function SubmitForm({
         />
       </div>
 
-      {/* ── 02 · The Sighting ──────────────────────────────────────────────── */}
-      {movieEverSelected ? (
-        <div className="grid gap-5">
-          <SectionHeader step="02" title="The Sighting" />
+      {/* ── 02 · The rat moment ────────────────────────────────────────────── */}
+      <div className="grid gap-4">
+        <SectionHeader title="The sighting" />
 
-          {/* Sighting title */}
-          <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-            <span>
-              Sighting title
-              <RequiredMarker />
+        {/* Sighting title */}
+        <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+          <span>
+            Name this moment
+            <RequiredMarker />
+          </span>
+          <input
+            data-field="sightingTitle"
+            name="sightingTitle"
+            required
+            placeholder="e.g., Rat darts across the kitchen counter mid-chase"
+            aria-invalid={Boolean(errorFor("sightingTitle"))}
+            className={`wr-input ${errorFor("sightingTitle") ? inputErrorClass : ""}`}
+          />
+          <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            Short and vivid — something anyone who&apos;s seen it would instantly picture.
+          </p>
+          {errorFor("sightingTitle") ? (
+            <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+              {errorFor("sightingTitle")}
             </span>
-            <input
-              data-field="sightingTitle"
-              name="sightingTitle"
-              required
-              placeholder="e.g., Stray rodent behind academy shelving"
-              aria-invalid={Boolean(errorFor("sightingTitle"))}
-              className={`wr-input ${errorFor("sightingTitle") ? inputErrorClass : ""}`}
-            />
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-              A short, specific label — what makes this rat moment distinctive?
-            </p>
-            {errorFor("sightingTitle") ? (
-              <span className="text-xs font-semibold text-red-700 dark:text-red-300">
-                {errorFor("sightingTitle")}
-              </span>
-            ) : null}
-          </label>
+          ) : null}
+        </label>
 
-          {/* Timestamp + rat count side by side */}
-          <div className="grid gap-5 sm:grid-cols-2">
-            <SightingTimestampField
-              label={`Approx. point in ${selectedImdbKind === "series" ? "episode" : "movie"}`}
-              errorMessage={errorFor("timestamp")}
-            />
-            <SightingRatCountField />
-          </div>
+        {/* Rodent type */}
+        <SightingRodentTypesField onTypesChange={setSelectedRodentTypes} />
 
-          {/* Description */}
-          <SightingDescriptionField required errorMessage={errorFor("description")} />
+        {/* Timestamp */}
+        <SightingTimestampField
+          label={`When in the ${selectedImdbKind === "series" ? "episode" : "movie"}?`}
+          errorMessage={errorFor("timestamp")}
+        />
 
-          {/* Images — part of the sighting, not "about you" */}
-          <SightingImageUpload />
-        </div>
-      ) : null}
+        {/* Rat count */}
+        <SightingRatCountField
+          label={rodentCountFieldLabel(selectedRodentTypes)}
+          emoji={selectedRodentTypes.length === 1 ? (RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.emoji ?? "🐀") : "🐀"}
+          noun={rodentSwarmNoun(selectedRodentTypes)}
+        />
 
-      {/* ── 03 · About You ─────────────────────────────────────────────────── */}
-      {movieEverSelected ? (
-        <div className="grid gap-5">
-          <SectionHeader step="03" title="About You" />
+        {/* Description */}
+        <SightingDescriptionField required errorMessage={errorFor("description")} />
+
+        {/* Images — part of the sighting, not "about you" */}
+        <SightingImageUpload />
+      </div>
+
+      {/* ── 03 · Credit yourself ───────────────────────────────────────────── */}
+      <div className="grid gap-4">
+        <SectionHeader title="Credit yourself" />
 
           <div className="grid gap-4">
             <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
@@ -304,7 +302,7 @@ export function SubmitForm({
                 className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterName") ? inputErrorClass : ""}`}
               />
               <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                You&apos;ll be credited as the author of this sighting on the public listing.
+                Your name appears on the published sighting as the finder.
               </p>
               {errorFor("submitterName") ? (
                 <span className="text-xs font-semibold text-red-700 dark:text-red-300">
@@ -377,11 +375,10 @@ export function SubmitForm({
             ) : null}
           </div>
 
-          <div>
-            <SubmitButton />
-          </div>
+        <div>
+          <SubmitButton />
         </div>
-      ) : null}
+      </div>
     </form>
   );
 }

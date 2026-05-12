@@ -7,29 +7,29 @@
 
 import { useState, useId, useRef } from "react";
 import { SightingMarkdown } from "@/components/sighting-markdown";
-import { CONTENT_WARNING_OPTIONS } from "@/lib/whererat";
+import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, rodentCountFieldLabel } from "@/lib/whererat";
 
 // ─── Swarm signal ────────────────────────────────────────────────────────────
 
-function swarmLabel(count: number): { label: string; sublabel: string; fill: number } {
-  if (count === 1) return { label: "Lone scout", sublabel: "A solitary rat. Brave.", fill: 1 };
-  if (count <= 3) return { label: "Small pack", sublabel: "A couple of friends.", fill: 2 };
-  if (count <= 7) return { label: "Growing colony", sublabel: "Things are getting ratty.", fill: 3 };
-  if (count <= 15) return { label: "Swarm forming", sublabel: "Someone call an exterminator.", fill: 4 };
-  if (count <= 40) return { label: "Full swarm", sublabel: "Absolute chaos.", fill: 5 };
-  return { label: "Rat apocalypse", sublabel: "We bow to our new overlords.", fill: 6 };
+function swarmLabel(count: number, noun = "Rat"): { label: string; sublabel: string; fill: number } {
+  if (count === 1) return { label: "Lone scout",    sublabel: "A solitary one. Brave.",      fill: 1 };
+  if (count <= 3) return { label: "Small pack",     sublabel: "A cozy little crew.",          fill: 2 };
+  if (count <= 7) return { label: "Growing colony", sublabel: "Now we're talking.",           fill: 3 };
+  if (count <= 15) return { label: "Swarm forming", sublabel: "A glorious gathering.",        fill: 4 };
+  if (count <= 40) return { label: "Full swarm",    sublabel: "An absolute delight.",         fill: 5 };
+  return { label: `${noun} apocalypse`,             sublabel: "We bow to our new overlords.", fill: 6 };
 }
 
 const MAX_SLOTS = 6;
 
-export function SwarmSignal({ count }: { count: number }) {
-  const { label, sublabel, fill } = swarmLabel(count);
+export function SwarmSignal({ count, emoji = "🐀", noun = "Rat" }: { count: number; emoji?: string; noun?: string }) {
+  const { label, sublabel, fill } = swarmLabel(count, noun);
   return (
     <div className="flex flex-1 items-center gap-3 rounded-lg border border-stone-900/8 bg-stone-50/80 px-3 py-2 dark:border-white/8 dark:bg-stone-900/40">
       <div className="flex gap-0.5 text-base leading-none" aria-hidden>
         {Array.from({ length: MAX_SLOTS }).map((_, i) => (
           <span key={i} className={`transition-all duration-200 ${i < fill ? "opacity-100" : "opacity-15 grayscale"}`}>
-            🐀
+            {emoji}
           </span>
         ))}
       </div>
@@ -103,14 +103,20 @@ export function SightingTimestampField({
 
 export function SightingRatCountField({
   defaultValue = 1,
+  label,
+  emoji,
+  noun,
 }: {
   defaultValue?: number;
+  label?: string;
+  emoji?: string;
+  noun?: string;
 }) {
   const [count, setCount] = useState(Math.max(1, defaultValue));
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Approx. rats on screen</p>
+      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">{label ?? "Rats on screen"}</p>
       <div className="flex items-center gap-3">
         <div className="flex items-center rounded-xl border-2 border-stone-900/12 bg-white dark:border-white/12 dark:bg-stone-900">
           <button
@@ -139,7 +145,7 @@ export function SightingRatCountField({
             +
           </button>
         </div>
-        <SwarmSignal count={count} />
+        <SwarmSignal count={count} emoji={emoji} noun={noun} />
       </div>
     </div>
   );
@@ -382,6 +388,70 @@ export function SightingContentWarningsField({
       {toggleRow}
       {picker}
       {hiddenInput}
+    </div>
+  );
+}
+
+// ─── Rodent type picker ───────────────────────────────────────────────────────
+
+/**
+ * Multi-select pill chips for the type(s) of rodent in the sighting.
+ * "Rat" is selected by default.
+ */
+export function SightingRodentTypesField({
+  initialTypes,
+  onTypesChange,
+}: {
+  initialTypes?: string[];
+  onTypesChange?: (types: string[]) => void;
+}) {
+  const [selected, setSelected] = useState<Set<string>>(
+    new Set(initialTypes ?? ["rat"]),
+  );
+
+  function toggle(id: string) {
+    const next = new Set(selected);
+    if (next.has(id)) {
+      // Always keep at least one selected
+      if (next.size > 1) next.delete(id);
+    } else {
+      next.add(id);
+    }
+    setSelected(next);
+    onTypesChange?.(Array.from(next));
+  }
+
+  const pillBase =
+    "inline-flex cursor-pointer select-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-150";
+  const pillOff =
+    "border-stone-300/80 bg-white text-stone-600 hover:border-stone-400 hover:text-stone-800 dark:border-white/12 dark:bg-stone-800/60 dark:text-stone-400 dark:hover:border-white/25 dark:hover:text-stone-200";
+  const pillOn =
+    "border-amber-500/70 bg-amber-50 text-amber-900 dark:border-amber-400/50 dark:bg-amber-900/30 dark:text-amber-200";
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
+        Rodent type
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {RODENT_TYPE_OPTIONS.map((option) => {
+          const isOn = selected.has(option.id);
+          return (
+            <label key={option.id} className={`${pillBase} ${isOn ? pillOn : pillOff}`}>
+              <input
+                type="checkbox"
+                name="rodentTypes"
+                value={option.id}
+                checked={isOn}
+                onChange={() => toggle(option.id)}
+                className="sr-only"
+              />
+              <span aria-hidden>{option.emoji}</span>
+              {option.label}
+            </label>
+          );
+        })}
+      </div>
     </div>
   );
 }

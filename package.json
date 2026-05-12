@@ -13,7 +13,7 @@
     "imdb:resync": "tsx scripts/imdb-resync-all.ts",
     "db:bootstrap": "npm run seed:postgres:export && npm run db:schema:apply && npm run db:seed",
     "db:clear:content": "tsx scripts/db-clear-content.ts",
-"store:play:graphics": "tsx scripts/generate-play-store-graphics.ts",
+    "store:play:graphics": "tsx scripts/generate-play-store-graphics.ts",
     "store:play:backdrop": "tsx scripts/play-phone-backdrop.ts",
     "store:play:screenshots": "tsx scripts/generate-play-phone-screenshots.ts"
   },

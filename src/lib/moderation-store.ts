@@ -42,6 +42,7 @@ type SubmissionEdits = Partial<
     | "submitterEmail"
     | "curatorNote"
     | "contentWarnings"
+    | "rodentTypes"
   >
 >;
 
@@ -77,6 +78,7 @@ function toDbSubmission(row: {
   movie_poster_url: string | null;
   images_json: unknown;
   content_warnings: string[] | null;
+  rodent_types: string[] | null;
 }): Submission {
   const images = Array.isArray(row.images_json)
     ? row.images_json
@@ -124,6 +126,7 @@ function toDbSubmission(row: {
     imageAlt: leadImage?.alt,
     images,
     contentWarnings: (row.content_warnings?.length ? row.content_warnings : undefined) as string[] | undefined,
+    rodentTypes: (row.rodent_types?.length ? row.rodent_types : undefined) as string[] | undefined,
   };
 }
 
@@ -245,6 +248,7 @@ export async function readModerationStore() {
       movie_poster_url: string | null;
       images_json: unknown;
       content_warnings: string[] | null;
+      rodent_types: string[] | null;
     }>(
       `select s.*,
               (
@@ -298,8 +302,8 @@ export async function addSubmission(
   };
   await pool.query(
     `insert into submissions
-      (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url, content_warnings)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`,
+      (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url, content_warnings, rodent_types)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
     [
       nextSubmission.id,
       nextSubmission.movieTitle,
@@ -321,6 +325,7 @@ export async function addSubmission(
       nextSubmission.duplicateHint ?? null,
       nextSubmission.moviePosterUrl ?? null,
       nextSubmission.contentWarnings ?? [],
+      nextSubmission.rodentTypes ?? ["rat"],
     ],
   );
   for (const [index, slot] of (nextSubmission.images ?? []).entries()) {
@@ -388,6 +393,7 @@ async function submissionToSyntheticSighting(
     episodeNumber: submission.episodeNumber,
     episodeTitle: submission.episodeTitle,
     contentWarnings: submission.contentWarnings,
+    rodentTypes: submission.rodentTypes,
   };
 }
 
@@ -422,8 +428,9 @@ export async function getMergedSightingsForMovie(movieId: string): Promise<Sight
         submitter_name: string | null;
         submission_reviewed_at: string | null;
         content_warnings: string[] | null;
+        rodent_types: string[] | null;
       }>(
-        `select id, movie_id, timestamp_code, title, description, prominence, scene_type, spoiler, confidence, verification_state, verified_by, source_ids, curator_note, approximate_rat_count, submitter_name, submission_reviewed_at, content_warnings
+        `select id, movie_id, timestamp_code, title, description, prominence, scene_type, spoiler, confidence, verification_state, verified_by, source_ids, curator_note, approximate_rat_count, submitter_name, submission_reviewed_at, content_warnings, rodent_types
          from sightings
          where movie_id = $1 and is_deleted = false`,
         [movieId],
@@ -449,6 +456,7 @@ export async function getMergedSightingsForMovie(movieId: string): Promise<Sight
     submitterName: row.submitter_name ?? undefined,
     submissionReviewedAtISO: row.submission_reviewed_at ?? undefined,
     contentWarnings: (row.content_warnings?.length ? row.content_warnings : undefined),
+    rodentTypes: (row.rodent_types?.length ? row.rodent_types : undefined),
   }));
 
   const queueCandidates = storedSubs.filter((s) => s.status === "approved");
@@ -557,6 +565,7 @@ export async function reviewSubmission({
             duplicate_hint = $18,
             movie_poster_url = $19,
             content_warnings = $20,
+            rodent_types = $21,
             updated_at = now()
       where id = $1`,
     [
@@ -580,6 +589,7 @@ export async function reviewSubmission({
       reviewedSubmission.duplicateHint ?? null,
       reviewedSubmission.moviePosterUrl ?? null,
       reviewedSubmission.contentWarnings ?? [],
+      reviewedSubmission.rodentTypes ?? ["rat"],
     ],
   );
   await pool.query(

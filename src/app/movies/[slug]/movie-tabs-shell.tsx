@@ -90,7 +90,7 @@ export function MovieTabsShell({
                 aria-selected={isActive}
                 onClick={() => setActiveIdx(i)}
                 className={[
-                  "h-[52px] cursor-pointer rounded-t-xl px-6 text-base font-extrabold tracking-tight",
+                  "h-[52px] cursor-pointer rounded-t-xl px-3 text-xs font-extrabold tracking-tight whitespace-nowrap sm:px-5 sm:text-sm md:px-6 md:text-base",
                   // Only animate color/shadow — never geometry — so there's no size flash or movement
                   "transition-[background-color,color,box-shadow,border-color] duration-150",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 focus-visible:ring-offset-1",

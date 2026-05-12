@@ -468,7 +468,7 @@ export default async function MoviePage({
             <div className="flex max-w-3xl flex-col gap-6">
               <div className="flex flex-col gap-2 sm:gap-3">
                 <h1
-                  className={`wr-display max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl sm:leading-[1.04] lg:text-6xl lg:leading-[1.03] ${
+                  className={`wr-display max-w-3xl text-[clamp(1.5rem,5.5vw,2.25rem)] font-bold leading-[1.05] tracking-tight sm:text-4xl sm:leading-[1.04] lg:text-5xl lg:leading-[1.03] ${
                     palette
                       ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_5%,rgb(255_253_249))]"
                       : "text-amber-50"
@@ -818,8 +818,8 @@ export default async function MoviePage({
       </section>
 
       {editMovie && canEditMovie ? (
-        <div className="fixed inset-0 z-[220] flex items-start justify-center bg-black/55 px-4 py-8 sm:py-12">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
+        <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
+          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
@@ -996,8 +996,8 @@ export default async function MoviePage({
         </div>
       ) : null}
       {editingSighting && canEditSightings ? (
-        <div className="fixed inset-0 z-[220] flex items-start justify-center bg-black/55 px-4 py-8 sm:py-12">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
+        <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
+          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">Edit sighting</p>
