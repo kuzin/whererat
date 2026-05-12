@@ -1,5 +1,6 @@
 import { updateMovieOverride } from "@/lib/movie-edit-store";
 import { getCatalogMovies } from "@/lib/movie-catalog";
+import { fetchTmdbYoutubeTrailerKey } from "@/lib/tmdb-banner";
 import type { ImdbImage, ImdbRelatedTitle, ImdbReview, ImdbVideo, Movie } from "@/lib/whererat";
 
 // ---------------------------------------------------------------------------
@@ -30,8 +31,8 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-function mentionsRat(text: string): boolean {
-  return /\brat(s|ty|like|proof|infested|catcher)?\b/i.test(text);
+function mentionsRodent(text: string): boolean {
+  return /\b(rats?|ratty|rat-like|rat-proof|ratcatcher|mice|mouse|rodents?|gerbils?|hamsters?|squirrels?|voles?|beavers?|marmots?|guinea\s+pigs?|murine|vermin)\b/i.test(text);
 }
 
 // ---------------------------------------------------------------------------
@@ -250,7 +251,7 @@ function extractReviews(edges: unknown[]): ImdbReview[] {
       text,
       rating,
       date,
-      mentionsRat: mentionsRat(combined),
+      mentionsRat: mentionsRodent(combined),
     });
   }
   return reviews;
@@ -259,12 +260,12 @@ function extractReviews(edges: unknown[]): ImdbReview[] {
 function extractRatFacts(edges: unknown[]): string[] {
   const facts: string[] = [];
   for (const edge of edges) {
-    if (facts.length >= 3) break;
+    if (facts.length >= 5) break;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw: string = (edge as any)?.node?.displayableArticle?.body?.plaidHtml ?? "";
     if (!raw) continue;
     const plain = stripHtml(String(raw));
-    if (plain && mentionsRat(plain)) facts.push(plain);
+    if (plain && mentionsRodent(plain)) facts.push(plain);
   }
   return facts;
 }
@@ -428,12 +429,13 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
   const apiKey = process.env.OMDB_API_KEY;
 
   // Run all fetches in parallel
-  const [omdb, triviaEdges, reviewEdges, imdbRelated, imdbMedia] = await Promise.all([
+  const [omdb, triviaEdges, reviewEdges, imdbRelated, imdbMedia, youtubeTrailerKey] = await Promise.all([
     apiKey ? fetchOmdbData(imdbId, apiKey) : Promise.resolve(undefined),
     fetchImdbTrivia(imdbId),
     fetchImdbReviews(imdbId),
     fetchImdbRelated(imdbId),
     fetchImdbMedia(imdbId),
+    fetchTmdbYoutubeTrailerKey({ imdbId, tmdbId: movie.externalIds.tmdb }),
   ]);
 
   const ratFacts = extractRatFacts(triviaEdges);
@@ -497,6 +499,7 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
       ...(imdbRelated.length > 0 ? { imdbRelated } : {}),
       ...(imdbMedia.videos.length > 0 ? { imdbVideos: imdbMedia.videos } : {}),
       ...(imdbMedia.images.length > 0 ? { imdbImages: imdbMedia.images } : {}),
+      ...(youtubeTrailerKey ? { youtubeTrailerKey } : {}),
     },
   });
 }

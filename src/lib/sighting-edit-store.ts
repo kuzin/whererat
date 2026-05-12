@@ -40,6 +40,7 @@ export async function updateSightingOverride(
             spoiler = coalesce($5, spoiler),
             curator_note = coalesce($6, curator_note),
             approximate_rat_count = coalesce($7, approximate_rat_count),
+            content_warnings = case when $8::text[] is not null then $8 else content_warnings end,
             updated_at = now()
       where id = $1`,
     [
@@ -50,6 +51,7 @@ export async function updateSightingOverride(
       typeof override.spoiler === "boolean" ? override.spoiler : null,
       override.curatorNote ?? null,
       override.approximateRatCount ?? null,
+      override.contentWarnings ?? null,
     ],
   );
   if (override.images) {

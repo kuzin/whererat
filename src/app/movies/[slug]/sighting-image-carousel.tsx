@@ -39,6 +39,7 @@ export function SightingImageCarousel({
   const [index, setIndex] = useState(0);
   const dirRef = useRef<1 | -1>(1);
   const [motionOn, setMotionOn] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
   const n = slides.length;
 
@@ -88,6 +89,14 @@ export function SightingImageCarousel({
             }
           : undefined
       }
+      onTouchStart={(e) => { touchStartX.current = e.touches[0]?.clientX ?? null; }}
+      onTouchEnd={(e) => {
+        if (touchStartX.current === null) return;
+        const delta = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+        touchStartX.current = null;
+        if (Math.abs(delta) < 30) return;
+        go(delta < 0 ? 1 : -1);
+      }}
       className={`relative outline-none ${n > 1 ? "focus-visible:ring-2 focus-visible:ring-amber-500/85 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900/10" : ""} ${className}`}
     >
       {n > 1 ? (

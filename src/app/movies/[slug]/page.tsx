@@ -16,7 +16,9 @@ import { tabCardClass, tabHeaderBorderClass } from "./movie-tab-classes";
 import { MovieSightingsPagingBar, MovieSightingsSortControl } from "./movie-sightings-toolbar";
 import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
-import { ImdbLinkButton } from "@/components/imdb-link-button";
+import { AccentColorField } from "@/components/accent-color-field";
+import { ResyncButton } from "@/components/resync-button";
+import { EditSightingForm } from "./edit-sighting-form";
 import {
   deleteMovie,
   deleteSighting,
@@ -173,10 +175,6 @@ function movieHeroMetaLine(movie: Movie, isSeriesTitle: boolean): string | null 
   return parts.join(" · ");
 }
 
-const sidebarSectionTitleClass =
-  "text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500";
-const sidebarDtClass =
-  "text-xs font-medium text-stone-500 dark:text-stone-400";
 
 function ImdbCreditsInline({ line }: { line: string }) {
   const segments = splitImdbCreditSegments(line);
@@ -207,6 +205,30 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+const RODENT_HIGHLIGHT_RE =
+  /\b(rats?|ratty|rat-like|ratcatcher|mice|mouse|rodents?|gerbils?|hamsters?|squirrels?|voles?|beavers?|marmots?|guinea\s+pigs?|murine|vermin)\b/gi;
+
+function highlightRodentWords(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  let last = 0;
+  RODENT_HIGHLIGHT_RE.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = RODENT_HIGHLIGHT_RE.exec(text)) !== null) {
+    if (match.index > last) parts.push(text.slice(last, match.index));
+    parts.push(
+      <mark
+        key={match.index}
+        className="rounded-sm bg-amber-200/70 px-0.5 text-amber-950 not-italic dark:bg-amber-500/30 dark:text-amber-200"
+      >
+        {match[0]}
+      </mark>,
+    );
+    last = match.index + match[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length > 0 ? parts : text;
 }
 
 export async function generateStaticParams() {
@@ -304,6 +326,14 @@ export default async function MoviePage({
       } as CSSProperties)
     : undefined;
 
+  // Sidebar label classes — mix accent colour in on palette pages for better readability
+  const sidebarSectionTitleClass = palette
+    ? "text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(120_113_108))] dark:text-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(168_162_158))]"
+    : "text-[0.7rem] font-bold uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500";
+  const sidebarDtClass = palette
+    ? "text-xs font-medium text-[color-mix(in_srgb,var(--movie-accent)_40%,rgb(120_113_108))] dark:text-[color-mix(in_srgb,var(--movie-accent)_35%,rgb(161_155_150))]"
+    : "text-xs font-medium text-stone-500 dark:text-stone-400";
+
   const director = trimMeta(movie.metadata.director);
   const originalLanguage = trimMeta(movie.metadata.originalLanguage);
   const countriesLine = movie.metadata.productionCountries
@@ -320,6 +350,7 @@ export default async function MoviePage({
   const imdbRelated = movie.metadata.imdbRelated ?? [];
   const imdbVideos = movie.metadata.imdbVideos ?? [];
   const imdbImages = movie.metadata.imdbImages ?? [];
+  const youtubeTrailerKey = typeof movie.metadata.youtubeTrailerKey === "string" ? movie.metadata.youtubeTrailerKey : undefined;
   const imdbRating = trimMeta(movie.metadata.imdbRating);
   const imdbVotes = trimMeta(movie.metadata.imdbVotes);
   const metascore = trimMeta(movie.metadata.metascore);
@@ -347,7 +378,7 @@ export default async function MoviePage({
           href="/#catalog"
           aria-label="Back to catalog"
           title="Back to catalog"
-          className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
+          className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
         </Link>
@@ -356,14 +387,7 @@ export default async function MoviePage({
             <div className="flex items-center gap-1.5">
               <form action={resyncMovieFromImdb}>
                 <input type="hidden" name="slug" value={slug} />
-                <button
-                  type="submit"
-                  aria-label="Resync from IMDb"
-                  title="Resync from IMDb"
-                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
-                >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-                </button>
+                <ResyncButton />
               </form>
               <form action={deleteMovie}>
                 <input type="hidden" name="slug" value={slug} />
@@ -372,7 +396,7 @@ export default async function MoviePage({
                   type="submit"
                   aria-label="Delete movie"
                   title="Delete movie"
-                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/35"
+                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0 text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/35"
                 >
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                 </ConfirmSubmitButton>
@@ -381,7 +405,7 @@ export default async function MoviePage({
                 href={`/movies/${slug}?editMovie=1`}
                 aria-label="Edit movie information"
                 title="Edit movie information"
-                className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
+                className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
               >
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </Link>
@@ -394,7 +418,7 @@ export default async function MoviePage({
               rel="noreferrer"
               aria-label="Open on IMDb"
               title="Open on IMDb"
-              className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center"
+              className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             </a>
@@ -440,7 +464,7 @@ export default async function MoviePage({
           ) : (
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/75 to-stone-950/25" />
           )}
-          <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
+<div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
             <div className="flex max-w-3xl flex-col gap-6">
               <div className="flex flex-col gap-2 sm:gap-3">
                 <h1
@@ -475,90 +499,47 @@ export default async function MoviePage({
                   &quot;{movie.metadata.tagline.trim()}&quot;
                 </p>
               ) : null}
-              <dl className="flex flex-wrap gap-3">
-                <div
-                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
-                    palette
-                      ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                      : "border-white/22 bg-black/42"
-                  }`}
-                >
-                  <dt
-                    className={
-                      palette
-                        ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
-                        : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78"
-                    }
-                  >
-                    Sightings
-                  </dt>
-                  <dd
-                    className={`wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
-                      palette
-                        ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                        : "text-amber-50"
-                    }`}
-                  >
-                    {movieSightings.length}
-                  </dd>
-                </div>
-                <div
-                  className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
-                    palette
-                      ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                      : "border-white/22 bg-black/42"
-                  }`}
-                >
-                  <dt
-                    className={
-                      palette
-                        ? "max-w-[10rem] text-[0.65rem] font-bold uppercase leading-snug tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
-                        : "max-w-[10rem] text-[0.65rem] font-bold uppercase leading-snug tracking-[0.18em] text-amber-200/78"
-                    }
-                  >
-                    Total rats
-                  </dt>
-                  <dd
-                    className={`wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
-                      palette
-                        ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                        : "text-amber-50"
-                    }`}
-                  >
-                    {approxRatsInMovie}
-                  </dd>
-                </div>
-                {imdbRating ? (
-                  <div
-                    className={`rounded-xl border px-4 py-2.5 backdrop-blur-md ${
-                      palette
-                        ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                        : "border-white/22 bg-black/42"
-                    }`}
-                  >
-                    <dt
-                      className={
-                        palette
-                          ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
-                          : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78"
-                      }
-                    >
-                      IMDb rating
-                    </dt>
-                    <dd
-                      className={`wr-display mt-1 flex items-baseline gap-1.5 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
-                        palette
-                          ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                          : "text-amber-50"
-                      }`}
-                    >
-                      <span className="text-amber-400">★</span>
-                      {imdbRating}
-                      <span className="text-base font-normal opacity-60">/10</span>
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
+              {(movieSightings.length > 0 || imdbRating) ? (() => {
+                const chipWrap = `rounded-xl border px-4 py-2.5 backdrop-blur-md ${
+                  palette
+                    ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
+                    : "border-white/22 bg-black/42"
+                }`;
+                const chipDt = palette
+                  ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
+                  : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78";
+                const chipDd = `wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${
+                  palette
+                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
+                    : "text-amber-50"
+                }`;
+                return (
+                  <dl className="flex flex-wrap gap-3">
+                    {movieSightings.length > 0 ? (
+                      <div className={chipWrap}>
+                        <dt className={chipDt}>Sightings</dt>
+                        <dd className={chipDd}>{movieSightings.length}</dd>
+                      </div>
+                    ) : null}
+                    {approxRatsInMovie > 0 ? (
+                      <div className={chipWrap}>
+                        <dt className={chipDt}>Total rats</dt>
+                        <dd className={chipDd}>{approxRatsInMovie}</dd>
+                      </div>
+                    ) : null}
+                    {imdbRating ? (
+                      <div className={chipWrap}>
+                        <dt className={chipDt}>IMDb</dt>
+                        <dd className={`${chipDd} flex items-baseline gap-1.5`}>
+                          <span className="text-amber-400">★</span>
+                          {imdbRating}
+                          <span className="text-base font-normal opacity-60">/10</span>
+                        </dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                );
+              })() : null}
             </div>
           </div>
         </div>
@@ -751,12 +732,12 @@ export default async function MoviePage({
                       : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
                   }`}
                 >
-                  <p className="wr-display text-lg font-bold text-stone-800 dark:text-stone-100">
-                    No sightings yet for this title.
+                  <p className="text-5xl leading-none" aria-hidden>🐀</p>
+                  <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
+                    No rat sightings catalogued yet
                   </p>
-                  <p className="mx-auto mt-2 max-w-md text-sm text-stone-600 dark:text-stone-400">
-                    Catalog curators haven&apos;t published rat cameos here. Check
-                    back after the queue catches up—or submit what you spotted.
+                  <p className="mx-auto mt-2 max-w-sm text-sm text-stone-600 dark:text-stone-400">
+                    Be the first to document a rat in this title — your sighting goes into review and gets published when approved.
                   </p>
                   <Link
                     href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
@@ -796,27 +777,17 @@ export default async function MoviePage({
           {ratFacts.length > 0 ? (
             <div>
               <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
-                <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-h-12 items-center">
                   <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
                     Rat Facts
                   </h2>
-                  <ImdbLinkButton
-                    href={`https://www.imdb.com/title/${movie.externalIds.imdb}/trivia/`}
-                    label="All trivia on IMDb"
-                  />
                 </div>
               </header>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {ratFacts.map((fact, i) => (
-                  <div key={i} className={tabCardClass(Boolean(palette))}>
-                    <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-stone-400 dark:text-stone-500">
-                      Rat Fact {i + 1}
-                    </p>
+                  <div key={i} className={`${tabCardClass(Boolean(palette))} px-5 py-4`}>
                     <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-                      {fact}
-                    </p>
-                    <p className="mt-3 text-xs text-stone-400 dark:text-stone-500">
-                      Source: IMDb trivia
+                      {highlightRodentWords(fact)}
                     </p>
                   </div>
                 ))}
@@ -827,7 +798,6 @@ export default async function MoviePage({
           {/* Panel 2 — Reviews */}
           <MovieRatviewsTab
             reviews={imdbReviews}
-            imdbId={movie.externalIds.imdb}
             palette={Boolean(palette)}
           />
 
@@ -835,14 +805,13 @@ export default async function MoviePage({
           <MovieRatMediaTab
             videos={imdbVideos}
             images={imdbImages}
-            imdbId={movie.externalIds.imdb}
+            youtubeTrailerKey={youtubeTrailerKey}
             palette={Boolean(palette)}
           />
 
           {/* Panel 4 — Related */}
           <MovieRatlatedTab
             titles={imdbRelated}
-            imdbId={movie.externalIds.imdb}
             palette={Boolean(palette)}
           />
         </MovieTabsShell>
@@ -916,26 +885,13 @@ export default async function MoviePage({
                 Tagline
                 <input name="tagline" defaultValue={movie.metadata.tagline} className="wr-input" />
               </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+              <div className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                 Accent color
-                <div className="flex items-center gap-2">
-                  <div
-                    className="h-9 w-9 shrink-0 rounded-lg border border-stone-300 dark:border-stone-600"
-                    style={{ backgroundColor: visuals.syncedPalette?.accent ?? "#b45309" }}
-                    title={`Auto-derived: ${visuals.syncedPalette?.accent ?? "none"}`}
-                  />
-                  <input
-                    name="overrideAccent"
-                    type="text"
-                    placeholder={`Auto (${visuals.syncedPalette?.accent ?? "#b45309"})`}
-                    defaultValue={movie.metadata.overrideAccent ?? ""}
-                    className="wr-input font-mono"
-                  />
-                </div>
-                <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
-                  Hex color, e.g. {visuals.syncedPalette?.accent ?? "#b45309"}. Leave blank to use auto-derived.
-                </span>
-              </label>
+                <AccentColorField
+                  autoAccent={visuals.syncedPalette?.accent ?? "#b45309"}
+                  currentOverride={movie.metadata.overrideAccent ?? ""}
+                />
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
                   Certificate
@@ -1044,113 +1000,33 @@ export default async function MoviePage({
           <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
+                <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">Edit sighting</p>
+                <h2 className="mt-1 text-xl font-bold text-stone-950 dark:text-stone-100">
                   {editingSighting.title}
                 </h2>
-                <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
+                <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
                   {movie.title}
                 </p>
               </div>
               <Link
                 href={sightingsBasePath}
-                className="rounded-lg border border-stone-900/25 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-white/18 dark:text-stone-200 dark:hover:bg-stone-800"
+                className="wr-btn-ghost inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0"
+                aria-label="Close"
+                title="Close"
               >
-                Close
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4" aria-hidden="true">
+                  <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+                </svg>
               </Link>
             </div>
-
-            <form action={updateSightingInfo} className="mt-6 grid gap-4">
-              <input type="hidden" name="slug" value={slug} />
-              <input type="hidden" name="sightingId" value={editingSighting.id} />
-              <input type="hidden" name="returnTo" value={sightingsBasePath} />
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Sighting title
-                <input name="title" required defaultValue={editingSighting.title} className="wr-input" />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. point in movie
-                <input
-                  name="timestamp"
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  defaultValue={getSightingTimestampPercent(editingSighting.timestamp) ?? 50}
-                  className="accent-amber-700 dark:accent-amber-400"
-                />
-                <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Stored as a percentage into the {isSeriesTitle ? "episode" : "movie"}.
-                </p>
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Approx. rats
-                <input
-                  name="approximateRatCount"
-                  type="number"
-                  min={1}
-                  max={999}
-                  required
-                  defaultValue={editingSighting.approximateRatCount}
-                  className="wr-input tabular-nums"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Description
-                <textarea
-                  name="description"
-                  rows={4}
-                  required
-                  defaultValue={editingSighting.description}
-                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
-                />
-                <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                  Markdown is supported (bold, lists, links, headings). It renders on movie pages.
-                </span>
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                Curator message
-                <textarea
-                  name="curatorNote"
-                  rows={3}
-                  defaultValue={editingSighting.curatorNote ?? ""}
-                  placeholder="Optional note shown with the published sighting."
-                  className="wr-input h-auto min-h-24 resize-y py-3 leading-relaxed"
-                />
-              </label>
-              <EditableSightingImagesField initialImages={editingSightingImages} />
-              <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-900/12 bg-stone-50 px-3 py-2.5 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/10 dark:bg-stone-900/50 dark:text-stone-100 dark:hover:bg-white/5">
-                <span>Contains spoilers</span>
-                <span className="relative inline-flex shrink-0 items-center">
-                  <input
-                    name="spoiler"
-                    type="checkbox"
-                    defaultChecked={editingSighting.spoiler}
-                    className="peer sr-only"
-                  />
-                  <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
-                  <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
-                </span>
-              </label>
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <ConfirmSubmitButton
-                  confirmMessage="Delete this sighting? This cannot be undone."
-                  type="submit"
-                  formAction={deleteSighting}
-                  className="wr-btn bg-red-100 text-red-900 dark:border-red-400/20 dark:bg-red-950/40 dark:text-red-100"
-                >
-                  Delete sighting
-                </ConfirmSubmitButton>
-                <Link
-                  href={sightingsBasePath}
-                  className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
-                >
-                  Cancel
-                </Link>
-                <button type="submit" className="wr-btn-primary">
-                  Save sighting
-                </button>
-              </div>
-            </form>
+            <EditSightingForm
+              sighting={editingSighting}
+              slug={slug}
+              returnTo={sightingsBasePath}
+              isSeriesTitle={isSeriesTitle}
+              updateAction={updateSightingInfo}
+              deleteAction={deleteSighting}
+            />
           </div>
         </div>
       ) : null}

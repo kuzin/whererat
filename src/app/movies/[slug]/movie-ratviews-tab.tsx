@@ -1,9 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { ImdbReview } from "@/lib/whererat";
-import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { tabCardClass, tabCardColors, tabHeaderBorderClass } from "./movie-tab-classes";
+
+const RODENT_RE =
+  /\b(rats?|ratty|rat-like|ratcatcher|mice|mouse|rodents?|gerbils?|hamsters?|squirrels?|voles?|beavers?|marmots?|guinea\s+pigs?|murine|vermin)\b/gi;
+
+function highlightRodentWords(text: string): ReactNode {
+  const parts: ReactNode[] = [];
+  let last = 0;
+  RODENT_RE.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = RODENT_RE.exec(text)) !== null) {
+    if (match.index > last) parts.push(text.slice(last, match.index));
+    parts.push(
+      <mark
+        key={match.index}
+        className="rounded-sm bg-amber-200/70 px-0.5 text-amber-950 not-italic dark:bg-amber-500/30 dark:text-amber-200"
+      >
+        {match[0]}
+      </mark>,
+    );
+    last = match.index + match[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length > 0 ? parts : text;
+}
 
 type SortKey = "latest" | "lowest" | "highest";
 
@@ -54,7 +77,6 @@ function ReviewDate({ date }: { date: string }) {
 
 type Props = {
   reviews: ImdbReview[];
-  imdbId: string;
   palette: boolean;
 };
 
@@ -85,7 +107,7 @@ function sortReviews(reviews: ImdbReview[], sort: SortKey): ImdbReview[] {
   });
 }
 
-export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
+export function MovieRatviewsTab({ reviews, palette }: Props) {
   const [sort, setSort] = useState<SortKey>("latest");
   const [onlyRats, setOnlyRats] = useState(false);
   const [listFlash, setListFlash] = useState(false);
@@ -116,22 +138,23 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
   return (
     <div>
       <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(palette)}`}>
-        <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
             Reviews
           </h2>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             {/* Rat-only toggle */}
             {ratCount > 0 ? (
               <label className="flex cursor-pointer items-center gap-2 select-none">
                 <span className="whitespace-nowrap text-sm font-bold leading-none text-stone-800 dark:text-stone-200">
-                  Rat filter:
+                  Rodent filter:
                 </span>
                 <button
                   type="button"
                   role="switch"
                   aria-checked={onlyRats}
-                  aria-label="Show only reviews that mention rats"
+                  aria-label="Show only reviews that mention rodents"
                   onClick={() => setOnlyRats((v) => !v)}
                   className={[
                     "relative inline-flex h-9 w-[3.75rem] shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors duration-200",
@@ -172,13 +195,10 @@ export function MovieRatviewsTab({ reviews, imdbId, palette }: Props) {
               </select>
             </label>
 
-            <ImdbLinkButton
-              href={`https://www.imdb.com/title/${imdbId}/reviews/`}
-              label="All reviews on IMDb"
-            />
           </div>
         </div>
       </header>
+
 
       {reviews.length === 0 ? (
         <div className={`rounded-2xl border-2 border-dashed px-6 py-14 text-center ${tabCardColors(palette)}`}>
@@ -260,7 +280,7 @@ function ReviewCard({
       {/* Summary (title of the review) */}
       {review.summary ? (
         <p className="mb-1.5 text-base font-bold leading-snug text-stone-900 dark:text-stone-100">
-          {review.summary}
+          {highlightRodentWords(review.summary)}
         </p>
       ) : null}
 
@@ -274,7 +294,7 @@ function ReviewCard({
               {/* Closed view */}
               <div className="group-open:hidden">
                 <p className="line-clamp-3 text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-                  {review.text}
+                  {highlightRodentWords(review.text)}
                 </p>
                 <span className="mt-1 inline-block text-xs font-semibold text-stone-500 dark:text-stone-400">
                   Read more ↓
@@ -283,7 +303,7 @@ function ReviewCard({
               {/* Open view */}
               <div className="hidden group-open:block">
                 <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-                  {review.text}
+                  {highlightRodentWords(review.text)}
                 </p>
                 <span className="mt-1 inline-block text-xs font-semibold text-stone-500 dark:text-stone-400">
                   Show less ↑
@@ -293,7 +313,7 @@ function ReviewCard({
           </details>
         ) : (
           <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-            {review.text}
+            {highlightRodentWords(review.text)}
           </p>
         )
       ) : null}

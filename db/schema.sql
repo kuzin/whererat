@@ -168,3 +168,7 @@ create table if not exists review_actions (
 
 create index if not exists review_actions_submission_reviewed_idx
   on review_actions(submission_id, reviewed_at desc);
+
+-- Content warnings on sightings and submissions
+alter table sightings add column if not exists content_warnings text[] not null default '{}';
+alter table submissions add column if not exists content_warnings text[] not null default '{}';

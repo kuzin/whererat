@@ -119,12 +119,21 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+a,
+button,
+[role="button"],
+select,
+label[for],
+summary {
+  cursor: pointer;
+}
+
 .wr-shell {
   position: relative;
   background: var(--background);
 }
 
-.wr-shell > * {
+.wr-shell > :not(header) {
   position: relative;
 }
 
@@ -335,6 +344,7 @@ body {
 .wr-btn-ghost:active {
   background-color: var(--wr-btn-ghost-active);
 }
+
 
 @utility wr-input {
   @apply h-11 rounded-xl border px-4 text-sm font-medium outline-none transition-[background-color,border-color,box-shadow,color] placeholder:font-medium;

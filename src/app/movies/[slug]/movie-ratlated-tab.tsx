@@ -1,5 +1,4 @@
 import type { ImdbRelatedTitle } from "@/lib/whererat";
-import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
 
 function formatRating(rating: number) {
@@ -78,24 +77,19 @@ function imdbPosterThumb(url: string): string {
 
 type Props = {
   titles: ImdbRelatedTitle[];
-  imdbId: string;
   palette: boolean;
 };
 
-export function MovieRatlatedTab({ titles, imdbId, palette }: Props) {
+export function MovieRatlatedTab({ titles, palette }: Props) {
   const headerBorder = tabHeaderBorderClass(palette);
 
   return (
     <div>
       <header className={`mb-6 border-b pb-4 ${headerBorder}`}>
-        <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-h-12 items-center">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
             Related
           </h2>
-          <ImdbLinkButton
-            href={`https://www.imdb.com/title/${imdbId}/recommendations/`}
-            label="More recommendations on IMDb"
-          />
         </div>
       </header>
 

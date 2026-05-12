@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import type { ImdbImage, ImdbVideo } from "@/lib/whererat";
-import { ImdbLinkButton } from "@/components/imdb-link-button";
 import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
 
 function formatDuration(seconds: number): string {
@@ -107,21 +106,99 @@ function ImageModal({
 
       {/* Image — stop click from bubbling to backdrop */}
       <div
-        className="relative max-h-[90vh] max-w-[80vw]"
+        className="flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={image.id}
-          src={imdbFull(image.url)}
-          alt={image.caption || "Production still"}
-          className="max-h-[85vh] max-w-[80vw] rounded-xl object-contain shadow-[0_8px_40px_rgb(0_0_0/0.7)]"
-        />
-        <div className="mt-3 flex items-center justify-center gap-4">
-          {image.caption ? (
-            <p className="text-center text-sm text-white/75">{image.caption}</p>
+        {/* Image with counter overlaid bottom-right */}
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={image.id}
+            src={imdbFull(image.url)}
+            alt={image.caption || "Production still"}
+            className="block max-h-[85vh] max-w-[80vw] rounded-xl object-contain shadow-[0_8px_40px_rgb(0_0_0/0.7)]"
+          />
+          <p className="absolute right-2 bottom-2 rounded-md bg-black/50 px-2 py-0.5 text-xs tabular-nums text-white/70 backdrop-blur-sm">
+            {idx + 1} / {images.length}
+          </p>
+        </div>
+        {image.caption ? (
+          <p className="mt-3 max-w-[80vw] text-center text-sm text-white/75">{image.caption}</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+// ── Video preview modal ───────────────────────────────────────────────────────
+
+function VideoModal({ video, onClose }: { video: ImdbVideo; onClose: () => void }) {
+  const href = `https://www.imdb.com/video/${video.id}/`;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/85"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5">
+          <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+        </svg>
+      </button>
+
+      <div className="flex w-full max-w-2xl flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
+        {/* Thumbnail */}
+        {video.thumbnailUrl ? (
+          <div className="relative w-full overflow-hidden rounded-xl shadow-[0_8px_48px_rgb(0_0_0/0.8)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imdbThumb(video.thumbnailUrl, 800)}
+              alt={video.name}
+              className="aspect-video w-full object-cover"
+            />
+            {video.runtimeSeconds != null ? (
+              <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-bold tabular-nums text-white backdrop-blur-sm">
+                {formatDuration(video.runtimeSeconds)}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* Title + Watch button */}
+        <div className="flex w-full flex-col items-center gap-3 text-center">
+          {video.contentType ? (
+            <span className="rounded bg-white/10 px-2 py-0.5 text-[0.65rem] font-black uppercase tracking-widest text-white/60">
+              {video.contentType}
+            </span>
           ) : null}
-          <p className="shrink-0 text-xs tabular-nums text-white/40">{idx + 1} / {images.length}</p>
+          <p className="text-base font-semibold text-white">{video.name}</p>
+          <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-amber-400 px-5 py-2.5 text-sm font-bold text-stone-900 transition hover:bg-amber-300"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
+              <path d="M8 5v14l11-7z" transform="scale(0.667)" />
+              <path fillRule="evenodd" d="M4.75 2a.75.75 0 0 0 0 1.5h4.19L2.22 10.22a.75.75 0 1 0 1.06 1.06L10 4.56v4.19a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 10.75 2H4.75Z" clipRule="evenodd" />
+            </svg>
+            Watch on IMDb
+          </a>
         </div>
       </div>
     </div>
@@ -131,53 +208,56 @@ function ImageModal({
 // ── Video card ────────────────────────────────────────────────────────────────
 
 function VideoCard({ video, palette }: { video: ImdbVideo; palette: boolean }) {
-  const href = `https://www.imdb.com/video/${video.id}/`;
-  const cardBase = `${tabMediaCardClass(palette)} transition-shadow hover:shadow-lg group`;
+  const [open, setOpen] = useState(false);
+  const cardBase = `${tabMediaCardClass(palette)} transition-shadow hover:shadow-lg group cursor-pointer`;
 
   return (
-    <a href={href} target="_blank" rel="noreferrer" className={`flex flex-col no-underline ${cardBase}`}>
-      <div className="relative aspect-video w-full overflow-hidden bg-stone-900">
-        {video.thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imdbThumb(video.thumbnailUrl, 400)}
-            alt={video.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <span className="text-4xl opacity-40" aria-hidden>▶</span>
+    <>
+      {open ? <VideoModal video={video} onClose={() => setOpen(false)} /> : null}
+      <button type="button" onClick={() => setOpen(true)} className={`flex w-full flex-col text-left no-underline ${cardBase}`}>
+        <div className="relative aspect-video w-full overflow-hidden bg-stone-900">
+          {video.thumbnailUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imdbThumb(video.thumbnailUrl, 400)}
+              alt={video.name}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="text-4xl opacity-40" aria-hidden>▶</span>
+            </div>
+          )}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/70 text-white shadow-xl">
+              <span className="ml-0.5 text-xl" aria-hidden>▶</span>
+            </div>
           </div>
-        )}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/70 text-white shadow-xl">
-            <span className="ml-0.5 text-xl" aria-hidden>▶</span>
-          </div>
+          {video.runtimeSeconds != null ? (
+            <span className="absolute bottom-1.5 right-2 rounded bg-black/75 px-1.5 py-0.5 text-[0.65rem] font-bold tabular-nums text-white">
+              {formatDuration(video.runtimeSeconds)}
+            </span>
+          ) : null}
         </div>
-        {video.runtimeSeconds != null ? (
-          <span className="absolute bottom-1.5 right-2 rounded bg-black/75 px-1.5 py-0.5 text-[0.65rem] font-bold tabular-nums text-white">
-            {formatDuration(video.runtimeSeconds)}
-          </span>
-        ) : null}
-      </div>
-      <div className="flex flex-col gap-1 p-3">
-        {video.contentType ? (
-          <span
-            className={`w-fit rounded px-1.5 py-0.5 text-[0.6rem] font-black uppercase tracking-wider ${
-              palette
-                ? "bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(220_210_198))] text-stone-700 dark:bg-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(50_40_30))] dark:text-stone-200"
-                : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
-            }`}
-          >
-            {video.contentType}
-          </span>
-        ) : null}
-        <p className="line-clamp-2 text-xs font-semibold leading-snug text-stone-800 group-hover:underline dark:text-stone-200">
-          {video.name}
-        </p>
-      </div>
-    </a>
+        <div className="flex flex-col gap-1 p-3">
+          {video.contentType ? (
+            <span
+              className={`w-fit rounded px-1.5 py-0.5 text-[0.6rem] font-black uppercase tracking-wider ${
+                palette
+                  ? "bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(220_210_198))] text-stone-700 dark:bg-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(50_40_30))] dark:text-stone-200"
+                  : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
+              }`}
+            >
+              {video.contentType}
+            </span>
+          ) : null}
+          <p className="line-clamp-2 text-xs font-semibold leading-snug text-stone-800 group-hover:underline dark:text-stone-200">
+            {video.name}
+          </p>
+        </div>
+      </button>
+    </>
   );
 }
 
@@ -214,22 +294,111 @@ function ImageCard({
   );
 }
 
+// ── YouTube modal ─────────────────────────────────────────────────────────────
+
+function YoutubeModal({ videoKey, onClose }: { videoKey: string; onClose: () => void }) {
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoKey}?autoplay=1&rel=0&modestbranding=1`;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      {/* Close */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close video"
+        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/85"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5">
+          <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+        </svg>
+      </button>
+
+      {/* Player */}
+      <div
+        className="w-full max-w-4xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-[0_8px_48px_rgb(0_0_0/0.8)]">
+          <iframe
+            src={embedUrl}
+            title="Movie trailer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full border-0"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── YouTube trailer thumbnail ─────────────────────────────────────────────────
+
+function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette: boolean }) {
+  const [open, setOpen] = useState(false);
+  const thumbUrl = `https://img.youtube.com/vi/${videoKey}/maxresdefault.jpg`;
+  const cardBase = tabMediaCardClass(palette);
+
+  return (
+    <>
+      {open ? <YoutubeModal videoKey={videoKey} onClose={() => setOpen(false)} /> : null}
+      <div className={`${cardBase} overflow-hidden`}>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="group relative flex aspect-video w-full items-center justify-center overflow-hidden bg-stone-900"
+          aria-label="Play trailer"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={thumbUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+          <div className="absolute inset-0 bg-black/30 transition-opacity duration-200 group-hover:bg-black/20" />
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-[0_4px_24px_rgb(0_0_0/0.6)] transition-transform duration-200 group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="ml-1 size-8">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+          <span className="absolute bottom-3 left-3 rounded bg-black/70 px-2 py-0.5 text-xs font-bold text-white">
+            Official Trailer
+          </span>
+        </button>
+      </div>
+    </>
+  );
+}
+
 // ── Main tab component ────────────────────────────────────────────────────────
 
 type Props = {
   videos: ImdbVideo[];
   images: ImdbImage[];
-  imdbId: string;
+  youtubeTrailerKey?: string;
   palette: boolean;
 };
 
-export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
+export function MovieRatMediaTab({ videos, images, youtubeTrailerKey, palette }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const headerBorder = tabHeaderBorderClass(palette);
   const sectionTitle = "wr-display mb-4 text-xl font-bold tracking-tight text-stone-950 dark:text-stone-50";
   const divider = `my-8 border-t ${headerBorder}`;
-  const hasContent = videos.length > 0 || images.length > 0;
+  const hasContent = youtubeTrailerKey || videos.length > 0 || images.length > 0;
 
   return (
     <div>
@@ -238,14 +407,10 @@ export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
       ) : null}
 
       <header className={`mb-6 border-b pb-4 ${headerBorder}`}>
-        <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-h-12 items-center">
           <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
             Media
           </h2>
-          <ImdbLinkButton
-            href={`https://www.imdb.com/title/${imdbId}/mediaindex`}
-            label="Full gallery on IMDb"
-          />
         </div>
       </header>
 
@@ -261,6 +426,18 @@ export function MovieRatMediaTab({ videos, images, imdbId, palette }: Props) {
         </div>
       ) : (
         <div>
+          {/* YouTube trailer — shown inline when available */}
+          {youtubeTrailerKey ? (
+            <section className={videos.length > 0 || images.length > 0 ? "mb-8" : ""}>
+              <p className={sectionTitle}>Trailer</p>
+              <YoutubeTrailerEmbed videoKey={youtubeTrailerKey} palette={palette} />
+            </section>
+          ) : null}
+
+          {youtubeTrailerKey && (videos.length > 0 || images.length > 0) ? (
+            <div className={divider} />
+          ) : null}
+
           {videos.length > 0 ? (
             <section>
               <p className={sectionTitle}>Videos ({videos.length})</p>

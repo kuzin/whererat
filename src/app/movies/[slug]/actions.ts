@@ -526,6 +526,9 @@ export async function updateSightingInfo(formData: FormData) {
     formData.get("approximateRatCount"),
   );
   const curatorNote = String(formData.get("curatorNote") ?? "").trim();
+  const contentWarnings = formData.getAll("contentWarnings").map((v) => String(v).trim()).filter(Boolean);
+  const otherWarning = String(formData.get("contentWarningOther") ?? "").trim().slice(0, 200);
+  if (otherWarning) contentWarnings.push(otherWarning);
   const reason = "Edited from movie page.";
   const imageListManaged = String(formData.get("imageListManaged") ?? "") === "1";
   let nextImages: SightingImageSlot[] = [];
@@ -588,6 +591,7 @@ export async function updateSightingInfo(formData: FormData) {
         images: nextImages,
         imageUrl: leadImage?.url,
         imageAlt: leadImage?.alt,
+        contentWarnings: contentWarnings.length ? contentWarnings : undefined,
       },
     });
   } else {
@@ -601,6 +605,7 @@ export async function updateSightingInfo(formData: FormData) {
       images: nextImages,
       imageUrl: leadImage?.url,
       imageAlt: leadImage?.alt,
+      contentWarnings: contentWarnings.length ? contentWarnings : undefined,
     });
   }
 
