@@ -144,6 +144,7 @@ export async function executePublicSightingSubmit(
       episodeNumber,
       episodeTitle: episodeTitle || undefined,
       timestamp,
+      submittedAt: new Date(),
       title: sightingTitle,
       description,
       spoiler,
