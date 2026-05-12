@@ -45,6 +45,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "where-rat.s3.us-east-1.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
       ...(s3PublicHostname
         ? [
             {
