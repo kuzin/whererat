@@ -114,20 +114,10 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
   return (
     <div>
       <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(palette)}`}>
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-              Reviews
-            </h2>
-            {reviews.length > 0 ? (
-              <p className="text-xs text-stone-500 dark:text-stone-400">
-                {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
-                {ratCount > 0 ? (
-                  <> · <span className="text-amber-600 dark:text-amber-400 font-semibold">{ratCount} mention rats 🐀</span></>
-                ) : null}
-              </p>
-            ) : null}
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+            Reviews
+          </h2>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             {/* Rat-only toggle */}
@@ -184,6 +174,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
           </div>
         </div>
       </header>
+
 
       {reviews.length === 0 ? (
         <div className={`rounded-2xl border-2 border-dashed px-6 py-14 text-center ${tabCardColors(palette)}`}>

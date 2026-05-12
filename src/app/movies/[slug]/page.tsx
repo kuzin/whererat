@@ -756,9 +756,6 @@ export default async function MoviePage({
                 <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
                   Rat Facts
                 </h2>
-                <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                  {ratFacts.length} {ratFacts.length === 1 ? "trivia entry" : "trivia entries"} mentioning rats · sourced from IMDb
-                </p>
               </header>
               <div className="space-y-3">
                 {ratFacts.map((fact, i) => (
