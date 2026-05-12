@@ -130,56 +130,134 @@ function ImageModal({
   );
 }
 
+// ── Video preview modal ───────────────────────────────────────────────────────
+
+function VideoModal({ video, onClose }: { video: ImdbVideo; onClose: () => void }) {
+  const href = `https://www.imdb.com/video/${video.id}/`;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close"
+        className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/85"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-5">
+          <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+        </svg>
+      </button>
+
+      <div className="flex w-full max-w-2xl flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
+        {/* Thumbnail */}
+        {video.thumbnailUrl ? (
+          <div className="relative w-full overflow-hidden rounded-xl shadow-[0_8px_48px_rgb(0_0_0/0.8)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imdbThumb(video.thumbnailUrl, 800)}
+              alt={video.name}
+              className="aspect-video w-full object-cover"
+            />
+            {video.runtimeSeconds != null ? (
+              <span className="absolute bottom-2 right-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-bold tabular-nums text-white backdrop-blur-sm">
+                {formatDuration(video.runtimeSeconds)}
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* Title + Watch button */}
+        <div className="flex w-full flex-col items-center gap-3 text-center">
+          {video.contentType ? (
+            <span className="rounded bg-white/10 px-2 py-0.5 text-[0.65rem] font-black uppercase tracking-widest text-white/60">
+              {video.contentType}
+            </span>
+          ) : null}
+          <p className="text-base font-semibold text-white">{video.name}</p>
+          <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-amber-400 px-5 py-2.5 text-sm font-bold text-stone-900 transition hover:bg-amber-300"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
+              <path d="M8 5v14l11-7z" transform="scale(0.667)" />
+              <path fillRule="evenodd" d="M4.75 2a.75.75 0 0 0 0 1.5h4.19L2.22 10.22a.75.75 0 1 0 1.06 1.06L10 4.56v4.19a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 10.75 2H4.75Z" clipRule="evenodd" />
+            </svg>
+            Watch on IMDb
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Video card ────────────────────────────────────────────────────────────────
 
 function VideoCard({ video, palette }: { video: ImdbVideo; palette: boolean }) {
-  const href = `https://www.imdb.com/video/${video.id}/`;
-  const cardBase = `${tabMediaCardClass(palette)} transition-shadow hover:shadow-lg group`;
+  const [open, setOpen] = useState(false);
+  const cardBase = `${tabMediaCardClass(palette)} transition-shadow hover:shadow-lg group cursor-pointer`;
 
   return (
-    <a href={href} target="_blank" rel="noreferrer" className={`flex flex-col no-underline ${cardBase}`}>
-      <div className="relative aspect-video w-full overflow-hidden bg-stone-900">
-        {video.thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imdbThumb(video.thumbnailUrl, 400)}
-            alt={video.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <span className="text-4xl opacity-40" aria-hidden>▶</span>
+    <>
+      {open ? <VideoModal video={video} onClose={() => setOpen(false)} /> : null}
+      <button type="button" onClick={() => setOpen(true)} className={`flex w-full flex-col text-left no-underline ${cardBase}`}>
+        <div className="relative aspect-video w-full overflow-hidden bg-stone-900">
+          {video.thumbnailUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imdbThumb(video.thumbnailUrl, 400)}
+              alt={video.name}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="text-4xl opacity-40" aria-hidden>▶</span>
+            </div>
+          )}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/70 text-white shadow-xl">
+              <span className="ml-0.5 text-xl" aria-hidden>▶</span>
+            </div>
           </div>
-        )}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/70 text-white shadow-xl">
-            <span className="ml-0.5 text-xl" aria-hidden>▶</span>
-          </div>
+          {video.runtimeSeconds != null ? (
+            <span className="absolute bottom-1.5 right-2 rounded bg-black/75 px-1.5 py-0.5 text-[0.65rem] font-bold tabular-nums text-white">
+              {formatDuration(video.runtimeSeconds)}
+            </span>
+          ) : null}
         </div>
-        {video.runtimeSeconds != null ? (
-          <span className="absolute bottom-1.5 right-2 rounded bg-black/75 px-1.5 py-0.5 text-[0.65rem] font-bold tabular-nums text-white">
-            {formatDuration(video.runtimeSeconds)}
-          </span>
-        ) : null}
-      </div>
-      <div className="flex flex-col gap-1 p-3">
-        {video.contentType ? (
-          <span
-            className={`w-fit rounded px-1.5 py-0.5 text-[0.6rem] font-black uppercase tracking-wider ${
-              palette
-                ? "bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(220_210_198))] text-stone-700 dark:bg-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(50_40_30))] dark:text-stone-200"
-                : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
-            }`}
-          >
-            {video.contentType}
-          </span>
-        ) : null}
-        <p className="line-clamp-2 text-xs font-semibold leading-snug text-stone-800 group-hover:underline dark:text-stone-200">
-          {video.name}
-        </p>
-      </div>
-    </a>
+        <div className="flex flex-col gap-1 p-3">
+          {video.contentType ? (
+            <span
+              className={`w-fit rounded px-1.5 py-0.5 text-[0.6rem] font-black uppercase tracking-wider ${
+                palette
+                  ? "bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(220_210_198))] text-stone-700 dark:bg-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(50_40_30))] dark:text-stone-200"
+                  : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
+              }`}
+            >
+              {video.contentType}
+            </span>
+          ) : null}
+          <p className="line-clamp-2 text-xs font-semibold leading-snug text-stone-800 group-hover:underline dark:text-stone-200">
+            {video.name}
+          </p>
+        </div>
+      </button>
+    </>
   );
 }
 
