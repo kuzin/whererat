@@ -1,17 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   SightingTimestampField,
   SightingRatCountField,
   SightingDescriptionField,
   SightingContentWarningsField,
+  SightingRodentTypesField,
 } from "@/components/sighting-fields";
 import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import {
   getSightingTimestampPercent,
   getSightingImageRefs,
+  RODENT_TYPE_OPTIONS,
+  rodentCountFieldLabel,
+  rodentSwarmNoun,
   type Sighting,
 } from "@/lib/whererat";
 
@@ -34,6 +39,11 @@ export function EditSightingForm({
 }: EditSightingFormProps) {
   const initialImages = getSightingImageRefs(sighting);
   const initialPercent = getSightingTimestampPercent(sighting.timestamp) ?? 50;
+  const initialRodentTypes = (sighting as { rodentTypes?: string[] }).rodentTypes ?? ["rat"];
+  const [selectedRodentTypes, setSelectedRodentTypes] = useState<string[]>(initialRodentTypes);
+  const rodentEmoji = selectedRodentTypes.length === 1
+    ? (RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.emoji ?? "🐀")
+    : "🐀";
 
   return (
     <form action={updateAction} className="mt-6 grid gap-5">
@@ -50,16 +60,30 @@ export function EditSightingForm({
           defaultValue={sighting.title}
           className="wr-input"
         />
+        <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+          A short, punchy label for this rat moment.
+        </p>
       </label>
+
+      {/* Rodent type picker */}
+      <SightingRodentTypesField
+        initialTypes={initialRodentTypes}
+        onTypesChange={setSelectedRodentTypes}
+      />
 
       {/* Timestamp slider */}
       <SightingTimestampField
         defaultValue={initialPercent}
-        label={`Approx. point in ${isSeriesTitle ? "episode" : "movie"}`}
+        label={`When in the ${isSeriesTitle ? "episode" : "movie"}?`}
       />
 
-      {/* Rat count stepper */}
-      <SightingRatCountField defaultValue={sighting.approximateRatCount} />
+      {/* Rodent count stepper */}
+      <SightingRatCountField
+        defaultValue={sighting.approximateRatCount}
+        label={rodentCountFieldLabel(selectedRodentTypes)}
+        emoji={rodentEmoji}
+        noun={rodentSwarmNoun(selectedRodentTypes)}
+      />
 
       {/* Description + preview */}
       <SightingDescriptionField

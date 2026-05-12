@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 const s3PublicBaseUrl = process.env.S3_PUBLIC_BASE_URL?.trim();
@@ -11,6 +12,9 @@ const s3PublicHostname = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
   images: {
     remotePatterns: [
       {

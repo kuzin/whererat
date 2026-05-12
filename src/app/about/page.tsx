@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { InfoPageShell, InfoHero, InfoSection } from "@/components/info-page";
 
 export const metadata: Metadata = {
   title: "About",
@@ -8,11 +9,11 @@ export const metadata: Metadata = {
   },
 };
 
-const aboutSections = [
+const sections = [
   {
     icon: "🐀",
-    title: "About WhereRat",
-    body: "WhereRat is a spoiler-aware catalog of rat appearances in film and TV. It helps people track specific rat moments without forcing spoilers by default.",
+    title: "What is WhereRat",
+    body: "WhereRat is a spoiler-aware catalog of rodent appearances in film and TV. It helps people track specific rodent moments without forcing spoilers by default.",
   },
   {
     icon: "🧱",
@@ -34,37 +35,24 @@ const aboutSections = [
     title: "Accessibility",
     body: "WhereRat aims to keep content readable, keyboard-friendly, and spoiler-safe by default. If you encounter accessibility issues, please reach out through the public contact channels linked from the site.",
   },
-] as const;
+];
 
 export default function AboutPage() {
   return (
-    <main className="wr-page-shell py-10">
-      <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="self-start rounded-2xl border border-amber-500/35 wr-panel-warm p-8">
-          <div className="text-4xl leading-none sm:text-5xl">
-            <span aria-hidden>ℹ️</span>
-          </div>
-          <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">About</h1>
-          <p className="mt-5 leading-relaxed text-orange-950">
-            What powers WhereRat, where core metadata comes from, and how the project is built and maintained.
-          </p>
-        </aside>
-
-        <section className="grid gap-4">
-          {aboutSections.map((item) => (
-            <article
-              key={item.title}
-              className="rounded-2xl border border-stone-900/25 bg-stone-50 p-5 dark:border-white/12 dark:bg-stone-900/70"
-            >
-              <h2 className="wr-display flex items-center gap-2 text-2xl font-bold text-stone-950 dark:text-stone-100">
-                <span aria-hidden>{item.icon}</span>
-                <span>{item.title}</span>
-              </h2>
-              <p className="mt-3 leading-relaxed text-stone-700 dark:text-stone-300">{item.body}</p>
-            </article>
-          ))}
-        </section>
-      </section>
-    </main>
+    <InfoPageShell
+      hero={
+        <InfoHero
+          icon="🐀"
+          title="About"
+          description="What powers WhereRat, where core metadata comes from, and how the project is built and maintained."
+        />
+      }
+    >
+      {sections.map((s) => (
+        <InfoSection key={s.title} icon={s.icon} title={s.title}>
+          {s.body}
+        </InfoSection>
+      ))}
+    </InfoPageShell>
   );
 }

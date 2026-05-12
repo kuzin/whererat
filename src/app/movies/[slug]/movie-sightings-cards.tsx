@@ -6,6 +6,7 @@ import { useId, useLayoutEffect, useMemo, useRef, useState, useCallback } from "
 import {
   estimateRatsForAppearance,
   formatApproximateRatLine,
+  formatContentWarningLabel,
   formatSightingEpisodeContext,
   formatSightingStartingTimeDisplay,
   getSightingCardHeadline,
@@ -383,34 +384,29 @@ export function MovieSightingsCards({
                         </span>
                       ) : null}
                       <p
-                        className="inline-flex h-9 shrink-0 items-center gap-x-1 rounded-lg border border-orange-800/25 bg-orange-50 px-3 text-xs tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
+                        className="inline-flex h-9 shrink-0 items-center gap-x-1 rounded-lg border border-orange-800/25 bg-orange-50 px-3 text-xs font-semibold tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
                         title={isSeries ? "Position in episode" : "Position in film"}
                         aria-label={`Sighting at ${startingTimeLabel} into the ${isSeries ? "episode" : "film"}`}
                       >
-                        <span className="font-bold tabular-nums">{startingTimeLabel}</span>
-                        <span className="font-medium opacity-70">
+                        <span className="tabular-nums">{startingTimeLabel}</span>
+                        <span className="opacity-70">
                           {isSeries ? "into episode" : "into film"}
                         </span>
                       </p>
-                      {sighting.spoiler && !showSpoilers ? (
-                        <span className="inline-flex h-9 shrink-0 items-center rounded-lg border border-red-800/30 bg-[#fecaca] px-3 text-xs font-semibold text-red-950 dark:border-red-400/35 dark:bg-red-950/50 dark:text-red-100">
-                          Spoiler
-                        </span>
-                      ) : null}
                       {(sighting.contentWarnings ?? []).map((id) => {
                         const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
                         return (
                           <span
                             key={id}
-                            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-yellow-800/20 bg-yellow-50 px-3 text-xs font-semibold text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/40 dark:text-yellow-200"
+                            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-yellow-800/20 bg-yellow-50 px-3 text-xs font-semibold tracking-tight text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/40 dark:text-yellow-200"
                           >
                             <span aria-hidden>{opt ? opt.emoji : "⚠️"}</span>
-                            {opt ? opt.label : id}
+                            {formatContentWarningLabel(id, sighting.rodentTypes)}
                           </span>
                         );
                       })}
                       <span
-                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-amber-900/25 bg-amber-50 px-2.5 text-xs font-semibold tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
+                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-amber-900/25 bg-amber-50 px-2.5 text-xs font-semibold tracking-tight tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
                         title="Estimated rats on screen for this moment"
                       >
                         <SightingRatPresenceVisual
@@ -418,7 +414,7 @@ export function MovieSightingsCards({
                           palette={palette}
                           className="-mx-0.5"
                         />
-                        <span>{formatApproximateRatLine(ratEstimate)}</span>
+                        <span>{formatApproximateRatLine(ratEstimate, sighting.rodentTypes)}</span>
                       </span>
                     </div>
                   </div>

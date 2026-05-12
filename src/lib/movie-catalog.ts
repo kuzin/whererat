@@ -151,9 +151,11 @@ const SQL_SEARCH_NO_TRGM = `
 export async function searchCatalogMovies({
   query,
   genre,
+  rodentType,
 }: {
   query?: string;
   genre?: string;
+  rodentType?: string;
 }): Promise<Movie[]> {
   const allMovies = await getCatalogMovies();
   const normalizedQuery = query?.trim();
@@ -162,11 +164,23 @@ export async function searchCatalogMovies({
   const genreFiltered =
     !genre || genre === "all" ? allMovies : allMovies.filter((m) => m.genres.includes(genre));
 
-  if (!normalizedQuery) return genreFiltered;
+  // Apply rodent type filter: keep only movies with at least one matching sighting
+  let rodentFiltered = genreFiltered;
+  if (rodentType && rodentType !== "all") {
+    const pool = getDbPool();
+    const result = await pool.query<{ movie_id: string }>(
+      `SELECT DISTINCT movie_id FROM sightings WHERE $1 = ANY(rodent_types) AND is_deleted = false`,
+      [rodentType],
+    );
+    const matchingMovieIds = new Set(result.rows.map((r) => r.movie_id));
+    rodentFiltered = genreFiltered.filter((m) => matchingMovieIds.has(m.id));
+  }
+
+  if (!normalizedQuery) return rodentFiltered;
 
   // Fast path: IMDb ID lookup
   if (/^tt\d+$/i.test(normalizedQuery)) {
-    return genreFiltered.filter(
+    return rodentFiltered.filter(
       (m) => m.externalIds.imdb.toLowerCase() === normalizedQuery.toLowerCase(),
     );
   }
@@ -188,7 +202,7 @@ export async function searchCatalogMovies({
       rows = result.rows;
     } catch {
       // SQL search unavailable — fall back to in-memory substring match
-      return genreFiltered.filter(
+      return rodentFiltered.filter(
         (m) =>
           m.title.toLowerCase().includes(normalizedQuery.toLowerCase()) ||
           m.summary.toLowerCase().includes(normalizedQuery.toLowerCase()),
@@ -198,7 +212,7 @@ export async function searchCatalogMovies({
 
   const rankByMovieId = new Map(rows.map((r) => [r.id, Number(r.rank)]));
 
-  return genreFiltered
+  return rodentFiltered
     .filter((m) => rankByMovieId.has(m.id))
     .sort((a, b) => (rankByMovieId.get(b.id) ?? 0) - (rankByMovieId.get(a.id) ?? 0));
 }
@@ -206,6 +220,17 @@ export async function searchCatalogMovies({
 export async function getCatalogGenres() {
   const allMovies = await getCatalogMovies();
   return Array.from(new Set(allMovies.flatMap((movie) => movie.genres))).sort();
+}
+
+export async function getCatalogRodentTypes(): Promise<string[]> {
+  const pool = getDbPool();
+  const result = await pool.query<{ rodent_type: string }>(
+    `SELECT DISTINCT unnest(rodent_types) AS rodent_type
+     FROM sightings
+     WHERE is_deleted = false
+     ORDER BY rodent_type`,
+  );
+  return result.rows.map((r) => r.rodent_type);
 }
 
 export async function getCatalogStatsWithCommunity() {

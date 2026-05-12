@@ -172,3 +172,7 @@ create index if not exists review_actions_submission_reviewed_idx
 -- Content warnings on sightings and submissions
 alter table sightings add column if not exists content_warnings text[] not null default '{}';
 alter table submissions add column if not exists content_warnings text[] not null default '{}';
+
+-- Rodent types on sightings and submissions (defaults to rat)
+alter table sightings add column if not exists rodent_types text[] not null default '{rat}';
+alter table submissions add column if not exists rodent_types text[] not null default '{rat}';
