@@ -13,14 +13,14 @@
     "imdb:resync": "tsx scripts/imdb-resync-all.ts",
     "db:bootstrap": "npm run seed:postgres:export && npm run db:schema:apply && npm run db:seed",
     "db:clear:content": "tsx scripts/db-clear-content.ts",
-"store:play:graphics": "tsx scripts/generate-play-store-graphics.ts",
+    "store:play:graphics": "tsx scripts/generate-play-store-graphics.ts",
     "store:play:backdrop": "tsx scripts/play-phone-backdrop.ts",
     "store:play:screenshots": "tsx scripts/generate-play-phone-screenshots.ts"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.2.8",
     "@vercel/blob": "^2.3.3",
-    "next": "16.2.4",
+    "next": "^16.2.6",
     "pg": "^8.20.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
