@@ -31,8 +31,8 @@ function stripHtml(html: string): string {
     .trim();
 }
 
-function mentionsRat(text: string): boolean {
-  return /\brat(s|ty|like|proof|infested|catcher)?\b/i.test(text);
+function mentionsRodent(text: string): boolean {
+  return /\b(rats?|ratty|rat-like|rat-proof|ratcatcher|mice|mouse|rodents?|gerbils?|hamsters?|squirrels?|voles?|beavers?|marmots?|guinea\s+pigs?|murine|vermin)\b/i.test(text);
 }
 
 // ---------------------------------------------------------------------------
@@ -251,7 +251,7 @@ function extractReviews(edges: unknown[]): ImdbReview[] {
       text,
       rating,
       date,
-      mentionsRat: mentionsRat(combined),
+      mentionsRat: mentionsRodent(combined),
     });
   }
   return reviews;
@@ -260,12 +260,12 @@ function extractReviews(edges: unknown[]): ImdbReview[] {
 function extractRatFacts(edges: unknown[]): string[] {
   const facts: string[] = [];
   for (const edge of edges) {
-    if (facts.length >= 3) break;
+    if (facts.length >= 5) break;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const raw: string = (edge as any)?.node?.displayableArticle?.body?.plaidHtml ?? "";
     if (!raw) continue;
     const plain = stripHtml(String(raw));
-    if (plain && mentionsRat(plain)) facts.push(plain);
+    if (plain && mentionsRodent(plain)) facts.push(plain);
   }
   return facts;
 }

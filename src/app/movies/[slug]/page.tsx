@@ -207,6 +207,30 @@ function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
+const RODENT_HIGHLIGHT_RE =
+  /\b(rats?|ratty|rat-like|ratcatcher|mice|mouse|rodents?|gerbils?|hamsters?|squirrels?|voles?|beavers?|marmots?|guinea\s+pigs?|murine|vermin)\b/gi;
+
+function highlightRodentWords(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  let last = 0;
+  RODENT_HIGHLIGHT_RE.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = RODENT_HIGHLIGHT_RE.exec(text)) !== null) {
+    if (match.index > last) parts.push(text.slice(last, match.index));
+    parts.push(
+      <mark
+        key={match.index}
+        className="rounded-sm bg-amber-200/70 px-0.5 text-amber-950 not-italic dark:bg-amber-500/30 dark:text-amber-200"
+      >
+        {match[0]}
+      </mark>,
+    );
+    last = match.index + match[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length > 0 ? parts : text;
+}
+
 export async function generateStaticParams() {
   const allMovies = await getCatalogMovies();
   return allMovies.map((movie) => ({ slug: movie.slug }));
@@ -759,10 +783,9 @@ export default async function MoviePage({
               </header>
               <div className="space-y-3">
                 {ratFacts.map((fact, i) => (
-                  <div key={i} className={`${tabCardClass(Boolean(palette))} flex gap-4`}>
-                    <span className="mt-0.5 shrink-0 text-xl leading-none" aria-hidden>🐀</span>
+                  <div key={i} className={`${tabCardClass(Boolean(palette))} px-5 py-4`}>
                     <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-                      {fact}
+                      {highlightRodentWords(fact)}
                     </p>
                   </div>
                 ))}
