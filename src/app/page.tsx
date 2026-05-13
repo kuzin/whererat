@@ -171,7 +171,7 @@ export default async function Home({
         id="catalog"
         className="mx-auto w-full max-w-7xl px-4 pt-0 pb-0 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
       >
-        <div className="wr-card bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
+        <div className="wr-card bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/10 dark:bg-[rgb(40_35_30/0.97)]">
           <CatalogPendingProvider>
             <CatalogFilters
               availableGenres={availableGenres}
@@ -195,7 +195,7 @@ export default async function Home({
                         <Link
                           key={movie.id}
                           href={`/movies/${movie.slug}`}
-                          className="group relative overflow-hidden rounded-xl border-2 border-stone-950/90 bg-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] outline-none transition hover:border-stone-950 focus-visible:ring-2 focus-visible:ring-amber-600/35 dark:border-white/14 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40"
+                          className="group relative overflow-hidden rounded-xl border-2 border-stone-950/90 bg-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] outline-none transition hover:border-stone-950 focus-visible:ring-2 focus-visible:ring-amber-600/35 dark:border-white/10 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.48)] dark:hover:border-white/20"
                         >
                           <div className="relative aspect-[2/3] overflow-hidden">
                             <Image
@@ -243,9 +243,9 @@ export default async function Home({
                         <Link
                           key={movie.id}
                           href={`/movies/${movie.slug}`}
-                          className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
+                          className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/10 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-white/20 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
                         >
-                          <div className="relative aspect-[2/3] overflow-hidden border-stone-950/90 bg-stone-900 sm:border-r-2 dark:border-white/14">
+                          <div className="relative aspect-[2/3] overflow-hidden border-stone-950/90 bg-stone-900 sm:border-r-2 dark:border-white/10">
                             <Image
                               src={movie.posterUrl}
                               alt={movie.posterAlt}
