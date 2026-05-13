@@ -48,9 +48,9 @@
   --wr-input-border-focus: #ea580c;
   --wr-input-text: #1c1410;
   --wr-input-placeholder: #78716c;
-  --wr-panel-warm-bg: #fcd34d;
+  --wr-panel-warm-bg: #fde68a;
   --wr-panel-warm-fg: #292524;
-  --wr-panel-warm-border: rgb(217 119 6 / 0.46);
+  --wr-panel-warm-border: rgb(217 119 6 / 0.38);
   --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2357534e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 
