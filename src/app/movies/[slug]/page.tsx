@@ -437,7 +437,7 @@ export default async function MoviePage({
       <section
         className={`wr-cheese-panel mt-6 overflow-hidden ${palette ? "movie-page-palette-bg" : "wr-cheese-tile-cream"}`}
       >
-        <div className="relative min-h-[min(22rem,70vw)] overflow-hidden border-b-2 border-stone-950/85 dark:border-white/14 sm:min-h-80">
+        <div className="relative min-h-[min(22rem,70vw)] overflow-hidden border-b-2 border-stone-950/22 dark:border-white/20 sm:min-h-80">
           <Image
             src={visuals.bannerUrl}
             alt={
@@ -811,7 +811,7 @@ export default async function MoviePage({
 
       {editMovie && canEditMovie ? (
         <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95">
+          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/22 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/20 dark:bg-stone-900/95">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
@@ -989,7 +989,7 @@ export default async function MoviePage({
       ) : null}
       {editingSighting && canEditSightings ? (
         <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/14 dark:bg-stone-900/95">
+          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/22 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/20 dark:bg-stone-900/95">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">Edit sighting</p>

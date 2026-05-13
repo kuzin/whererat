@@ -16,7 +16,7 @@
 
   /* Masthead surface + logo tints — tweak here or in `src/components/site-masthead.tsx` */
   --wr-header-bg: rgb(255 248 237 / 0.92);
-  --wr-header-border: rgb(28 25 23 / 0.8);
+  --wr-header-border: rgb(28 25 23 / 0.22);
   /** Header brand (mask fill) — warmed stone / cheese, not pure black */
   --wr-brand-mark: #a16207;
   --wr-brand-wordmark: #57534e;
@@ -29,8 +29,8 @@
   --wr-surface-cream-soft: #fffdf8;
   --wr-surface-cream-muted: #faf7f2;
   --wr-card-bg-soft: rgb(255 255 255 / 0.92);
-  --wr-card-border: rgb(168 162 158 / 0.84);
-  --wr-card-border-soft: rgb(168 162 158 / 0.64);
+  --wr-card-border: rgb(28 25 23 / 0.22);
+  --wr-card-border-soft: rgb(28 25 23 / 0.14);
 
   --wr-shadow-card: rgb(87 83 78 / 0.42);
   --wr-shadow-card-soft: rgb(87 83 78 / 0.3);
@@ -66,7 +66,7 @@
     --wr-accent-btn-dark-hover: #92400e;
 
     --wr-header-bg: rgb(41 37 36 / 0.94);
-    --wr-header-border: rgb(254 243 199 / 0.14);
+    --wr-header-border: rgb(255 255 255 / 0.16);
     --wr-brand-mark: #fbbf24;
     --wr-brand-wordmark: #fef3c7;
 
@@ -79,8 +79,8 @@
     --wr-surface-cream-soft: #292524;
     --wr-surface-cream-muted: #1f1a17;
     --wr-card-bg-soft: rgb(28 25 23 / 0.94);
-    --wr-card-border: rgb(68 64 60 / 0.95);
-    --wr-card-border-soft: rgb(68 64 60 / 0.72);
+    --wr-card-border: rgb(255 255 255 / 0.20);
+    --wr-card-border-soft: rgb(255 255 255 / 0.13);
 
     --wr-shadow-card: rgb(0 0 0 / 0.52);
     --wr-shadow-card-soft: rgb(0 0 0 / 0.38);
@@ -100,7 +100,7 @@
     --wr-input-placeholder: #a8a29e;
     --wr-panel-warm-bg: #1e0904;
     --wr-panel-warm-fg: #fef3c7;
-    --wr-panel-warm-border: rgb(255 255 255 / 0.10);
+    --wr-panel-warm-border: rgb(255 255 255 / 0.16);
     --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 

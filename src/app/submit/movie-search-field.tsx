@@ -519,7 +519,7 @@ export function MovieSearchField({
           {visibleResults.map((movie) => (
             <article
               key={movie.imdbId}
-              className="grid overflow-hidden rounded-xl border-2 border-stone-950/85 bg-[var(--wr-card-bg)] transition-colors hover:bg-amber-50/40 dark:border-white/14 dark:hover:bg-stone-800/85 sm:grid-cols-[90px_1fr_auto]"
+              className="grid overflow-hidden rounded-xl border-2 border-stone-950/22 bg-[var(--wr-card-bg)] transition-colors hover:bg-amber-50/40 dark:border-white/20 dark:hover:bg-stone-800/85 sm:grid-cols-[90px_1fr_auto]"
             >
               <MoviePoster
                 src={movie.posterUrl}
