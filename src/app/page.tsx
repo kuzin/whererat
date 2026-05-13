@@ -169,7 +169,7 @@ export default async function Home({
 
       <section
         id="catalog"
-        className="mx-auto max-w-7xl px-4 pt-0 pb-0 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
+        className="mx-auto w-full max-w-7xl px-4 pt-0 pb-0 sm:px-6 sm:pt-0 lg:px-8 lg:pt-0"
       >
         <div className="wr-card bg-[#fdfbf7]/95 p-4 sm:p-7 dark:border-white/14 dark:bg-[rgb(40_35_30/0.97)]">
           <CatalogPendingProvider>
@@ -245,13 +245,13 @@ export default async function Home({
                           href={`/movies/${movie.slug}`}
                           className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
                         >
-                          <div className="relative h-40 overflow-hidden border-stone-950/90 bg-stone-900 sm:h-auto sm:border-r-2 dark:border-white/14">
+                          <div className="relative aspect-[2/3] overflow-hidden border-stone-950/90 bg-stone-900 sm:border-r-2 dark:border-white/14">
                             <Image
                               src={movie.posterUrl}
                               alt={movie.posterAlt}
                               width={280}
                               height={420}
-                              className="h-full w-full scale-[1.04] object-cover object-top transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-95 sm:min-h-full sm:object-center"
+                              className="h-full w-full object-cover transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-95"
                             />
                             <div className={`absolute inset-x-0 bottom-0 h-1.5 ${movie.posterTone}`} />
                           </div>

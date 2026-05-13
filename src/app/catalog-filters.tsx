@@ -203,7 +203,7 @@ export function CatalogFilters({
             })}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm font-bold text-stone-800 md:gap-2 dark:text-stone-300">
+        <label className="col-span-2 flex flex-col gap-1 text-sm font-bold text-stone-800 md:col-span-1 md:gap-2 dark:text-stone-300">
           Sort by
           <select
             value={sort}
@@ -220,83 +220,78 @@ export function CatalogFilters({
         </label>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Row 1: active filter pills — only rendered when something is active */}
+      {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
           {genre !== "all" && (
             <button
               type="button"
               onClick={() => handleGenreChange("all")}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+              className="inline-flex items-center gap-1.5 rounded-full bg-orange-600 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
             >
               {genre}
-              <span aria-hidden="true" className="text-stone-400 dark:text-stone-400">×</span>
+              <span aria-hidden="true" className="text-orange-200 dark:text-stone-400">×</span>
             </button>
           )}
           {rodentType !== "all" && (
             <button
               type="button"
               onClick={() => handleRodentTypeChange("all")}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+              className="inline-flex items-center gap-1.5 rounded-full bg-orange-600 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
             >
               {RODENT_TYPE_OPTIONS.find((o) => o.id === rodentType)?.emoji}{" "}
               {RODENT_TYPE_OPTIONS.find((o) => o.id === rodentType)?.label ?? rodentType}
-              <span aria-hidden="true" className="text-stone-400 dark:text-stone-400">×</span>
+              <span aria-hidden="true" className="text-orange-200 dark:text-stone-400">×</span>
             </button>
           )}
           {sort !== "latest-added-title" && (
             <button
               type="button"
               onClick={() => handleSortChange("latest-added-title")}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+              className="inline-flex items-center gap-1.5 rounded-full bg-orange-600 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
             >
               {catalogSortLabels[sort]}
-              <span aria-hidden="true" className="text-stone-400 dark:text-stone-400">×</span>
+              <span aria-hidden="true" className="text-orange-200 dark:text-stone-400">×</span>
             </button>
-          )}
-          {!hasActiveFilters && (
-            <p className={`text-sm font-medium text-stone-500 transition-opacity dark:text-stone-500${isPending ? " opacity-50" : ""}`}>
-              {countLabel}{countSuffix}
-            </p>
           )}
         </div>
+      )}
 
-        <div className="flex items-center gap-3">
-          {hasActiveFilters && (
-            <p className={`text-sm font-medium text-stone-500 transition-opacity dark:text-stone-500${isPending ? " opacity-50" : ""}`}>
-              {countLabel}{countSuffix}
-            </p>
-          )}
-          <div className="flex gap-0.5 rounded-lg border border-stone-200 p-0.5 dark:border-stone-700">
-            <button
-              type="button"
-              onClick={() => handleViewChange("list")}
-              title="List view"
-              aria-pressed={view === "list"}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "list" ? "bg-orange-600 text-white dark:bg-stone-100 dark:text-stone-900" : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"}`}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <rect x="1" y="2" width="12" height="2" rx="1" fill="currentColor" />
-                <rect x="1" y="6" width="12" height="2" rx="1" fill="currentColor" />
-                <rect x="1" y="10" width="12" height="2" rx="1" fill="currentColor" />
-              </svg>
-              List
-            </button>
-            <button
-              type="button"
-              onClick={() => handleViewChange("card")}
-              title="Card view"
-              aria-pressed={view === "card"}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "card" ? "bg-orange-600 text-white dark:bg-stone-100 dark:text-stone-900" : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"}`}
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" />
-                <rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor" />
-                <rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor" />
-                <rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor" />
-              </svg>
-              Cards
-            </button>
-          </div>
+      {/* Row 2: count + toggle */}
+      <div className="flex items-center justify-between gap-2">
+        <p className={`text-sm font-medium text-stone-500 transition-opacity dark:text-stone-500${isPending ? " opacity-50" : ""}`}>
+          {countLabel}{countSuffix}
+        </p>
+        <div className="flex shrink-0 gap-0.5 rounded-lg border border-stone-200 p-0.5 dark:border-stone-700">
+          <button
+            type="button"
+            onClick={() => handleViewChange("list")}
+            title="List view"
+            aria-pressed={view === "list"}
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "list" ? "bg-orange-600 text-white dark:bg-stone-100 dark:text-stone-900" : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"}`}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="1" y="2" width="12" height="2" rx="1" fill="currentColor" />
+              <rect x="1" y="6" width="12" height="2" rx="1" fill="currentColor" />
+              <rect x="1" y="10" width="12" height="2" rx="1" fill="currentColor" />
+            </svg>
+            List
+          </button>
+          <button
+            type="button"
+            onClick={() => handleViewChange("card")}
+            title="Card view"
+            aria-pressed={view === "card"}
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-semibold transition-colors ${view === "card" ? "bg-orange-600 text-white dark:bg-stone-100 dark:text-stone-900" : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"}`}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" />
+              <rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor" />
+              <rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor" />
+              <rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor" />
+            </svg>
+            Cards
+          </button>
         </div>
       </div>
     </div>
