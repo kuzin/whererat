@@ -90,6 +90,20 @@ yarn lint         # ESLint
 tsx scripts/...   # one-off scripts (load .env.local automatically)
 ```
 
+## Deploy workflow
+
+Production deploys are gated by CI. **Never push directly to `main`** — always open a PR.
+
+```
+PR → CI (lint + typecheck + build) must pass → merge to main → Vercel auto-deploys
+```
+
+- CI is defined in `.github/workflows/ci.yml` — job name `CI / Lint, typecheck, build`
+- Vercel is connected via GitHub app integration; it deploys automatically from `main`
+- **Do not use `vercel deploy` CLI** — the GitHub integration handles it
+- GitHub branch protection on `main` requires the CI check before merge
+- If asked to deploy, verify CI passes on the latest push to `main` (check GitHub Actions), then confirm Vercel picked it up automatically
+
 ## What NOT to do
 
 - Don't touch `apps/mobile/` unless explicitly asked

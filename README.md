@@ -1,14 +1,23 @@
-# WhereRat
+# 🐀 WhereRat
 
-Next.js app for a **spoiler-aware** public catalog of rat cameos in films, with submissions, moderator review, and Postgres-backed data.
+> *They were in that movie. You saw them. Now you can log them.*
+
+A **spoiler-aware** public catalog of rat (and rodent) cameos in films and TV — with a public submission flow, moderator review queue, and Postgres-backed data.
+
+```
+  (\(\
+  ( -.-)   whererat.com
+  o_(")(")  spot a rat. log a rat.
+```
 
 ## Features
 
-- Catalog home + per-movie sighting pages  
-- Public submit flow  
-- Moderator queue, edits, approvals  
-- Profile (moderator accounts)  
-- Optional S3 uploads; optional TMDB imagery for movie pages  
+- 🎬 Catalog home with genre, rodent type, and sort filters
+- 🐁 Per-movie pages with sighting carousels + rat presence visuals
+- 📝 Public submit flow with image uploads
+- 🛡️ Moderator queue, edits, approvals, and audit log
+- 👤 Profile (moderator accounts)
+- 🖼️ Optional S3 uploads; optional TMDB imagery for movie pages
 
 ## Stack
 
@@ -16,7 +25,8 @@ Next.js app for a **spoiler-aware** public catalog of rat cameos in films, with 
 |--------|--------|
 | Framework | Next.js 16 (App Router) |
 | UI | React 19, Tailwind CSS 4 |
-| Data | Postgres via `pg` |
+| Data | Postgres via `pg` (no ORM) |
+| Package manager | Yarn 4 |
 
 ## Prerequisites
 
@@ -34,7 +44,7 @@ Sanity check: **`GET /api/health/db`** should return **`{ ok: true }`** when Pos
 **1.** Install dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 **2.** Create `.env.local` in the repo root. Start from [`.env.example`](.env.example): `cp .env.example .env.local`, then paste your real **`DATABASE_URL`**. Next and the DB scripts load `.env.local` / `.env` via `scripts/load-env.ts`.
@@ -62,7 +72,7 @@ UPLOAD_FALLBACK_TO_LOCAL=true
 **3.** Apply schema and seed:
 
 ```bash
-npm run db:bootstrap
+yarn db:bootstrap
 ```
 
 This runs `seed:postgres:export` (writes `db/seed.json` from `src/lib/whererat.ts`), `db:schema:apply`, and `db:seed`.
@@ -70,7 +80,7 @@ This runs `seed:postgres:export` (writes `db/seed.json` from `src/lib/whererat.t
 **4.** Dev server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 **5.** Sanity check DB:
@@ -81,21 +91,21 @@ curl http://localhost:3000/api/health/db
 
 More database notes: [`db/README.md`](db/README.md).
 
-## NPM scripts
+## Scripts
 
 | Script | Purpose |
-|--------|---------|
-| `npm run dev` | Development server |
-| `npm run build` | Production build |
-| `npm run start` | Run production server |
-| `npm run lint` | ESLint |
-| `npm run seed:postgres:export` | Regenerate `db/seed.json` from in-repo catalog + moderator accounts |
-| `npm run db:schema:apply` | Apply `db/schema.sql` to `DATABASE_URL` |
-| `npm run db:seed` | Truncate seeded tables and load `db/seed.json` |
-| `npm run db:bootstrap` | Export seed → apply schema → seed |
-| `npm run db:clear:content` | Clear catalog/submissions/etc.; **keeps** existing `accounts` rows |
+|--------|--------|
+| `yarn dev` | Development server |
+| `yarn build` | Production build |
+| `yarn start` | Run production server |
+| `yarn lint` | ESLint |
+| `yarn typecheck` | TypeScript check (no emit) |
+| `yarn seed:postgres:export` | Regenerate `db/seed.json` from in-repo catalog + moderator accounts |
+| `yarn db:schema:apply` | Apply `db/schema.sql` to `DATABASE_URL` |
+| `yarn db:seed` | Truncate seeded tables and load `db/seed.json` |
+| `yarn db:bootstrap` | Export seed → apply schema → seed |
+| `yarn db:clear:content` | Clear catalog/submissions/etc.; **keeps** existing `accounts` rows |
 | `npx tsx scripts/db-add-temp-content.ts` | Add temporary bulk content (~30 movies / few hundred sightings) directly to live tables for UI density checks |
-| `npm run media:migrate:uploads-to-s3` | Migrate legacy local uploads to S3 |
 
 ## Repo layout (high level)
 
@@ -119,15 +129,35 @@ Iterating on the **top bar** is easiest here:
 
 Icons / PWA: favicon + manifest icons use **`SEEDED_MODERATOR_AVATAR_URL`** (`src/lib/auth.ts`) plus `src/app/manifest.ts`.
 
+## CI & Deploy 🐀
+
+All production deploys go through GitHub Actions first.
+
+```
+PR opened
+  └─ CI runs (lint + typecheck + build)
+       ├─ ❌ fails → merge blocked
+       └─ ✅ passes → PR can merge to main
+                         └─ Vercel auto-deploys via GitHub integration
+```
+
+**GitHub branch protection required** (`main`):
+- Require pull request before merging
+- Required status check: `CI / Lint, typecheck, build`
+- Require branches to be up to date before merging
+
+**Vercel**: connected via GitHub app — deploys automatically on push to `main`. No CLI deploys needed. Enable **Deployment Protection** in Vercel project settings for the extra status check gating on PRs.
+
+**Never push directly to `main`** — open a PR and let CI gate the deploy.
+
 ## Production checklist
 
 1. Provision Postgres; set **`DATABASE_URL`**.  
 2. Set strong moderator secrets (`MODERATOR_ADMIN_PASSWORD`, etc.).  
 3. Replace plaintext `password_hash` in **`db/seed.json`** workflow with proper hashing before running `db:seed` in prod (see [`db/README.md`](db/README.md)).  
-4. Run `npm run db:schema:apply` and **`npm run db:seed`** (or your migration pipeline).  
+4. Run `yarn db:schema:apply` and **`yarn db:seed`** (or your migration pipeline).  
 5. Configure S3 / CDN vars if uploads should not stay on disk.  
-6. Deploy: `npm run build` → `npm run start` (or platform equivalent).  
-7. Confirm **`GET /api/health/db`** returns `{ ok: true }`.
+6. Confirm **`GET /api/health/db`** returns `{ ok: true }`.
 
 ## Notes
 
