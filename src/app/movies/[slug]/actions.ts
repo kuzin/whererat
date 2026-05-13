@@ -352,8 +352,8 @@ export async function resyncMovieFromImdb(formData: FormData) {
   });
   const hasTmdbToken = Boolean(
     process.env.TMDB_READ_ACCESS_TOKEN?.trim() ||
-      process.env.TMDB_API_READ_ACCESS_TOKEN?.trim() ||
-      process.env.TMDB_BEARER_TOKEN?.trim(),
+    process.env.TMDB_API_READ_ACCESS_TOKEN?.trim() ||
+    process.env.TMDB_BEARER_TOKEN?.trim(),
   );
   const tmdbBannerStatus = tmdbBackdrop ? "ok" : hasTmdbToken ? "failed" : "not-configured";
   const syncedVisuals = await getSyncedMoviePageVisuals({

@@ -469,8 +469,8 @@ export default async function MoviePage({
               <div className="flex flex-col gap-2 sm:gap-3">
                 <h1
                   className={`wr-display max-w-3xl text-[clamp(1.5rem,5.5vw,2.25rem)] font-bold leading-[1.05] tracking-tight sm:text-4xl sm:leading-[1.04] lg:text-5xl lg:leading-[1.03] ${palette
-                      ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_5%,rgb(255_253_249))]"
-                      : "text-amber-50"
+                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_5%,rgb(255_253_249))]"
+                    : "text-amber-50"
                     }`}
                 >
                   {movie.title}
@@ -478,8 +478,8 @@ export default async function MoviePage({
                 {heroMetaLine ? (
                   <p
                     className={`text-sm font-semibold ${palette
-                        ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_35%,rgb(254_246_229_/_0.92))]"
-                        : "text-amber-200/90"
+                      ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_35%,rgb(254_246_229_/_0.92))]"
+                      : "text-amber-200/90"
                       }`}
                   >
                     {heroMetaLine}
@@ -489,8 +489,8 @@ export default async function MoviePage({
               {trimMeta(movie.metadata.tagline) ? (
                 <p
                   className={`max-w-2xl text-base font-medium italic leading-relaxed sm:text-lg ${palette
-                      ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_18%,rgb(255_251_246_/_0.96))]"
-                      : "text-amber-100/95"
+                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_18%,rgb(255_251_246_/_0.96))]"
+                    : "text-amber-100/95"
                     }`}
                 >
                   &quot;{movie.metadata.tagline.trim()}&quot;
@@ -498,15 +498,15 @@ export default async function MoviePage({
               ) : null}
               {(movieSightings.length > 0 || imdbRating) ? (() => {
                 const chipWrap = `rounded-xl border px-4 py-2.5 backdrop-blur-md ${palette
-                    ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                    : "border-white/22 bg-black/42"
+                  ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
+                  : "border-white/22 bg-black/42"
                   }`;
                 const chipDt = palette
                   ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
                   : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78";
                 const chipDd = `wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${palette
-                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                    : "text-amber-50"
+                  ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
+                  : "text-amber-50"
                   }`;
                 return (
                   <dl className="flex flex-wrap gap-3">
@@ -570,8 +570,8 @@ export default async function MoviePage({
                     <li key={genre}>
                       <span
                         className={`inline-flex rounded-lg border px-2.5 py-1.5 text-xs font-semibold leading-none shadow-[1px_1px_0_0_rgb(28_25_23/0.12)] dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.35)] ${palette
-                            ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_88%,white)] text-stone-900 dark:border-amber-400/45 dark:bg-stone-900 dark:text-amber-100"
-                            : "border-stone-400/65 bg-white text-stone-900 dark:border-amber-500/40 dark:bg-stone-800 dark:text-amber-100"
+                          ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_88%,white)] text-stone-900 dark:border-amber-400/45 dark:bg-stone-900 dark:text-amber-100"
+                          : "border-stone-400/65 bg-white text-stone-900 dark:border-amber-500/40 dark:bg-stone-800 dark:text-amber-100"
                           }`}
                       >
                         {genre}
@@ -583,8 +583,8 @@ export default async function MoviePage({
               {hasDetailsSection ? (
                 <section
                   className={`space-y-5 border-t pt-8 ${palette
-                      ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.7))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
-                      : "border-stone-900/18 dark:border-white/14"
+                    ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.7))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
+                    : "border-stone-900/18 dark:border-white/14"
                     }`}
                 >
                   <h2 className={sidebarSectionTitleClass}>Details</h2>
@@ -720,8 +720,8 @@ export default async function MoviePage({
               {movieSightings.length === 0 ? (
                 <div
                   className={`mt-6 rounded-2xl border-2 border-dashed px-6 py-14 text-center dark:border-white/18 ${palette
-                      ? "border-[color-mix(in_srgb,var(--movie-accent)_25%,rgb(214_211_209))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,white)] dark:bg-[rgb(34_29_25/0.65)]"
-                      : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
+                    ? "border-[color-mix(in_srgb,var(--movie-accent)_25%,rgb(214_211_209))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,white)] dark:bg-[rgb(34_29_25/0.65)]"
+                    : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
                     }`}
                 >
                   <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={48} height={48} className="mx-auto" aria-hidden />
