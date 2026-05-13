@@ -30,12 +30,12 @@ A **spoiler-aware** public catalog of rat (and rodent) cameos in films and TV �
 
 ## Prerequisites
 
-- Node.js (LTS recommended)  
-- Postgres instance and a Postgres URL ([`DATABASE_URL` and fallbacks](ENVIRONMENT.md))  
+- Node.js (LTS recommended)
+- Access to the Vercel project — all secrets (including `DATABASE_URL`) live there
 
 Full layout of **`.env*`** files: **[`ENVIRONMENT.md`](ENVIRONMENT.md)**.
 
-If anything DB-backed fails with **`DATABASE_URL` is required** or returns **500** on `/api/v1/*`, the running build or server simply **does not have that env var**. After editing `.env.local`, **restart `npm run dev`**. On **Vercel**, set **`DATABASE_URL`** under **Project → Settings → Environment Variables** for **each** scope you need (**Production**, **Preview**, **Development**)—Preview deploys omit vars that aren’t explicitly enabled there—then **redeploy**.
+The app uses a single **Neon Postgres** database for all environments. There's no local database — `DATABASE_URL` points at the live Neon instance in every context. Pull it via `vercel env pull` (see Local setup below).
 
 Sanity check: **`GET /api/health/db`** should return **`{ ok: true }`** when Postgres is reachable.
 
@@ -47,43 +47,23 @@ Sanity check: **`GET /api/health/db`** should return **`{ ok: true }`** when Pos
 yarn install
 ```
 
-**2.** Create `.env.local` in the repo root. Start from [`.env.example`](.env.example): `cp .env.example .env.local`, then paste your real **`DATABASE_URL`**. Next and the DB scripts load `.env.local` / `.env` via `scripts/load-env.ts`.
-
-```env
-# Required
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/whererat
-
-# Moderator login (defaults: admin / ratpack if unset — see src/lib/auth.ts)
-# MODERATOR_ADMIN_PASSWORD=
-# MODERATOR_PASSWORD=
-
-# Movie search / detail stills — optional but recommended for submit search + widescreen backdrops
-# TMDB_READ_ACCESS_TOKEN=
-
-# Uploads → S3 (omit to use local public/uploads when UPLOAD_FALLBACK_TO_LOCAL=true)
-# AWS_REGION=
-# S3_BUCKET_NAME=
-# S3_PUBLIC_BASE_URL=
-# AWS_ACCESS_KEY_ID=
-# AWS_SECRET_ACCESS_KEY=
-UPLOAD_FALLBACK_TO_LOCAL=true
-```
-
-**3.** Apply schema and seed:
+**2.** Pull secrets from Vercel:
 
 ```bash
-yarn db:bootstrap
+vercel env pull .env.local --environment=development
 ```
 
-This runs `seed:postgres:export` (writes `db/seed.json` from `src/lib/whererat.ts`), `db:schema:apply`, and `db:seed`.
+This gives you `DATABASE_URL` (pointing at the live Neon DB) plus all other secrets. You can also copy `.env.example` → `.env.local` and fill values from the Vercel dashboard manually.
 
-**4.** Dev server:
+> All environments (local, Preview, Production) share the same Neon database — there's no local Postgres instance.
+
+**3.** Dev server:
 
 ```bash
 yarn dev
 ```
 
-**5.** Sanity check DB:
+**4.** Sanity check DB:
 
 ```bash
 curl http://localhost:3000/api/health/db
@@ -152,16 +132,14 @@ PR opened
 
 ## Production checklist
 
-1. Provision Postgres; set **`DATABASE_URL`**.  
-2. Set strong moderator secrets (`MODERATOR_ADMIN_PASSWORD`, etc.).  
-3. Replace plaintext `password_hash` in **`db/seed.json`** workflow with proper hashing before running `db:seed` in prod (see [`db/README.md`](db/README.md)).  
-4. Run `yarn db:schema:apply` and **`yarn db:seed`** (or your migration pipeline).  
-5. Configure S3 / CDN vars if uploads should not stay on disk.  
-6. Confirm **`GET /api/health/db`** returns `{ ok: true }`.
+1. Secrets: confirm all vars are set in Vercel for Production and Preview scopes (see [`ENVIRONMENT.md`](ENVIRONMENT.md)).
+2. Schema changes: run `yarn db:schema:apply` against Neon if schema has changed.
+3. Uploads: confirm `BLOB_READ_WRITE_TOKEN` is set — without it images are written to ephemeral disk and lost on each deploy.
+4. Confirm **`GET /api/health/db`** returns `{ ok: true }` after deploy.
 
 ## Notes
 
-- Use **`.env.local`** for local overrides (never commit secrets).  
-- **OMDb** (`OMDB_API_KEY`) improves movie title search when set (`src/app/api/movies/search`).  
+- Use **`.env.local`** for local overrides (never commit secrets).
+- **OMDb** (`OMDB_API_KEY`) improves movie title search when set (`src/app/api/movies/search`).
 - **`TMDB_*`** improves backdrops/lightbox stills on movie pages (`src/lib/tmdb-banner.ts`); catalog can be empty until you rebuild seed/data.
 - Temporary bulk data inserted by `scripts/db-add-temp-content.ts` uses IDs prefixed with `temp-livefill-` so it can be removed easily later.
