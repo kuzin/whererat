@@ -344,6 +344,7 @@ summary {
 
 
 @utility wr-input {
+  /* prettier-ignore */
   @apply h-11 rounded-xl border px-4 text-sm font-medium outline-none transition-[background-color, border-color, box-shadow, color] placeholder:font-medium;
   background-color: var(--wr-input-bg);
   border-color: var(--wr-input-border);
