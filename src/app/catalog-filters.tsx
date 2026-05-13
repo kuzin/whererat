@@ -135,9 +135,9 @@ export function CatalogFilters({
   const countSuffix = totalResults < totalCatalog ? ` of ${totalCatalog} total` : "";
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-3">
-        <label className="col-span-2 flex flex-col gap-1 text-sm font-bold text-stone-800 md:col-span-1 md:gap-2 dark:text-stone-300">
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-2 md:gap-3">
+        <label className="col-span-1 sm:col-span-3 md:col-span-1 flex flex-col gap-0.5 text-xs font-semibold text-stone-700 md:gap-1.5 md:text-sm md:font-bold md:text-stone-800 dark:text-stone-400 md:dark:text-stone-300">
           <span className="flex items-center gap-2">
             Search
             {isPending && (
@@ -164,16 +164,16 @@ export function CatalogFilters({
               }
             }}
             placeholder="Enter title or IMDb ID…"
-            className="wr-input h-9 md:h-11"
+            className="wr-input h-8 md:h-10"
             aria-label="Search movies by title or IMDb ID"
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm font-bold text-stone-800 md:gap-2 dark:text-stone-300">
+        <label className="flex flex-col gap-0.5 text-xs font-semibold text-stone-700 md:gap-1.5 md:text-sm md:font-bold md:text-stone-800 dark:text-stone-400 md:dark:text-stone-300">
           Genre
           <select
             value={genre}
             onChange={(e) => handleGenreChange(e.target.value)}
-            className="wr-select h-9 md:h-11"
+            className="wr-select h-8 md:h-10"
             disabled={isPending}
           >
             <option value="all">All genres</option>
@@ -184,12 +184,12 @@ export function CatalogFilters({
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm font-bold text-stone-800 md:gap-2 dark:text-stone-300">
+        <label className="flex flex-col gap-0.5 text-xs font-semibold text-stone-700 md:gap-1.5 md:text-sm md:font-bold md:text-stone-800 dark:text-stone-400 md:dark:text-stone-300">
           Rodent
           <select
             value={rodentType}
             onChange={(e) => handleRodentTypeChange(e.target.value)}
-            className="wr-select h-9 md:h-11"
+            className="wr-select h-8 md:h-10"
             disabled={isPending}
           >
             <option value="all">All rodents</option>
@@ -203,12 +203,12 @@ export function CatalogFilters({
             })}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm font-bold text-stone-800 md:gap-2 dark:text-stone-300">
+        <label className="flex flex-col gap-0.5 text-xs font-semibold text-stone-700 md:gap-1.5 md:text-sm md:font-bold md:text-stone-800 dark:text-stone-400 md:dark:text-stone-300">
           Sort by
           <select
             value={sort}
             onChange={(e) => handleSortChange(e.target.value as CatalogSortOption)}
-            className="wr-select h-9 md:h-11"
+            className="wr-select h-8 md:h-10"
             disabled={isPending}
           >
             {catalogSortOptions.map((option) => (

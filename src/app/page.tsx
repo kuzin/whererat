@@ -188,7 +188,7 @@ export default async function Home({
             <CatalogResultsWrapper>
               {totalResults > 0 ? (
                 view === "card" ? (
-                  <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                  <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {results.map((movie) => {
                       const sightingCount = sightingCountByMovie.get(movie.id) ?? 0;
                       return (
@@ -243,9 +243,9 @@ export default async function Home({
                         <Link
                           key={movie.id}
                           href={`/movies/${movie.slug}`}
-                          className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[140px_1fr]"
+                          className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[160px_1fr]"
                         >
-                          <div className="relative h-40 overflow-hidden border-stone-950/90 bg-stone-900 sm:h-auto sm:border-r-2 dark:border-white/14">
+                          <div className="relative h-56 overflow-hidden border-stone-950/90 bg-stone-900 sm:h-auto sm:border-r-2 dark:border-white/14">
                             <Image
                               src={movie.posterUrl}
                               alt={movie.posterAlt}
