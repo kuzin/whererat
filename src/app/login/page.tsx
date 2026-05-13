@@ -25,8 +25,8 @@ export default async function LoginPage({
   const next = single(params.next) ?? "/moderation";
 
   return (
-    <main className="wr-page-shell py-10">
-      <section className="wr-card mx-auto max-w-md p-6 sm:p-7">
+    <main className="wr-page-shell flex flex-1 flex-col items-center justify-center py-10">
+      <section className="wr-card w-full max-w-md p-6 sm:p-7">
         <h1 className="wr-display text-3xl font-black tracking-tight">Log in</h1>
         <form action={loginModerator} className="mt-6 grid gap-4">
           <input name="next" type="hidden" value={next} />
@@ -52,7 +52,7 @@ export default async function LoginPage({
             />
           </label>
           <button type="submit" className="wr-btn-primary">
-            Let me moderate things
+            Log in
           </button>
         </form>
       </section>

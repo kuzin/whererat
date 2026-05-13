@@ -18,7 +18,7 @@ import {
   deleteMovieById,
   updateMovieOverride,
 } from "@/lib/movie-edit-store";
-import { fetchImdbMedia, fetchImdbRelated, syncMovieFromImdb } from "@/lib/movie-imdb-sync";
+import { fetchImdbMedia, fetchImdbRelated } from "@/lib/movie-imdb-sync";
 import { reviewSubmission } from "@/lib/moderation-store";
 import { deleteSightingById, updateSightingOverride } from "@/lib/sighting-edit-store";
 import { getCatalogMovieBySlug } from "@/lib/movie-catalog";

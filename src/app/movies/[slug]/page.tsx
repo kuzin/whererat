@@ -14,7 +14,6 @@ import { MovieRatlatedTab } from "./movie-ratlated-tab";
 import { MovieRatMediaTab } from "./movie-rat-media-tab";
 import { tabCardClass, tabHeaderBorderClass } from "./movie-tab-classes";
 import { MovieSightingsPagingBar, MovieSightingsSortControl } from "./movie-sightings-toolbar";
-import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { AccentColorField } from "@/components/accent-color-field";
 import { ResyncButton } from "@/components/resync-button";
@@ -32,8 +31,6 @@ import {
   formatRuntimeMinutes,
   getImdbNameSearchUrl,
   getImdbTitleUrl,
-  getSightingImageRefs,
-  getSightingTimestampPercent,
   parseMovieSightingsPageParam,
   parseMovieSightingsSortParam,
   prepareMovieSightingsView,
@@ -307,9 +304,6 @@ export default async function MoviePage({
   const editingSighting = editSightingId
     ? movieSightings.find((item) => item.id === editSightingId)
     : undefined;
-  const editingSightingImages = editingSighting
-    ? getSightingImageRefs(editingSighting)
-    : [];
   const visuals = await getMoviePageVisuals(movie);
   const palette = visuals.palette;
   const heroMetaLine = movieHeroMetaLine(movie, isSeriesTitle);

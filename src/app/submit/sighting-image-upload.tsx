@@ -98,7 +98,7 @@ export function SightingImageUpload() {
           <div className="flex flex-wrap gap-2">
             {previews.map((p, i) => (
               <div key={p.url} className="group relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                { }
                 <img
                   src={p.url}
                   alt={p.name}

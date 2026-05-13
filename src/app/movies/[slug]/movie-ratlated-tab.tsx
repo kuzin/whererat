@@ -26,7 +26,7 @@ function RelatedCard({
       {/* Poster */}
       <div className="aspect-[2/3] w-full overflow-hidden bg-stone-200 dark:bg-stone-800">
         {title.posterUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
+           
           <img
             src={imdbPosterThumb(title.posterUrl)}
             alt={`${title.title} poster`}

@@ -177,10 +177,6 @@ export default async function Home({
               availableGenres={availableGenres}
               availableRodentTypes={availableRodentTypes}
               defaultQuery={query}
-              defaultGenre={genre}
-              defaultRodentType={rodentType}
-              defaultSort={sort}
-              defaultView={view}
               totalResults={totalResults}
               totalCatalog={catalogMovies.length}
             />
@@ -253,23 +249,20 @@ export default async function Home({
                               height={420}
                               className="h-full w-full scale-[1.04] object-cover object-top transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-95 sm:min-h-full sm:object-center"
                             />
-                            <div className={`absolute inset-x-0 bottom-0 h-1.5 ${movie.posterTone}`} />
+                            {sightingCount > 0 && (
+                              <span className="absolute bottom-2 left-2 inline-flex items-center rounded-full bg-orange-600/90 px-2 py-0.5 text-xs font-bold text-white shadow dark:bg-stone-800/90 dark:text-amber-300">
+                                {sightingCount} {sightingCount === 1 ? "sighting" : "sightings"}
+                              </span>
+                            )}
                           </div>
                           <div className="flex flex-col justify-center gap-3 p-4 sm:p-5">
                             <div className="min-w-0">
                               <h3 className="wr-display text-xl font-bold leading-snug tracking-tight text-stone-950 group-hover:text-stone-800 dark:text-stone-50 dark:group-hover:text-amber-50 sm:text-2xl">
                                 {movie.title}
                               </h3>
-                              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                <p className="text-sm font-semibold text-stone-600 dark:text-stone-400">
-                                  {isSeriesTitle ? seriesMetaLine : movieMetaLine}
-                                </p>
-                                {sightingCount > 0 && (
-                                  <span className="inline-flex items-center rounded-full bg-orange-600 px-2 py-0.5 text-xs font-bold text-white dark:bg-stone-700 dark:text-amber-300">
-                                    {sightingCount} {sightingCount === 1 ? "sighting" : "sightings"}
-                                  </span>
-                                )}
-                              </div>
+                              <p className="mt-1 text-sm font-semibold text-stone-600 dark:text-stone-400">
+                                {isSeriesTitle ? seriesMetaLine : movieMetaLine}
+                              </p>
                             </div>
                             <p className="line-clamp-2 text-sm leading-relaxed text-stone-700 dark:text-stone-400">
                               {movie.summary}

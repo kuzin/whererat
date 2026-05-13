@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useFormStatus } from "react-dom";
-import { normalizeImdbId, RODENT_TYPE_OPTIONS, rodentCountFieldLabel, rodentSwarmNoun, formatPercentAsTimestamp } from "@/lib/whererat";
+import { normalizeImdbId, RODENT_TYPE_OPTIONS, rodentCountFieldLabel, rodentSwarmNoun } from "@/lib/whererat";
 import {
   SightingTimestampField,
   SightingRatCountField,

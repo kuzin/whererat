@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useId, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   estimateRatsForAppearance,
   formatApproximateRatLine,
@@ -244,7 +244,6 @@ export function MovieSightingsCards({
   isSeries?: boolean;
 }) {
   const [showSpoilers, setShowSpoilers] = useState(false);
-  const spoilerToggleLabelId = useId();
 
   const showSpoilerToggle = spoilerCountMovie > 0;
 

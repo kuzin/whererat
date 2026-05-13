@@ -51,10 +51,6 @@ type Props = {
   availableGenres: string[];
   availableRodentTypes: string[];
   defaultQuery: string;
-  defaultGenre: string;
-  defaultRodentType: string;
-  defaultSort: CatalogSortOption;
-  defaultView: CatalogView;
   totalResults: number;
   totalCatalog: number;
 };
@@ -63,30 +59,26 @@ export function CatalogFilters({
   availableGenres,
   availableRodentTypes,
   defaultQuery,
-  defaultGenre,
-  defaultRodentType,
-  defaultSort,
-  defaultView,
   totalResults,
   totalCatalog,
 }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isPending, startTransition } = useContext(PendingContext);
   const [query, setQuery] = useState(defaultQuery);
-  const [genre, setGenre] = useState(defaultGenre);
-  const [rodentType, setRodentType] = useState(defaultRodentType);
-  const [sort, setSort] = useState<CatalogSortOption>(defaultSort);
-  const [view, setView] = useState<CatalogView>(defaultView);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sync local state when server re-renders with new URL params (back/forward navigation).
-  // Skip query sync when a debounce is pending — user is mid-type and the settled URL
-  // would overwrite whatever they're currently typing.
+  // Derive filter values from URL — reactive to back/forward navigation, no effects needed.
+  const genre = searchParams.get("genre") ?? "all";
+  const rodentType = searchParams.get("rodent") ?? "all";
+  const rawSort = searchParams.get("sort");
+  const sort: CatalogSortOption = (catalogSortOptions as readonly string[]).includes(rawSort ?? "")
+    ? (rawSort as CatalogSortOption)
+    : "latest-added-title";
+  const view: CatalogView = searchParams.get("view") === "card" ? "card" : "list";
+
+  // Sync query from URL on back/forward navigation (skip when user is mid-type).
   useEffect(() => { if (!debounceRef.current) setQuery(defaultQuery); }, [defaultQuery]);
-  useEffect(() => { setGenre(defaultGenre); }, [defaultGenre]);
-  useEffect(() => { setRodentType(defaultRodentType); }, [defaultRodentType]);
-  useEffect(() => { setSort(defaultSort); }, [defaultSort]);
-  useEffect(() => { setView(defaultView); }, [defaultView]);
 
   const navigate = (q: string, g: string, r: string, s: CatalogSortOption, v: CatalogView) => {
     const urlParams = new URLSearchParams();
@@ -107,25 +99,21 @@ export function CatalogFilters({
   };
 
   const handleGenreChange = (value: string) => {
-    setGenre(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     navigate(query, value, rodentType, sort, view);
   };
 
   const handleRodentTypeChange = (value: string) => {
-    setRodentType(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     navigate(query, genre, value, sort, view);
   };
 
   const handleSortChange = (value: CatalogSortOption) => {
-    setSort(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     navigate(query, genre, rodentType, value, view);
   };
 
   const handleViewChange = (value: CatalogView) => {
-    setView(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     navigate(query, genre, rodentType, sort, value);
   };

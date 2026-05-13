@@ -36,7 +36,7 @@ export function SubmissionImageThumbs({ slides }: { slides: SightingImageSlot[] 
             className="group relative h-16 w-16 overflow-hidden rounded-lg border border-stone-900/15 bg-stone-200 dark:border-white/12 dark:bg-stone-800"
             aria-label={slide.alt ?? `Attachment ${i + 1}`}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img
               src={slide.url}
               alt={slide.alt ?? ""}
@@ -61,7 +61,7 @@ export function SubmissionImageThumbs({ slides }: { slides: SightingImageSlot[] 
             className="relative max-h-[90vh] max-w-4xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img
               src={slides[open]!.url}
               alt={slides[open]!.alt ?? ""}

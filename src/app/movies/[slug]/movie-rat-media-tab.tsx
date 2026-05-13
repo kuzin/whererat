@@ -111,7 +111,7 @@ function ImageModal({
       >
         {/* Image with counter overlaid bottom-right */}
         <div className="relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img
             key={image.id}
             src={imdbFull(image.url)}
@@ -165,7 +165,7 @@ function VideoModal({ video, onClose }: { video: ImdbVideo; onClose: () => void 
         {/* Thumbnail */}
         {video.thumbnailUrl ? (
           <div className="relative w-full overflow-hidden rounded-xl shadow-[0_8px_48px_rgb(0_0_0/0.8)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img
               src={imdbThumb(video.thumbnailUrl, 800)}
               alt={video.name}
@@ -217,7 +217,7 @@ function VideoCard({ video, palette }: { video: ImdbVideo; palette: boolean }) {
       <button type="button" onClick={() => setOpen(true)} className={`flex w-full flex-col text-left no-underline ${cardBase}`}>
         <div className="relative aspect-video w-full overflow-hidden bg-stone-900">
           {video.thumbnailUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
+             
             <img
               src={imdbThumb(video.thumbnailUrl, 400)}
               alt={video.name}
@@ -282,7 +282,7 @@ function ImageCard({
       className={`block w-full text-left ${cardBase} mb-4 break-inside-avoid`}
       aria-label={image.caption || "View production still"}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      { }
       <img
         src={imdbThumb(image.url, 400)}
         alt={image.caption || ""}
@@ -361,7 +361,7 @@ function YoutubeTrailerEmbed({ videoKey, palette }: { videoKey: string; palette:
           className="group relative flex aspect-video w-full items-center justify-center overflow-hidden bg-stone-900"
           aria-label="Play trailer"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img
             src={thumbUrl}
             alt=""
