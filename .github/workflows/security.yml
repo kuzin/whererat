@@ -1,0 +1,49 @@
+name: Security scan
+
+on:
+  schedule:
+    # Run nightly at 02:00 UTC
+    - cron: "0 2 * * *"
+  pull_request:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/security.yml"
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "yarn.lock"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # Fail fast on PRs if any critical/high vulnerabilities are found.
+      # The nightly run uses --all to catch lower-severity issues too.
+      - name: Audit (PR — high+)
+        if: github.event_name == 'pull_request'
+        run: yarn npm audit --recursive --environment production --severity high
+
+      - name: Audit (scheduled — all severities)
+        if: github.event_name == 'schedule' || github.event_name == 'push'
+        run: yarn npm audit --recursive --environment production
+        continue-on-error: true
