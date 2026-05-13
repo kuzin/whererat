@@ -50,6 +50,7 @@ export function CaitlinEasterEggToggle({
           : systemPrefersDark
             ? "dark"
             : "light";
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMode(initial);
     } catch {
       // Ignore storage issues in private/restricted contexts.

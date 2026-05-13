@@ -250,11 +250,11 @@ export function MovieSightingsCards({
 
   const panelSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_12%,rgb(41_37_36))] bg-[color-mix(in_srgb,var(--movie-column-wash)_48%,rgb(253_251_246))]"
-    : "border-stone-950/90 bg-[var(--wr-surface-cream-soft)]";
+    : "border-stone-950/22 bg-[var(--wr-surface-cream-soft)]";
 
   const toggleSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
-    : "border-stone-950/85 bg-[var(--wr-surface-cream-muted)]";
+    : "border-stone-950/22 bg-[var(--wr-surface-cream-muted)]";
 
   return (
     <>
@@ -317,7 +317,7 @@ export function MovieSightingsCards({
           return (
             <article
               key={sighting.id}
-              className={`overflow-hidden rounded-2xl border-2 shadow-[3px_3px_0_0_rgb(28_25_23/0.55)] dark:border-white/14 dark:bg-[rgb(36_30_26)] dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.4)] ${panelSkin}`}
+              className={`overflow-hidden rounded-2xl border-2 shadow-[3px_3px_0_0_rgb(28_25_23/0.55)] dark:border-white/20 dark:bg-[rgb(36_30_26)] dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.4)] ${panelSkin}`}
             >
               {hasCarousel ? (
                 <SightingImageCarousel

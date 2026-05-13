@@ -95,10 +95,15 @@ export function SightingTimestampField({
             className="absolute inset-0 h-full w-full cursor-grab opacity-0 active:cursor-grabbing"
           />
         </div>
-        <div className="shrink-0 text-right">
-          <span className="text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">
-            {percent}%{calculatedTimestamp && <span className="text-stone-500 dark:text-stone-400"> · {calculatedTimestamp}</span>}
-          </span>
+        <div className="w-[5rem] shrink-0 text-right">
+          <div className="whitespace-nowrap text-2xl font-black tabular-nums text-stone-950 dark:text-stone-50">
+            {percent}%
+          </div>
+          {calculatedTimestamp && (
+            <div className="mt-0.5 text-xs font-semibold tabular-nums text-stone-500 dark:text-stone-400">
+              {calculatedTimestamp}
+            </div>
+          )}
         </div>
       </div>
       {errorMessage ? (

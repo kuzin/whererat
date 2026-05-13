@@ -56,23 +56,28 @@ function StarRating({ rating }: { rating: number }) {
 
 function ReviewDate({ date }: { date: string }) {
   if (!date) return null;
+  let formatted: string | null = null;
   try {
-    return (
-      <time
-        dateTime={date}
-        className="text-xs text-stone-400 dark:text-stone-500"
-      >
-        {new Date(date).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          timeZone: "UTC",
-        })}
-      </time>
-    );
+    formatted = new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
   } catch {
+    // Ignore invalid date strings.
+  }
+  if (!formatted) {
     return <span className="text-xs text-stone-400">{date}</span>;
   }
+  return (
+    <time
+      dateTime={date}
+      className="text-xs text-stone-400 dark:text-stone-500"
+    >
+      {formatted}
+    </time>
+  );
 }
 
 type Props = {
@@ -113,6 +118,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
   const [listFlash, setListFlash] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setListFlash(true);
     const t = setTimeout(() => setListFlash(false), 400);
     return () => clearTimeout(t);
@@ -127,6 +133,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
   const rowMeta = sorted.map((review) => {
     const collapsed = onlyRats && !review.mentionsRat;
     const addMargin = !collapsed && firstVisibleSeen;
+    // eslint-disable-next-line react-hooks/immutability
     if (!collapsed) firstVisibleSeen = true;
     return { review, collapsed, addMargin };
   });

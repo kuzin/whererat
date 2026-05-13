@@ -341,7 +341,7 @@ export default async function ModerationPage({
               return (
                 <article
                   key={submission.id}
-                  className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[var(--wr-surface-cream)] dark:border-white/14 dark:bg-stone-900/70"
+                  className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[var(--wr-surface-cream)] dark:border-white/20 dark:bg-stone-900/70"
                 >
                   <div className="relative p-5">
                     <div className="pr-12">
