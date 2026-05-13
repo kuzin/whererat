@@ -4,7 +4,12 @@ import { getCatalogMovies } from "@/lib/movie-catalog";
 const BASE_URL = "https://whererat.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const movies = await getCatalogMovies();
+  let movies: Awaited<ReturnType<typeof getCatalogMovies>> = [];
+  try {
+    movies = await getCatalogMovies();
+  } catch {
+    // No DB available (e.g. CI build) — serve static routes only.
+  }
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
