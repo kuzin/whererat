@@ -293,7 +293,7 @@ export async function getApprovedSubmissionRatTally(): Promise<number> {
 }
 
 export async function addSubmission(
-  submission: Omit<Submission, "id" | "status">,
+  submission: Omit<Submission, "id" | "status" | "submittedAt">,
 ) {
   await ensureSeedModerationStore();
   const pool = getDbPool();
@@ -301,6 +301,7 @@ export async function addSubmission(
     ...submission,
     id: `sub-${crypto.randomUUID()}`,
     status: "pending",
+    submittedAt: new Date(),
     approximateRatCount: clampApproximateRatCount(submission.approximateRatCount),
   };
   await pool.query(
