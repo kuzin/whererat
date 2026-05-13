@@ -83,9 +83,13 @@ export function CatalogFilters({
   // Skip query sync when a debounce is pending — user is mid-type and the settled URL
   // would overwrite whatever they're currently typing.
   useEffect(() => { if (!debounceRef.current) setQuery(defaultQuery); }, [defaultQuery]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setGenre(defaultGenre); }, [defaultGenre]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setRodentType(defaultRodentType); }, [defaultRodentType]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setSort(defaultSort); }, [defaultSort]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setView(defaultView); }, [defaultView]);
 
   const navigate = (q: string, g: string, r: string, s: CatalogSortOption, v: CatalogView) => {

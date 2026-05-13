@@ -68,6 +68,10 @@ export function SightingImageCarousel({
 
   const current = slides[index]!;
   const labelId = `${baseId}-label`;
+  // dirRef.current is read here intentionally: it drives the CSS slide-enter animation
+  // direction and is set synchronously in go/jumpTo before setIndex triggers re-render.
+  // eslint-disable-next-line react-hooks/refs
+  const carouselDx = dirRef.current === 1 ? "clamp(12px,3vw,20px)" : "clamp(-20px,-3vw,-12px)";
 
   return (
     <div
@@ -110,8 +114,7 @@ export function SightingImageCarousel({
           key={`slide-${index}`}
           style={
             {
-              "--wr-carousel-dx":
-                dirRef.current === 1 ? "clamp(12px,3vw,20px)" : "clamp(-20px,-3vw,-12px)",
+              "--wr-carousel-dx": carouselDx,
             } as CSSProperties
           }
           className={

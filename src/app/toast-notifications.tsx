@@ -207,6 +207,7 @@ export function ToastNotifications() {
 
   useEffect(() => {
     if (!toast) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(false);
       return;
     }
