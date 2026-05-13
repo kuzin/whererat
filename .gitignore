@@ -40,6 +40,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude code
+.claude/
+
+# yarn 4 (not tracked in this repo)
+.yarnrc.yml
+yarn.lock
+
 # user-uploaded sighting images (prototype)
 /public/uploads/sightings/*
 !/public/uploads/sightings/.gitkeep
