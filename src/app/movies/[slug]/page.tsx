@@ -232,8 +232,14 @@ function highlightRodentWords(text: string): React.ReactNode {
 }
 
 export async function generateStaticParams() {
-  const allMovies = await getCatalogMovies();
-  return allMovies.map((movie) => ({ slug: movie.slug }));
+  try {
+    const allMovies = await getCatalogMovies();
+    return allMovies.map((movie) => ({ slug: movie.slug }));
+  } catch {
+    // No DB available (e.g. CI build without DATABASE_URL) — skip pre-generation;
+    // all slugs will be served dynamically at request time.
+    return [];
+  }
 }
 
 export default async function MoviePage({
