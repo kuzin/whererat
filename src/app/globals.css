@@ -344,8 +344,10 @@ summary {
 
 
 @utility wr-input {
-  /* prettier-ignore */
-  @apply h-11 rounded-xl border px-4 text-sm font-medium outline-none transition-[background-color, border-color, box-shadow, color] placeholder:font-medium;
+  @apply h-11 rounded-xl border px-4 text-sm font-medium outline-none placeholder:font-medium;
+  transition-property: background-color, border-color, box-shadow, color;
+  transition-timing-function: ease;
+  transition-duration: 150ms;
   background-color: var(--wr-input-bg);
   border-color: var(--wr-input-border);
   color: var(--wr-input-text);
