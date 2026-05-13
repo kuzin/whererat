@@ -519,28 +519,28 @@ export function MovieSearchField({
           {visibleResults.map((movie) => (
             <article
               key={movie.imdbId}
-              className="grid overflow-hidden rounded-xl border-2 border-stone-950/22 bg-[var(--wr-card-bg)] transition-colors hover:bg-amber-50/40 dark:border-white/20 dark:hover:bg-stone-800/85 sm:grid-cols-[90px_1fr_auto]"
+              className="grid grid-cols-[80px_1fr] overflow-hidden rounded-xl border-2 border-stone-950/22 bg-[var(--wr-card-bg)] transition-colors hover:bg-amber-50/40 dark:border-white/20 dark:hover:bg-stone-800/85 sm:grid-cols-[90px_1fr_auto]"
             >
               <MoviePoster
                 src={movie.posterUrl}
                 alt={`${movie.title} poster`}
                 width={180}
                 height={270}
-                className="h-[135px] w-full object-cover sm:h-full sm:min-h-[135px]"
+                className="row-span-2 h-full min-h-[130px] w-full object-cover sm:row-span-1 sm:min-h-[135px]"
                 title={movie.title}
               />
-              <div className="flex min-w-0 flex-col justify-center px-5 py-4 sm:px-6">
-                <p className="block text-lg font-black text-stone-950 dark:text-stone-100">
+              <div className="flex min-w-0 flex-col justify-center px-4 py-4 sm:px-6">
+                <p className="block text-base font-black text-stone-950 dark:text-stone-100 sm:text-lg">
                   {movie.title}
                 </p>
                 <p className="mt-1 block text-sm font-semibold text-stone-600 dark:text-stone-300">
                   {formatMovieMetaLine(movie)}
                 </p>
-                <p className="mt-2 block text-xs font-black uppercase tracking-[0.18em] text-amber-800 dark:text-amber-300">
+                <p className="mt-1.5 block text-xs font-black uppercase tracking-[0.18em] text-amber-800 dark:text-amber-300">
                   {formatImdbStars(movie.imdbRating)}
                 </p>
               </div>
-              <div className="flex items-center justify-end px-4 pb-4 sm:px-5 sm:pb-0">
+              <div className="flex items-center px-4 pb-4 sm:justify-end sm:px-5 sm:pb-0">
                 <button
                   type="button"
                   onClick={() => {
@@ -553,7 +553,7 @@ export function MovieSearchField({
                     setEpisodes([]);
                     setSeasonLookupError(undefined);
                   }}
-                  className="wr-btn-ghost h-10 border-stone-900/20 bg-white text-stone-900 px-4 text-xs font-bold dark:border-white/22 dark:bg-stone-800 dark:text-stone-100"
+                  className="wr-btn-primary h-10 w-full px-4 text-xs font-bold sm:w-auto"
                   aria-label={`Select ${movie.kind === "series" ? "show" : "movie"} ${movie.title}`}
                 >
                   {movie.kind === "series" ? "Select show" : "Select movie"}
