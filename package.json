@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "seed:postgres:export": "tsx scripts/export-postgres-seed.ts",
     "db:schema:apply": "tsx scripts/db-apply-schema.ts",
     "db:seed": "tsx scripts/db-seed.ts",
