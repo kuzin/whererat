@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "Monday"
     groups:
       # Batch all dev-dependency updates together for a single review
       dev-dependencies:
@@ -20,7 +20,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
+      day: "Monday"
     groups:
       github-actions:
         patterns:
