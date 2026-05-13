@@ -36,12 +36,12 @@ type EpisodeLookupResponse = {
   error?: string;
 };
 
-function PosterFallback({ title }: { title: string }) {
+function PosterFallback({ title, className }: { title: string; className?: string }) {
   return (
     <div
       role="img"
       aria-label={title}
-      className="flex h-full w-full items-center justify-center bg-stone-200/75 dark:bg-stone-800/75"
+      className={`flex h-full w-full items-center justify-center bg-stone-200/75 dark:bg-stone-800/75${className ? ` ${className}` : ""}`}
     >
       <div className="relative h-full w-full rounded-md bg-stone-300/80 dark:bg-stone-700/80">
         <svg
@@ -82,7 +82,7 @@ function MoviePoster({
   const [failed, setFailed] = useState(!src || src === "N/A");
 
   if (failed) {
-    return <PosterFallback title={`${title} poster unavailable`} />;
+    return <PosterFallback title={`${title} poster unavailable`} className={className} />;
   }
 
   return (
