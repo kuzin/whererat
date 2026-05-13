@@ -21,12 +21,24 @@ A **spoiler-aware** public catalog of rat (and rodent) cameos in films and TV �
 
 ## Stack
 
-| Layer | Choice |
-|--------|--------|
-| Framework | Next.js 16 (App Router) |
-| UI | React 19, Tailwind CSS 4 |
-| Data | Postgres via `pg` (no ORM) |
-| Package manager | Yarn 4 |
+[![Next.js](https://img.shields.io/badge/Next.js_16-000000?logo=next.js&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React_19-20232A?logo=react&logoColor=61DAFB)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript_5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-0F172A?logo=tailwindcss&logoColor=38BDF8)](https://tailwindcss.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![Neon](https://img.shields.io/badge/Neon-00E5BF?logo=neon&logoColor=black)](https://neon.tech)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com)
+[![Yarn](https://img.shields.io/badge/Yarn_4-2C8EBB?logo=yarn&logoColor=white)](https://yarnpkg.com)
+
+| Layer | Choice | Notes |
+|-------|--------|-------|
+| Framework | **Next.js 16** App Router | Server components by default; `"use client"` only where interaction requires it |
+| UI | **React 19** + **Tailwind CSS 4** | PostCSS-based Tailwind; utility classes differ from v3 in some areas |
+| Language | **TypeScript 5** strict mode | Path alias `@/*` → `src/*` |
+| Database | **Postgres** via `pg` | Raw SQL only — no ORM. All envs point at a shared **Neon** instance |
+| Storage | **S3** / **Vercel Blob** / local disk | Controlled by env vars in `src/lib/storage.ts` |
+| Deploy | **Vercel** via GitHub integration | Auto-deploys from `main`; never use `vercel deploy` CLI directly |
+| Package manager | **Yarn 4** | Use `yarn add`, not `npm install` |
 
 ## Prerequisites
 
