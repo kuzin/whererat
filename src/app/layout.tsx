@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Boogaloo, Fredoka, Geist, Geist_Mono } from "next/font/google";
+import versions from "../../versions.json";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
@@ -165,6 +166,9 @@ export default async function RootLayout({
                           kuz
                         </a>
                         {" "}· For Kaitlyn. ❤️
+                      </p>
+                      <p className="text-xs text-amber-100/25">
+                        web v{versions.web} · api v{versions.api}
                       </p>
                     </div>
 

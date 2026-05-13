@@ -104,7 +104,7 @@ export function InfoCta({
   label: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-orange-700/28 bg-orange-100/80 p-5 dark:border-white/12 dark:bg-amber-950/20">
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-orange-700/28 bg-orange-100/80 p-5 dark:border-white/12 dark:bg-amber-950/20">
       <div>
         <p className="font-bold text-stone-900 dark:text-stone-100">{title}</p>
         <p className="mt-0.5 text-sm text-stone-600 dark:text-stone-400">{subtitle}</p>
