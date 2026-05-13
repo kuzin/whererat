@@ -55,53 +55,53 @@
 }
 
 .dark {
-    color-scheme: dark;
-    --background: #1c1917;
-    --foreground: #fef3c7;
-    --wr-cheese: #ea580c;
-    --wr-cheddar: #ea580c;
-    --wr-accent-btn: #ea580c;
-    --wr-accent-btn-hover: #c2410c;
-    --wr-accent-btn-dark: #b45309;
-    --wr-accent-btn-dark-hover: #92400e;
+  color-scheme: dark;
+  --background: #1c1917;
+  --foreground: #fef3c7;
+  --wr-cheese: #ea580c;
+  --wr-cheddar: #ea580c;
+  --wr-accent-btn: #ea580c;
+  --wr-accent-btn-hover: #c2410c;
+  --wr-accent-btn-dark: #b45309;
+  --wr-accent-btn-dark-hover: #92400e;
 
-    --wr-header-bg: rgb(41 37 36 / 0.94);
-    --wr-header-border: rgb(255 255 255 / 0.16);
-    --wr-brand-mark: #fbbf24;
-    --wr-brand-wordmark: #fef3c7;
+  --wr-header-bg: rgb(41 37 36 / 0.94);
+  --wr-header-border: rgb(255 255 255 / 0.16);
+  --wr-brand-mark: #fbbf24;
+  --wr-brand-wordmark: #fef3c7;
 
-    --wr-footer-bg: #3d2616;
-    --wr-footer-fg: #fff7dc;
-    --wr-footer-rule: rgb(253 243 220 / 0.12);
+  --wr-footer-bg: #3d2616;
+  --wr-footer-fg: #fff7dc;
+  --wr-footer-rule: rgb(253 243 220 / 0.12);
 
-    --wr-card-bg: #1f1a17;
-    --wr-surface-cream: #1c1917;
-    --wr-surface-cream-soft: #292524;
-    --wr-surface-cream-muted: #1f1a17;
-    --wr-card-bg-soft: rgb(28 25 23 / 0.94);
-    --wr-card-border: rgb(255 255 255 / 0.20);
-    --wr-card-border-soft: rgb(255 255 255 / 0.13);
+  --wr-card-bg: #1f1a17;
+  --wr-surface-cream: #1c1917;
+  --wr-surface-cream-soft: #292524;
+  --wr-surface-cream-muted: #1f1a17;
+  --wr-card-bg-soft: rgb(28 25 23 / 0.94);
+  --wr-card-border: rgb(255 255 255 / 0.20);
+  --wr-card-border-soft: rgb(255 255 255 / 0.13);
 
-    --wr-shadow-card: rgb(0 0 0 / 0.52);
-    --wr-shadow-card-soft: rgb(0 0 0 / 0.38);
-    --wr-shadow-btn: rgb(0 0 0 / 0.58);
-    --wr-shadow-btn-soft: rgb(0 0 0 / 0.32);
-    --wr-shadow-input-focus: rgb(251 191 36 / 0.35);
+  --wr-shadow-card: rgb(0 0 0 / 0.52);
+  --wr-shadow-card-soft: rgb(0 0 0 / 0.38);
+  --wr-shadow-btn: rgb(0 0 0 / 0.58);
+  --wr-shadow-btn-soft: rgb(0 0 0 / 0.32);
+  --wr-shadow-input-focus: rgb(251 191 36 / 0.35);
 
-    --wr-btn-ghost-hover: rgb(53 46 41);
-    --wr-btn-ghost-active: rgb(63 54 46);
-    --wr-btn-ghost-bg: rgb(68 64 60 / 0.88);
-    --wr-btn-ghost-border: rgb(214 211 209 / 0.24);
+  --wr-btn-ghost-hover: rgb(53 46 41);
+  --wr-btn-ghost-active: rgb(63 54 46);
+  --wr-btn-ghost-bg: rgb(68 64 60 / 0.88);
+  --wr-btn-ghost-border: rgb(214 211 209 / 0.24);
 
-    --wr-input-bg: #1c1917;
-    --wr-input-border: rgb(254 243 199 / 0.18);
-    --wr-input-border-focus: #f97316;
-    --wr-input-text: #fef3c7;
-    --wr-input-placeholder: #a8a29e;
-    --wr-panel-warm-bg: #1e0904;
-    --wr-panel-warm-fg: #fef3c7;
-    --wr-panel-warm-border: rgb(255 255 255 / 0.16);
-    --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+  --wr-input-bg: #1c1917;
+  --wr-input-border: rgb(254 243 199 / 0.18);
+  --wr-input-border-focus: #f97316;
+  --wr-input-text: #fef3c7;
+  --wr-input-placeholder: #a8a29e;
+  --wr-panel-warm-bg: #1e0904;
+  --wr-panel-warm-fg: #fef3c7;
+  --wr-panel-warm-border: rgb(255 255 255 / 0.16);
+  --wr-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -137,7 +137,7 @@ summary {
   background: var(--background);
 }
 
-.wr-shell > :not(header) {
+.wr-shell> :not(header) {
   position: relative;
 }
 
@@ -193,17 +193,13 @@ summary {
 .movie-page-palette-bg {
   --movie-skin-end: rgb(253 251 246);
   background:
-    radial-gradient(
-      ellipse 90% 55% at 10% -6%,
+    radial-gradient(ellipse 90% 55% at 10% -6%,
       color-mix(in srgb, var(--movie-accent) 28%, transparent) 0%,
-      transparent 58%
-    ),
-    linear-gradient(
-      176deg,
+      transparent 58%),
+    linear-gradient(176deg,
       var(--movie-wash) 0%,
       var(--movie-column-wash) 94%,
-      var(--movie-skin-end) 100%
-    );
+      var(--movie-skin-end) 100%);
 }
 
 /**
@@ -213,21 +209,15 @@ summary {
 .dark .movie-page-palette-bg {
   --movie-skin-end: rgb(12 10 9);
   background:
-    radial-gradient(
-      ellipse 92% 52% at 14% 0%,
+    radial-gradient(ellipse 92% 52% at 14% 0%,
       color-mix(in srgb, var(--movie-accent-dark, var(--movie-accent)) 16%, transparent) 0%,
-      transparent 56%
-    ),
-    linear-gradient(
-      168deg,
+      transparent 56%),
+    linear-gradient(168deg,
       var(--movie-wash-dark, rgb(17 14 12)) 0%,
-      color-mix(
-        in srgb,
+      color-mix(in srgb,
         var(--movie-accent-dark, var(--movie-accent)) 9%,
-        var(--movie-column-wash-dark, rgb(22 18 15))
-      ) 42%,
-      var(--movie-skin-end) 100%
-    );
+        var(--movie-column-wash-dark, rgb(22 18 15))) 42%,
+      var(--movie-skin-end) 100%);
 }
 
 /* Brand logos in header: CSS-masked SVG fills follow --wr-brand-* */
@@ -321,14 +311,17 @@ summary {
   border-color: color-mix(in srgb, var(--movie-accent) 60%, #000 40%);
   color: var(--movie-accent-ink, #fff);
 }
+
 .wr-btn-movie:hover {
   background-color: color-mix(in srgb, var(--movie-accent) 74%, #fff 26%);
 }
+
 .dark .wr-btn-movie {
   background-color: color-mix(in srgb, var(--movie-accent) 72%, #fff 28%);
   border-color: color-mix(in srgb, var(--movie-accent) 55%, #fff 45%);
   color: var(--movie-accent-ink-dark, #fff);
 }
+
 .dark .wr-btn-movie:hover {
   background-color: color-mix(in srgb, var(--movie-accent) 80%, #fff 20%);
 }
@@ -351,7 +344,7 @@ summary {
 
 
 @utility wr-input {
-  @apply h-11 rounded-xl border px-4 text-sm font-medium outline-none transition-[background-color,border-color,box-shadow,color] placeholder:font-medium;
+  @apply h-11 rounded-xl border px-4 text-sm font-medium outline-none transition-[background-color, border-color, box-shadow, color] placeholder:font-medium;
   background-color: var(--wr-input-bg);
   border-color: var(--wr-input-border);
   color: var(--wr-input-text);
@@ -401,6 +394,7 @@ summary {
     opacity: 0;
     transform: translateX(var(--wr-carousel-dx, 12px));
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -411,6 +405,7 @@ summary {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -425,6 +420,7 @@ summary {
     opacity: 0;
     transform: translateY(-8px) scale(0.985);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -445,4 +441,3 @@ summary {
     animation: wr-carousel-fade-soft 0.12s ease-out both;
   }
 }
-
