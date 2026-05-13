@@ -18,7 +18,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.whererat.app",
+      "buildNumber": "1",
       "infoPlist": {
+        "CFBundleShortVersionString": "1.0.0",
         "UIViewControllerBasedStatusBarAppearance": true,
         "NSPhotoLibraryUsageDescription": "Allow WhereRat to choose images for sightings.",
         "NSCameraUsageDescription": "Allow WhereRat to take photos for sightings."
@@ -30,6 +32,7 @@
         "backgroundColor": "#ea580c"
       },
       "package": "com.whererat",
+      "versionCode": 1,
       "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "resize",
       "permissions": [

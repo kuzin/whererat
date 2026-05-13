@@ -18,7 +18,8 @@
     "db:clear:content": "tsx scripts/db-clear-content.ts",
     "store:play:graphics": "tsx scripts/generate-play-store-graphics.ts",
     "store:play:backdrop": "tsx scripts/play-phone-backdrop.ts",
-    "store:play:screenshots": "tsx scripts/generate-play-phone-screenshots.ts"
+    "store:play:screenshots": "tsx scripts/generate-play-phone-screenshots.ts",
+    "version:bump": "tsx scripts/bump-version.ts"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.2.8",
