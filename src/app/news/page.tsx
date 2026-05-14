@@ -94,27 +94,7 @@ function SidebarItem({
     );
 }
 
-function MobilePill({
-    item,
-    isActive,
-}: {
-    item: NewsItem;
-    isActive: boolean;
-}) {
-    return (
-        <Link
-            href={`/news?post=${item.id}`}
-            className={`inline-flex shrink-0 items-center rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors ${isActive
-                ? "border-stone-900/30 bg-stone-900 text-white dark:border-white/20 dark:bg-stone-100 dark:text-stone-900"
-                : "border-stone-900/15 bg-white text-stone-700 hover:bg-stone-50 dark:border-white/12 dark:bg-stone-800/60 dark:text-stone-300 dark:hover:bg-stone-800"
-                }`}
-        >
-            {item.title}
-        </Link>
-    );
-}
-
-function ArticleView({ item }: { item: NewsItem }) {
+function ArticleView({ item, titleAs: Title = "h1" }: { item: NewsItem; titleAs?: "h1" | "h2" }) {
     const pubDate = item.publishedAt!;
     const formattedDate = pubDate.toLocaleDateString("en-US", {
         year: "numeric",
@@ -157,9 +137,9 @@ function ArticleView({ item }: { item: NewsItem }) {
             </div>
 
             {/* Title */}
-            <h1 className="wr-display mt-3 text-3xl font-bold leading-tight tracking-tight text-stone-950 sm:text-4xl dark:text-stone-50">
+            <Title className="wr-display mt-3 text-3xl font-bold leading-tight tracking-tight text-stone-950 sm:text-4xl dark:text-stone-50">
                 {item.title}
-            </h1>
+            </Title>
 
             {/* Body */}
             <div className="mt-6">
@@ -217,18 +197,22 @@ export default async function NewsPage({
                 </div>
             ) : (
                 <>
-                    {/* Mobile: horizontal scrollable pill nav */}
-                    <div className="mb-6 -mx-4 px-4 lg:hidden">
-                        <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                            {items.map((item) => (
-                                <MobilePill key={item.id} item={item} isActive={selected?.id === item.id} />
-                            ))}
-                        </div>
+                    {/* Mobile: blog-style feed — all articles stacked */}
+                    <div className="lg:hidden space-y-0">
+                        {items.map((item, i) => (
+                            <div key={item.id}>
+                                {i > 0 && (
+                                    <hr className="my-10 border-stone-900/10 dark:border-white/10" />
+                                )}
+                                <ArticleView item={item} titleAs="h2" />
+                            </div>
+                        ))}
                     </div>
 
-                    <div className="grid gap-8 lg:grid-cols-[240px_1fr] lg:items-start lg:gap-10">
-                        {/* Desktop sidebar */}
-                        <aside className="hidden lg:block lg:sticky lg:top-6">
+                    {/* Desktop: sidebar + selected article */}
+                    <div className="hidden lg:grid gap-8 lg:grid-cols-[240px_1fr] lg:items-start lg:gap-10">
+                        {/* Sidebar */}
+                        <aside className="lg:sticky lg:top-6">
                             <nav className="flex flex-col gap-0.5">
                                 {items.map((item) => (
                                     <SidebarItem
