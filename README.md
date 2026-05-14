@@ -92,10 +92,6 @@ More database notes: [`db/README.md`](db/README.md).
 | `yarn lint` | ESLint (includes jsx-a11y WCAG AA rules) |
 | `yarn typecheck` | TypeScript check (no emit) |
 | `yarn db:schema:apply` | Apply `db/schema.sql` to `DATABASE_URL` |
-| `yarn db:seed` | Truncate seeded tables and load `db/seed.json` |
-| `yarn db:bootstrap` | Export seed → apply schema → seed |
-| `yarn db:clear:content` | Clear catalog/submissions; **keeps** existing `accounts` rows |
-| `yarn seed:postgres:export` | Regenerate `db/seed.json` from in-repo catalog + moderator accounts |
 
 ## CI & Deploy
 

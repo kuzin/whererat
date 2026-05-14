@@ -1,6 +1,5 @@
 import type { Movie } from "@/lib/whererat";
 import { getDbPool } from "@/lib/db";
-import { movies as seedMovies } from "@/lib/whererat";
 
 export async function getMovieOverride(movieId: string) {
   const pool = getDbPool();
@@ -69,43 +68,6 @@ export async function updateMovieOverride(movieId: string, override: Partial<Mov
 export async function clearMovieOverride(movieId: string) {
   const pool = getDbPool();
   await pool.query(`delete from movie_overrides where movie_id = $1`, [movieId]);
-  const seed = seedMovies.find((movie) => movie.id === movieId);
-  if (!seed) return;
-  await pool.query(
-    `update movies
-        set title = $2,
-            slug = $3,
-            release_year = $4,
-            runtime_minutes = $5,
-            genres = $6,
-            poster_tone = $7,
-            poster_url = $8,
-            backdrop_url = $9,
-            poster_alt = $10,
-            imdb_id = $11,
-            tmdb_id = $12,
-            summary = $13,
-            metadata = $14,
-            is_deleted = false,
-            updated_at = now()
-      where id = $1`,
-    [
-      seed.id,
-      seed.title,
-      seed.slug,
-      seed.releaseYear,
-      seed.runtimeMinutes,
-      seed.genres,
-      seed.posterTone,
-      seed.posterUrl,
-      seed.backdropUrl,
-      seed.posterAlt,
-      seed.externalIds.imdb,
-      seed.externalIds.tmdb ?? null,
-      seed.summary,
-      seed.metadata,
-    ],
-  );
 }
 
 export async function getDeletedMovieIds() {
