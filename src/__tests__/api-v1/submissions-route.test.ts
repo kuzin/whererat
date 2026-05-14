@@ -146,4 +146,18 @@ describe("POST /api/v1/submissions", () => {
     expect(body.ok).toBe(false);
     expect(body.error).toBe("server-error");
   });
+
+  it("returns 400 when formData cannot be parsed", async () => {
+    // Craft a request that claims multipart but has an unreadable body so formData() throws
+    const req = new NextRequest("http://localhost/api/v1/submissions", {
+      method: "POST",
+      headers: { "content-type": "multipart/form-data; boundary=----fakeboundary" },
+      body: "not valid multipart data",
+    });
+    const response = await POST(req);
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.ok).toBe(false);
+    expect(body.error).toBe("bad_request");
+  });
 });

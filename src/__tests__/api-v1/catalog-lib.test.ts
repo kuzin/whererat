@@ -229,4 +229,71 @@ describe("getV1CatalogJson", () => {
     expect(result.total).toBe(0);
     expect(result.pageCount).toBe(1);
   });
+
+  it("breaks most-rats-logged ties by sightingCount", async () => {
+    // Both movies have the same ratsLogged — m2 has more sightings so ranks higher
+    const movieList = [makeMovie("m1", "slug-m1"), makeMovie("m2", "slug-m2")];
+    mockGetCatalogMovies.mockResolvedValueOnce(movieList as never);
+    mockSearchCatalogMovies.mockResolvedValueOnce(movieList as never);
+    mockGetMergedSightingsForMovie
+      .mockResolvedValueOnce([
+        makeSighting("m1", { approximateRatCount: 5 }),
+      ] as never)
+      .mockResolvedValueOnce([
+        makeSighting("m2", { approximateRatCount: 5 }),
+        makeSighting("m2", { approximateRatCount: 0 }),
+      ] as never);
+
+    const result = await getV1CatalogJson({
+      query: "",
+      genre: "all",
+      sort: "most-rats-logged",
+      page: 1,
+      pageSize: 12,
+    });
+
+    // Both have ratsLogged=5; m2 has more sightings so it wins the tiebreak
+    expect(result.movies[0].slug).toBe("slug-m2");
+  });
+
+  it("breaks total-sightings ties by ratsLogged", async () => {
+    // Both movies have the same sightingCount (1) — m2 has more ratsLogged so ranks higher
+    const movieList = [makeMovie("m1", "slug-m1"), makeMovie("m2", "slug-m2")];
+    mockGetCatalogMovies.mockResolvedValueOnce(movieList as never);
+    mockSearchCatalogMovies.mockResolvedValueOnce(movieList as never);
+    mockGetMergedSightingsForMovie
+      .mockResolvedValueOnce([makeSighting("m1", { approximateRatCount: 2 })] as never)
+      .mockResolvedValueOnce([makeSighting("m2", { approximateRatCount: 10 })] as never);
+
+    const result = await getV1CatalogJson({
+      query: "",
+      genre: "all",
+      sort: "total-sightings",
+      page: 1,
+      pageSize: 12,
+    });
+
+    // Same sightingCount=1; m2 has more ratsLogged so it wins the tiebreak
+    expect(result.movies[0].slug).toBe("slug-m2");
+  });
+
+  it("latest-added-title uses catalogIndex to sort multiple movies", async () => {
+    // catalogIndex is derived from position in the catalogMovies array
+    // m1 comes before m2 in the catalog, so m1 should rank lower (higher index = later addition)
+    const movieList = [makeMovie("m1", "slug-m1"), makeMovie("m2", "slug-m2")];
+    mockGetCatalogMovies.mockResolvedValueOnce(movieList as never);
+    mockSearchCatalogMovies.mockResolvedValueOnce(movieList as never);
+
+    const result = await getV1CatalogJson({
+      query: "",
+      genre: "all",
+      sort: "latest-added-title",
+      page: 1,
+      pageSize: 12,
+    });
+
+    // catalogIndex: m1=0, m2=1. Higher index → more recent → sorted first
+    expect(result.movies[0].slug).toBe("slug-m2");
+    expect(result.movies[1].slug).toBe("slug-m1");
+  });
 });
