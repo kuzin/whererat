@@ -200,6 +200,7 @@ function ImdbCreditsInline({ line }: { line: string }) {
 
 /** Sample pixels with sharp (Node). */
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
