@@ -30,7 +30,7 @@ export default async function LoginPage({
         <h1 className="wr-display text-3xl font-black tracking-tight">Log in</h1>
         <form action={loginModerator} className="mt-6 grid gap-4">
           <input name="next" type="hidden" value={next} />
-          <label className="flex flex-col gap-2 text-sm font-bold text-stone-800 dark:text-stone-200">
+          <label className="flex flex-col gap-2.5 text-sm font-bold text-stone-800 dark:text-stone-200">
             Username
             <input
               name="username"
@@ -40,7 +40,7 @@ export default async function LoginPage({
               className="wr-input"
             />
           </label>
-          <label className="flex flex-col gap-2 text-sm font-bold text-stone-800 dark:text-stone-200">
+          <label className="flex flex-col gap-2.5 text-sm font-bold text-stone-800 dark:text-stone-200">
             Password
             <input
               name="password"
