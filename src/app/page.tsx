@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getApprovedSubmissionRatTally } from "@/lib/moderation-store";
 import { getDeletedMovieIds } from "@/lib/movie-edit-store";
-import { estimateRatsForAppearance } from "@/lib/whererat";
+import { estimateRatsForAppearance, getMoviePath, RODENT_TYPE_OPTIONS } from "@/lib/whererat";
 import {
   getCatalogGenres,
   getCatalogRodentTypes,
@@ -187,11 +187,14 @@ export default async function Home({
                   <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {results.map((movie) => {
                       const sightingCount = sightingCountByMovie.get(movie.id) ?? 0;
+                      const accent = (typeof movie.metadata.overrideAccent === 'string' && movie.metadata.overrideAccent) ? movie.metadata.overrideAccent : movie.metadata.pagePalette?.accent ?? null;
+                      const accentStyle = accent ? { '--movie-accent': accent } as React.CSSProperties : undefined;
                       return (
                         <Link
                           key={movie.id}
-                          href={`/movies/${movie.slug}`}
-                          className="group relative overflow-hidden rounded-xl border-2 border-stone-950/90 bg-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] outline-none transition hover:border-stone-950 focus-visible:ring-2 focus-visible:ring-amber-600/35 dark:border-white/14 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40"
+                          href={getMoviePath(movie)}
+                          style={accentStyle}
+                          className="group relative overflow-hidden rounded-xl border-2 border-stone-950/90 bg-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] outline-none transition hover:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_60%,#1c1410)] focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_50%,transparent)] dark:border-white/14 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.48)] dark:hover:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_55%,white)]"
                         >
                           <div className="relative aspect-[2/3] overflow-hidden">
                             <Image
@@ -202,7 +205,7 @@ export default async function Home({
                               className="h-full w-full object-cover transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 group-hover:opacity-90"
                             />
                             {sightingCount > 0 && (
-                              <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-full bg-orange-600/90 px-2 py-0.5 text-xs font-bold text-white shadow backdrop-blur-[2px] dark:bg-stone-900/80 dark:text-amber-300">
+                              <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-full bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_85%,#7c2d12)] px-2 py-0.5 text-xs font-bold text-white shadow backdrop-blur-[2px] dark:bg-stone-900/80 dark:text-amber-300">
                                 {sightingCount} {sightingCount === 1 ? "sighting" : "sightings"}
                               </span>
                             )}
@@ -234,12 +237,15 @@ export default async function Home({
                         .filter(Boolean)
                         .join(" · ");
                       const movieMetaLine = `${movie.releaseYear} · ${movie.runtimeMinutes} min · ${movie.metadata.rating}`;
+                      const accent = (typeof movie.metadata.overrideAccent === 'string' && movie.metadata.overrideAccent) ? movie.metadata.overrideAccent : movie.metadata.pagePalette?.accent ?? null;
+                      const accentStyle = accent ? { '--movie-accent': accent } as React.CSSProperties : undefined;
 
                       return (
                         <Link
                           key={movie.id}
-                          href={`/movies/${movie.slug}`}
-                          className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[160px_1fr]"
+                          href={getMoviePath(movie)}
+                          style={accentStyle}
+                          className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_60%,#1c1410)] hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_50%,transparent)] focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_55%,white)] dark:hover:bg-stone-900/95 dark:focus-visible:ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_50%,transparent)] dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[160px_1fr]"
                         >
                           <div className="relative h-56 overflow-hidden border-stone-950/90 bg-stone-900 sm:h-auto sm:border-r-2 dark:border-white/14">
                             <Image
@@ -250,7 +256,7 @@ export default async function Home({
                               className="h-full w-full scale-[1.04] object-cover object-top transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-95 sm:min-h-full sm:object-center"
                             />
                             {sightingCount > 0 && (
-                              <span className="absolute bottom-2 left-2 inline-flex items-center rounded-full bg-orange-600/90 px-2 py-0.5 text-xs font-bold text-white shadow dark:bg-stone-800/90 dark:text-amber-300">
+                              <span className="absolute bottom-2 left-2 inline-flex items-center rounded-full bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_85%,#7c2d12)] px-2 py-0.5 text-xs font-bold text-white shadow dark:bg-stone-800/90 dark:text-amber-300">
                                 {sightingCount} {sightingCount === 1 ? "sighting" : "sightings"}
                               </span>
                             )}
@@ -290,7 +296,7 @@ export default async function Home({
                 <div className="mt-6 rounded-2xl border-2 border-dashed border-stone-900/30 bg-orange-50/60 p-10 text-center dark:border-stone-600/50 dark:bg-orange-950/30">
                   <img src="/openmoji/color/svg/1F9C0.svg" alt="Cheese" width={40} height={40} className="mx-auto" />
                   <h3 className="wr-display mt-4 text-2xl font-bold text-stone-950 dark:text-stone-100">
-                    No rats in this hole.
+                    No {RODENT_TYPE_OPTIONS.find((r) => r.id === rodentType)?.plural ?? "rats"} in this hole.
                   </h3>
                   <p className="mt-2 text-stone-700 dark:text-stone-400">
                     Widen those filters—or submit a cheeky sighting so moderators can

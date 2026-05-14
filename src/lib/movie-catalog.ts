@@ -1,4 +1,4 @@
-import { normalizeImdbId, type Movie } from "@/lib/whererat";
+import { normalizeImdbId, RODENT_TYPE_OPTIONS, type Movie } from "@/lib/whererat";
 
 function hasValidImdbId(imdbId: string | null | undefined): boolean {
   return Boolean(normalizeImdbId(String(imdbId ?? "")));
@@ -223,14 +223,7 @@ export async function getCatalogGenres() {
 }
 
 export async function getCatalogRodentTypes(): Promise<string[]> {
-  const pool = getDbPool();
-  const result = await pool.query<{ rodent_type: string }>(
-    `SELECT DISTINCT unnest(rodent_types) AS rodent_type
-     FROM sightings
-     WHERE is_deleted = false
-     ORDER BY rodent_type`,
-  );
-  return result.rows.map((r) => r.rodent_type);
+  return RODENT_TYPE_OPTIONS.map((r) => r.id);
 }
 
 export async function getCatalogStatsWithCommunity() {

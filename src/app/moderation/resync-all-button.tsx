@@ -8,35 +8,26 @@ export function ResyncAllButton() {
     <button
       type="submit"
       disabled={pending}
-      className="wr-btn bg-amber-700 text-amber-50 hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-amber-600 dark:hover:bg-amber-500"
+      title="Resync all movie titles"
+      aria-label="Resync all movie titles"
+      className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0 disabled:cursor-not-allowed disabled:opacity-50"
     >
-      {pending ? (
-        <span className="inline-flex items-center gap-2">
-          <svg
-            className="h-4 w-4 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-            />
-          </svg>
-          Syncing…
-        </span>
-      ) : (
-        "↺ Resync All Movies from IMDb"
-      )}
+      <svg
+        width="17"
+        height="17"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={pending ? "animate-spin" : ""}
+        aria-hidden
+      >
+        <polyline points="23 4 23 10 17 10" />
+        <polyline points="1 20 1 14 7 14" />
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+      </svg>
     </button>
   );
 }

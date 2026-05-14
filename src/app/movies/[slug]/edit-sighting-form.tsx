@@ -27,6 +27,8 @@ type EditSightingFormProps = {
   isSeriesTitle: boolean;
   updateAction: (formData: FormData) => void | Promise<void>;
   deleteAction: (formData: FormData) => void | Promise<void>;
+  /** When set, the form gets this id and footer buttons are suppressed — parent renders them externally. */
+  formId?: string;
 };
 
 export function EditSightingForm({
@@ -36,17 +38,16 @@ export function EditSightingForm({
   isSeriesTitle,
   updateAction,
   deleteAction,
+  formId,
 }: EditSightingFormProps) {
   const initialImages = getSightingImageRefs(sighting);
   const initialPercent = getSightingTimestampPercent(sighting.timestamp) ?? 50;
   const initialRodentTypes = (sighting as { rodentTypes?: string[] }).rodentTypes ?? ["rat"];
   const [selectedRodentTypes, setSelectedRodentTypes] = useState<string[]>(initialRodentTypes);
-  const rodentOption = selectedRodentTypes.length === 1
-    ? RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])
-    : undefined;
+  const rodentOption = RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0]);
 
   return (
-    <form action={updateAction} className="mt-6 grid gap-5">
+    <form id={formId} action={updateAction} className={`${formId ? "py-5" : "mt-6"} grid gap-5`}>
       <input type="hidden" name="slug" value={slug} />
       <input type="hidden" name="sightingId" value={sighting.id} />
       <input type="hidden" name="returnTo" value={returnTo} />
@@ -110,7 +111,7 @@ export function EditSightingForm({
       <EditableSightingImagesField initialImages={initialImages} />
 
       {/* Content warnings */}
-      <SightingContentWarningsField initialWarnings={sighting.contentWarnings} />
+      <SightingContentWarningsField initialWarnings={sighting.contentWarnings} rodentTypes={selectedRodentTypes} />
 
       {/* Spoiler toggle */}
       <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-stone-900/12 bg-stone-50 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/10 dark:bg-stone-900/50 dark:text-stone-100 dark:hover:bg-white/5">
@@ -132,26 +133,28 @@ export function EditSightingForm({
         </span>
       </label>
 
-      {/* Actions */}
-      <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-end">
-        <ConfirmSubmitButton
-          confirmMessage="Delete this sighting? This cannot be undone."
-          type="submit"
-          formAction={deleteAction}
-          className="wr-btn bg-red-100 text-red-900 dark:border-red-400/20 dark:bg-red-950/40 dark:text-red-100"
-        >
-          Delete sighting
-        </ConfirmSubmitButton>
-        <Link
-          href={returnTo}
-          className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
-        >
-          Cancel
-        </Link>
-        <button type="submit" className="wr-btn-primary">
-          Save sighting
-        </button>
-      </div>
+      {/* Actions — only rendered when not using external footer (formId prop) */}
+      {!formId && (
+        <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-end">
+          <ConfirmSubmitButton
+            confirmMessage="Delete this sighting? This cannot be undone."
+            type="submit"
+            formAction={deleteAction}
+            className="wr-btn bg-red-100 text-red-900 dark:border-red-400/20 dark:bg-red-950/40 dark:text-red-100"
+          >
+            Delete sighting
+          </ConfirmSubmitButton>
+          <Link
+            href={returnTo}
+            className="wr-btn-ghost"
+          >
+            Cancel
+          </Link>
+          <button type="submit" className="wr-btn-primary">
+            Save sighting
+          </button>
+        </div>
+      )}
     </form>
   );
 }

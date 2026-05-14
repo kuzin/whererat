@@ -213,7 +213,7 @@ export function SubmitForm({
       ) : null}
 
       {/* ── 01 · Find the film ─────────────────────────────────────────────── */}
-      <div className="grid gap-4">
+      <div className="grid gap-5">
         <SectionHeader title="Find the film" />
         <MovieSearchField
           fieldErrors={fieldErrors}
@@ -228,7 +228,7 @@ export function SubmitForm({
       </div>
 
       {/* ── 02 · The rat moment ────────────────────────────────────────────── */}
-      <div className="grid gap-4">
+      <div className="grid gap-5">
         <SectionHeader title="The sighting" />
 
         {/* Sighting title */}
@@ -268,8 +268,8 @@ export function SubmitForm({
         {/* Rat count */}
         <SightingRatCountField
           label={rodentCountFieldLabel(selectedRodentTypes)}
-          openmojiCode={selectedRodentTypes.length === 1 ? (RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.openmojiCode ?? "1F400") : "1F400"}
-          rodentId={selectedRodentTypes.length === 1 ? selectedRodentTypes[0] : undefined}
+          openmojiCode={RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.openmojiCode ?? "1F400"}
+          rodentId={selectedRodentTypes[0]}
           noun={rodentSwarmNoun(selectedRodentTypes)}
         />
 
@@ -281,10 +281,10 @@ export function SubmitForm({
       </div>
 
       {/* ── 03 · Credit yourself ───────────────────────────────────────────── */}
-      <div className="grid gap-4">
+      <div className="grid gap-5">
         <SectionHeader title="Credit yourself" />
 
-        <div className="grid gap-4">
+        <div className="grid gap-5">
           <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
             <span>
               Your name
@@ -361,7 +361,7 @@ export function SubmitForm({
               </span>
             </label>
 
-            <SightingContentWarningsField embedded />
+            <SightingContentWarningsField embedded rodentTypes={selectedRodentTypes} />
 
             {canAutoApprove ? (
               <label className="flex cursor-pointer items-center justify-between gap-4 border-t border-stone-900/8 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/8 dark:text-stone-100 dark:hover:bg-white/5">

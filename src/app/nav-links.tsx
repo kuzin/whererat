@@ -33,14 +33,15 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
 
   const desktopLinks = (
     <>
-      {ghostLink("/", "Browse the catalog")}
+      {ghostLink("/", "Browse")}
+      {ghostLink("/news", "News")}
       {session ? ghostLink("/moderation", "Moderate") : null}
       <Link
         className="wr-btn-primary"
         href="/submit"
         aria-current={currentPage("/submit") ? "page" : undefined}
       >
-        Submit a sighting
+        Submit
       </Link>
       {session ? (
         <>
@@ -66,10 +67,9 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
   );
 
   const mobileItemClass = (href: string) =>
-    `inline-flex h-11 items-center justify-between rounded-lg border px-4 text-sm font-semibold outline-none transition ${
-      currentPage(href)
-        ? "border-orange-700/60 bg-orange-500/90 text-white shadow-[0_4px_14px_rgb(234_88_12/0.35)]"
-        : "border-stone-800/25 bg-white/10 text-stone-900 hover:bg-white/20 dark:border-white/20 dark:bg-white/6 dark:text-stone-100 dark:hover:bg-white/10"
+    `inline-flex h-11 items-center justify-between rounded-lg border px-4 text-sm font-semibold outline-none transition ${currentPage(href)
+      ? "border-orange-700/60 bg-orange-500/90 text-white shadow-[0_4px_14px_rgb(234_88_12/0.35)]"
+      : "border-stone-800/25 bg-white/10 text-stone-900 hover:bg-white/20 dark:border-white/20 dark:bg-white/6 dark:text-stone-100 dark:hover:bg-white/10"
     }`;
 
   const mobileLabel = (label: string) => (
@@ -88,7 +88,7 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
         href="/"
         aria-current={currentPage("/") ? "page" : undefined}
       >
-        {mobileLabel("Browse the catalog")}
+        {mobileLabel("Browse")}
       </Link>
       {session ? (
         <Link
@@ -100,11 +100,18 @@ export function NavLinks({ session }: { session?: ModeratorSession }) {
         </Link>
       ) : null}
       <Link
+        className={mobileItemClass("/news")}
+        href="/news"
+        aria-current={currentPage("/news") ? "page" : undefined}
+      >
+        {mobileLabel("News")}
+      </Link>
+      <Link
         className={mobileItemClass("/submit")}
         href="/submit"
         aria-current={currentPage("/submit") ? "page" : undefined}
       >
-        {mobileLabel("Submit a sighting")}
+        {mobileLabel("Submit")}
       </Link>
       {session ? (
         <Link

@@ -1,6 +1,7 @@
 "use client";
 
-import { Children, useState, type ReactNode } from "react";
+import { Children, type ReactNode } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 type Tab = { id: string; label: string };
 
@@ -15,16 +16,32 @@ export function MovieTabsShell({
   sidebarContent: ReactNode;
   children: ReactNode | ReactNode[];
 }) {
-  const [activeIdx, setActiveIdx] = useState(0);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const panels = Children.toArray(children);
+
+  const tabParam = searchParams.get("tab");
+  const activeIdx = Math.max(0, tabs.findIndex((t) => t.id === tabParam));
+
+  function setActiveIdx(idx: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (idx === 0) {
+      params.delete("tab");
+    } else {
+      params.set("tab", tabs[idx].id);
+    }
+    const qs = params.toString();
+    router.replace(pathname + (qs ? `?${qs}` : ""), { scroll: false });
+  }
 
   // ── Colour tokens ────────────────────────────────────────────────────────
   // Active bg must exactly match the panel background so the tab "sits on" it.
-  // Palette light  → var(--movie-wash) = gradient 0% stop of .movie-page-palette-bg
-  // Palette dark   → rgb(17 14 12)     = gradient 0% stop of .dark .movie-page-palette-bg
+  // Palette light  → var(--movie-wash)      = gradient 0% stop of .movie-page-palette-bg
+  // Palette dark   → var(--movie-wash-dark) = gradient 0% stop of .dark .movie-page-palette-bg
   // No-palette l/d → #fffbeb / #2d241d = wr-cheese-tile-cream base colours
   const activeBg = palette
-    ? "bg-[var(--movie-wash,#fffbeb)] dark:bg-[rgb(17_14_12)]"
+    ? "bg-[var(--movie-wash,#fffbeb)] dark:bg-[color-mix(in_srgb,var(--movie-accent)_24%,rgb(12_9_7))]"
     : "bg-amber-50 dark:bg-[#2d241d]";
 
   const activeText = "text-stone-900 dark:text-stone-50";
@@ -34,13 +51,13 @@ export function MovieTabsShell({
     ? "border-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(28_25_23/0.85))] dark:border-white/18"
     : "border-stone-950/85 dark:border-white/18";
   const activeBottomBorder = palette
-    ? "[border-bottom-color:var(--movie-wash,#fffbeb)] dark:[border-bottom-color:rgb(17_14_12)]"
+    ? "[border-bottom-color:var(--movie-wash,#fffbeb)] dark:[border-bottom-color:color-mix(in_srgb,var(--movie-accent)_24%,rgb(12_9_7))]"
     : "[border-bottom-color:#fffbeb] dark:[border-bottom-color:#2d241d]";
 
   // Inactive: warm mid-tone — dark enough to recede against the hero, light
   // enough to read comfortably. Mixes the accent in at ~35% over a mid-dark base.
   const inactiveBg = palette
-    ? "bg-[color-mix(in_srgb,var(--movie-accent)_35%,rgb(45_32_20))]"
+    ? "bg-[color-mix(in_srgb,var(--movie-accent)_42%,rgb(18_12_6))]"
     : "bg-stone-700/80";
   const inactiveText = palette
     ? "text-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(230_215_198))]"
@@ -48,7 +65,7 @@ export function MovieTabsShell({
 
   // Hover: visibly lighter + brighter text — feels responsive without being jarring.
   const inactiveHoverBg = palette
-    ? "hover:bg-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(62_44_26))]"
+    ? "hover:bg-[color-mix(in_srgb,var(--movie-accent)_52%,rgb(24_16_8))]"
     : "hover:bg-stone-600/90";
   const inactiveHoverText = palette
     ? "hover:text-[color-mix(in_srgb,var(--movie-accent)_30%,rgb(255_248_238))]"
@@ -56,13 +73,13 @@ export function MovieTabsShell({
 
   // Active-press: a touch darker so the click registers visually.
   const inactiveActiveBg = palette
-    ? "active:bg-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(30_20_12))]"
+    ? "active:bg-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(12_8_4))]"
     : "active:bg-stone-800";
 
   // Mobile select colours — mirrors the inactive tab palette so it feels
   // like a sibling of the tab bar rather than a foreign form element.
   const selectBg = palette
-    ? "bg-[color-mix(in_srgb,var(--movie-accent)_35%,rgb(45_32_20))]"
+    ? "bg-[color-mix(in_srgb,var(--movie-accent)_42%,rgb(18_12_6))]"
     : "bg-stone-700/80";
   const selectText = palette
     ? "text-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(230_215_198))]"
@@ -70,6 +87,9 @@ export function MovieTabsShell({
   const selectBorder = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(28_25_23/0.85))]"
     : "border-stone-950/85";
+  const focusRing = palette
+    ? "focus-visible:ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_50%,transparent)]"
+    : "focus-visible:ring-amber-400/70";
 
   return (
     <>
@@ -78,7 +98,7 @@ export function MovieTabsShell({
        *  with the tab bottoms flush against the hero's border-b-2.
        *  The active tab's invisible bottom border covers that 2px seam.
        * ──────────────────────────────────────────────────────────────────*/}
-      <div className="relative z-10 -mt-[52px] hidden items-end justify-center px-6 sm:flex lg:justify-end lg:px-10">
+      <div className="relative z-10 -mt-[52px] hidden items-end justify-center px-6 sm:flex lg:justify-start lg:px-10">
         <div className="flex items-end gap-2" role="tablist">
           {tabs.map((tab, i) => {
             const isActive = i === activeIdx;
@@ -93,27 +113,26 @@ export function MovieTabsShell({
                   "h-[52px] cursor-pointer rounded-t-xl px-3 text-xs font-extrabold tracking-tight whitespace-nowrap sm:px-5 sm:text-sm md:px-6 md:text-base",
                   // Only animate color/shadow — never geometry — so there's no size flash or movement
                   "transition-[background-color,color,box-shadow,border-color] duration-150",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 focus-visible:ring-offset-1",
+                  `focus-visible:outline-none focus-visible:ring-2 ${focusRing} focus-visible:ring-offset-1`,
                   // Both states keep border-2 so the box size never changes on switch
                   "border-2",
                   isActive
                     ? [
-                        activeBorder,
-                        activeBottomBorder,
-                        activeBg,
-                        activeText,
-                        "shadow-[0_-4px_14px_-2px_rgb(0_0_0/0.22)]",
-                      ].join(" ")
+                      activeBorder,
+                      activeBottomBorder,
+                      activeBg,
+                      activeText,
+                    ].join(" ")
                     : [
-                        // Transparent border — same box size as active, invisible edge
-                        "border-transparent",
-                        "-translate-y-px",
-                        inactiveBg,
-                        inactiveText,
-                        inactiveHoverBg,
-                        inactiveHoverText,
-                        inactiveActiveBg,
-                      ].join(" "),
+                      // Transparent border — same box size as active, invisible edge
+                      "border-transparent",
+                      "-translate-y-[2px]",
+                      inactiveBg,
+                      inactiveText,
+                      inactiveHoverBg,
+                      inactiveHoverText,
+                      inactiveActiveBg,
+                    ].join(" "),
                 ].join(" ")}
               >
                 {tab.label}
@@ -136,7 +155,7 @@ export function MovieTabsShell({
               "w-full h-10 rounded-lg border-2 pl-3 pr-10 font-bold text-sm",
               "appearance-none cursor-pointer",
               "transition-[background-color,color,border-color] duration-150",
-              "focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:ring-offset-1",
+              `focus:outline-none focus:ring-2 ${focusRing.replace('focus-visible:', 'focus:')} focus:ring-offset-1`,
               selectBg,
               selectText,
               selectBorder,
@@ -160,18 +179,17 @@ export function MovieTabsShell({
       {/* ── Two-column content grid ─────────────────────────────────────
        *  Explicit background pinned to the same value as the active tab so
        *  the seam between tab button and content is guaranteed flush.      */}
-      <div className={`grid gap-10 p-6 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-10 lg:p-10 ${activeBg}`}>
+      <div className={`grid gap-10 p-6 lg:grid-cols-[1fr_minmax(0,20rem)] lg:gap-10 lg:p-10 ${activeBg}`}>
         <aside
-          className={`order-2 flex min-w-0 flex-col gap-8 lg:order-none lg:border-r lg:pr-11 lg:pt-0.5 ${
-            palette
-              ? "lg:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(120_113_108/0.85))] dark:lg:border-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(245_240_232/0.28))]"
-              : "lg:border-stone-900/22 dark:lg:border-white/18"
-          }`}
+          className={`order-2 flex min-w-0 flex-col gap-8 lg:order-2 lg:border-l lg:pl-11 lg:pt-0.5 ${palette
+            ? "lg:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(120_113_108/0.85))] dark:lg:border-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(245_240_232/0.28))]"
+            : "lg:border-stone-900/22 dark:lg:border-white/18"
+            }`}
         >
           {sidebarContent}
         </aside>
 
-        <div className="order-1 min-w-0 lg:order-none">
+        <div className="order-1 min-w-0 lg:order-1">
           {panels.map((panel, i) => (
             <div key={i} hidden={i !== activeIdx} role="tabpanel">
               {panel}

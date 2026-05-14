@@ -8,7 +8,7 @@
 import { useState, useId, useRef } from "react";
 import { SightingMarkdown } from "@/components/sighting-markdown";
 import { RodentTypeIcon } from "@/components/rodent-type-icon";
-import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, formatPercentAsTimestamp } from "@/lib/whererat";
+import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, formatContentWarningLabel, formatPercentAsTimestamp } from "@/lib/whererat";
 
 // ─── Swarm signal ────────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ const MAX_SLOTS = 6;
 export function SwarmSignal({ count, openmojiCode = "1F400", rodentId, noun = "Rat" }: { count: number; openmojiCode?: string; rodentId?: string; noun?: string }) {
   const { label, sublabel, fill } = swarmLabel(count, noun);
   return (
-    <div className="flex flex-1 items-center gap-3 rounded-lg border border-stone-900/8 bg-stone-50/80 px-3 py-2 dark:border-white/8 dark:bg-stone-900/40">
+    <div className="flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-stone-900/8 bg-stone-50/80 px-3 py-2 dark:border-white/8 dark:bg-stone-900/40">
       <div className="flex gap-0.5 items-center leading-none" aria-hidden>
         {Array.from({ length: MAX_SLOTS }).map((_, i) => (
           <span key={i} className={`transition-all duration-200 ${i < fill ? "opacity-100" : "opacity-15 grayscale"}`}>
@@ -131,9 +131,9 @@ export function SightingRatCountField({
   const [count, setCount] = useState(Math.max(1, defaultValue));
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex min-w-0 flex-col gap-2">
       <p className="text-sm font-bold text-stone-700 dark:text-stone-200">{label ?? "Rats on screen"}</p>
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <div className="flex items-center rounded-xl border-2 border-stone-900/12 bg-white dark:border-white/12 dark:bg-stone-900">
           <button
             type="button"
@@ -256,6 +256,7 @@ export function SightingDescriptionField({
 export function SightingContentWarningsField({
   initialWarnings,
   embedded = false,
+  rodentTypes,
 }: {
   initialWarnings?: string[];
   /**
@@ -264,6 +265,8 @@ export function SightingContentWarningsField({
    * The toggle row gets a top border to visually separate from the row above.
    */
   embedded?: boolean;
+  /** Selected rodent types — used to localise warning labels (e.g. "Mouse dies" instead of "Rat dies"). */
+  rodentTypes?: string[];
 }) {
   const knownIds = CONTENT_WARNING_OPTIONS.map((o) => o.id) as string[];
   const initialKnown = (initialWarnings ?? []).filter((w) => knownIds.includes(w));
@@ -355,7 +358,7 @@ export function SightingContentWarningsField({
                 height={16}
                 aria-hidden
               />
-              {option.label}
+              {formatContentWarningLabel(option.id, rodentTypes)}
             </label>
           );
         })}
@@ -426,20 +429,13 @@ export function SightingRodentTypesField({
   initialTypes?: string[];
   onTypesChange?: (types: string[]) => void;
 }) {
-  const [selected, setSelected] = useState<Set<string>>(
-    new Set(initialTypes ?? ["rat"]),
+  const [selected, setSelected] = useState<string>(
+    initialTypes?.[0] ?? "rat",
   );
 
-  function toggle(id: string) {
-    const next = new Set(selected);
-    if (next.has(id)) {
-      // Always keep at least one selected
-      if (next.size > 1) next.delete(id);
-    } else {
-      next.add(id);
-    }
-    setSelected(next);
-    onTypesChange?.(Array.from(next));
+  function select(id: string) {
+    setSelected(id);
+    onTypesChange?.([id]);
   }
 
   const pillBase =
@@ -451,20 +447,21 @@ export function SightingRodentTypesField({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
-        Rodent type
-      </p>
+      <div>
+        <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Rodent type</p>
+        <p className="text-xs font-medium text-stone-400 dark:text-stone-500">Select one</p>
+      </div>
       <div className="flex flex-wrap gap-2">
         {RODENT_TYPE_OPTIONS.map((option) => {
-          const isOn = selected.has(option.id);
+          const isOn = selected === option.id;
           return (
             <label key={option.id} className={`${pillBase} ${isOn ? pillOn : pillOff}`}>
               <input
-                type="checkbox"
+                type="radio"
                 name="rodentTypes"
                 value={option.id}
                 checked={isOn}
-                onChange={() => toggle(option.id)}
+                onChange={() => select(option.id)}
                 className="sr-only"
               />
               <RodentTypeIcon

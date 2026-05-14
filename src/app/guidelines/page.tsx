@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { InfoPageShell, InfoHero, InfoSection, InfoCta, InfoFootnote, OM } from "@/components/info-page";
+import Link from "next/link";
+import { InfoPageShell, InfoHero, InfoSection, OM } from "@/components/info-page";
 
 export const metadata: Metadata = {
   title: "Submission Guidelines",
@@ -66,6 +67,11 @@ export default function GuidelinesPage() {
           icon={<OM code="1F4D6" label="Book" size={56} />}
           title="Guidelines"
           description="Standards for submissions, spoilers, moderation, inclusivity, and accessibility — so the catalog stays accurate, welcoming, and easy to trust."
+          cta={
+            <Link href="/submit" className="wr-btn-primary px-5 py-2.5 text-sm font-bold">
+              Submit a sighting →
+            </Link>
+          }
         />
       }
     >
@@ -75,19 +81,6 @@ export default function GuidelinesPage() {
         </InfoSection>
       ))}
 
-      <InfoCta
-        title="Ready to submit a sighting?"
-        subtitle="You know the rules — go log that sighting."
-        href="/submit"
-        label="Submit a sighting →"
-      />
-
-      <InfoFootnote>
-        * rodents have seen more films than most critics and charge nothing for their opinions
-        · they prefer the middle seat · their tiny claws make no noise during quiet scenes
-        · they will eat your popcorn but only the unpopped kernels, out of respect
-        · no rodent has ever spoiled an ending · they are, frankly, professionals
-      </InfoFootnote>
     </InfoPageShell>
   );
 }

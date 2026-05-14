@@ -68,6 +68,11 @@ export default function PrivacyPage() {
         This page reflects the current v1 behavior and should be updated when new features are added
         (accounts, app submissions, analytics providers, or additional data retention).
       </InfoNote>
+
+      <InfoNote>
+        This page is not a legal privacy policy. WhereRat is a personal project and makes no legal
+        warranties. For formal legal advice, consult a qualified professional.
+      </InfoNote>
     </InfoPageShell>
   );
 }

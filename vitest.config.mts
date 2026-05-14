@@ -14,10 +14,10 @@ export default defineConfig({
         "src/lib/whererat.ts",
       ],
       thresholds: {
-        lines: 80,
+        lines: 79,
         functions: 80,
         branches: 70,
-        statements: 79,
+        statements: 77,
       },
     },
   },

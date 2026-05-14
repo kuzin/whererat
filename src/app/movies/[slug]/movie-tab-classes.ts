@@ -11,11 +11,11 @@
 export function tabCardColors(palette: boolean): string {
   return palette
     ? [
-        "border-[color-mix(in_srgb,var(--movie-accent)_12%,rgb(41_37_36))]",
-        "bg-[color-mix(in_srgb,var(--movie-column-wash)_48%,rgb(253_251_246))]",
-        "dark:border-white/14",
-        "dark:bg-[rgb(34_29_25/0.55)]",
-      ].join(" ")
+      "border-[color-mix(in_srgb,var(--movie-accent)_12%,rgb(41_37_36))]",
+      "bg-[color-mix(in_srgb,var(--movie-column-wash)_48%,rgb(253_251_246))]",
+      "dark:border-white/14",
+      "dark:bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(28_20_14))]",
+    ].join(" ")
     : "border-stone-950/90 bg-[var(--wr-surface-cream-soft)] dark:border-white/14 dark:bg-[rgb(36_30_26)]";
 }
 
@@ -30,12 +30,12 @@ export function tabCardClass(palette: boolean): string {
 export function tabHighlightCardClass(palette: boolean): string {
   return palette
     ? [
-        "rounded-xl border-2 px-5 py-4",
-        "border-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(180_100_40))]",
-        "bg-[color-mix(in_srgb,var(--movie-column-wash)_50%,rgb(255_248_230))]",
-        "dark:border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_80_20/0.7))]",
-        "dark:bg-[rgb(40_28_14/0.75)]",
-      ].join(" ")
+      "rounded-xl border-2 px-5 py-4",
+      "border-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(180_100_40))]",
+      "bg-[color-mix(in_srgb,var(--movie-column-wash)_50%,rgb(255_248_230))]",
+      "dark:border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_80_20/0.7))]",
+      "dark:bg-[color-mix(in_srgb,var(--movie-accent)_24%,rgb(30_18_8))]",
+    ].join(" ")
     : "rounded-xl border-2 px-5 py-4 border-amber-400/70 bg-amber-50 dark:border-amber-500/40 dark:bg-amber-950/30";
 }
 

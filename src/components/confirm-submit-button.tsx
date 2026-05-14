@@ -48,8 +48,8 @@ export function ConfirmSubmitButton({
         {children}
       </button>
       {open ? (
-        <div className="fixed inset-0 z-[1200] flex items-end justify-center bg-black/55 sm:items-center sm:px-4">
-          <div className="w-full max-w-md rounded-t-3xl border-2 border-stone-950/85 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-6 sm:pb-6 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/16 dark:bg-stone-900">
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/55 p-6">
+          <div className="w-full max-w-md rounded-2xl border-2 border-stone-950/85 bg-[var(--wr-surface-cream)] p-6 shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/16 dark:bg-stone-900">
             <p className="text-sm font-semibold leading-relaxed text-stone-800 dark:text-stone-100">
               {confirmMessage}
             </p>
@@ -57,7 +57,7 @@ export function ConfirmSubmitButton({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
+                className="wr-btn-ghost"
               >
                 Cancel
               </button>

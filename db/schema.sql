@@ -176,3 +176,26 @@ alter table submissions add column if not exists content_warnings text[] not nul
 -- Rodent types on sightings and submissions (defaults to rat)
 alter table sightings add column if not exists rodent_types text[] not null default '{rat}';
 alter table submissions add column if not exists rodent_types text[] not null default '{rat}';
+
+-- News items (owner-curated posts shown on /news)
+create table if not exists news_items (
+  id text primary key,
+  title text not null,
+  body text not null,
+  type text not null check (type in ('announcement', 'product-news', 'community', 'update')),
+  image_url text,
+  image_alt text,
+  image_position_x float not null default 50,
+  image_position_y float not null default 50,
+  image_zoom float not null default 1,
+  author_id text not null,
+  author_name text not null,
+  author_avatar_url text not null,
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table news_items add column if not exists image_position_x float not null default 50;
+alter table news_items add column if not exists image_position_y float not null default 50;
+alter table news_items add column if not exists image_zoom float not null default 1;

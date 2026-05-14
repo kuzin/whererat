@@ -49,7 +49,7 @@ const sightingMarkdownComponents: Components = {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="break-words font-semibold text-amber-800 underline decoration-amber-700/40 underline-offset-2 hover:decoration-amber-900 dark:text-amber-300 dark:decoration-amber-400/40 dark:hover:decoration-amber-200"
+      className="break-words font-semibold text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_88%,#000)] underline decoration-[color-mix(in_srgb,var(--movie-accent,#ea580c)_55%,rgb(120_113_108/0.5))] underline-offset-2 hover:decoration-[color-mix(in_srgb,var(--movie-accent,#ea580c)_90%,#000)] dark:text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_42%,rgb(245_240_232))] dark:decoration-[color-mix(in_srgb,var(--movie-accent,#ea580c)_50%,rgb(245_240_232/0.45))] dark:hover:decoration-[color-mix(in_srgb,var(--movie-accent,#ea580c)_68%,rgb(245_240_232))]"
     >
       {children}
     </a>
@@ -66,7 +66,7 @@ const sightingMarkdownComponents: Components = {
   ),
   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
   blockquote: ({ children }) => (
-    <blockquote className="my-3 border-l-4 border-amber-600/50 pl-4 text-stone-600 italic dark:border-amber-400/45 dark:text-stone-400">
+    <blockquote className="my-3 border-l-4 border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_55%,rgb(120_113_108/0.55))] pl-4 text-stone-600 italic dark:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_48%,rgb(245_240_232/0.35))] dark:text-stone-400">
       {children}
     </blockquote>
   ),

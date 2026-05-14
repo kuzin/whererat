@@ -10,6 +10,7 @@ import {
 import {
   clampApproximateRatCount,
   normalizeSightingTimestampInput,
+  getMoviePath,
   type ImdbReview,
   type SightingImageSlot,
 } from "@/lib/whererat";
@@ -58,9 +59,10 @@ export async function updateMovieInfo(formData: FormData) {
   const genresRaw = String(formData.get("genres") ?? "").trim();
   const countriesRaw = String(formData.get("countries") ?? "").trim();
   const overrideAccentRaw = String(formData.get("overrideAccent") ?? "").trim();
-  const overrideAccent = overrideAccentRaw && HEX_COLOR_RE.test(overrideAccentRaw)
+  // Use null (not undefined) when clearing so the JSONB merge actually overwrites the stored value.
+  const overrideAccent: string | null = overrideAccentRaw && HEX_COLOR_RE.test(overrideAccentRaw)
     ? (overrideAccentRaw.startsWith("#") ? overrideAccentRaw.toLowerCase() : `#${overrideAccentRaw.toLowerCase()}`)
-    : undefined;
+    : null;
 
   await updateMovieOverride(movie.id, {
     title: String(formData.get("title") ?? "").trim() || movie.title,
@@ -93,8 +95,9 @@ export async function updateMovieInfo(formData: FormData) {
   });
 
   revalidatePath(`/movies/${slug}`);
+  revalidatePath(`/shows/${slug}`);
   revalidatePath("/moderation");
-  redirect(`/movies/${slug}?toast=movie-saved`);
+  redirect(`${getMoviePath(movie)}?toast=movie-saved`);
 }
 
 type RatFactsResult =
@@ -288,8 +291,9 @@ export async function resyncMovieFromImdb(formData: FormData) {
   if (!apiKey || !imdbId) {
     await clearMovieOverride(movie.id);
     revalidatePath(`/movies/${slug}`);
+    revalidatePath(`/shows/${slug}`);
     revalidatePath("/moderation");
-    redirect(`/movies/${slug}?toast=resync-no-key`);
+    redirect(`${getMoviePath(movie)}?toast=resync-no-key`);
   }
 
   const url = new URL("https://www.omdbapi.com/");
@@ -310,7 +314,8 @@ export async function resyncMovieFromImdb(formData: FormData) {
 
   if (!omdb) {
     revalidatePath(`/movies/${slug}`);
-    redirect(`/movies/${slug}?toast=resync-failed`);
+    revalidatePath(`/shows/${slug}`);
+    redirect(`${getMoviePath(movie)}?toast=resync-failed`);
   }
 
   function omdbStr(val: string | undefined) {
@@ -454,6 +459,8 @@ export async function resyncMovieFromImdb(formData: FormData) {
       metadataProvider: "OMDb via IMDb ID",
       lastSyncedAt: new Date().toISOString().slice(0, 10),
       syncedHeaderBannerUrl: syncedVisuals.bannerUrl,
+      ...(syncedVisuals.palette ? { syncedPalette: syncedVisuals.palette } : {}),
+      ...(syncedVisuals.paletteDark ? { syncedPaletteDark: syncedVisuals.paletteDark } : {}),
       syncSnapshot: nextSyncSnapshot,
       lastSyncChangedFields: changedLabels,
       ...(ratFacts.length > 0 ? { ratFacts } : {}),
@@ -465,6 +472,7 @@ export async function resyncMovieFromImdb(formData: FormData) {
   });
 
   revalidatePath(`/movies/${slug}`);
+  revalidatePath(`/shows/${slug}`);
   revalidatePath("/moderation");
 
   // Build a single comprehensive resync-complete toast with all outcome details.
@@ -493,7 +501,10 @@ export async function resyncMovieFromImdb(formData: FormData) {
   params.set("images", String(imdbMedia.images.length));
   params.set("changed", String(changedLabels.length));
   params.set("tmdbbanner", tmdbBannerStatus);
-  redirect(`/movies/${slug}?${params.toString()}`);
+  // After resync, the type may have changed; use the new syncSnapshot to determine route.
+  const newType = (nextSyncSnapshot as Record<string, unknown>).Type;
+  const targetPath = newType === "series" ? `/shows/${slug}` : `/movies/${slug}`;
+  redirect(`${targetPath}?${params.toString()}`);
 }
 
 export async function deleteMovie(formData: FormData) {
@@ -507,6 +518,7 @@ export async function deleteMovie(formData: FormData) {
   await deleteMovieById(movie.id);
   revalidatePath("/");
   revalidatePath(`/movies/${slug}`);
+  revalidatePath(`/shows/${slug}`);
   revalidatePath("/moderation");
   redirect("/?toast=deleted");
 }

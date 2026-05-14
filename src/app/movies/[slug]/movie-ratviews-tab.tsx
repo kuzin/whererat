@@ -30,23 +30,25 @@ function highlightRodentWords(text: string): ReactNode {
 
 type SortKey = "latest" | "lowest" | "highest";
 
+function StarIcon({ fill }: { fill: "full" | "half" | "empty" }) {
+  if (fill === "full") return <span className="text-amber-500 dark:text-amber-400" aria-hidden>★</span>;
+  if (fill === "empty") return <span className="text-stone-300 dark:text-stone-600" aria-hidden>★</span>;
+  return (
+    <span className="relative inline-block" aria-hidden>
+      <span className="text-stone-300 dark:text-stone-600">★</span>
+      <span className="absolute inset-0 w-[52%] overflow-hidden text-amber-500 dark:text-amber-400">★</span>
+    </span>
+  );
+}
+
 function StarRating({ rating }: { rating: number }) {
-  const filled = Math.round(rating / 2); // 1–10 → 1–5 stars
+  const stars = rating / 2; // 1–10 → 0.5–5
   return (
     <span className="inline-flex items-center gap-0.5 tabular-nums">
-      {Array.from({ length: 5 }, (_, i) => (
-        <span
-          key={i}
-          className={
-            i < filled
-              ? "text-amber-500 dark:text-amber-400"
-              : "text-stone-300 dark:text-stone-600"
-          }
-          aria-hidden
-        >
-          ★
-        </span>
-      ))}
+      {Array.from({ length: 5 }, (_, i) => {
+        const fill = i + 1 <= stars ? "full" : i < stars ? "half" : "empty";
+        return <StarIcon key={i} fill={fill} />;
+      })}
       <span className="ml-1.5 text-xs font-bold text-stone-700 dark:text-stone-300">
         {rating}/10
       </span>
@@ -139,7 +141,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
   });
 
   const selectSkin = palette
-    ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
+    ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_16%,rgb(26_20_14))] dark:text-stone-100"
     : "border-stone-950/85 bg-[var(--wr-surface-cream-muted)]";
 
   return (
@@ -153,7 +155,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             {/* Rat-only toggle */}
             {ratCount > 0 ? (
-              <label className="flex cursor-pointer items-center gap-2 select-none">
+              <div className="flex cursor-pointer items-center gap-2 select-none">
                 <span className="whitespace-nowrap text-sm font-bold leading-none text-stone-800 dark:text-stone-200">
                   Rodent filter:
                 </span>
@@ -165,9 +167,9 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
                   onClick={() => setOnlyRats((v) => !v)}
                   className={[
                     "relative inline-flex h-9 w-[3.75rem] shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors duration-200",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 focus-visible:ring-offset-1",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_65%,rgb(245_240_232/0.7))] focus-visible:ring-offset-1",
                     onlyRats
-                      ? "border-amber-500 bg-amber-400 dark:border-amber-400 dark:bg-amber-500"
+                      ? "border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_88%,#000)] bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_80%,white)] dark:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_78%,white)] dark:bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_78%,white)]"
                       : "border-stone-400 bg-stone-300 dark:border-stone-500 dark:bg-stone-600",
                   ].join(" ")}
                 >
@@ -182,7 +184,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
                     <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={18} height={18} />
                   </span>
                 </button>
-              </label>
+              </div>
             ) : null}
 
             {/* Sort control */}
@@ -256,7 +258,7 @@ function ReviewCard({
   return (
     <article
       className={`${className} ${highlight
-        ? "ring-2 ring-inset ring-amber-400/35 dark:ring-amber-300/30"
+        ? "ring-2 ring-inset ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_62%,rgb(245_240_232/0.38))] dark:ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_52%,rgb(245_240_232/0.32))]"
         : ""
         }`}
     >

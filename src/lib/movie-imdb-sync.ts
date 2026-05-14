@@ -1,6 +1,8 @@
 import { updateMovieOverride } from "@/lib/movie-edit-store";
 import { getCatalogMovies } from "@/lib/movie-catalog";
 import { fetchTmdbYoutubeTrailerKey } from "@/lib/tmdb-banner";
+import { upsizeAmazonPosterUrl } from "@/lib/amazon-poster-url";
+import { extractMoviePagePalette, deriveDarkMoviePagePalette, type MoviePagePalette } from "@/lib/movie-page-palette";
 import type { ImdbImage, ImdbRelatedTitle, ImdbReview, ImdbVideo, Movie } from "@/lib/whererat";
 
 // ---------------------------------------------------------------------------
@@ -23,12 +25,17 @@ const HTML_ENTITIES: Record<string, string> = {
   "&rdquo;": "\u201d",
 };
 
+function decodeEntities(s: string): string {
+  return s.replace(/&[a-z]+;|&#\d+;/gi, (e) => HTML_ENTITIES[e] ?? e);
+}
+
 function stripHtml(html: string): string {
-  return html
+  const stripped = html
     .replace(/<[^>]*>/g, " ")
-    .replace(/&[a-z]+;|&#\d+;/gi, (e) => HTML_ENTITIES[e] ?? e)
     .replace(/\s+/g, " ")
     .trim();
+  // Two passes: first decodes &amp;#39; → &#39;, second decodes &#39; → '
+  return decodeEntities(decodeEntities(stripped));
 }
 
 function mentionsRodent(text: string): boolean {
@@ -452,12 +459,28 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
     : undefined;
   const posterUrl =
     omdb?.Poster && omdb.Poster !== "N/A" ? omdb.Poster : undefined;
+
+  // Extract palette from poster (best-effort, stored so page loads skip re-processing)
+  const paletteSourceUrl = upsizeAmazonPosterUrl(posterUrl ?? movie.posterUrl) || posterUrl || movie.posterUrl;
+  let syncedPalette: MoviePagePalette | null = null;
+  let syncedPaletteDark: MoviePagePalette | null = null;
+  if (paletteSourceUrl) {
+    try {
+      const p = await extractMoviePagePalette(paletteSourceUrl);
+      if (p) {
+        syncedPalette = p;
+        syncedPaletteDark = deriveDarkMoviePagePalette(p);
+      }
+    } catch {
+      // palette extraction is best-effort
+    }
+  }
   const totalEpisodes = apiKey
     ? await fetchOmdbTotalEpisodeCount({
-        imdbId,
-        apiKey,
-        totalSeasonsRaw: omdb?.totalSeasons ?? omdb?.TotalSeasons,
-      })
+      imdbId,
+      apiKey,
+      totalSeasonsRaw: omdb?.totalSeasons ?? omdb?.TotalSeasons,
+    })
     : undefined;
   const prevSyncSnapshot =
     movie.metadata.syncSnapshot && typeof movie.metadata.syncSnapshot === "object"
@@ -500,6 +523,8 @@ export async function syncMovieFromImdb(movie: Movie): Promise<void> {
       ...(imdbMedia.videos.length > 0 ? { imdbVideos: imdbMedia.videos } : {}),
       ...(imdbMedia.images.length > 0 ? { imdbImages: imdbMedia.images } : {}),
       ...(youtubeTrailerKey ? { youtubeTrailerKey } : {}),
+      ...(syncedPalette ? { syncedPalette } : {}),
+      ...(syncedPaletteDark ? { syncedPaletteDark } : {}),
     },
   });
 }

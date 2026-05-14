@@ -17,6 +17,7 @@ type TmdbImagesResponse = {
 
 type TmdbFindResponse = {
   movie_results?: Array<{ id?: number }>;
+  tv_results?: Array<{ id?: number }>;
 };
 
 type TmdbVideoResult = {
@@ -51,11 +52,8 @@ async function resolveTmdbMovieId({
   headers: HeadersInit;
   cache: { next: { revalidate: number } } | { cache: "no-store" };
   forceRefresh?: boolean;
-}) {
-  // When forcing a refresh, always re-resolve via IMDb ID to avoid using a
-  // stale or incorrect stored TMDB ID. Only use the stored tmdbId as a
-  // cache shortcut during normal (non-forced) renders.
-  if (tmdbId?.trim() && !forceRefresh) return tmdbId.trim();
+}): Promise<{ id: string; mediaType: "movie" | "tv" } | null> {
+  if (tmdbId?.trim() && !forceRefresh) return { id: tmdbId.trim(), mediaType: "movie" };
   const normalizedImdbId = normalizeImdbId(imdbId);
   if (!normalizedImdbId) return null;
 
@@ -69,8 +67,11 @@ async function resolveTmdbMovieId({
     );
     if (!findRes.ok) return null;
     const payload = (await findRes.json()) as TmdbFindResponse;
-    const foundId = payload.movie_results?.[0]?.id;
-    return typeof foundId === "number" ? String(foundId) : null;
+    const movieId = payload.movie_results?.[0]?.id;
+    if (typeof movieId === "number") return { id: String(movieId), mediaType: "movie" };
+    const tvId = payload.tv_results?.[0]?.id;
+    if (typeof tvId === "number") return { id: String(tvId), mediaType: "tv" };
+    return null;
   } catch {
     return null;
   }
@@ -96,22 +97,22 @@ export async function getTmdbBackdropUrl({
   const cache = forceRefresh
     ? ({ cache: "no-store" } as const)
     : ({ next: { revalidate: 86400 } } as const);
-  const resolvedTmdbId = await resolveTmdbMovieId({
+  const resolved = await resolveTmdbMovieId({
     tmdbId,
     imdbId,
     headers,
     cache,
     forceRefresh,
   });
-  if (!resolvedTmdbId) return null;
+  if (!resolved) return null;
+  const { id: resolvedTmdbId, mediaType } = resolved;
 
   try {
     const detailRes = await fetch(
-      `${TMDB_API}/movie/${encodeURIComponent(resolvedTmdbId)}`,
-      {
-        headers: { Accept: "application/json", ...headers },
-        ...cache,
-      },
+      `${TMDB_API}/${mediaType}/${encodeURIComponent(resolvedTmdbId)}`, {
+      headers: { Accept: "application/json", ...headers },
+      ...cache,
+    },
     );
 
     if (detailRes.ok) {
@@ -122,7 +123,7 @@ export async function getTmdbBackdropUrl({
     }
 
     const imagesRes = await fetch(
-      `${TMDB_API}/movie/${encodeURIComponent(resolvedTmdbId)}/images`,
+      `${TMDB_API}/${mediaType}/${encodeURIComponent(resolvedTmdbId)}/images`,
       {
         headers: { Accept: "application/json", ...headers },
         ...cache,
@@ -184,11 +185,12 @@ export async function fetchTmdbYoutubeTrailerKey({
     ? ({ cache: "no-store" } as const)
     : ({ next: { revalidate: 86400 } } as const);
 
-  const resolvedTmdbId = await resolveTmdbMovieId({ imdbId, tmdbId, headers, cache, forceRefresh });
-  if (!resolvedTmdbId) return undefined;
+  const resolved = await resolveTmdbMovieId({ imdbId, tmdbId, headers, cache, forceRefresh });
+  if (!resolved) return undefined;
+  const { id: resolvedTmdbId, mediaType } = resolved;
 
   try {
-    const res = await fetch(`${TMDB_API}/movie/${encodeURIComponent(resolvedTmdbId)}/videos`, {
+    const res = await fetch(`${TMDB_API}/${mediaType}/${encodeURIComponent(resolvedTmdbId)}/videos`, {
       headers: { Accept: "application/json", ...headers },
       ...cache,
     });

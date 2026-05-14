@@ -164,7 +164,7 @@ export function CatalogFilters({
             className="wr-select h-8 md:h-10"
             disabled={isPending}
           >
-            <option value="all">All genres</option>
+            <option value="all">Any Genre</option>
             {availableGenres.map((item) => (
               <option key={item} value={item}>
                 {item}
@@ -180,7 +180,7 @@ export function CatalogFilters({
             className="wr-select h-8 md:h-10"
             disabled={isPending}
           >
-            <option value="all">All rodents</option>
+            <option value="all">Any Rodent</option>
             {availableRodentTypes.map((id) => {
               const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
               return (
