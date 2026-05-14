@@ -255,7 +255,7 @@ export function MovieSightingsCards({
     : "";
 
   const toggleSkin = palette
-    ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
+    ? "border-[color-mix(in_srgb,var(--movie-accent)_68%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_68%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_72%,rgb(76_72_69))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_40%,rgb(26_20_14))] dark:text-stone-100"
     : "border-stone-950/22 bg-[var(--wr-surface-cream-muted)]";
 
   return (
@@ -278,8 +278,8 @@ export function MovieSightingsCards({
             aria-checked={showSpoilers}
             aria-label={showSpoilers ? "Hide spoilers" : "Show spoilers"}
             onClick={() => setShowSpoilers((prev) => !prev)}
-            className={`relative inline-flex h-8 w-[3.25rem] shrink-0 items-center rounded-full border-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out active:scale-[0.94] motion-reduce:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 ${showSpoilers
-              ? "border-amber-700 bg-amber-500 shadow-[inset_0_1px_0_rgb(255_255_255/0.35)] dark:border-amber-500 dark:bg-amber-600"
+            className={`relative inline-flex h-8 w-[3.25rem] shrink-0 items-center rounded-full border-2 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out active:scale-[0.94] motion-reduce:duration-150 motion-reduce:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color-mix(in_srgb,var(--movie-accent,#ea580c)_75%,white)] ${showSpoilers
+              ? "border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_88%,#000)] bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_80%,white)] dark:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_78%,white)] dark:bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_78%,white)]"
               : "border-stone-700/80 bg-[color-mix(in_srgb,rgb(120_113_108)_22%,rgb(255_253_248))] dark:border-white/25 dark:bg-stone-700"
               }`}
           >

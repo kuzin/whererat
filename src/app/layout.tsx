@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Boogaloo, Fredoka, Geist, Geist_Mono } from "next/font/google";
-import versions from "../../versions.json";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
@@ -124,21 +123,24 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} ${boogaloo.variable} h-full antialiased`}
     >
       <body className="bg-background text-foreground min-h-full transition-colors duration-150">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-stone-900 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white focus:outline-none dark:focus:bg-white dark:focus:text-stone-900"
+        >
+          Skip to main content
+        </a>
         <TooltipProvider>
           <div className="wr-shell flex min-h-screen flex-col">
             <SiteMasthead session={session} />
             <div className="relative flex min-h-0 flex-1 flex-col">
-              <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+              <div id="main-content" className="flex min-h-0 flex-1 flex-col">{children}</div>
               <footer className="relative z-0 border-t-2 border-[var(--wr-footer-rule)] bg-[var(--wr-footer-bg)] text-[var(--wr-footer-fg)] transition-colors duration-150">
                 <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                   <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
 
                     {/* Brand + social */}
                     <div className="flex flex-col gap-5">
-                      <div>
-                        <p className="text-lg font-bold tracking-tight text-amber-50">WhereRat</p>
-                        <p className="mt-0.5 text-sm text-amber-100/50">An obsessive guide to <img src="/openmoji/color/svg/1F400.svg" alt="rats" width={16} height={16} style={{ display: "inline", verticalAlign: "middle" }} /> on film.</p>
-                      </div>
+                      <img src="/brand/rat.svg" alt="" aria-hidden width={28} height={28} className="opacity-40 dark:opacity-25" />
                       <div className="flex flex-wrap gap-2">
                         {[
                           { label: "LinkedIn", short: "in", href: "https://www.linkedin.com/in/mikekuzin" },
@@ -154,21 +156,18 @@ export default async function RootLayout({
                             rel="noreferrer"
                             aria-label={label}
                             title={label}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/20 bg-white/8 text-[0.65rem] font-bold text-amber-100/70 transition hover:border-amber-100/40 hover:bg-white/14 hover:text-amber-50"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-stone-900/18 bg-stone-900/6 text-[0.65rem] font-bold text-stone-500 transition hover:border-stone-900/35 hover:bg-stone-900/10 hover:text-stone-800 dark:border-white/18 dark:bg-white/8 dark:text-stone-400 dark:hover:border-white/35 dark:hover:text-stone-100"
                           >
                             {short}
                           </a>
                         ))}
                       </div>
-                      <p className="text-xs text-amber-100/40">
+                      <p className="text-xs text-stone-400 dark:text-stone-500">
                         © 2026{" "}
-                        <a href="https://kuzn.me" target="_blank" rel="noreferrer" className="underline decoration-amber-100/25 underline-offset-2 hover:decoration-amber-100/60">
+                        <a href="https://kuzn.me" target="_blank" rel="noreferrer" className="underline decoration-stone-400/50 underline-offset-2 hover:decoration-stone-600 dark:decoration-stone-600/50 dark:hover:decoration-stone-400">
                           kuz
                         </a>
                         {" "}· For Kaitlyn. ❤️
-                      </p>
-                      <p className="text-xs text-amber-100/25">
-                        web v{versions.web} · api v{versions.api}
                       </p>
                     </div>
 
@@ -182,19 +181,19 @@ export default async function RootLayout({
                         <Link
                           key={label}
                           href={href}
-                          className="text-sm font-semibold text-amber-100/60 transition hover:text-amber-50"
+                          className="text-sm font-semibold text-stone-600 transition hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
                         >
                           {label}
                         </Link>
                       ))}
                       {session ? (
                         <form action={logoutModerator}>
-                          <button type="submit" className="text-sm font-semibold text-red-300/60 transition hover:text-red-200">
+                          <button type="submit" className="text-sm font-semibold text-red-500/60 transition hover:text-red-700 dark:text-red-400/60 dark:hover:text-red-300">
                             Log out
                           </button>
                         </form>
                       ) : (
-                        <Link href="/login" className="text-sm font-semibold text-amber-100/60 transition hover:text-amber-50">
+                        <Link href="/login" className="text-sm font-semibold text-stone-600 transition hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100">
                           Login
                         </Link>
                       )}

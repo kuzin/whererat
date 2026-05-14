@@ -25,7 +25,7 @@ export function MovieSightingsSortControl({ moviePath, sort, palette, isSeries, 
   const sortOptions = getMovieSightingsSortOptions(isSeries);
 
   const selectSkin = palette
-    ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
+    ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_16%,rgb(26_20_14))] dark:text-stone-100"
     : "border-stone-950/85 bg-[var(--wr-surface-cream-muted)]";
 
   const pushSort = (nextSort: MovieSightingsSortOption) => {
@@ -93,7 +93,7 @@ export function MovieSightingsPagingBar({
     : "Sightings pagination (top)";
 
   const prevEnabledSkin = palette
-    ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,rgb(253_251_246))] text-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(44_38_35))] dark:border-[color-mix(in_srgb,var(--movie-accent)_34%,rgb(245_240_232/0.35))] dark:bg-[rgb(34_29_24)] dark:text-[color-mix(in_srgb,var(--movie-accent)_42%,rgb(245_240_232))]"
+    ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,rgb(253_251_246))] text-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(44_38_35))] dark:border-[color-mix(in_srgb,var(--movie-accent)_34%,rgb(245_240_232/0.35))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_16%,rgb(26_20_14))] dark:text-[color-mix(in_srgb,var(--movie-accent)_42%,rgb(245_240_232))]"
     : "border-stone-950/90 bg-white text-stone-950 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100";
 
   const nextEnabledSkin = palette
@@ -101,7 +101,7 @@ export function MovieSightingsPagingBar({
     : "border-stone-950/90 bg-[var(--wr-cheese)] text-stone-950 dark:border-amber-400/40 dark:bg-[var(--wr-accent-btn-dark)] dark:text-amber-50";
 
   const disabledSkin = palette
-    ? "border-dashed border-[color-mix(in_srgb,var(--movie-accent)_24%,rgb(161_161_170))] text-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(120_113_108))] dark:border-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(113_113_122))] dark:text-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(161_161_170))]"
+    ? "border-dashed border-[color-mix(in_srgb,var(--movie-accent)_48%,rgb(161_161_170))] text-[color-mix(in_srgb,var(--movie-accent)_44%,rgb(120_113_108))] dark:border-[color-mix(in_srgb,var(--movie-accent)_42%,rgb(113_113_122))] dark:text-[color-mix(in_srgb,var(--movie-accent)_38%,rgb(161_161_170))]"
     : "border-dashed border-stone-400 text-stone-400 dark:border-stone-600 dark:text-stone-500";
 
   const bottomDividerSkin = palette

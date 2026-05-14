@@ -144,6 +144,9 @@ export default async function ModerationPage({
     editingSubmissionId
       ? store.submissions.find((submission) => submission.id === editingSubmissionId)
       : undefined;
+  const editingMovieRuntimeMinutes = editingSubmission?.imdbId
+    ? (await getCatalogMovieByImdbId(editingSubmission.imdbId))?.runtimeMinutes
+    : undefined;
   const pendingMovieEntries = await Promise.all(
     pendingSlice.map(async (submission) => {
       const movie =
@@ -171,73 +174,53 @@ export default async function ModerationPage({
   return (
     <main className="wr-page-shell py-10">
       {session.role === "owner" ? (
-        <details className="group mb-8 overflow-hidden rounded-2xl border border-amber-600/60 bg-amber-100/90 dark:border-amber-500/25 dark:bg-amber-950/15">
-          <summary className="flex cursor-pointer select-none list-none items-center gap-3 p-5 text-amber-950 sm:p-6 dark:text-amber-100">
-            <span aria-hidden className="text-xl">⚠</span>
-            <span className="font-black text-amber-950 dark:text-amber-200">Owner Controls</span>
-            <span className="ml-2 rounded-md border border-amber-600/70 bg-amber-200 px-2 py-0.5 text-xs font-bold uppercase tracking-[0.12em] text-amber-900 dark:border-amber-500/40 dark:bg-amber-900/40 dark:text-amber-300">
-              Danger zone
-            </span>
-            <svg
-              className="ml-auto h-4 w-4 shrink-0 text-amber-900 transition-transform group-open:rotate-180 dark:text-amber-400"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              aria-hidden
-            >
-              <path d="M8 10.94 2.53 5.47l1.06-1.06L8 8.82l4.41-4.41 1.06 1.06L8 10.94Z" />
+        <div className="mb-8 rounded-2xl border border-amber-600/40 bg-amber-50/80 px-5 py-4 dark:border-amber-500/20 dark:bg-amber-950/15">
+          <div className="mb-3 flex items-center gap-2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 dark:text-amber-400" aria-hidden>
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
-          </summary>
-
-          <div className="space-y-5 border-t border-amber-600/35 px-5 py-5 sm:px-6 dark:border-amber-500/20">
-            {/* Stats row */}
-            <div>
-              <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-amber-800 dark:text-amber-400">
-                Catalog stats
-              </h3>
-              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div className="rounded-xl border border-amber-300/60 bg-white px-4 py-3 dark:border-amber-600/30 dark:bg-stone-900/60">
-                  <dt className="text-xs font-bold uppercase tracking-[0.12em] text-amber-700 dark:text-amber-400">Movies</dt>
-                  <dd className="mt-1 text-2xl font-black text-stone-950 dark:text-stone-100">{stats.movies}</dd>
-                </div>
-                <div className="rounded-xl border border-amber-300/60 bg-white px-4 py-3 dark:border-amber-600/30 dark:bg-stone-900/60">
-                  <dt className="text-xs font-bold uppercase tracking-[0.12em] text-amber-700 dark:text-amber-400">Sightings approved</dt>
-                  <dd className="mt-1 text-2xl font-black text-stone-950 dark:text-stone-100">{stats.sightings}</dd>
-                </div>
-              </dl>
-            </div>
-
-            {/* Resync action */}
-            <div className="rounded-xl border border-amber-300/60 bg-white p-5 dark:border-amber-600/30 dark:bg-stone-900/60">
-              <h3 className="font-black text-stone-950 dark:text-stone-100">Resync All Movies from IMDb</h3>
-              <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
-                Pulls fresh metadata, ratings, poster URLs, and rat trivia from OMDb/IMDb for every movie in the catalog. Runs one movie at a time; full catalog may take minutes. Cron uses a short default time budget (~8s) plus daily rotation over the catalog (set{" "}
-                <span className="font-mono text-xs">CRON_SYNC_BUDGET_MS=-1</span>{" "}
-                on paid tiers for whole-catalog runs). Cron needs a non-empty{" "}
-                <span className="font-mono text-xs">CRON_SECRET</span>{" "}
-                plus Production redeploy.
-              </p>
-              <form action={resyncAllMovies} className="mt-4">
-                <ResyncAllButton />
-              </form>
-            </div>
+            <span className="text-sm font-bold text-amber-800 dark:text-amber-300">Owner controls</span>
+            <span className="ml-auto rounded-full bg-amber-200/70 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 dark:bg-amber-800/40 dark:text-amber-400">Owner only</span>
           </div>
-        </details>
+          <div className="flex items-center gap-1">
+            <form action={resyncAllMovies}>
+              <ResyncAllButton />
+            </form>
+            <Link
+              href="/moderation/users"
+              title="Manage Users"
+              aria-label="Manage Users"
+              className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </Link>
+            <Link
+              href="/moderation/news"
+              title="Manage News"
+              aria-label="Manage News"
+              className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+                <path d="M18 14h-8" />
+                <path d="M15 18h-5" />
+                <path d="M10 6h8v4h-8V6Z" />
+              </svg>
+            </Link>
+          </div>
+        </div>
       ) : null}
 
-      <section className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <aside className="contents lg:block lg:space-y-6">
-          <div className="order-1 self-start rounded-2xl wr-panel-warm p-8">
-            <img src="/openmoji/color/svg/1F50D.svg" alt="" width={56} height={56} aria-hidden />
-            <h1 className="wr-display mt-4 text-4xl font-bold tracking-tight">
-              Moderation queue
-            </h1>
-            <p className="mt-5 leading-relaxed text-stone-800 dark:text-amber-100/90">
-              Triage sightings with approve, tighten-up edits, or gentle rejections
-              that explain why Netflix might not need another duplicate starting time.
-            </p>
-          </div>
-
-          <div className="order-3 wr-card-soft space-y-3 p-6 sm:p-7">
+      <section className="grid grid-cols-1 gap-6">
+        <aside className="contents">
+          <div className="order-3 wr-card-soft space-y-3 p-5 sm:p-7">
             <h2 className="text-xl font-black text-stone-950 dark:text-stone-100">Queue health</h2>
             <dl className="mt-3 divide-y divide-stone-900/12 dark:divide-white/12">
               <div className="flex items-center justify-between py-3">
@@ -273,7 +256,7 @@ export default async function ModerationPage({
             </dl>
           </div>
 
-          <div className="order-4 wr-card-soft space-y-3 p-6 sm:p-7">
+          <div className="order-4 wr-card-soft space-y-3 p-5 sm:p-7">
             <h2 className="text-xl font-black text-stone-950 dark:text-stone-100">User trust signals</h2>
             <div className="mt-2 divide-y divide-stone-900/12 dark:divide-white/12">
               {trustSignalAccounts.map((user) => (
@@ -342,31 +325,25 @@ export default async function ModerationPage({
               return (
                 <article
                   key={submission.id}
-                  className="overflow-hidden rounded-2xl border-2 border-stone-900/80 bg-[var(--wr-surface-cream)] dark:border-white/20 dark:bg-stone-900/70"
+                  className="wr-card overflow-hidden rounded-2xl"
                 >
-                  <div className="relative p-5">
-                    <div className="pr-12">
-                      <Link
-                        href={`/moderation?edit=${submission.id}`}
-                        className="wr-btn-ghost absolute top-5 right-5 inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 text-lg"
-                        aria-label="Edit submission"
-                        title="Edit submission"
-                      >
-                        ✎
-                      </Link>
+                  <div className="p-4 sm:p-5">
+                    <div>
 
                       {/* ── Movie block ── */}
                       <div className="flex gap-4">
                         {posterUrl ? (
-                          <Image
-                            src={posterUrl}
-                            alt={`${submission.movieTitle} poster`}
-                            width={80}
-                            height={120}
-                            className="w-14 shrink-0 self-center rounded-lg object-cover"
-                          />
+                          <div className="w-14 sm:w-20 shrink-0 self-stretch">
+                            <Image
+                              src={posterUrl}
+                              alt={`${submission.movieTitle} poster`}
+                              width={80}
+                              height={120}
+                              className="h-full w-full rounded-lg object-cover"
+                            />
+                          </div>
                         ) : null}
-                        <div className="min-w-0 self-center">
+                        <div className="min-w-0 self-start">
                           <h3 className="text-xl font-black text-stone-950 dark:text-stone-100">
                             {submission.movieTitle}
                             {submission.movieYear ? (
@@ -376,7 +353,7 @@ export default async function ModerationPage({
                             ) : null}
                           </h3>
                           {episodeContext ? (
-                            <p className="mt-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
+                            <p className="mt-0.5 truncate text-xs font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
                               {episodeContext}
                             </p>
                           ) : null}
@@ -395,13 +372,6 @@ export default async function ModerationPage({
                               </p>
                             </div>
                           ) : null}
-                          {/* ── Duplicate warning ── */}
-                          {catalogMovie ? (
-                            <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-amber-600/40 bg-amber-50 px-2.5 py-2 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200">
-                              <img src="/openmoji/color/svg/26A0.svg" alt="Warning" width={16} height={16} className="mt-px shrink-0" aria-hidden />
-                              <span>Already in catalog — verify this isn&apos;t a duplicate sighting before approving.</span>
-                            </div>
-                          ) : null}
                           {!catalogMovie ? (
                             <div className="mt-1 text-sm text-stone-600 dark:text-stone-400">
                               {submission.imdbId ? (
@@ -417,10 +387,18 @@ export default async function ModerationPage({
                         </div>
                       </div>
 
+                      {/* ── Duplicate warning ── */}
+                      {catalogMovie ? (
+                        <div className="mt-3 flex items-start gap-1.5 rounded-lg border border-amber-600/40 bg-amber-50 px-3 py-2.5 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200">
+                          <img src="/openmoji/color/svg/26A0.svg" alt="" width={16} height={16} className="mt-px shrink-0" aria-hidden />
+                          <span>Already in catalog — verify this isn&apos;t a duplicate sighting before approving.</span>
+                        </div>
+                      ) : null}
+
                       <div className="mt-4 border-t border-stone-950/8 dark:border-white/8" />
 
                       {/* ── Sighting block ── */}
-                      <dl className="mt-3 grid grid-cols-[10rem_1fr] gap-x-3 gap-y-1.5 text-sm">
+                      <dl className="mt-3 grid grid-cols-1 gap-y-0.5 text-sm sm:grid-cols-[10rem_1fr] sm:gap-x-3 sm:gap-y-2 [&_dt]:mt-4 [&_dt]:text-xs [&_dt]:font-semibold [&_dt]:uppercase [&_dt]:tracking-wide [&_dt]:opacity-60 sm:[&_dt]:mt-0 sm:[&_dt]:text-sm sm:[&_dt]:font-bold sm:[&_dt]:normal-case sm:[&_dt]:tracking-normal sm:[&_dt]:opacity-100">
                         {episodeContext ? (
                           <>
                             <dt className="font-bold text-stone-600 dark:text-stone-400">Episode</dt>
@@ -486,7 +464,6 @@ export default async function ModerationPage({
                               year: "numeric",
                               hour: "2-digit",
                               minute: "2-digit",
-                              second: "2-digit",
                               timeZoneName: "short",
                             })}
                           </time>
@@ -553,6 +530,7 @@ export default async function ModerationPage({
                     <div className="mt-5">
                       <InlineApproveForm
                         submissionId={submission.id}
+                        editHref={`/moderation?edit=${submission.id}`}
                         moderateAction={moderateSubmission}
                       />
                     </div>
@@ -597,6 +575,7 @@ export default async function ModerationPage({
         <ModerationEditModal
           submission={editingSubmission}
           moderateAction={moderateSubmission}
+          runtimeMinutes={editingMovieRuntimeMinutes}
         />
       ) : null}
     </main>

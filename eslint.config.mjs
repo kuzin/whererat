@@ -17,6 +17,15 @@ const eslintConfig = defineConfig([
         caughtErrorsIgnorePattern: "^_",
         destructuredArrayIgnorePattern: "^_",
       }],
+      // WCAG AA accessibility rules (jsx-a11y is bundled with eslint-config-next)
+      "jsx-a11y/alt-text": "error",
+      "jsx-a11y/aria-props": "error",
+      "jsx-a11y/aria-proptypes": "error",
+      "jsx-a11y/aria-unsupported-elements": "error",
+      "jsx-a11y/interactive-supports-focus": "warn",
+      "jsx-a11y/label-has-associated-control": ["warn", { depth: 3 }],
+      "jsx-a11y/no-redundant-roles": "warn",
+      "jsx-a11y/role-has-required-aria-props": "error",
     },
   },
   // Override default ignores of eslint-config-next.

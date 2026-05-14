@@ -58,20 +58,28 @@ export function AvatarUploadField({
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={`rounded-xl border-2 border-dashed p-4 transition-colors ${
-          isDragging
+        className={`rounded-xl border-2 border-dashed p-4 transition-colors ${isDragging
             ? "border-amber-500 bg-amber-100/80 dark:border-amber-400 dark:bg-amber-900/35"
             : "border-stone-950/30 bg-amber-50/65 dark:border-white/20 dark:bg-stone-900/55"
-        }`}
+          }`}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Image
-            src={previewUrl}
-            alt={`${displayName} avatar preview`}
-            width={120}
-            height={120}
-            className="h-20 w-20 rounded-xl border border-stone-900/20 object-cover dark:border-white/16"
-          />
+          {previewUrl ? (
+            <Image
+              src={previewUrl}
+              alt={`${displayName} avatar preview`}
+              width={120}
+              height={120}
+              className="h-20 w-20 shrink-0 rounded-xl border border-stone-900/20 object-cover dark:border-white/16"
+            />
+          ) : (
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-stone-300 bg-stone-100 dark:border-stone-600 dark:bg-stone-800">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-stone-400 dark:text-stone-500" aria-hidden>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+          )}
           <div className="space-y-2">
             <p className="text-sm font-semibold text-stone-800 dark:text-stone-200">
               Drag and drop a new image, or{" "}

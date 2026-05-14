@@ -25,12 +25,17 @@ const HTML_ENTITIES: Record<string, string> = {
   "&rdquo;": "\u201d",
 };
 
+function decodeEntities(s: string): string {
+  return s.replace(/&[a-z]+;|&#\d+;/gi, (e) => HTML_ENTITIES[e] ?? e);
+}
+
 function stripHtml(html: string): string {
-  return html
+  const stripped = html
     .replace(/<[^>]*>/g, " ")
-    .replace(/&[a-z]+;|&#\d+;/gi, (e) => HTML_ENTITIES[e] ?? e)
     .replace(/\s+/g, " ")
     .trim();
+  // Two passes: first decodes &amp;#39; → &#39;, second decodes &#39; → '
+  return decodeEntities(decodeEntities(stripped));
 }
 
 function mentionsRodent(text: string): boolean {

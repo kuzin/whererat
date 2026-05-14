@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import versions from "../../../versions.json";
 import { InfoPageShell, InfoHero, InfoSection, OM } from "@/components/info-page";
 
 export const metadata: Metadata = {
@@ -53,6 +54,9 @@ export default function AboutPage() {
           {s.body}
         </InfoSection>
       ))}
+      <InfoSection icon={<OM code="1F4E6" label="Package" size={28} />} title="Version">
+        web v{versions.web} · api v{versions.api}
+      </InfoSection>
     </InfoPageShell>
   );
 }

@@ -38,10 +38,12 @@ export function InfoHero({
   icon,
   title,
   description,
+  cta,
 }: {
   icon?: ReactNode;
   title: string;
   description: string;
+  cta?: ReactNode;
 }) {
   return (
     <div className="rounded-2xl wr-panel-warm p-8">
@@ -54,6 +56,7 @@ export function InfoHero({
         {title}
       </h1>
       <p className="mt-5 leading-relaxed text-stone-800 dark:text-amber-100/90">{description}</p>
+      {cta && <div className="mt-6">{cta}</div>}
     </div>
   );
 }
@@ -84,9 +87,11 @@ export function InfoSection({
 
 export function InfoNote({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-2xl border border-stone-900/15 bg-amber-50/70 p-5 text-sm leading-relaxed text-stone-700 dark:border-white/12 dark:bg-amber-950/20 dark:text-stone-300">
-      {children}
-    </p>
+    <div className="border-l-2 border-stone-300 pl-4 dark:border-stone-700">
+      <p className="text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+        {children}
+      </p>
+    </div>
   );
 }
 

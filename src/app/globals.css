@@ -20,9 +20,9 @@
   /** Header brand (mask fill) — warmed stone / cheese, not pure black */
   --wr-brand-mark: #a16207;
   --wr-brand-wordmark: #57534e;
-  --wr-footer-bg: #78350f;
-  --wr-footer-fg: #fef3c7;
-  --wr-footer-rule: rgb(28 25 23 / 0.2);
+  --wr-footer-bg: #fff8ed;
+  --wr-footer-fg: #57534e;
+  --wr-footer-rule: rgb(28 25 23 / 0.22);
 
   --wr-card-bg: #ffffff;
   --wr-surface-cream: #fff8ed;
@@ -70,9 +70,9 @@
   --wr-brand-mark: #fbbf24;
   --wr-brand-wordmark: #fef3c7;
 
-  --wr-footer-bg: #3d2616;
-  --wr-footer-fg: #fff7dc;
-  --wr-footer-rule: rgb(253 243 220 / 0.12);
+  --wr-footer-bg: #292524;
+  --wr-footer-fg: #d6d3d1;
+  --wr-footer-rule: rgb(255 255 255 / 0.16);
 
   --wr-card-bg: #1f1a17;
   --wr-surface-cream: #1c1917;
@@ -141,9 +141,18 @@ summary {
   position: relative;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
+
 .wr-display {
   font-family: var(--font-display);
-  letter-spacing: -0.025em;
+  letter-spacing: 0.01em;
 }
 
 ::selection {

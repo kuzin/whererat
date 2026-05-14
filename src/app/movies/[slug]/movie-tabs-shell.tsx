@@ -1,6 +1,7 @@
 "use client";
 
-import { Children, useState, type ReactNode } from "react";
+import { Children, type ReactNode } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 type Tab = { id: string; label: string };
 
@@ -15,8 +16,24 @@ export function MovieTabsShell({
   sidebarContent: ReactNode;
   children: ReactNode | ReactNode[];
 }) {
-  const [activeIdx, setActiveIdx] = useState(0);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const panels = Children.toArray(children);
+
+  const tabParam = searchParams.get("tab");
+  const activeIdx = Math.max(0, tabs.findIndex((t) => t.id === tabParam));
+
+  function setActiveIdx(idx: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (idx === 0) {
+      params.delete("tab");
+    } else {
+      params.set("tab", tabs[idx].id);
+    }
+    const qs = params.toString();
+    router.replace(pathname + (qs ? `?${qs}` : ""), { scroll: false });
+  }
 
   // ── Colour tokens ────────────────────────────────────────────────────────
   // Active bg must exactly match the panel background so the tab "sits on" it.
@@ -70,6 +87,9 @@ export function MovieTabsShell({
   const selectBorder = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(28_25_23/0.85))]"
     : "border-stone-950/85";
+  const focusRing = palette
+    ? "focus-visible:ring-[color-mix(in_srgb,var(--movie-accent,#ea580c)_50%,transparent)]"
+    : "focus-visible:ring-amber-400/70";
 
   return (
     <>
@@ -93,7 +113,7 @@ export function MovieTabsShell({
                   "h-[52px] cursor-pointer rounded-t-xl px-3 text-xs font-extrabold tracking-tight whitespace-nowrap sm:px-5 sm:text-sm md:px-6 md:text-base",
                   // Only animate color/shadow — never geometry — so there's no size flash or movement
                   "transition-[background-color,color,box-shadow,border-color] duration-150",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 focus-visible:ring-offset-1",
+                  `focus-visible:outline-none focus-visible:ring-2 ${focusRing} focus-visible:ring-offset-1`,
                   // Both states keep border-2 so the box size never changes on switch
                   "border-2",
                   isActive
@@ -135,7 +155,7 @@ export function MovieTabsShell({
               "w-full h-10 rounded-lg border-2 pl-3 pr-10 font-bold text-sm",
               "appearance-none cursor-pointer",
               "transition-[background-color,color,border-color] duration-150",
-              "focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:ring-offset-1",
+              `focus:outline-none focus:ring-2 ${focusRing.replace('focus-visible:', 'focus:')} focus:ring-offset-1`,
               selectBg,
               selectText,
               selectBorder,

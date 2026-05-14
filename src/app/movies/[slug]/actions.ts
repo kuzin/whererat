@@ -59,9 +59,10 @@ export async function updateMovieInfo(formData: FormData) {
   const genresRaw = String(formData.get("genres") ?? "").trim();
   const countriesRaw = String(formData.get("countries") ?? "").trim();
   const overrideAccentRaw = String(formData.get("overrideAccent") ?? "").trim();
-  const overrideAccent = overrideAccentRaw && HEX_COLOR_RE.test(overrideAccentRaw)
+  // Use null (not undefined) when clearing so the JSONB merge actually overwrites the stored value.
+  const overrideAccent: string | null = overrideAccentRaw && HEX_COLOR_RE.test(overrideAccentRaw)
     ? (overrideAccentRaw.startsWith("#") ? overrideAccentRaw.toLowerCase() : `#${overrideAccentRaw.toLowerCase()}`)
-    : undefined;
+    : null;
 
   await updateMovieOverride(movie.id, {
     title: String(formData.get("title") ?? "").trim() || movie.title,

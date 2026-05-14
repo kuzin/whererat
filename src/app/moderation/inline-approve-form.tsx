@@ -2,9 +2,11 @@
 
 export function InlineApproveForm({
   submissionId,
+  editHref,
   moderateAction,
 }: {
   submissionId: string;
+  editHref: string;
   moderateAction: (formData: FormData) => void | Promise<void>;
 }) {
   return (
@@ -25,6 +27,9 @@ export function InlineApproveForm({
       </label>
 
       <div className="flex gap-2">
+        <a href={editHref} className="wr-btn-ghost flex-1 text-center">
+          Edit
+        </a>
         <button
           type="submit"
           name="decision"

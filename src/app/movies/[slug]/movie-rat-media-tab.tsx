@@ -191,7 +191,7 @@ function VideoModal({ video, onClose }: { video: ImdbVideo; onClose: () => void 
             href={href}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-amber-400 px-5 py-2.5 text-sm font-bold text-stone-900 transition hover:bg-amber-300"
+            className="inline-flex items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_78%,white)] px-5 py-2.5 text-sm font-bold text-[var(--movie-accent-ink,#1a1209)] transition hover:bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_68%,white)]"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
               <path d="M8 5v14l11-7z" transform="scale(0.667)" />
@@ -217,7 +217,7 @@ function VideoCard({ video, palette }: { video: ImdbVideo; palette: boolean }) {
       <button type="button" onClick={() => setOpen(true)} className={`flex w-full flex-col text-left no-underline ${cardBase}`}>
         <div className="relative aspect-video w-full overflow-hidden bg-stone-900">
           {video.thumbnailUrl ? (
-             
+
             <img
               src={imdbThumb(video.thumbnailUrl, 400)}
               alt={video.name}
@@ -244,8 +244,8 @@ function VideoCard({ video, palette }: { video: ImdbVideo; palette: boolean }) {
           {video.contentType ? (
             <span
               className={`w-fit rounded px-1.5 py-0.5 text-[0.6rem] font-black uppercase tracking-wider ${palette
-                  ? "bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(220_210_198))] text-stone-700 dark:bg-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(50_40_30))] dark:text-stone-200"
-                  : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
+                ? "bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(220_210_198))] text-stone-700 dark:bg-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(50_40_30))] dark:text-stone-200"
+                : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200"
                 }`}
             >
               {video.contentType}

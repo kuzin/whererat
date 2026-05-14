@@ -111,10 +111,45 @@ const toastMessages: Record<string, { title: string; body: string; tone: ToastTo
     body: "The submission has been rejected and moved to the history log.",
     tone: "info",
   },
-  deleted: {
-    title: "Deleted",
-    body: "The item has been permanently removed.",
-    tone: "error",
+  "user-created": {
+    title: "User created",
+    body: "The new account is ready. Share the credentials out-of-band.",
+    tone: "success",
+  },
+  "user-updated": {
+    title: "User updated",
+    body: "Account details have been saved.",
+    tone: "success",
+  },
+  "user-deleted": {
+    title: "User deleted",
+    body: "The account has been permanently removed.",
+    tone: "info",
+  },
+  "news-created": {
+    title: "Post created",
+    body: "The news post has been saved.",
+    tone: "success",
+  },
+  "news-updated": {
+    title: "Post updated",
+    body: "Changes to the news post were saved.",
+    tone: "success",
+  },
+  "news-published": {
+    title: "Post published",
+    body: "The news post is now publicly visible.",
+    tone: "success",
+  },
+  "news-unpublished": {
+    title: "Post unpublished",
+    body: "The news post has been moved back to draft.",
+    tone: "info",
+  },
+  "news-deleted": {
+    title: "Post deleted",
+    body: "The news post has been permanently removed.",
+    tone: "info",
   },
   error: {
     title: "Something went wrong",
@@ -130,9 +165,9 @@ const toneBorder: Record<ToastTone, string> = {
 };
 
 const toneShadow: Record<ToastTone, string> = {
-  success: "[box-shadow:4px_4px_0_0_rgb(21_128_61/0.7)] dark:[box-shadow:4px_4px_0_0_rgb(22_101_52/0.8)]",
-  error: "[box-shadow:4px_4px_0_0_rgb(185_28_28/0.7)] dark:[box-shadow:4px_4px_0_0_rgb(153_27_27/0.8)]",
-  info: "[box-shadow:4px_4px_0_0_rgb(180_83_9/0.7)] dark:[box-shadow:4px_4px_0_0_rgb(146_64_14/0.8)]",
+  success: "shadow-[0_8px_40px_rgb(0_0_0/0.3),4px_4px_0_0_rgb(21_128_61/0.7)] dark:shadow-[0_8px_40px_rgb(0_0_0/0.45),4px_4px_0_0_rgb(22_101_52/0.8)]",
+  error: "shadow-[0_8px_40px_rgb(0_0_0/0.3),4px_4px_0_0_rgb(185_28_28/0.7)] dark:shadow-[0_8px_40px_rgb(0_0_0/0.45),4px_4px_0_0_rgb(153_27_27/0.8)]",
+  info: "shadow-[0_8px_40px_rgb(0_0_0/0.3),4px_4px_0_0_rgb(180_83_9/0.7)] dark:shadow-[0_8px_40px_rgb(0_0_0/0.45),4px_4px_0_0_rgb(146_64_14/0.8)]",
 };
 
 export function ToastNotifications() {
@@ -228,7 +263,7 @@ export function ToastNotifications() {
       <div
         role="status"
         aria-live="polite"
-        className={`pointer-events-auto w-full max-w-sm rounded-xl border-2 bg-white p-5 dark:bg-stone-900 ${toneBorder[toast.tone]} ${toneShadow[toast.tone]}`}
+        className={`pointer-events-auto w-full max-w-sm rounded-2xl border-2 bg-white p-5 dark:bg-stone-900/95 ${toneBorder[toast.tone]} ${toneShadow[toast.tone]}`}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
