@@ -5,11 +5,9 @@
  */
 
 import { getDbPool } from "@/lib/db";
+import { sendBrandedEmail } from "@/lib/email-send";
 import { renderBrandedEmail, type EmailContentBlock } from "@/lib/email-template";
 import { formatApproximateRatLine, type Submission } from "@/lib/whererat";
-
-const RESEND_ENDPOINT = "https://api.resend.com/emails";
-const DEFAULT_FROM = "WhereRat <no-reply@whererat.com>";
 
 async function getModeratorEmails(): Promise<string[]> {
   try {
@@ -100,40 +98,18 @@ export async function notifyOwnerOfNewSubmission(
   submission: Submission,
   _catalogMatchSlug?: string,
 ): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.info("[moderation-notify] RESEND_API_KEY not set; skipping notification.");
-    return;
-  }
-
   const recipients = await getModeratorEmails();
   if (!recipients.length) {
     console.warn("[moderation-notify] no moderator emails; skipping notification.");
     return;
   }
 
-  const from = process.env.MODERATION_NOTIFY_FROM ?? DEFAULT_FROM;
   const { subject, text, html } = buildSubmissionEmail(submission);
 
   // Send one email per moderator so addresses aren't exposed across the team.
   await Promise.all(
-    recipients.map(async (to) => {
-      try {
-        const res = await fetch(RESEND_ENDPOINT, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ from, to, subject, text, html }),
-        });
-        if (!res.ok) {
-          const body = await res.text().catch(() => "");
-          console.warn(`[moderation-notify] Resend ${res.status} for ${to}: ${body}`);
-        }
-      } catch (e) {
-        console.warn(`[moderation-notify] send failed for ${to}:`, e);
-      }
-    }),
+    recipients.map((to) =>
+      sendBrandedEmail({ to, subject, html, text, logTag: "moderation-notify" }),
+    ),
   );
 }
