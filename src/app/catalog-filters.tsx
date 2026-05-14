@@ -152,7 +152,7 @@ export function CatalogFilters({
               }
             }}
             placeholder="Enter title or IMDb ID…"
-            className="wr-input h-8 md:h-10"
+            className="wr-input h-8 sm:h-9 md:h-10"
             aria-label="Search movies by title or IMDb ID"
           />
         </label>
@@ -161,7 +161,7 @@ export function CatalogFilters({
           <select
             value={genre}
             onChange={(e) => handleGenreChange(e.target.value)}
-            className="wr-select h-8 md:h-10"
+            className="wr-select h-8 sm:h-9 md:h-10"
             disabled={isPending}
           >
             <option value="all">Any Genre</option>
@@ -177,7 +177,7 @@ export function CatalogFilters({
           <select
             value={rodentType}
             onChange={(e) => handleRodentTypeChange(e.target.value)}
-            className="wr-select h-8 md:h-10"
+            className="wr-select h-8 sm:h-9 md:h-10"
             disabled={isPending}
           >
             <option value="all">Any Rodent</option>
@@ -196,7 +196,7 @@ export function CatalogFilters({
           <select
             value={sort}
             onChange={(e) => handleSortChange(e.target.value as CatalogSortOption)}
-            className="wr-select h-8 md:h-10"
+            className="wr-select h-8 sm:h-9 md:h-10"
             disabled={isPending}
           >
             {catalogSortOptions.map((option) => (
@@ -214,7 +214,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={() => handleGenreChange("all")}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-orange-600/85 dark:text-white dark:hover:bg-orange-500"
             >
               {genre}
               <span aria-hidden="true" className="text-stone-400 dark:text-stone-400">×</span>
@@ -224,7 +224,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={() => handleRodentTypeChange("all")}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-orange-600/85 dark:text-white dark:hover:bg-orange-500"
             >
               {RODENT_TYPE_OPTIONS.find((o) => o.id === rodentType)?.emoji}{" "}
               {RODENT_TYPE_OPTIONS.find((o) => o.id === rodentType)?.label ?? rodentType}
@@ -235,7 +235,7 @@ export function CatalogFilters({
             <button
               type="button"
               onClick={() => handleSortChange("latest-added-title")}
-              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-stone-700 dark:text-stone-200 dark:hover:bg-stone-600"
+              className="inline-flex items-center gap-2 rounded-full bg-orange-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-orange-700 dark:bg-orange-600/85 dark:text-white dark:hover:bg-orange-500"
             >
               {catalogSortLabels[sort]}
               <span aria-hidden="true" className="text-stone-400 dark:text-stone-400">×</span>

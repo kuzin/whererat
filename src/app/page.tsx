@@ -256,7 +256,7 @@ export default async function Home({
                               className="h-full w-full scale-[1.04] object-cover object-top transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:opacity-95 sm:min-h-full sm:object-center"
                             />
                             {sightingCount > 0 && (
-                              <span className="absolute bottom-2 left-2 inline-flex items-center rounded-full bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_85%,#7c2d12)] px-2 py-0.5 text-xs font-bold text-white shadow dark:bg-stone-800/90 dark:text-amber-300">
+                              <span className="absolute bottom-2 left-2 inline-flex items-center rounded-full bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_85%,#7c2d12)] px-2 py-0.5 text-xs font-bold text-white shadow dark:bg-[color-mix(in_srgb,var(--movie-accent,#ea580c)_70%,#000)] dark:text-white">
                                 {sightingCount} {sightingCount === 1 ? "sighting" : "sightings"}
                               </span>
                             )}
@@ -293,7 +293,7 @@ export default async function Home({
               )}
 
               {totalResults === 0 ? (
-                <div className="mt-6 rounded-2xl border-2 border-dashed border-stone-900/30 bg-orange-50/60 p-10 text-center dark:border-stone-600/50 dark:bg-orange-950/30">
+                <div className="mt-6 rounded-2xl border-2 border-dashed border-stone-900/30 bg-orange-100/75 p-10 text-center dark:border-stone-600/50 dark:bg-orange-950/30">
                   <img src="/openmoji/color/svg/1F9C0.svg" alt="Cheese" width={40} height={40} className="mx-auto" />
                   <h3 className="wr-display mt-4 text-2xl font-bold text-stone-950 dark:text-stone-100">
                     No {RODENT_TYPE_OPTIONS.find((r) => r.id === rodentType)?.plural ?? "rats"} in this hole.

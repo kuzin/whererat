@@ -55,7 +55,7 @@ export function HistoryCard({
           </p>
           <p className="truncate text-xs text-stone-500 dark:text-stone-400">{subtitle}</p>
         </div>
-        <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-bold uppercase tracking-[0.12em] ${statusClass}`}>
+        <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-bold uppercase tracking-[0.12em] transition-colors duration-150 ${statusClass}`}>
           {submission.status}
         </span>
         <svg

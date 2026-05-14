@@ -20,7 +20,8 @@ import {
 } from "@/lib/whererat";
 import { ModerationEditModal } from "./moderation-edit-modal";
 import { InlineApproveForm } from "./inline-approve-form";
-import { HistorySection } from "./history-section";
+import { HistoryList } from "./history-list";
+import { SightingsTabs } from "./sightings-tabs";
 import { SubmissionImageThumbs } from "./submission-image-thumbs";
 import { SightingMarkdown } from "@/components/sighting-markdown";
 import {
@@ -292,29 +293,30 @@ export default async function ModerationPage({
 
         </aside>
 
-        <section className="order-2 wr-card-soft p-6 sm:p-7">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-3xl font-black tracking-tight">
-                Pending sightings
-              </h2>
-            </div>
-          </div>
+        <section
+          className="order-2 wr-card-soft p-6 sm:p-7"
+          aria-label="Sightings"
+        >
+          <SightingsTabs
+            pendingCount={pendingSubmissions.length}
+            approvedCount={approvedSubmissions.length}
+            deniedCount={deniedSubmissions.length}
+            pendingContent={
+              <>
+                <div className="space-y-5">
+                  {pendingSubmissions.length === 0 ? (
+                    <div className="rounded-2xl border border-dashed border-stone-500/75 bg-stone-100/90 p-10 text-center dark:border-white/20 dark:bg-stone-900/40">
+                      <img src="/openmoji/color/svg/1F573.svg" alt="" width={40} height={40} className="mx-auto" aria-hidden />
+                      <h3 className="wr-display mt-3 text-2xl font-bold">
+                        Quiet burrow. No crumbs.
+                      </h3>
+                      <p className="mt-2 text-stone-700 dark:text-stone-300">
+                        New public submissions will appear here as pending reviews.
+                      </p>
+                    </div>
+                  ) : null}
 
-          <div className="mt-6 space-y-5">
-            {pendingSubmissions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-stone-500/75 bg-stone-100/90 p-10 text-center dark:border-white/20 dark:bg-stone-900/40">
-                <img src="/openmoji/color/svg/1F573.svg" alt="" width={40} height={40} className="mx-auto" aria-hidden />
-                <h3 className="wr-display mt-3 text-2xl font-bold">
-                  Quiet burrow. No crumbs.
-                </h3>
-                <p className="mt-2 text-stone-700 dark:text-stone-300">
-                  New public submissions will appear here as pending reviews.
-                </p>
-              </div>
-            ) : null}
-
-            {pendingSlice.map((submission) => {
+                  {pendingSlice.map((submission) => {
               const attachmentSlides = getSubmissionImageRefs(submission);
               const sightingTitle = getSubmissionSightingTitle(submission);
               const startingPretty = formatSightingMomentDisplay(submission.timestamp);
@@ -389,7 +391,7 @@ export default async function ModerationPage({
 
                       {/* ── Duplicate warning ── */}
                       {catalogMovie ? (
-                        <div className="mt-3 flex items-start gap-1.5 rounded-lg border border-amber-600/40 bg-amber-50 px-3 py-2.5 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200">
+                        <div className="mt-3 flex items-start gap-1.5 rounded-lg border border-amber-600/60 bg-amber-100 px-3 py-2.5 text-xs font-semibold text-amber-950 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200">
                           <img src="/openmoji/color/svg/26A0.svg" alt="" width={16} height={16} className="mt-px shrink-0" aria-hidden />
                           <span>Already in catalog — verify this isn&apos;t a duplicate sighting before approving.</span>
                         </div>
@@ -480,21 +482,21 @@ export default async function ModerationPage({
                                   {rodentTypes.map((id) => {
                                     const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
                                     return (
-                                      <span key={id} className="inline-flex items-center gap-1 rounded-md border border-amber-800/20 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-900 dark:border-amber-400/25 dark:bg-amber-950/35 dark:text-amber-200">
+                                      <span key={id} className="inline-flex items-center gap-1 rounded-md border border-amber-700/35 bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-950 dark:border-amber-400/25 dark:bg-amber-950/35 dark:text-amber-200">
                                         <img src={`/openmoji/color/svg/${opt?.openmojiCode ?? "26A0"}.svg`} alt="" width={14} height={14} aria-hidden />
                                         {opt?.label ?? id}
                                       </span>
                                     );
                                   })}
                                   {submission.spoiler ? (
-                                    <span className="inline-flex items-center rounded-md border border-red-800/25 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-900 dark:border-red-400/30 dark:bg-red-950/35 dark:text-red-200">
+                                    <span className="inline-flex items-center rounded-md border border-red-700/35 bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-950 dark:border-red-400/30 dark:bg-red-950/35 dark:text-red-200">
                                       Spoiler
                                     </span>
                                   ) : null}
                                   {warnings.map((id) => {
                                     const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
                                     return (
-                                      <span key={id} className="inline-flex items-center gap-1 rounded-md border border-yellow-800/20 bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/35 dark:text-yellow-200">
+                                      <span key={id} className="inline-flex items-center gap-1 rounded-md border border-yellow-700/35 bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-950 dark:border-yellow-400/25 dark:bg-yellow-950/35 dark:text-yellow-200">
                                         <img src={`/openmoji/color/svg/${opt?.openmojiCode ?? "26A0"}.svg`} alt="" width={14} height={14} aria-hidden />
                                         {formatContentWarningLabel(id, submission.rodentTypes)}
                                       </span>
@@ -535,38 +537,50 @@ export default async function ModerationPage({
                       />
                     </div>
                   </div>
-                </article>
-              );
-            })}
-          </div>
+                  </article>
+                );
+              })}
+                </div>
 
-          {pendingPageCount > 1 ? (
-            <div className="mt-8 flex items-center justify-between gap-3">
-              <Link
-                href={pendingPath(safePendingPage - 1)}
-                className={`wr-btn-ghost ${safePendingPage === 1 ? "pointer-events-none opacity-40" : ""}`}
-                aria-disabled={safePendingPage === 1}
-              >
-                ← Previous
-              </Link>
-              <p className="text-sm font-semibold text-stone-600 dark:text-stone-300">
-                Showing {pendingStart + 1}–{pendingStart + pendingSlice.length} of {pendingSubmissions.length}
-              </p>
-              <Link
-                href={pendingPath(safePendingPage + 1)}
-                className={`wr-btn-ghost ${safePendingPage === pendingPageCount ? "pointer-events-none opacity-40" : ""}`}
-                aria-disabled={safePendingPage === pendingPageCount}
-              >
-                Next →
-              </Link>
-            </div>
-          ) : null}
-
-          <HistorySection
-            approvedItems={approvedItems}
-            deniedItems={deniedItems}
-            rereviewAction={rereviewSubmission}
-            removeAction={removeSubmission}
+                {pendingPageCount > 1 ? (
+                  <div className="mt-8 flex items-center justify-between gap-3">
+                    <Link
+                      href={pendingPath(safePendingPage - 1)}
+                      className={`wr-btn-ghost ${safePendingPage === 1 ? "pointer-events-none cursor-not-allowed opacity-40" : ""}`}
+                      aria-disabled={safePendingPage === 1}
+                    >
+                      ← Previous
+                    </Link>
+                    <p className="text-sm font-semibold text-stone-600 dark:text-stone-300">
+                      Showing {pendingStart + 1}–{pendingStart + pendingSlice.length} of {pendingSubmissions.length}
+                    </p>
+                    <Link
+                      href={pendingPath(safePendingPage + 1)}
+                      className={`wr-btn-ghost ${safePendingPage === pendingPageCount ? "pointer-events-none cursor-not-allowed opacity-40" : ""}`}
+                      aria-disabled={safePendingPage === pendingPageCount}
+                    >
+                      Next →
+                    </Link>
+                  </div>
+                ) : null}
+              </>
+            }
+            approvedContent={
+              <HistoryList
+                items={approvedItems}
+                mode="approved"
+                rereviewAction={rereviewSubmission}
+                removeAction={removeSubmission}
+              />
+            }
+            deniedContent={
+              <HistoryList
+                items={deniedItems}
+                mode="denied"
+                rereviewAction={rereviewSubmission}
+                removeAction={removeSubmission}
+              />
+            }
           />
         </section>
       </section>

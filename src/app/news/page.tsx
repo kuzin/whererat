@@ -69,9 +69,9 @@ function SidebarItem({
     return (
         <Link
             href={`/news?post=${item.id}`}
-            className={`group flex items-center gap-3 rounded-xl px-3 py-3 transition-colors ${isActive
-                ? "bg-stone-900/8 dark:bg-white/8"
-                : "hover:bg-stone-900/4 dark:hover:bg-white/4"
+            className={`group flex items-center gap-3 rounded-xl border-l-2 py-3 pr-3 pl-[10px] transition-colors ${isActive
+                ? "border-orange-600 bg-stone-900/8 dark:border-amber-400 dark:bg-white/8"
+                : "border-transparent hover:bg-stone-900/4 dark:hover:bg-white/4"
                 }`}
         >
             <div className="min-w-0 flex-1">

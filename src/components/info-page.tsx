@@ -87,7 +87,7 @@ export function InfoSection({
 
 export function InfoNote({ children }: { children: ReactNode }) {
   return (
-    <div className="border-l-2 border-stone-300 pl-4 dark:border-stone-700">
+    <div className="border-l-2 border-stone-300 pl-4 dark:border-stone-500/70">
       <p className="text-xs leading-relaxed text-stone-500 dark:text-stone-400">
         {children}
       </p>
