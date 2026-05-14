@@ -29,6 +29,8 @@ This will include `VERCEL_OIDC_TOKEN` noise from Vercel — you can delete that 
 | `OMDB_API_KEY` | Production, Preview | Recommended | Movie search + metadata sync. Free at omdbapi.com. |
 | `TMDB_READ_ACCESS_TOKEN` | Production, Preview | Recommended | Backdrop images. Free at themoviedb.org. |
 | `BLOB_READ_WRITE_TOKEN` | Production, Preview | For uploads | Vercel Blob token. Without it, images write to local disk and are lost on deploy. |
+| `RESEND_API_KEY` | Production, Preview | Optional | When set, emails the owner account on each new public submission. |
+| `MODERATION_NOTIFY_FROM` | Production, Preview | Optional | Override the From address used for moderation emails. Default `WhereRat <no-reply@whererat.com>` — requires a verified sender domain in Resend. |
 
 ## Adding a new variable
 

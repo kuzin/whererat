@@ -12,6 +12,7 @@ import {
 import { addSubmission } from "@/lib/moderation-store";
 import { getCatalogMovieByImdbId, getCatalogMovieByTitleSearch } from "@/lib/movie-catalog";
 import { persistSightingFiles } from "@/lib/media-storage";
+import { notifyOwnerOfNewSubmission } from "@/lib/moderation-notify";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 
@@ -162,6 +163,8 @@ export async function executePublicSightingSubmit(
       contentWarnings: contentWarnings.length ? contentWarnings : undefined,
       rodentTypes: rodentTypes.length ? rodentTypes : undefined,
     });
+
+    void notifyOwnerOfNewSubmission(submissionRow, existingMovie?.slug);
 
     return {
       ok: true,
