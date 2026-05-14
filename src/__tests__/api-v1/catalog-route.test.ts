@@ -126,4 +126,16 @@ describe("GET /api/v1/catalog", () => {
       expect(movie).toHaveProperty("sightingCount");
     }
   });
+
+  it("uses V1_CATALOG_PAGE_DEFAULT when pageSize param is omitted", async () => {
+    mockGetV1CatalogJson.mockResolvedValueOnce({ ...CATALOG_RESPONSE } as never);
+
+    const req = makeRequest("http://localhost/api/v1/catalog?q=rat");
+    await GET(req);
+
+    // When pageSize is absent, the route falls back to V1_CATALOG_PAGE_DEFAULT (12)
+    expect(mockGetV1CatalogJson).toHaveBeenCalledWith(
+      expect.objectContaining({ pageSize: 12 }),
+    );
+  });
 });

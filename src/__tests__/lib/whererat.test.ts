@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import {
   normalizeImdbId,
   clampApproximateRatCount,
@@ -733,4 +733,482 @@ describe("getHeroRecentSightings", () => {
   });
 });
 
+// ── Additional uncovered functions ────────────────────────────────────────────
+
+import {
+  formatSubmissionEpisodeContext,
+  splitImdbCreditSegments,
+  getImdbNameSearchUrl,
+  getSightingImageRefs,
+  sightingHasUploadedImage,
+  getSubmissionImageRefs,
+  rodentCountFieldLabel,
+  rodentSwarmNoun,
+  rodentSwarmNounPlural,
+  formatSightingMomentDisplay,
+  formatColonTimecodeDisplay,
+  formatSightingStartingTimeDisplay,
+  getSubmissionSightingTitle,
+  getSightingCatalogRank,
+  sightingNewestSortValue,
+  getMoviePath,
+  sightings,
+} from "@/lib/whererat";
+import type { Submission, Movie } from "@/lib/whererat";
+
+function makeMinimalSubmission(overrides: Partial<Submission> = {}): Submission {
+  return {
+    id: "sub1",
+    movieTitle: "Ratatouille",
+    timestamp: "42%",
+    title: undefined,
+    description: "A rat appears.",
+    spoiler: false,
+    approximateRatCount: 1,
+    status: "pending",
+    submittedBy: "Alice",
+    submittedAt: new Date("2024-01-01"),
+    ...overrides,
+  } as Submission;
+}
+
+function makeMinimalMovie(slug: string, isSeriesType = false): Movie {
+  return {
+    id: `movie-${slug}`,
+    slug,
+    title: `Title ${slug}`,
+    releaseYear: 2020,
+    runtimeMinutes: 90,
+    genres: ["Drama"],
+    posterTone: "bg-gray-700",
+    posterUrl: "",
+    backdropUrl: "",
+    posterAlt: "",
+    externalIds: { imdb: "tt0000001" },
+    metadata: {
+      tagline: "",
+      rating: "PG",
+      director: "",
+      originalLanguage: "en",
+      productionCountries: [],
+      metadataProvider: "IMDb seed",
+      lastSyncedAt: "2024-01-01",
+      syncSnapshot: isSeriesType ? { Type: "series" } : { Type: "movie" },
+    },
+    summary: "A test movie",
+  } as unknown as Movie;
+}
+
+// ── formatSubmissionEpisodeContext ────────────────────────────────────────────
+
+describe("formatSubmissionEpisodeContext", () => {
+  it("returns undefined for non-series", () => {
+    expect(formatSubmissionEpisodeContext({ imdbKind: "movie" })).toBeUndefined();
+    expect(formatSubmissionEpisodeContext({})).toBeUndefined();
+  });
+
+  it("returns S1E2 format for series with season and episode", () => {
+    expect(
+      formatSubmissionEpisodeContext({ imdbKind: "series", seasonNumber: 1, episodeNumber: 2 }),
+    ).toBe("S1E2");
+  });
+
+  it("includes episode title when present", () => {
+    expect(
+      formatSubmissionEpisodeContext({
+        imdbKind: "series",
+        seasonNumber: 3,
+        episodeNumber: 4,
+        episodeTitle: "Pilot",
+      }),
+    ).toBe("S3E4 · Pilot");
+  });
+
+  it("returns undefined when season/episode missing", () => {
+    expect(formatSubmissionEpisodeContext({ imdbKind: "series" })).toBeUndefined();
+  });
+
+  it("strips blank episode title", () => {
+    expect(
+      formatSubmissionEpisodeContext({
+        imdbKind: "series",
+        seasonNumber: 1,
+        episodeNumber: 1,
+        episodeTitle: "  ",
+      }),
+    ).toBe("S1E1");
+  });
+});
+
+// ── splitImdbCreditSegments ───────────────────────────────────────────────────
+
+describe("splitImdbCreditSegments", () => {
+  it("splits on commas", () => {
+    expect(splitImdbCreditSegments("Alice, Bob, Carol")).toEqual(["Alice", "Bob", "Carol"]);
+  });
+
+  it("trims whitespace", () => {
+    expect(splitImdbCreditSegments("  Alice  ,  Bob  ")).toEqual(["Alice", "Bob"]);
+  });
+
+  it("filters out empty segments", () => {
+    expect(splitImdbCreditSegments("Alice,,Bob")).toEqual(["Alice", "Bob"]);
+  });
+
+  it("returns empty array for empty string", () => {
+    expect(splitImdbCreditSegments("")).toEqual([]);
+  });
+});
+
+// ── getImdbNameSearchUrl ──────────────────────────────────────────────────────
+
+describe("getImdbNameSearchUrl", () => {
+  it("returns an IMDb name search URL", () => {
+    const url = getImdbNameSearchUrl("John Doe");
+    expect(url).toContain("imdb.com/find");
+    expect(url).toContain("q=John+Doe");
+    expect(url).toContain("s=nm");
+  });
+
+  it("strips trailing parenthetical for the query", () => {
+    const url = getImdbNameSearchUrl("Jane Smith (voice)");
+    expect(url).toContain("q=Jane+Smith");
+    expect(url).not.toContain("voice");
+  });
+
+  it("uses the full name when stripping yields empty", () => {
+    const url = getImdbNameSearchUrl("(voice)");
+    expect(url).toContain("q=%28voice%29");
+  });
+});
+
+// ── getSightingImageRefs ──────────────────────────────────────────────────────
+
+describe("getSightingImageRefs", () => {
+  it("returns empty array when no images", () => {
+    expect(getSightingImageRefs(makeSighting())).toEqual([]);
+  });
+
+  it("returns imageUrl when present", () => {
+    const refs = getSightingImageRefs(makeSighting({ imageUrl: "https://example.com/rat.jpg", imageAlt: "A rat" }));
+    expect(refs).toHaveLength(1);
+    expect(refs[0]!.url).toBe("https://example.com/rat.jpg");
+    expect(refs[0]!.alt).toBe("A rat");
+  });
+
+  it("excludes placeholder URLs", () => {
+    const refs = getSightingImageRefs(makeSighting({ imageUrl: "https://placehold.co/400x300" }));
+    expect(refs).toHaveLength(0);
+  });
+
+  it("uses images array when provided", () => {
+    const images = [
+      { url: "https://example.com/a.jpg", alt: "A" },
+      { url: "https://example.com/b.jpg" },
+    ];
+    const refs = getSightingImageRefs(makeSighting({ images }));
+    expect(refs).toHaveLength(2);
+    expect(refs[0]!.url).toBe("https://example.com/a.jpg");
+  });
+
+  it("deduplicates by base URL", () => {
+    const images = [
+      { url: "https://example.com/rat.jpg?v=1" },
+      { url: "https://example.com/rat.jpg?v=2" },
+    ];
+    const refs = getSightingImageRefs(makeSighting({ images }));
+    expect(refs).toHaveLength(1);
+  });
+
+  it("caps at 5 images", () => {
+    const images = Array.from({ length: 7 }, (_, i) => ({
+      url: `https://example.com/rat${i}.jpg`,
+    }));
+    const refs = getSightingImageRefs(makeSighting({ images }));
+    expect(refs).toHaveLength(5);
+  });
+});
+
+// ── sightingHasUploadedImage ──────────────────────────────────────────────────
+
+describe("sightingHasUploadedImage", () => {
+  it("returns false when no images", () => {
+    expect(sightingHasUploadedImage(makeSighting())).toBe(false);
+  });
+
+  it("returns true when imageUrl is set", () => {
+    expect(sightingHasUploadedImage(makeSighting({ imageUrl: "https://example.com/rat.jpg" }))).toBe(true);
+  });
+
+  it("returns false for placeholder image URL", () => {
+    expect(sightingHasUploadedImage(makeSighting({ imageUrl: "https://placehold.co/200x200" }))).toBe(false);
+  });
+});
+
+// ── getSubmissionImageRefs ────────────────────────────────────────────────────
+
+describe("getSubmissionImageRefs", () => {
+  it("returns empty array when no images", () => {
+    expect(getSubmissionImageRefs(makeMinimalSubmission())).toEqual([]);
+  });
+
+  it("returns imageUrl ref when set", () => {
+    const refs = getSubmissionImageRefs(
+      makeMinimalSubmission({ imageUrl: "https://example.com/rat.jpg", imageAlt: "Rat" }),
+    );
+    expect(refs).toHaveLength(1);
+    expect(refs[0]!.url).toBe("https://example.com/rat.jpg");
+  });
+
+  it("uses images array", () => {
+    const images = [{ url: "https://example.com/a.jpg" }, { url: "https://example.com/b.jpg" }];
+    const refs = getSubmissionImageRefs(makeMinimalSubmission({ images }));
+    expect(refs).toHaveLength(2);
+  });
+
+  it("caps at 5 images", () => {
+    const images = Array.from({ length: 8 }, (_, i) => ({
+      url: `https://example.com/rat${i}.jpg`,
+    }));
+    const refs = getSubmissionImageRefs(makeMinimalSubmission({ images }));
+    expect(refs).toHaveLength(5);
+  });
+});
+
+// ── rodentCountFieldLabel ─────────────────────────────────────────────────────
+
+describe("rodentCountFieldLabel", () => {
+  it("defaults to rats when no types specified", () => {
+    expect(rodentCountFieldLabel()).toBe("Rats on screen");
+    expect(rodentCountFieldLabel([])).toBe("Rats on screen");
+  });
+
+  it("uses the plural of the single type", () => {
+    expect(rodentCountFieldLabel(["mouse"])).toBe("Mice on screen");
+    expect(rodentCountFieldLabel(["rat"])).toBe("Rats on screen");
+  });
+
+  it("uses generic label for multiple types", () => {
+    expect(rodentCountFieldLabel(["rat", "mouse"])).toBe("Rodents on screen");
+  });
+});
+
+// ── rodentSwarmNoun ───────────────────────────────────────────────────────────
+
+describe("rodentSwarmNoun", () => {
+  it("defaults to Rat", () => {
+    expect(rodentSwarmNoun()).toBe("Rat");
+    expect(rodentSwarmNoun([])).toBe("Rat");
+  });
+
+  it("returns label for single type", () => {
+    expect(rodentSwarmNoun(["mouse"])).toBe("Mouse");
+    expect(rodentSwarmNoun(["hamster"])).toBe("Hamster");
+  });
+
+  it("returns Rodent for multiple types", () => {
+    expect(rodentSwarmNoun(["rat", "mouse"])).toBe("Rodent");
+  });
+});
+
+// ── rodentSwarmNounPlural ─────────────────────────────────────────────────────
+
+describe("rodentSwarmNounPlural", () => {
+  it("defaults to Rats", () => {
+    expect(rodentSwarmNounPlural()).toBe("Rats");
+    expect(rodentSwarmNounPlural([])).toBe("Rats");
+  });
+
+  it("returns plural for single type", () => {
+    expect(rodentSwarmNounPlural(["mouse"])).toBe("Mice");
+    expect(rodentSwarmNounPlural(["rat"])).toBe("Rats");
+  });
+
+  it("returns Rodents for multiple types", () => {
+    expect(rodentSwarmNounPlural(["rat", "mouse"])).toBe("Rodents");
+  });
+});
+
+// ── formatSightingMomentDisplay ───────────────────────────────────────────────
+
+describe("formatSightingMomentDisplay", () => {
+  it("formats a percent value", () => {
+    expect(formatSightingMomentDisplay("42%")).toBe("42%");
+    expect(formatSightingMomentDisplay("42")).toBe("42%");
+  });
+
+  it("formats a MM:SS timecode", () => {
+    expect(formatSightingMomentDisplay("2:30")).toBe("2m 30s");
+  });
+
+  it("formats an HH:MM:SS timecode", () => {
+    expect(formatSightingMomentDisplay("1:02:03")).toBe("1h 02m 03s");
+  });
+
+  it("returns raw value for unparseable input", () => {
+    expect(formatSightingMomentDisplay("abc")).toBe("abc");
+  });
+});
+
+// ── formatColonTimecodeDisplay ────────────────────────────────────────────────
+
+describe("formatColonTimecodeDisplay", () => {
+  it("delegates to formatSightingMomentDisplay", () => {
+    expect(formatColonTimecodeDisplay("1:30")).toBe("1m 30s");
+    expect(formatColonTimecodeDisplay("50%")).toBe("50%");
+  });
+});
+
+// ── formatSightingStartingTimeDisplay ────────────────────────────────────────
+
+describe("formatSightingStartingTimeDisplay", () => {
+  it("formats the sighting timestamp", () => {
+    expect(formatSightingStartingTimeDisplay(makeSighting({ timestamp: "2:30" }))).toBe("2m 30s");
+    expect(formatSightingStartingTimeDisplay(makeSighting({ timestamp: "50%" }))).toBe("50%");
+  });
+});
+
+// ── getSubmissionSightingTitle ────────────────────────────────────────────────
+
+describe("getSubmissionSightingTitle", () => {
+  it("returns explicit title when set", () => {
+    expect(getSubmissionSightingTitle(makeMinimalSubmission({ title: "The big rat" }))).toBe(
+      "The big rat",
+    );
+  });
+
+  it("extracts first sentence from description when no title", () => {
+    expect(
+      getSubmissionSightingTitle(
+        makeMinimalSubmission({ title: undefined, description: "Rat on a shelf. More detail." }),
+      ),
+    ).toBe("Rat on a shelf.");
+  });
+
+  it("falls back to 'Sighting' when no title or description", () => {
+    expect(
+      getSubmissionSightingTitle(makeMinimalSubmission({ title: undefined, description: "" })),
+    ).toBe("Sighting");
+  });
+});
+
+// ── getSightingCatalogRank ────────────────────────────────────────────────────
+
+describe("getSightingCatalogRank", () => {
+  it("returns 0 for an unknown sighting id", () => {
+    expect(getSightingCatalogRank("sighting-that-does-not-exist")).toBe(0);
+  });
+});
+
+// ── sightingNewestSortValue ───────────────────────────────────────────────────
+
+describe("sightingNewestSortValue", () => {
+  it("returns catalog rank for sightings without review date", () => {
+    const s = makeSighting({ id: "unknown-id" });
+    expect(typeof sightingNewestSortValue(s)).toBe("number");
+  });
+
+  it("returns parsed timestamp when submissionReviewedAtISO is set", () => {
+    const s = makeSighting({ submissionReviewedAtISO: "2024-06-15T12:00:00Z" });
+    const expected = Date.parse("2024-06-15T12:00:00Z");
+    expect(sightingNewestSortValue(s)).toBe(expected);
+  });
+
+  it("falls back to catalog rank for invalid ISO date", () => {
+    const s = makeSighting({ submissionReviewedAtISO: "not-a-date" });
+    expect(typeof sightingNewestSortValue(s)).toBe("number");
+  });
+});
+
+// ── getMoviePath ──────────────────────────────────────────────────────────────
+
+describe("getMoviePath", () => {
+  it("returns /movies/slug for a non-series movie", () => {
+    const movie = makeMinimalMovie("ratatouille-2007", false);
+    expect(getMoviePath(movie)).toBe("/movies/ratatouille-2007");
+  });
+
+  it("returns /shows/slug for a series", () => {
+    const movie = makeMinimalMovie("the-bear-s01", true);
+    expect(getMoviePath(movie)).toBe("/shows/the-bear-s01");
+  });
+
+  it("returns /movies/slug when syncSnapshot is absent", () => {
+    const movie = makeMinimalMovie("no-snapshot");
+    (movie as unknown as { metadata: { syncSnapshot?: unknown } }).metadata.syncSnapshot = undefined;
+    expect(getMoviePath(movie)).toBe("/movies/no-snapshot");
+  });
+});
+
+// ── searchMovies — with real movies in the array ──────────────────────────────
+
+describe("searchMovies — populated catalog", () => {
+  const testMovie = makeMinimalMovie("test-search-movie");
+  (testMovie as unknown as { title: string; summary: string }).title = "The Great Rat Chase";
+  (testMovie as unknown as { summary: string }).summary = "A story about a famous rodent heist.";
+  (testMovie as unknown as { genres: string[] }).genres = ["Thriller"];
+  (testMovie as unknown as { externalIds: { imdb: string } }).externalIds = { imdb: "tt1234567" };
+
+  afterEach(() => {
+    const idx = movies.indexOf(testMovie);
+    if (idx !== -1) movies.splice(idx, 1);
+  });
+
+  it("finds movies by title substring", () => {
+    movies.push(testMovie);
+    const results = searchMovies({ query: "great rat" });
+    expect(results.some((m) => m.slug === "test-search-movie")).toBe(true);
+  });
+
+  it("finds movies by summary substring", () => {
+    movies.push(testMovie);
+    const results = searchMovies({ query: "rodent heist" });
+    expect(results.some((m) => m.slug === "test-search-movie")).toBe(true);
+  });
+
+  it("finds movies by IMDb ID", () => {
+    movies.push(testMovie);
+    const results = searchMovies({ query: "tt1234567" });
+    expect(results.some((m) => m.slug === "test-search-movie")).toBe(true);
+  });
+
+  it("filters by genre", () => {
+    movies.push(testMovie);
+    const drama = searchMovies({ genre: "Drama" });
+    expect(drama.some((m) => m.slug === "test-search-movie")).toBe(false);
+    const thriller = searchMovies({ genre: "Thriller" });
+    expect(thriller.some((m) => m.slug === "test-search-movie")).toBe(true);
+  });
+
+  it("genre 'all' returns all movies", () => {
+    movies.push(testMovie);
+    const all = searchMovies({ genre: "all" });
+    expect(all.some((m) => m.slug === "test-search-movie")).toBe(true);
+  });
+});
+
+// ── getHeroRecentSightings — with populated catalog ───────────────────────────
+
+describe("getHeroRecentSightings — with verified sightings", () => {
+  const testMovie2 = makeMinimalMovie("test-hero-movie");
+  const testSighting = makeSighting({
+    id: "test-hero-sighting",
+    movieId: `movie-test-hero-movie`,
+    verificationState: "verified",
+  });
+
+  afterEach(() => {
+    const mIdx = movies.indexOf(testMovie2);
+    if (mIdx !== -1) movies.splice(mIdx, 1);
+    const sIdx = sightings.indexOf(testSighting);
+    if (sIdx !== -1) sightings.splice(sIdx, 1);
+  });
+
+  it("returns entries when catalog has verified sightings", () => {
+    movies.push(testMovie2);
+    sightings.push(testSighting);
+    const result = getHeroRecentSightings(5);
+    expect(Array.isArray(result)).toBe(true);
+  });
+});
 
