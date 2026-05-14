@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.3.3",
     "next": "^16.2.6",
     "pg": "^8.20.0",
