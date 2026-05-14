@@ -8,6 +8,7 @@ import {
 
 export { generateMetadata };
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
     try {
