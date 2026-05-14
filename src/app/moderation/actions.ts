@@ -118,32 +118,32 @@ export async function moderateSubmission(formData: FormData) {
     formData.has("sightingImages");
   const edits = hasEditFields
     ? {
-        title: String(formData.get("sightingTitle") ?? "").trim(),
-        imdbKind,
-        seasonNumber:
-          imdbKind === "series" && Number.isFinite(seasonNumberRaw) && seasonNumberRaw >= 1
-            ? seasonNumberRaw
-            : undefined,
-        episodeNumber:
-          imdbKind === "series" && Number.isFinite(episodeNumberRaw) && episodeNumberRaw >= 1
-            ? episodeNumberRaw
-            : undefined,
-        episodeTitle: imdbKind === "series" ? episodeTitle || undefined : undefined,
-        timestamp: normalizeSightingTimestampInput(
-          String(formData.get("timestamp") ?? ""),
-        ),
-        description: String(formData.get("description") ?? "").trim(),
-        spoiler: formData.get("spoiler") === "on",
-        approximateRatCount: clampApproximateRatCount(
-          formData.get("approximateRatCount"),
-        ),
-        images: nextImages,
-        imageUrl: leadImage?.url,
-        imageAlt: leadImage?.alt,
-        curatorNote: curatorNote || undefined,
-        contentWarnings: contentWarnings.length ? contentWarnings : undefined,
-        rodentTypes: rodentTypes.length ? rodentTypes : undefined,
-      }
+      title: String(formData.get("sightingTitle") ?? "").trim(),
+      imdbKind,
+      seasonNumber:
+        imdbKind === "series" && Number.isFinite(seasonNumberRaw) && seasonNumberRaw >= 1
+          ? seasonNumberRaw
+          : undefined,
+      episodeNumber:
+        imdbKind === "series" && Number.isFinite(episodeNumberRaw) && episodeNumberRaw >= 1
+          ? episodeNumberRaw
+          : undefined,
+      episodeTitle: imdbKind === "series" ? episodeTitle || undefined : undefined,
+      timestamp: normalizeSightingTimestampInput(
+        String(formData.get("timestamp") ?? ""),
+      ),
+      description: String(formData.get("description") ?? "").trim(),
+      spoiler: formData.get("spoiler") === "on",
+      approximateRatCount: clampApproximateRatCount(
+        formData.get("approximateRatCount"),
+      ),
+      images: nextImages,
+      imageUrl: leadImage?.url,
+      imageAlt: leadImage?.alt,
+      curatorNote: curatorNote || undefined,
+      contentWarnings: contentWarnings.length ? contentWarnings : undefined,
+      rodentTypes: rodentTypes.length ? rodentTypes : undefined,
+    }
     : curatorNote
       ? { curatorNote }
       : undefined;
@@ -217,6 +217,7 @@ export async function resyncAllMovies() {
 
   revalidatePath("/");
   revalidatePath("/movies/[slug]", "layout");
+  revalidatePath("/shows/[slug]", "layout");
   revalidatePath("/moderation");
 
   const params = new URLSearchParams();

@@ -453,16 +453,22 @@ describe("movieSightingsQueryString", () => {
 
 describe("buildMovieSightingsPath", () => {
   it("returns plain path for default params", () => {
-    expect(buildMovieSightingsPath("ratatouille-2007", { sort: "newest", page: 1 })).toBe(
+    expect(buildMovieSightingsPath("/movies/ratatouille-2007", { sort: "newest", page: 1 })).toBe(
       "/movies/ratatouille-2007",
     );
   });
 
   it("appends query string when params are non-default", () => {
-    const path = buildMovieSightingsPath("ratatouille-2007", { sort: "rats", page: 2 });
+    const path = buildMovieSightingsPath("/movies/ratatouille-2007", { sort: "rats", page: 2 });
     expect(path).toContain("/movies/ratatouille-2007?");
     expect(path).toContain("sort=rats");
     expect(path).toContain("page=2");
+  });
+
+  it("works with shows paths", () => {
+    expect(buildMovieSightingsPath("/shows/the-bear-s01", { sort: "newest", page: 1 })).toBe(
+      "/shows/the-bear-s01",
+    );
   });
 });
 

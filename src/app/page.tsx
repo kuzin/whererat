@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getApprovedSubmissionRatTally } from "@/lib/moderation-store";
 import { getDeletedMovieIds } from "@/lib/movie-edit-store";
-import { estimateRatsForAppearance } from "@/lib/whererat";
+import { estimateRatsForAppearance, getMoviePath } from "@/lib/whererat";
 import {
   getCatalogGenres,
   getCatalogRodentTypes,
@@ -190,7 +190,7 @@ export default async function Home({
                       return (
                         <Link
                           key={movie.id}
-                          href={`/movies/${movie.slug}`}
+                          href={getMoviePath(movie)}
                           className="group relative overflow-hidden rounded-xl border-2 border-stone-950/90 bg-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.55)] outline-none transition hover:border-stone-950 focus-visible:ring-2 focus-visible:ring-amber-600/35 dark:border-white/14 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40"
                         >
                           <div className="relative aspect-[2/3] overflow-hidden">
@@ -238,7 +238,7 @@ export default async function Home({
                       return (
                         <Link
                           key={movie.id}
-                          href={`/movies/${movie.slug}`}
+                          href={getMoviePath(movie)}
                           className="group relative grid overflow-hidden rounded-2xl border-2 border-stone-950/90 bg-[var(--wr-surface-cream)] shadow-[3px_3px_0_0_rgb(28_25_23/0.72)] outline-none transition hover:border-stone-950 hover:bg-[var(--wr-card-bg)] focus-visible:ring-2 focus-visible:ring-amber-600/35 focus-visible:ring-offset-2 dark:border-white/14 dark:bg-stone-900/70 dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.48)] dark:hover:border-amber-400/40 dark:hover:bg-stone-900/95 dark:focus-visible:ring-amber-400/40 dark:focus-visible:ring-offset-stone-900 sm:grid-cols-[160px_1fr]"
                         >
                           <div className="relative h-56 overflow-hidden border-stone-950/90 bg-stone-900 sm:h-auto sm:border-r-2 dark:border-white/14">

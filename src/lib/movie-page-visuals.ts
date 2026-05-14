@@ -79,6 +79,15 @@ export async function getSyncedMoviePageVisuals(movie: Movie, { forceRefresh }: 
     movieTitlePlaceholder;
   const bannerIsWidescreen = Boolean(tmdbBackdrop);
 
+  // Use palette cached during last sync if available (avoids per-request sharp processing)
+  const cachedPalette = !forceRefresh ? parsePaletteObject(movie.metadata.syncedPalette) : null;
+  const cachedPaletteDark = cachedPalette
+    ? (parsePaletteObject(movie.metadata.syncedPaletteDark) ?? deriveDarkMoviePagePalette(cachedPalette))
+    : null;
+  if (cachedPalette) {
+    return { bannerUrl, bannerIsWidescreen, palette: cachedPalette, paletteDark: cachedPaletteDark };
+  }
+
   const palette =
     (await extractMoviePagePalette(bannerUrl)) ??
     (posterCandidate ? await extractMoviePagePalette(posterCandidate) : null) ??

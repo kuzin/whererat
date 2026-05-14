@@ -12,13 +12,14 @@ import {
 } from "@/lib/whererat";
 
 type SortProps = {
-  slug: string;
+  moviePath: string;
   sort: MovieSightingsSortOption;
   palette: boolean;
   isSeries: boolean;
+  sortLabelRats?: string;
 };
 
-export function MovieSightingsSortControl({ slug, sort, palette, isSeries }: SortProps) {
+export function MovieSightingsSortControl({ moviePath, sort, palette, isSeries, sortLabelRats }: SortProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const sortOptions = getMovieSightingsSortOptions(isSeries);
@@ -28,7 +29,7 @@ export function MovieSightingsSortControl({ slug, sort, palette, isSeries }: Sor
     : "border-stone-950/85 bg-[var(--wr-surface-cream-muted)]";
 
   const pushSort = (nextSort: MovieSightingsSortOption) => {
-    const href = buildMovieSightingsPath(slug, {
+    const href = buildMovieSightingsPath(moviePath, {
       sort: nextSort,
       page: 1,
     });
@@ -50,7 +51,7 @@ export function MovieSightingsSortControl({ slug, sort, palette, isSeries }: Sor
       >
         {sortOptions.map((option) => (
           <option key={option} value={option}>
-            {movieSightingsSortLabels[option]}
+            {option === "rats" && sortLabelRats ? sortLabelRats : movieSightingsSortLabels[option]}
           </option>
         ))}
       </select>
@@ -59,7 +60,7 @@ export function MovieSightingsSortControl({ slug, sort, palette, isSeries }: Sor
 }
 
 type PageProps = {
-  slug: string;
+  moviePath: string;
   sort: MovieSightingsSortOption;
   safePage: number;
   pageCount: number;
@@ -69,7 +70,7 @@ type PageProps = {
 };
 
 export function MovieSightingsPagingBar({
-  slug,
+  moviePath,
   sort,
   safePage,
   pageCount,
@@ -97,7 +98,7 @@ export function MovieSightingsPagingBar({
 
   const nextEnabledSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_58%,rgb(62_45_30))] bg-[color-mix(in_srgb,var(--movie-accent)_82%,rgb(253_224_71))] text-stone-950 dark:border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(245_240_232/0.38))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_52%,rgb(85_55_22))] dark:text-[color-mix(in_srgb,var(--movie-accent)_10%,rgb(255_252_244))]"
-     : "border-stone-950/90 bg-[var(--wr-cheese)] text-stone-950 dark:border-amber-400/40 dark:bg-[var(--wr-accent-btn-dark)] dark:text-amber-50";
+    : "border-stone-950/90 bg-[var(--wr-cheese)] text-stone-950 dark:border-amber-400/40 dark:bg-[var(--wr-accent-btn-dark)] dark:text-amber-50";
 
   const disabledSkin = palette
     ? "border-dashed border-[color-mix(in_srgb,var(--movie-accent)_24%,rgb(161_161_170))] text-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(120_113_108))] dark:border-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(113_113_122))] dark:text-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(161_161_170))]"
@@ -111,11 +112,10 @@ export function MovieSightingsPagingBar({
     <div
       role="navigation"
       aria-label={navLandmarkLabel}
-      className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${
-        isBottom
-          ? `mt-10 border-t pt-8 ${bottomDividerSkin}`
-          : "mt-5 mb-6"
-      }`}
+      className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${isBottom
+        ? `mt-10 border-t pt-8 ${bottomDividerSkin}`
+        : "mt-5 mb-6"
+        }`}
     >
       <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
         Showing{" "}
@@ -137,7 +137,7 @@ export function MovieSightingsPagingBar({
         {pageCount > 1 && safePage > 1 ? (
           <Link
             prefetch={false}
-            href={buildMovieSightingsPath(slug, {
+            href={buildMovieSightingsPath(moviePath, {
               sort,
               page: safePage - 1,
             })}
@@ -156,7 +156,7 @@ export function MovieSightingsPagingBar({
         {pageCount > 1 && safePage < pageCount ? (
           <Link
             prefetch={false}
-            href={buildMovieSightingsPath(slug, {
+            href={buildMovieSightingsPath(moviePath, {
               sort,
               page: safePage + 1,
             })}

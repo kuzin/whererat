@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getCatalogMovies } from "@/lib/movie-catalog";
+import { getMoviePath } from "@/lib/whererat";
 
 const BASE_URL = "https://whererat.com";
 
@@ -39,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const movieRoutes: MetadataRoute.Sitemap = movies.map((movie) => ({
-    url: `${BASE_URL}/movies/${movie.slug}`,
+    url: `${BASE_URL}${getMoviePath(movie)}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 0.8,

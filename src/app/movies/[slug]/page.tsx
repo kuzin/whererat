@@ -31,11 +31,14 @@ import {
   formatRuntimeMinutes,
   getImdbNameSearchUrl,
   getImdbTitleUrl,
+  getMoviePath,
   parseMovieSightingsPageParam,
   parseMovieSightingsSortParam,
   prepareMovieSightingsView,
   getMovieSightingsSortOptions,
   splitImdbCreditSegments,
+  rodentSwarmNoun,
+  rodentSwarmNounPlural,
   type Movie,
 } from "@/lib/whererat";
 import { getCatalogMovieBySlug, getCatalogMovies } from "@/lib/movie-catalog";
@@ -198,7 +201,7 @@ function ImdbCreditsInline({ line }: { line: string }) {
 /** Sample pixels with sharp (Node). */
 export const runtime = "nodejs";
 
-type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+export type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 function single(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -239,7 +242,7 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function MoviePage({
+export async function MoviePage({
   params,
   searchParams,
 }: {
@@ -259,6 +262,7 @@ export default async function MoviePage({
   }
   const movieOverride = await getMovieOverride(baseMovie.id);
   const movie = applyMovieOverride(baseMovie, movieOverride);
+  const moviePath = getMoviePath(movie);
   const editMovie = single(query.editMovie) === "1";
   const editSightingId = single(query.editSighting)?.trim() ?? "";
   const cookieStore = await cookies();
@@ -273,6 +277,9 @@ export default async function MoviePage({
 
   const movieSightings = await getMergedSightingsForMovie(movie.id);
   const isSeriesTitle = movieSightings.some((sighting) => sighting.imdbKind === "series");
+  const allRodentTypes = [...new Set(movieSightings.flatMap((s) => s.rodentTypes ?? ["rat"]))];
+  const rodentNoun = rodentSwarmNoun(allRodentTypes);
+  const rodentNounPlural = rodentSwarmNounPlural(allRodentTypes);
   const allowedSorts = getMovieSightingsSortOptions(isSeriesTitle);
   const safeSort = allowedSorts.includes(sort) ? sort : "newest";
   const movieSpoilerCount = movieSightings.filter((s) => s.spoiler).length;
@@ -289,7 +296,7 @@ export default async function MoviePage({
 
   if (page !== sightingsView.safePage || safeSort !== sort) {
     redirect(
-      buildMovieSightingsPath(slug, {
+      buildMovieSightingsPath(moviePath, {
         sort: safeSort,
         page: sightingsView.safePage,
       }),
@@ -297,7 +304,7 @@ export default async function MoviePage({
   }
 
   const { pageSlice } = sightingsView;
-  const sightingsBasePath = buildMovieSightingsPath(slug, {
+  const sightingsBasePath = buildMovieSightingsPath(moviePath, {
     sort: safeSort,
     page: sightingsView.safePage,
   });
@@ -369,659 +376,687 @@ export default async function MoviePage({
   );
 
   return (
-    <main
-      style={rootStyle}
-      className="wr-page-shell py-8 sm:py-10"
-    >
-      <div className="flex items-center justify-between gap-2">
-        <Link
-          href="/#catalog"
-          aria-label="Back to catalog"
-          title="Back to catalog"
-          className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
-        </Link>
-        <div className="flex items-center gap-1.5">
-          {canEditMovie ? (
-            <div className="flex items-center gap-1.5">
-              <form action={resyncMovieFromImdb}>
-                <input type="hidden" name="slug" value={slug} />
-                <ResyncButton />
-              </form>
-              <form action={deleteMovie}>
-                <input type="hidden" name="slug" value={slug} />
-                <ConfirmSubmitButton
-                  confirmMessage="Delete this movie? This cannot be undone."
-                  type="submit"
-                  aria-label="Delete movie"
-                  title="Delete movie"
-                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0 text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/35"
+    <>
+      {palette && (
+        <style dangerouslySetInnerHTML={{
+          __html: [
+            `:root { --wr-header-bg: color-mix(in srgb, ${palette.accent} 7%, rgb(255 248 237 / 0.92)) !important; --wr-footer-bg: color-mix(in srgb, ${palette.accent} 20%, #78350f) !important; --wr-btn-ghost-bg: color-mix(in srgb, ${palette.accent} 8%, rgb(255 255 255 / 0.94)) !important; --wr-btn-ghost-border: color-mix(in srgb, ${palette.accent} 28%, rgb(87 83 78 / 0.58)) !important; --wr-btn-ghost-hover: color-mix(in srgb, ${palette.accent} 13%, rgb(245 245 244)) !important; --wr-btn-ghost-active: color-mix(in srgb, ${palette.accent} 17%, rgb(231 229 228)) !important; --wr-input-bg: color-mix(in srgb, ${palette.accent} 6%, rgb(255 253 249)) !important; --wr-input-border: color-mix(in srgb, ${palette.accent} 20%, rgb(28 25 23 / 0.22)) !important; }`,
+            `.dark { --wr-header-bg: color-mix(in srgb, ${palette.accent} 12%, rgb(41 37 36 / 0.94)) !important; --wr-footer-bg: color-mix(in srgb, ${palette.accent} 18%, #3d2616) !important; --wr-btn-ghost-bg: color-mix(in srgb, ${palette.accent} 14%, rgb(68 64 60 / 0.88)) !important; --wr-btn-ghost-border: color-mix(in srgb, ${palette.accent} 26%, rgb(214 211 209 / 0.24)) !important; --wr-btn-ghost-hover: color-mix(in srgb, ${palette.accent} 20%, rgb(53 46 41)) !important; --wr-btn-ghost-active: color-mix(in srgb, ${palette.accent} 24%, rgb(63 54 46)) !important; --wr-input-bg: color-mix(in srgb, ${palette.accent} 14%, rgb(22 16 10)) !important; --wr-input-border: color-mix(in srgb, ${palette.accent} 18%, rgb(254 243 199 / 0.16)) !important; }`,
+            `.wr-shell { background: color-mix(in srgb, ${palette.accent} 4%, var(--background)) !important; }`,
+          ].join(' ')
+        }} />
+      )}
+      <main
+        style={rootStyle}
+        className="wr-page-shell py-8 sm:py-10"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href="/#catalog"
+            aria-label="Back to catalog"
+            title="Back to catalog"
+            className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+          </Link>
+          <div className="flex items-center gap-1.5">
+            {canEditMovie ? (
+              <div className="flex items-center gap-1.5">
+                <form action={resyncMovieFromImdb}>
+                  <input type="hidden" name="slug" value={slug} />
+                  <ResyncButton />
+                </form>
+                <form action={deleteMovie}>
+                  <input type="hidden" name="slug" value={slug} />
+                  <ConfirmSubmitButton
+                    confirmMessage="Delete this movie? This cannot be undone."
+                    type="submit"
+                    aria-label="Delete movie"
+                    title="Delete movie"
+                    className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border-2 border-red-700/30 bg-red-50/80 text-red-700 outline-none transition shadow-[2px_2px_0_0_rgb(185_28_28/0.28)] hover:border-red-700/45 hover:bg-red-100 hover:shadow-[2px_2px_0_0_rgb(185_28_28/0.35)] active:brightness-95 active:shadow-none dark:border-red-400/25 dark:bg-red-950/40 dark:text-red-400 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.32)] dark:hover:bg-red-950/60"
+                  >
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" /></svg>
+                  </ConfirmSubmitButton>
+                </form>
+                <Link
+                  href={`${moviePath}?editMovie=1`}
+                  aria-label="Edit movie information"
+                  title="Edit movie information"
+                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
                 >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" /></svg>
-                </ConfirmSubmitButton>
-              </form>
-              <Link
-                href={`/movies/${slug}?editMovie=1`}
-                aria-label="Edit movie information"
-                title="Edit movie information"
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                </Link>
+              </div>
+            ) : null}
+            {imdbTitleUrlResolved ? (
+              <a
+                href={imdbTitleUrlResolved}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open on IMDb"
+                title="Open on IMDb"
                 className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
               >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-              </Link>
-            </div>
-          ) : null}
-          {imdbTitleUrlResolved ? (
-            <a
-              href={imdbTitleUrlResolved}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Open on IMDb"
-              title="Open on IMDb"
-              className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+              </a>
+            ) : null}
+            <Link
+              href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
+              className={`inline-flex h-11 items-center gap-2 rounded-xl border-2 px-4 text-sm font-bold outline-none transition ${palette
+                ? "cursor-pointer border-[color-mix(in_srgb,var(--movie-accent)_55%,rgb(28_25_23/0.8))] bg-[color-mix(in_srgb,var(--movie-accent)_12%,#fffbf2)] text-[color-mix(in_srgb,var(--movie-accent)_85%,#1a1209)] shadow-[3px_3px_0_0_color-mix(in_srgb,var(--movie-accent)_35%,rgb(28_25_23/0.7))] hover:brightness-[0.97] active:brightness-[0.94] active:shadow-none dark:border-[color-mix(in_srgb,var(--movie-accent)_45%,rgba(255,255,255,0.22))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_25%,var(--movie-wash-dark,#0f0c09))] dark:text-[color-mix(in_srgb,var(--movie-accent)_70%,#fdf6ec)] dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.45)]"
+                : "wr-btn-primary"}`}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
-            </a>
-          ) : null}
-          <Link
-            href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
-            className={`inline-flex h-11 items-center gap-2 px-4 text-sm font-semibold ${palette ? "wr-btn wr-btn-movie" : "wr-btn-primary"}`}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-            <span className="hidden sm:inline">Submit a Sighting</span>
-            <span className="sm:hidden">Submit</span>
-          </Link>
-        </div>
-      </div>
-
-      <section
-        className={`wr-cheese-panel mt-6 overflow-hidden ${palette ? "movie-page-palette-bg" : "wr-cheese-tile-cream"}`}
-      >
-        <div className="relative min-h-[min(22rem,70vw)] overflow-hidden border-b-2 border-stone-950/22 dark:border-white/20 sm:min-h-80">
-          <Image
-            src={visuals.bannerUrl}
-            alt={
-              visuals.bannerIsWidescreen
-                ? `${movie.title} theatrical backdrop (TMDB)`
-                : `${movie.title} poster artwork (wide header crop)`
-            }
-            width={1280}
-            height={720}
-            className="absolute inset-0 h-full w-full object-cover object-[center_28%]"
-            priority
-            sizes="100vw"
-          />
-          {palette ? (
-            <div
-              aria-hidden
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `
-                  radial-gradient(ellipse 100% 90% at 15% -5%, color-mix(in srgb, var(--movie-hero-bloom) 38%, transparent) 0%, transparent 55%),
-                  linear-gradient(to top, rgb(12 10 9 / 0.9) 0%, rgb(12 10 9 / 0.58) 40%, rgb(12 10 9 / 0.15) 100%)`,
-              }}
-            />
-          ) : (
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/75 to-stone-950/25" />
-          )}
-          <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
-            <div className="flex max-w-3xl flex-col gap-6">
-              <div className="flex flex-col gap-2 sm:gap-3">
-                <h1
-                  className={`wr-display max-w-3xl text-[clamp(1.5rem,5.5vw,2.25rem)] font-bold leading-[1.05] tracking-tight sm:text-4xl sm:leading-[1.04] lg:text-5xl lg:leading-[1.03] ${palette
-                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_5%,rgb(255_253_249))]"
-                    : "text-amber-50"
-                    }`}
-                >
-                  {movie.title}
-                </h1>
-                {heroMetaLine ? (
-                  <p
-                    className={`text-sm font-semibold ${palette
-                      ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_35%,rgb(254_246_229_/_0.92))]"
-                      : "text-amber-200/90"
-                      }`}
-                  >
-                    {heroMetaLine}
-                  </p>
-                ) : null}
-              </div>
-              {trimMeta(movie.metadata.tagline) ? (
-                <p
-                  className={`max-w-2xl text-base font-medium italic leading-relaxed sm:text-lg ${palette
-                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_18%,rgb(255_251_246_/_0.96))]"
-                    : "text-amber-100/95"
-                    }`}
-                >
-                  &quot;{movie.metadata.tagline.trim()}&quot;
-                </p>
-              ) : null}
-              {(movieSightings.length > 0 || imdbRating) ? (() => {
-                const chipWrap = `rounded-xl border px-4 py-2.5 backdrop-blur-md ${palette
-                  ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
-                  : "border-white/22 bg-black/42"
-                  }`;
-                const chipDt = palette
-                  ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
-                  : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78";
-                const chipDd = `wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${palette
-                  ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
-                  : "text-amber-50"
-                  }`;
-                return (
-                  <dl className="flex flex-wrap gap-3">
-                    {movieSightings.length > 0 ? (
-                      <div className={chipWrap}>
-                        <dt className={chipDt}>Sightings</dt>
-                        <dd className={chipDd}>{movieSightings.length}</dd>
-                      </div>
-                    ) : null}
-                    {approxRatsInMovie > 0 ? (
-                      <div className={chipWrap}>
-                        <dt className={chipDt}>Total rats</dt>
-                        <dd className={chipDd}>{approxRatsInMovie}</dd>
-                      </div>
-                    ) : null}
-                    {imdbRating ? (
-                      <div className={chipWrap}>
-                        <dt className={chipDt}>IMDb</dt>
-                        <dd className={`${chipDd} flex items-baseline gap-1.5`}>
-                          <span className="text-amber-400">★</span>
-                          {imdbRating}
-                          <span className="text-base font-normal opacity-60">/10</span>
-                        </dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                );
-              })() : null}
-            </div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+              <span className="hidden sm:inline">Submit a Sighting</span>
+              <span className="sm:hidden">Submit</span>
+            </Link>
           </div>
         </div>
 
-        <MovieTabsShell
-          palette={Boolean(palette)}
-          tabs={[
-            { id: "sightings", label: "Featured Rats" },
-            ...(ratFacts.length > 0 ? [{ id: "rat-facts", label: "Rat Facts" }] : []),
-            { id: "rat-views", label: "Reviews" },
-            { id: "rat-media", label: "Media" },
-            { id: "ratlated", label: "Related" },
-          ]}
-          sidebarContent={
-            <>
-              <Image
-                src={movie.posterUrl}
-                alt={movie.posterAlt}
-                width={480}
-                height={720}
-                className="aspect-[2/3] w-full max-w-[18rem] self-center shrink-0 rounded-xl object-cover shadow-[0_6px_28px_-4px_rgb(0_0_0/0.22)] dark:shadow-[0_6px_28px_-4px_rgb(0_0_0/0.55)] lg:max-w-full"
-              />
-              <section className="space-y-2.5">
-                <h2 className={sidebarSectionTitleClass}>Synopsis</h2>
-                <p className="text-sm leading-[1.65] text-stone-800 dark:text-stone-200">
-                  {movie.summary}
-                </p>
-              </section>
-              <section className="space-y-3">
-                <h2 className={sidebarSectionTitleClass}>Genres</h2>
-                <ul className="flex flex-wrap gap-2">
-                  {movie.genres.map((genre) => (
-                    <li key={genre}>
-                      <span
-                        className={`inline-flex rounded-lg border px-2.5 py-1.5 text-xs font-semibold leading-none shadow-[1px_1px_0_0_rgb(28_25_23/0.12)] dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.35)] ${palette
-                          ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_88%,white)] text-stone-900 dark:border-amber-400/45 dark:bg-stone-900 dark:text-amber-100"
-                          : "border-stone-400/65 bg-white text-stone-900 dark:border-amber-500/40 dark:bg-stone-800 dark:text-amber-100"
-                          }`}
-                      >
-                        {genre}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-              {hasDetailsSection ? (
-                <section
-                  className={`space-y-5 border-t pt-8 ${palette
-                    ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.7))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
-                    : "border-stone-900/18 dark:border-white/14"
-                    }`}
-                >
-                  <h2 className={sidebarSectionTitleClass}>Details</h2>
-                  <dl className="space-y-5 text-sm text-stone-800 dark:text-stone-100">
-                    {runtimeLabel ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Runtime</dt>
-                        <dd className="mt-1 font-semibold">{runtimeLabel}</dd>
-                      </div>
-                    ) : null}
-                    {certificate ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Certificate</dt>
-                        <dd className="mt-1 font-semibold">{certificate}</dd>
-                      </div>
-                    ) : null}
-                    {imdbRating ? (
-                      <div>
-                        <dt className={sidebarDtClass}>IMDb score</dt>
-                        <dd className="mt-1">
-                          <a
-                            href={imdbTitleUrlResolved}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="group font-semibold text-stone-900 underline decoration-stone-400 decoration-1 underline-offset-2 hover:decoration-amber-600 dark:text-amber-100 dark:decoration-amber-500/55 dark:hover:decoration-amber-400"
-                          >
-                            <span className="tabular-nums text-[1.06em] tracking-tight">
-                              ★ {imdbRating}
-                            </span>
-                            <span className="font-medium text-stone-600 dark:text-stone-300">
-                              /10
-                            </span>
-                            {imdbVotes ? (
-                              <span className="font-normal text-stone-600 dark:text-stone-400">
-                                {" "}
-                                ({imdbVotes} votes)
-                              </span>
-                            ) : null}
-                          </a>
-                        </dd>
-                      </div>
-                    ) : null}
-                    {metascore ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Metacritic</dt>
-                        <dd className="mt-1 font-semibold tabular-nums">
-                          {metascore}/100 Metascore
-                        </dd>
-                      </div>
-                    ) : null}
-                    {writers ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Writers</dt>
-                        <dd className="mt-1 leading-snug">
-                          <ImdbCreditsInline line={writers} />
-                        </dd>
-                      </div>
-                    ) : null}
-                    {director ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Director</dt>
-                        <dd className="mt-1 leading-snug">
-                          <ImdbCreditsInline line={director} />
-                        </dd>
-                      </div>
-                    ) : null}
-                    {cast ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Cast (top billed)</dt>
-                        <dd className="mt-1 leading-relaxed">
-                          <ImdbCreditsInline line={cast} />
-                        </dd>
-                      </div>
-                    ) : null}
-                    {originalLanguage ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Language</dt>
-                        <dd className="mt-1 font-medium">{originalLanguage}</dd>
-                      </div>
-                    ) : null}
-                    {countriesLine ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Countries</dt>
-                        <dd className="mt-1 font-medium leading-snug">
-                          {countriesLine}
-                        </dd>
-                      </div>
-                    ) : null}
-                    {awards ? (
-                      <div>
-                        <dt className={sidebarDtClass}>Honors</dt>
-                        <dd className="mt-1 text-sm italic leading-snug text-stone-600 dark:text-stone-400">
-                          {awards}
-                        </dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                </section>
-              ) : null}
-            </>
-          }
+        <section
+          className={`wr-cheese-panel mt-6 overflow-hidden ${palette ? "movie-page-palette-bg" : "wr-cheese-tile-cream"}`}
         >
-          {/* Panel 0 — On-screen Rats */}
-          <div>
-            <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
-              <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="wr-display shrink-0 text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                  Featured Rats
-                </h2>
+          <div className="relative min-h-[min(22rem,70vw)] overflow-hidden border-b-2 border-stone-950/22 dark:border-white/20 sm:min-h-80">
+            <Image
+              src={visuals.bannerUrl}
+              alt={
+                visuals.bannerIsWidescreen
+                  ? `${movie.title} theatrical backdrop (TMDB)`
+                  : `${movie.title} poster artwork (wide header crop)`
+              }
+              width={1280}
+              height={720}
+              className="absolute inset-0 h-full w-full object-cover object-[center_28%]"
+              priority
+              sizes="100vw"
+            />
+            {palette ? (
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `
+                  radial-gradient(ellipse 100% 90% at 15% -5%, color-mix(in srgb, var(--movie-hero-bloom) 38%, transparent) 0%, transparent 55%),
+                  linear-gradient(to top, rgb(12 10 9 / 0.9) 0%, rgb(12 10 9 / 0.58) 40%, rgb(12 10 9 / 0.15) 100%)`,
+                }}
+              />
+            ) : (
+              <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/75 to-stone-950/25" />
+            )}
+            <div className="relative flex min-h-[min(22rem,70vw)] flex-col justify-end p-6 pb-6 sm:min-h-80 sm:pb-24 lg:p-10 lg:pb-24">
+              <div className="flex max-w-3xl flex-col gap-6">
+                <div className="flex flex-col gap-2 sm:gap-3">
+                  <h1
+                    className={`wr-display max-w-3xl text-[clamp(1.5rem,5.5vw,2.25rem)] font-bold leading-[1.05] tracking-tight sm:text-4xl sm:leading-[1.04] lg:text-5xl lg:leading-[1.03] ${palette
+                      ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_5%,rgb(255_253_249))]"
+                      : "text-amber-50"
+                      }`}
+                  >
+                    {movie.title}
+                  </h1>
+                  {heroMetaLine ? (
+                    <p
+                      className={`text-sm font-semibold ${palette
+                        ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_35%,rgb(254_246_229_/_0.92))]"
+                        : "text-amber-200/90"
+                        }`}
+                    >
+                      {heroMetaLine}
+                    </p>
+                  ) : null}
+                </div>
+                {trimMeta(movie.metadata.tagline) ? (
+                  <p
+                    className={`max-w-2xl text-base font-medium italic leading-relaxed sm:text-lg ${palette
+                      ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_18%,rgb(255_251_246_/_0.96))]"
+                      : "text-amber-100/95"
+                      }`}
+                  >
+                    &quot;{movie.metadata.tagline.trim()}&quot;
+                  </p>
+                ) : null}
+                {(movieSightings.length > 0 || imdbRating) ? (() => {
+                  const chipWrap = `rounded-xl border px-4 py-2.5 backdrop-blur-md ${palette
+                    ? "border-[color-mix(in_srgb,var(--movie-accent)_28%,transparent)] bg-[rgb(0_0_0/0.48)]"
+                    : "border-white/22 bg-black/42"
+                    }`;
+                  const chipDt = palette
+                    ? "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_38%,rgb(254_244_229_/_0.85))]"
+                    : "text-[0.65rem] font-bold uppercase tracking-[0.18em] text-amber-200/78";
+                  const chipDd = `wr-display mt-1 tabular-nums text-2xl font-bold leading-none tracking-tight sm:text-[1.625rem] ${palette
+                    ? "text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_6%,rgb(255_252_246))]"
+                    : "text-amber-50"
+                    }`;
+                  return (
+                    <dl className="flex flex-wrap gap-3">
+                      {movieSightings.length > 0 ? (
+                        <div className={chipWrap}>
+                          <dt className={chipDt}>Sightings</dt>
+                          <dd className={chipDd}>{movieSightings.length}</dd>
+                        </div>
+                      ) : null}
+                      {approxRatsInMovie > 0 ? (
+                        <div className={chipWrap}>
+                          <dt className={chipDt}>Total {rodentNounPlural}</dt>
+                          <dd className={chipDd}>{approxRatsInMovie}</dd>
+                        </div>
+                      ) : null}
+                      {imdbRating ? (
+                        <div className={chipWrap}>
+                          <dt className={chipDt}>IMDb</dt>
+                          <dd className={`${chipDd} flex items-baseline gap-1.5`}>
+                            <span className="text-amber-400">★</span>
+                            {imdbRating}
+                          </dd>
+                        </div>
+                      ) : null}
+                    </dl>
+                  );
+                })() : null}
+              </div>
+            </div>
+          </div>
+
+          <MovieTabsShell
+            palette={Boolean(palette)}
+            tabs={[
+              { id: "sightings", label: `Featured ${rodentNounPlural}` },
+              ...(ratFacts.length > 0 ? [{ id: "rat-facts", label: `${rodentNoun} Facts` }] : []),
+              { id: "rat-views", label: "Reviews" },
+              { id: "rat-media", label: "Media" },
+              { id: "ratlated", label: "Related" },
+            ]}
+            sidebarContent={
+              <>
+                <Image
+                  src={movie.posterUrl}
+                  alt={movie.posterAlt}
+                  width={480}
+                  height={720}
+                  className="aspect-[2/3] w-full max-w-[18rem] self-center shrink-0 rounded-xl object-cover shadow-[0_6px_28px_-4px_rgb(0_0_0/0.22)] dark:shadow-[0_6px_28px_-4px_rgb(0_0_0/0.55)] lg:max-w-full"
+                />
+                <section className="space-y-2.5">
+                  <h2 className={sidebarSectionTitleClass}>Synopsis</h2>
+                  <p className="text-sm leading-[1.65] text-stone-800 dark:text-stone-200">
+                    {movie.summary}
+                  </p>
+                </section>
+                <section className="space-y-3">
+                  <h2 className={sidebarSectionTitleClass}>Genres</h2>
+                  <ul className="flex flex-wrap gap-2">
+                    {movie.genres.map((genre) => (
+                      <li key={genre}>
+                        <span
+                          className={`inline-flex rounded-lg border px-2.5 py-1.5 text-xs font-semibold leading-none shadow-[1px_1px_0_0_rgb(28_25_23/0.12)] dark:shadow-[1px_1px_0_0_rgb(0_0_0/0.35)] ${palette
+                            ? "border-[color-mix(in_srgb,var(--movie-accent)_45%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_88%,white)] text-stone-900 dark:border-amber-400/45 dark:bg-stone-900 dark:text-amber-100"
+                            : "border-stone-400/65 bg-white text-stone-900 dark:border-amber-500/40 dark:bg-stone-800 dark:text-amber-100"
+                            }`}
+                        >
+                          {genre}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+                {hasDetailsSection ? (
+                  <section
+                    className={`space-y-5 border-t pt-8 ${palette
+                      ? "border-[color-mix(in_srgb,var(--movie-accent)_26%,rgb(120_113_108/0.7))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(245_240_232/0.24))]"
+                      : "border-stone-900/18 dark:border-white/14"
+                      }`}
+                  >
+                    <h2 className={sidebarSectionTitleClass}>Details</h2>
+                    <dl className="space-y-5 text-sm text-stone-800 dark:text-stone-100">
+                      {runtimeLabel ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Runtime</dt>
+                          <dd className="mt-1 font-semibold">{runtimeLabel}</dd>
+                        </div>
+                      ) : null}
+                      {certificate ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Certificate</dt>
+                          <dd className="mt-1 font-semibold">{certificate}</dd>
+                        </div>
+                      ) : null}
+                      {imdbRating ? (
+                        <div>
+                          <dt className={sidebarDtClass}>IMDb score</dt>
+                          <dd className="mt-1">
+                            <a
+                              href={imdbTitleUrlResolved}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="group font-semibold text-stone-900 underline decoration-stone-400 decoration-1 underline-offset-2 hover:decoration-amber-600 dark:text-amber-100 dark:decoration-amber-500/55 dark:hover:decoration-amber-400"
+                            >
+                              <span className="tabular-nums text-[1.06em] tracking-tight">
+                                ★ {imdbRating}
+                              </span>
+                              <span className="font-medium text-stone-600 dark:text-stone-300">
+                                /10
+                              </span>
+                              {imdbVotes ? (
+                                <span className="font-normal text-stone-600 dark:text-stone-400">
+                                  {" "}
+                                  ({imdbVotes} votes)
+                                </span>
+                              ) : null}
+                            </a>
+                          </dd>
+                        </div>
+                      ) : null}
+                      {metascore ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Metacritic</dt>
+                          <dd className="mt-1 font-semibold tabular-nums">
+                            {metascore}/100 Metascore
+                          </dd>
+                        </div>
+                      ) : null}
+                      {writers ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Writers</dt>
+                          <dd className="mt-1 leading-snug">
+                            <ImdbCreditsInline line={writers} />
+                          </dd>
+                        </div>
+                      ) : null}
+                      {director ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Director</dt>
+                          <dd className="mt-1 leading-snug">
+                            <ImdbCreditsInline line={director} />
+                          </dd>
+                        </div>
+                      ) : null}
+                      {cast ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Cast (top billed)</dt>
+                          <dd className="mt-1 leading-relaxed">
+                            <ImdbCreditsInline line={cast} />
+                          </dd>
+                        </div>
+                      ) : null}
+                      {originalLanguage ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Language</dt>
+                          <dd className="mt-1 font-medium">{originalLanguage}</dd>
+                        </div>
+                      ) : null}
+                      {countriesLine ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Countries</dt>
+                          <dd className="mt-1 font-medium leading-snug">
+                            {countriesLine}
+                          </dd>
+                        </div>
+                      ) : null}
+                      {awards ? (
+                        <div>
+                          <dt className={sidebarDtClass}>Honors</dt>
+                          <dd className="mt-1 text-sm italic leading-snug text-stone-600 dark:text-stone-400">
+                            {awards}
+                          </dd>
+                        </div>
+                      ) : null}
+                    </dl>
+                  </section>
+                ) : null}
+              </>
+            }
+          >
+            {/* Panel 0 — On-screen Rats */}
+            <div>
+              <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
+                <div className="flex min-h-12 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="wr-display shrink-0 text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+                    Featured {rodentNounPlural}
+                  </h2>
+                  {movieSightings.length > 0 ? (
+                    <MovieSightingsSortControl
+                      moviePath={moviePath}
+                      sort={safeSort}
+                      palette={Boolean(palette)}
+                      isSeries={isSeriesTitle}
+                      sortLabelRats={`Most ${rodentNounPlural.toLowerCase()} (est.)`}
+                    />
+                  ) : null}
+                </div>
+              </header>
+
+              {movieSightings.length > 0 ? (
+                <MovieSightingsPagingBar
+                  moviePath={moviePath}
+                  sort={safeSort}
+                  safePage={sightingsView.safePage}
+                  pageCount={sightingsView.pageCount}
+                  totalCount={sightingsView.totalCount}
+                  palette={Boolean(palette)}
+                />
+              ) : null}
+
+              <div className="space-y-4">
+                {movieSightings.length === 0 ? (
+                  <div
+                    className={`mt-6 rounded-2xl border-2 border-dashed px-6 py-14 text-center dark:border-white/18 ${palette
+                      ? "border-[color-mix(in_srgb,var(--movie-accent)_25%,rgb(214_211_209))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,white)] dark:bg-[rgb(34_29_25/0.65)]"
+                      : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
+                      }`}
+                  >
+                    <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={48} height={48} className="mx-auto" aria-hidden />
+                    <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
+                      No rat sightings catalogued yet
+                    </p>
+                    <p className="mx-auto mt-2 max-w-sm text-sm text-stone-600 dark:text-stone-400">
+                      Be the first to document a rat in this title — your sighting goes into review and gets published when approved.
+                    </p>
+                    <Link
+                      href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
+                      className="mt-6 inline-flex wr-btn-primary"
+                    >
+                      Submit a sighting
+                    </Link>
+                  </div>
+                ) : null}
+
                 {movieSightings.length > 0 ? (
-                  <MovieSightingsSortControl
-                    slug={slug}
-                    sort={safeSort}
+                  <MovieSightingsCards
+                    items={pageSlice}
                     palette={Boolean(palette)}
+                    spoilerCountMovie={movieSpoilerCount}
+                    canEditSightings={canEditSightings}
+                    editBasePath={sightingsBasePath}
                     isSeries={isSeriesTitle}
                   />
                 ) : null}
               </div>
-            </header>
-
-            {movieSightings.length > 0 ? (
-              <MovieSightingsPagingBar
-                slug={slug}
-                sort={safeSort}
-                safePage={sightingsView.safePage}
-                pageCount={sightingsView.pageCount}
-                totalCount={sightingsView.totalCount}
-                palette={Boolean(palette)}
-              />
-            ) : null}
-
-            <div className="space-y-4">
-              {movieSightings.length === 0 ? (
-                <div
-                  className={`mt-6 rounded-2xl border-2 border-dashed px-6 py-14 text-center dark:border-white/18 ${palette
-                    ? "border-[color-mix(in_srgb,var(--movie-accent)_25%,rgb(214_211_209))] bg-[color-mix(in_srgb,var(--movie-column-wash)_55%,white)] dark:bg-[rgb(34_29_25/0.65)]"
-                    : "border-stone-900/25 bg-[var(--wr-surface-cream-soft)]/80 dark:bg-stone-900/40"
-                    }`}
-                >
-                  <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={48} height={48} className="mx-auto" aria-hidden />
-                  <p className="wr-display mt-4 text-lg font-bold text-stone-800 dark:text-stone-100">
-                    No rat sightings catalogued yet
-                  </p>
-                  <p className="mx-auto mt-2 max-w-sm text-sm text-stone-600 dark:text-stone-400">
-                    Be the first to document a rat in this title — your sighting goes into review and gets published when approved.
-                  </p>
-                  <Link
-                    href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
-                    className="mt-6 inline-flex wr-btn-primary"
-                  >
-                    Submit a sighting
-                  </Link>
-                </div>
-              ) : null}
 
               {movieSightings.length > 0 ? (
-                <MovieSightingsCards
-                  items={pageSlice}
+                <MovieSightingsPagingBar
+                  moviePath={moviePath}
+                  sort={safeSort}
+                  safePage={sightingsView.safePage}
+                  pageCount={sightingsView.pageCount}
+                  totalCount={sightingsView.totalCount}
                   palette={Boolean(palette)}
-                  spoilerCountMovie={movieSpoilerCount}
-                  canEditSightings={canEditSightings}
-                  editBasePath={sightingsBasePath}
-                  isSeries={isSeriesTitle}
+                  placement="bottom"
                 />
               ) : null}
             </div>
 
-            {movieSightings.length > 0 ? (
-              <MovieSightingsPagingBar
-                slug={slug}
-                sort={safeSort}
-                safePage={sightingsView.safePage}
-                pageCount={sightingsView.pageCount}
-                totalCount={sightingsView.totalCount}
-                palette={Boolean(palette)}
-                placement="bottom"
-              />
+            {/* Panel 1 — Rat Facts (conditional, must match tab condition) */}
+            {ratFacts.length > 0 ? (
+              <div>
+                <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
+                  <div className="flex min-h-12 items-center">
+                    <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+                      {rodentNoun} Facts
+                    </h2>
+                  </div>
+                </header>
+                <div className="space-y-3">
+                  {ratFacts.map((fact, i) => (
+                    <div key={i} className={`${tabCardClass(Boolean(palette))} px-5 py-4`}>
+                      <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
+                        {highlightRodentWords(fact)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : null}
-          </div>
 
-          {/* Panel 1 — Rat Facts (conditional, must match tab condition) */}
-          {ratFacts.length > 0 ? (
-            <div>
-              <header className={`mb-6 border-b pb-4 ${tabHeaderBorderClass(Boolean(palette))}`}>
-                <div className="flex min-h-12 items-center">
-                  <h2 className="wr-display text-2xl font-bold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-                    Rat Facts
+            {/* Panel 2 — Reviews */}
+            <MovieRatviewsTab
+              reviews={imdbReviews}
+              palette={Boolean(palette)}
+            />
+
+            {/* Panel 3 — Media */}
+            <MovieRatMediaTab
+              videos={imdbVideos}
+              images={imdbImages}
+              youtubeTrailerKey={youtubeTrailerKey}
+              palette={Boolean(palette)}
+            />
+
+            {/* Panel 4 — Related */}
+            <MovieRatlatedTab
+              titles={imdbRelated}
+              palette={Boolean(palette)}
+            />
+          </MovieTabsShell>
+        </section>
+
+        {editMovie && canEditMovie ? (
+          <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
+            <div className={`max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/22 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] ${palette ? "dark:border-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(255_255_255/0.18))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_10%,rgb(24_19_15))]" : "dark:border-white/20 dark:bg-stone-900/95"}`}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
+                    {movie.title}
                   </h2>
                 </div>
-              </header>
-              <div className="space-y-3">
-                {ratFacts.map((fact, i) => (
-                  <div key={i} className={`${tabCardClass(Boolean(palette))} px-5 py-4`}>
-                    <p className="text-sm leading-relaxed text-stone-700 dark:text-stone-300">
-                      {highlightRodentWords(fact)}
-                    </p>
-                  </div>
-                ))}
+                <Link
+                  href={moviePath}
+                  className="wr-btn-ghost px-4 py-1.5 text-sm"
+                >
+                  Close
+                </Link>
               </div>
+
+              {(() => {
+                const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
+                return (
+                  <form action={updateMovieInfo} className="mt-6 grid gap-4">
+                    <input type="hidden" name="slug" value={slug} />
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Title
+                      <input name="title" required defaultValue={movie.title} className="wr-input" />
+                    </label>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Release year
+                        <input name="releaseYear" type="number" defaultValue={movie.releaseYear} className="wr-input" />
+                      </label>
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Runtime (minutes)
+                        <input name="runtimeMinutes" type="number" defaultValue={movie.runtimeMinutes} className="wr-input" />
+                        {(() => {
+                          const syncedVal = String(syncSnapshot?.runtimeMinutes ?? "").trim();
+                          const currentVal = String(movie.runtimeMinutes ?? "");
+                          return syncedVal && syncedVal !== currentVal ? (
+                            <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                          ) : null;
+                        })()}
+                      </label>
+                    </div>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Genres (comma-separated)
+                      <input name="genres" defaultValue={movie.genres.join(", ")} className="wr-input" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Summary
+                      <textarea name="summary" rows={4} defaultValue={movie.summary} className="wr-input h-auto min-h-[7rem] py-3 leading-relaxed" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Poster image URL
+                      <input name="posterUrl" defaultValue={movie.posterUrl} className="wr-input" />
+                    </label>
+                    <div className="flex flex-col gap-1 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Current hero banner URL
+                      <p className="break-all rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-normal text-stone-600 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300">
+                        {visuals.bannerUrl}
+                      </p>
+                      <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
+                        Resynced {movie.metadata.lastSyncedAt ?? "never"}
+                      </span>
+                    </div>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Tagline
+                      <input name="tagline" defaultValue={movie.metadata.tagline} className="wr-input" />
+                    </label>
+                    <div className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Accent color
+                      <AccentColorField
+                        autoAccent={visuals.syncedPalette?.accent ?? "#b45309"}
+                        currentOverride={movie.metadata.overrideAccent ?? ""}
+                      />
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Certificate
+                        <input name="rating" defaultValue={movie.metadata.rating} className="wr-input" />
+                        {(() => {
+                          const syncedVal = String(syncSnapshot?.rating ?? "").trim();
+                          const currentVal = String(movie.metadata.rating ?? "").trim();
+                          return syncedVal && syncedVal !== currentVal ? (
+                            <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                          ) : null;
+                        })()}
+                      </label>
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Director
+                        <input name="director" defaultValue={movie.metadata.director} className="wr-input" />
+                        {(() => {
+                          const syncedVal = String(syncSnapshot?.director ?? "").trim();
+                          const currentVal = String(movie.metadata.director ?? "").trim();
+                          return syncedVal && syncedVal !== currentVal ? (
+                            <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                          ) : null;
+                        })()}
+                      </label>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Writers
+                        <input name="writers" defaultValue={movie.metadata.writers} className="wr-input" />
+                        {(() => {
+                          const syncedVal = String(syncSnapshot?.writers ?? "").trim();
+                          const currentVal = String(movie.metadata.writers ?? "").trim();
+                          return syncedVal && syncedVal !== currentVal ? (
+                            <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                          ) : null;
+                        })()}
+                      </label>
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Cast (top billed)
+                        <input name="cast" defaultValue={movie.metadata.cast} className="wr-input" />
+                        {(() => {
+                          const syncedVal = String(syncSnapshot?.cast ?? "").trim();
+                          const currentVal = String(movie.metadata.cast ?? "").trim();
+                          return syncedVal && syncedVal !== currentVal ? (
+                            <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                          ) : null;
+                        })()}
+                      </label>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        IMDb score
+                        <input name="imdbRating" defaultValue={movie.metadata.imdbRating} className="wr-input" />
+                        {(() => {
+                          const syncedVal = String(syncSnapshot?.imdbRating ?? "").trim();
+                          const currentVal = String(movie.metadata.imdbRating ?? "").trim();
+                          return syncedVal && syncedVal !== currentVal ? (
+                            <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
+                          ) : null;
+                        })()}
+                      </label>
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        IMDb votes
+                        <input name="imdbVotes" defaultValue={movie.metadata.imdbVotes} className="wr-input" />
+                      </label>
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Metascore
+                        <input name="metascore" defaultValue={movie.metadata.metascore} className="wr-input" />
+                      </label>
+                    </div>
+                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                      Awards / honors
+                      <input name="awards" defaultValue={movie.metadata.awards} className="wr-input" />
+                    </label>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Language
+                        <input name="originalLanguage" defaultValue={movie.metadata.originalLanguage} className="wr-input" />
+                      </label>
+                      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+                        Countries (comma-separated)
+                        <input name="countries" defaultValue={movie.metadata.productionCountries.join(", ")} className="wr-input" />
+                      </label>
+                    </div>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                      <Link
+                        href={`/movies/${slug}`}
+                        className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
+                      >
+                        Cancel
+                      </Link>
+                      <button
+                        type="submit"
+                        className="wr-btn-primary"
+                      >
+                        Save movie info
+                      </button>
+                    </div>
+                  </form>
+                );
+              })()}
             </div>
-          ) : null}
-
-          {/* Panel 2 — Reviews */}
-          <MovieRatviewsTab
-            reviews={imdbReviews}
-            palette={Boolean(palette)}
-          />
-
-          {/* Panel 3 — Media */}
-          <MovieRatMediaTab
-            videos={imdbVideos}
-            images={imdbImages}
-            youtubeTrailerKey={youtubeTrailerKey}
-            palette={Boolean(palette)}
-          />
-
-          {/* Panel 4 — Related */}
-          <MovieRatlatedTab
-            titles={imdbRelated}
-            palette={Boolean(palette)}
-          />
-        </MovieTabsShell>
-      </section>
-
-      {editMovie && canEditMovie ? (
-        <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/22 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/20 dark:bg-stone-900/95">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-black text-stone-950 dark:text-stone-100">
-                  {movie.title}
-                </h2>
-              </div>
-              <Link
-                href={`/movies/${slug}`}
-                className="rounded-lg border border-stone-900/25 px-3 py-1.5 text-sm font-semibold text-stone-700 hover:bg-stone-100 dark:border-white/18 dark:text-stone-200 dark:hover:bg-stone-800"
-              >
-                Close
-              </Link>
-            </div>
-
-            {(() => {
-              const syncSnapshot = movie.metadata.syncSnapshot as Record<string, unknown> | undefined;
-              return (
-                <form action={updateMovieInfo} className="mt-6 grid gap-4">
-                  <input type="hidden" name="slug" value={slug} />
-                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Title
-                    <input name="title" required defaultValue={movie.title} className="wr-input" />
-                  </label>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Release year
-                      <input name="releaseYear" type="number" defaultValue={movie.releaseYear} className="wr-input" />
-                    </label>
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Runtime (minutes)
-                      <input name="runtimeMinutes" type="number" defaultValue={movie.runtimeMinutes} className="wr-input" />
-                      {(() => {
-                        const syncedVal = String(syncSnapshot?.runtimeMinutes ?? "").trim();
-                        const currentVal = String(movie.runtimeMinutes ?? "");
-                        return syncedVal && syncedVal !== currentVal ? (
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                        ) : null;
-                      })()}
-                    </label>
-                  </div>
-                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Genres (comma-separated)
-                    <input name="genres" defaultValue={movie.genres.join(", ")} className="wr-input" />
-                  </label>
-                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Summary
-                    <textarea name="summary" rows={4} defaultValue={movie.summary} className="wr-input h-auto min-h-[7rem]" />
-                  </label>
-                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Poster image URL
-                    <input name="posterUrl" defaultValue={movie.posterUrl} className="wr-input" />
-                  </label>
-                  <div className="flex flex-col gap-1 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Current hero banner URL
-                    <p className="break-all rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-normal text-stone-600 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300">
-                      {visuals.bannerUrl}
-                    </p>
-                    <span className="text-xs font-normal text-stone-400 dark:text-stone-500">
-                      Resynced {movie.metadata.lastSyncedAt ?? "never"}
-                    </span>
-                  </div>
-                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Tagline
-                    <input name="tagline" defaultValue={movie.metadata.tagline} className="wr-input" />
-                  </label>
-                  <div className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Accent color
-                    <AccentColorField
-                      autoAccent={visuals.syncedPalette?.accent ?? "#b45309"}
-                      currentOverride={movie.metadata.overrideAccent ?? ""}
-                    />
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Certificate
-                      <input name="rating" defaultValue={movie.metadata.rating} className="wr-input" />
-                      {(() => {
-                        const syncedVal = String(syncSnapshot?.rating ?? "").trim();
-                        const currentVal = String(movie.metadata.rating ?? "").trim();
-                        return syncedVal && syncedVal !== currentVal ? (
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                        ) : null;
-                      })()}
-                    </label>
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Director
-                      <input name="director" defaultValue={movie.metadata.director} className="wr-input" />
-                      {(() => {
-                        const syncedVal = String(syncSnapshot?.director ?? "").trim();
-                        const currentVal = String(movie.metadata.director ?? "").trim();
-                        return syncedVal && syncedVal !== currentVal ? (
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                        ) : null;
-                      })()}
-                    </label>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Writers
-                      <input name="writers" defaultValue={movie.metadata.writers} className="wr-input" />
-                      {(() => {
-                        const syncedVal = String(syncSnapshot?.writers ?? "").trim();
-                        const currentVal = String(movie.metadata.writers ?? "").trim();
-                        return syncedVal && syncedVal !== currentVal ? (
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                        ) : null;
-                      })()}
-                    </label>
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Cast (top billed)
-                      <input name="cast" defaultValue={movie.metadata.cast} className="wr-input" />
-                      {(() => {
-                        const syncedVal = String(syncSnapshot?.cast ?? "").trim();
-                        const currentVal = String(movie.metadata.cast ?? "").trim();
-                        return syncedVal && syncedVal !== currentVal ? (
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                        ) : null;
-                      })()}
-                    </label>
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      IMDb score
-                      <input name="imdbRating" defaultValue={movie.metadata.imdbRating} className="wr-input" />
-                      {(() => {
-                        const syncedVal = String(syncSnapshot?.imdbRating ?? "").trim();
-                        const currentVal = String(movie.metadata.imdbRating ?? "").trim();
-                        return syncedVal && syncedVal !== currentVal ? (
-                          <span className="text-xs text-stone-400 dark:text-stone-500">Synced: {syncedVal}</span>
-                        ) : null;
-                      })()}
-                    </label>
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      IMDb votes
-                      <input name="imdbVotes" defaultValue={movie.metadata.imdbVotes} className="wr-input" />
-                    </label>
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Metascore
-                      <input name="metascore" defaultValue={movie.metadata.metascore} className="wr-input" />
-                    </label>
-                  </div>
-                  <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                    Awards / honors
-                    <input name="awards" defaultValue={movie.metadata.awards} className="wr-input" />
-                  </label>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Language
-                      <input name="originalLanguage" defaultValue={movie.metadata.originalLanguage} className="wr-input" />
-                    </label>
-                    <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-                      Countries (comma-separated)
-                      <input name="countries" defaultValue={movie.metadata.productionCountries.join(", ")} className="wr-input" />
-                    </label>
-                  </div>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                    <Link
-                      href={`/movies/${slug}`}
-                      className="wr-btn bg-white text-stone-900 dark:border-white/18 dark:bg-stone-800 dark:text-stone-100"
-                    >
-                      Cancel
-                    </Link>
-                    <button
-                      type="submit"
-                      className="wr-btn-primary"
-                    >
-                      Save movie info
-                    </button>
-                  </div>
-                </form>
-              );
-            })()}
           </div>
-        </div>
-      ) : null}
-      {editingSighting && canEditSightings ? (
-        <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
-          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/22 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] dark:border-white/20 dark:bg-stone-900/95">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">Edit sighting</p>
-                <h2 className="mt-1 text-xl font-bold text-stone-950 dark:text-stone-100">
-                  {editingSighting.title}
-                </h2>
-                <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
-                  {movie.title}
-                </p>
+        ) : null}
+        {editingSighting && canEditSightings ? (
+          <div className="fixed inset-0 z-[220] flex items-end justify-center bg-black/55 sm:items-start sm:px-4 sm:py-12">
+            <div className={`max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl border-2 border-stone-950/22 bg-[var(--wr-surface-cream)] p-6 pb-8 shadow-[0_-8px_40px_rgb(0_0_0/0.35)] sm:rounded-2xl sm:p-7 sm:pb-7 sm:shadow-[0_20px_60px_rgb(0_0_0/0.45)] ${palette ? "dark:border-[color-mix(in_srgb,var(--movie-accent)_20%,rgb(255_255_255/0.18))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_10%,rgb(24_19_15))]" : "dark:border-white/20 dark:bg-stone-900/95"}`}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 dark:text-stone-500">Edit sighting</p>
+                  <h2 className="mt-1 text-xl font-bold text-stone-950 dark:text-stone-100">
+                    {editingSighting.title}
+                  </h2>
+                  <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
+                    {movie.title}
+                  </p>
+                </div>
+                <Link
+                  href={sightingsBasePath}
+                  className="wr-btn-ghost inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0"
+                  aria-label="Close"
+                  title="Close"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4" aria-hidden="true">
+                    <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+                  </svg>
+                </Link>
               </div>
-              <Link
-                href={sightingsBasePath}
-                className="wr-btn-ghost inline-flex h-9 w-9 shrink-0 items-center justify-center px-0 py-0"
-                aria-label="Close"
-                title="Close"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4" aria-hidden="true">
-                  <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
-                </svg>
-              </Link>
+              <EditSightingForm
+                sighting={editingSighting}
+                slug={slug}
+                returnTo={sightingsBasePath}
+                isSeriesTitle={isSeriesTitle}
+                updateAction={updateSightingInfo}
+                deleteAction={deleteSighting}
+              />
             </div>
-            <EditSightingForm
-              sighting={editingSighting}
-              slug={slug}
-              returnTo={sightingsBasePath}
-              isSeriesTitle={isSeriesTitle}
-              updateAction={updateSightingInfo}
-              deleteAction={deleteSighting}
-            />
           </div>
-        </div>
-      ) : null}
-    </main>
+        ) : null}
+      </main>
+    </>
   );
+}
+
+export default async function MoviesRoute({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams?: SearchParams;
+}) {
+  const { slug } = await params;
+  const baseMovie = await getCatalogMovieBySlug(slug);
+  if (!baseMovie) notFound();
+  const type = (baseMovie.metadata.syncSnapshot as Record<string, unknown> | undefined)?.Type;
+  if (type === "series") redirect(`/shows/${slug}`);
+  return <MoviePage params={params} searchParams={searchParams} />;
 }

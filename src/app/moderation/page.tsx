@@ -12,6 +12,7 @@ import {
   formatRuntimeMinutes,
   formatPercentAsTimestamp,
   getImdbTitleUrl,
+  getMoviePath,
   getSubmissionImageRefs,
   getSubmissionSightingTitle,
   CONTENT_WARNING_OPTIONS,
@@ -122,7 +123,7 @@ export default async function ModerationPage({
         (submission.imdbId
           ? await getCatalogMovieByImdbId(submission.imdbId)
           : undefined) ?? (await getCatalogMovieByTitleSearch(submission.movieTitle));
-      return movie ? ([submission.id, `/movies/${movie.slug}`] as const) : undefined;
+      return movie ? ([submission.id, getMoviePath(movie)] as const) : undefined;
     }),
   );
   const approvedViewHrefBySubmissionId = new Map<string, string>(

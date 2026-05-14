@@ -180,6 +180,19 @@ export type Movie = {
     imdbImages?: ImdbImage[];
     /** YouTube video key for the primary official trailer, sourced from TMDB. */
     youtubeTrailerKey?: string;
+    /** Accent color palette cached during last sync (avoids per-request sharp processing). */
+    syncedPalette?: {
+      wash: string;
+      columnWash: string;
+      accent: string;
+      heroBloom: string;
+    };
+    syncedPaletteDark?: {
+      wash: string;
+      columnWash: string;
+      accent: string;
+      heroBloom: string;
+    };
   };
   summary: string;
 };
@@ -452,6 +465,19 @@ export function rodentSwarmNoun(rodentTypes?: string[]): string {
     return opt?.label ?? "Rat";
   }
   return "Rodent";
+}
+
+/** Plural noun for page headings ("Rats", "Mice", "Rodents", etc.). */
+export function rodentSwarmNounPlural(rodentTypes?: string[]): string {
+  const types = rodentTypes && rodentTypes.length > 0 ? rodentTypes : ["rat"];
+  if (types.length === 1) {
+    const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === types[0]) as typeof RODENT_TYPE_OPTIONS[number] | undefined;
+    const plural = opt?.plural;
+    const label = opt?.label ?? "Rat";
+    if (plural) return plural.charAt(0).toUpperCase() + plural.slice(1);
+    return `${label}s`;
+  }
+  return "Rodents";
 }
 
 /**
@@ -747,14 +773,20 @@ export function movieSightingsQueryString(parts: {
 }
 
 export function buildMovieSightingsPath(
-  slug: string,
+  moviePath: string,
   parts: {
     sort: MovieSightingsSortOption;
     page: number;
   },
 ): string {
   const q = movieSightingsQueryString(parts);
-  return q ? `/movies/${slug}?${q}` : `/movies/${slug}`;
+  return q ? `${moviePath}?${q}` : moviePath;
+}
+
+/** Returns the canonical web path for a movie or TV series. */
+export function getMoviePath(movie: Movie): string {
+  const type = (movie.metadata.syncSnapshot as Record<string, unknown> | undefined)?.Type;
+  return type === "series" ? `/shows/${movie.slug}` : `/movies/${movie.slug}`;
 }
 
 export function prepareMovieSightingsView({

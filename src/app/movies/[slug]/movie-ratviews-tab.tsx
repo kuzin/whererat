@@ -30,23 +30,25 @@ function highlightRodentWords(text: string): ReactNode {
 
 type SortKey = "latest" | "lowest" | "highest";
 
+function StarIcon({ fill }: { fill: "full" | "half" | "empty" }) {
+  if (fill === "full") return <span className="text-amber-500 dark:text-amber-400" aria-hidden>★</span>;
+  if (fill === "empty") return <span className="text-stone-300 dark:text-stone-600" aria-hidden>★</span>;
+  return (
+    <span className="relative inline-block" aria-hidden>
+      <span className="text-stone-300 dark:text-stone-600">★</span>
+      <span className="absolute inset-0 w-[52%] overflow-hidden text-amber-500 dark:text-amber-400">★</span>
+    </span>
+  );
+}
+
 function StarRating({ rating }: { rating: number }) {
-  const filled = Math.round(rating / 2); // 1–10 → 1–5 stars
+  const stars = rating / 2; // 1–10 → 0.5–5
   return (
     <span className="inline-flex items-center gap-0.5 tabular-nums">
-      {Array.from({ length: 5 }, (_, i) => (
-        <span
-          key={i}
-          className={
-            i < filled
-              ? "text-amber-500 dark:text-amber-400"
-              : "text-stone-300 dark:text-stone-600"
-          }
-          aria-hidden
-        >
-          ★
-        </span>
-      ))}
+      {Array.from({ length: 5 }, (_, i) => {
+        const fill = i + 1 <= stars ? "full" : i < stars ? "half" : "empty";
+        return <StarIcon key={i} fill={fill} />;
+      })}
       <span className="ml-1.5 text-xs font-bold text-stone-700 dark:text-stone-300">
         {rating}/10
       </span>

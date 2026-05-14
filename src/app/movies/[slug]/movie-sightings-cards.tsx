@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import { tabCardColors } from "./movie-tab-classes";
 import {
   estimateRatsForAppearance,
   formatApproximateRatLine,
@@ -247,9 +248,11 @@ export function MovieSightingsCards({
 
   const showSpoilerToggle = spoilerCountMovie > 0;
 
-  const panelSkin = palette
-    ? "border-[color-mix(in_srgb,var(--movie-accent)_12%,rgb(41_37_36))] bg-[color-mix(in_srgb,var(--movie-column-wash)_48%,rgb(253_251_246))]"
-    : "border-stone-950/22 bg-[var(--wr-surface-cream-soft)]";
+  const panelSkin = tabCardColors(palette);
+
+  const chipColors = palette
+    ? "border-[color-mix(in_srgb,var(--movie-accent)_32%,rgb(28_25_23/0.16))] bg-[color-mix(in_srgb,var(--movie-accent)_10%,rgb(255_253_248))] text-[color-mix(in_srgb,var(--movie-accent)_85%,rgb(20_8_2))] dark:border-[color-mix(in_srgb,var(--movie-accent)_30%,rgb(255_243_199/0.18))] dark:bg-[color-mix(in_srgb,var(--movie-accent)_18%,rgb(18_12_8))] dark:text-[color-mix(in_srgb,var(--movie-accent)_60%,rgb(254_243_220))]"
+    : "";
 
   const toggleSkin = palette
     ? "border-[color-mix(in_srgb,var(--movie-accent)_22%,rgb(120_113_108))] bg-[color-mix(in_srgb,var(--movie-column-wash)_40%,rgb(253_251_246))] dark:border-[color-mix(in_srgb,var(--movie-accent)_28%,rgb(76_72_69))] dark:bg-[rgb(34_29_24)] dark:text-stone-100"
@@ -316,7 +319,7 @@ export function MovieSightingsCards({
           return (
             <article
               key={sighting.id}
-              className={`overflow-hidden rounded-2xl border-2 shadow-[3px_3px_0_0_rgb(28_25_23/0.55)] dark:border-white/20 dark:bg-[rgb(36_30_26)] dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.4)] ${panelSkin}`}
+              className={`overflow-hidden rounded-2xl border-2 shadow-[3px_3px_0_0_rgb(28_25_23/0.55)] dark:shadow-[3px_3px_0_0_rgb(0_0_0/0.4)] ${panelSkin}`}
             >
               {hasCarousel ? (
                 <SightingImageCarousel
@@ -376,12 +379,12 @@ export function MovieSightingsCards({
                   <div className="border-t border-stone-900/10 pt-4 pb-1 dark:border-white/10">
                     <div className="flex flex-wrap items-center gap-2">
                       {episodeContext ? (
-                        <span className="inline-flex h-9 shrink-0 items-center rounded-lg border border-sky-800/25 bg-sky-50 px-3 text-xs font-semibold tracking-tight text-sky-950 dark:border-sky-400/35 dark:bg-sky-950/45 dark:text-sky-100">
+                        <span className={`inline-flex h-9 shrink-0 items-center rounded-lg border px-3 text-xs font-semibold tracking-tight ${palette ? chipColors : "border-sky-800/25 bg-sky-50 text-sky-950 dark:border-sky-400/35 dark:bg-sky-950/45 dark:text-sky-100"}`}>
                           {episodeContext}
                         </span>
                       ) : null}
                       <p
-                        className="inline-flex h-9 shrink-0 items-center gap-x-1 rounded-lg border border-orange-800/25 bg-orange-50 px-3 text-xs font-semibold tracking-tight text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"
+                        className={`inline-flex h-9 shrink-0 items-center gap-x-1 rounded-lg border px-3 text-xs font-semibold tracking-tight ${palette ? chipColors : "border-orange-800/25 bg-orange-50 text-orange-950 dark:border-orange-400/35 dark:bg-orange-950/50 dark:text-amber-100"}`}
                         title={isSeries ? "Position in episode" : "Position in film"}
                         aria-label={`Sighting at ${startingTimeLabel} into the ${isSeries ? "episode" : "film"}`}
                       >
@@ -395,7 +398,7 @@ export function MovieSightingsCards({
                         return (
                           <span
                             key={id}
-                            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-yellow-800/20 bg-yellow-50 px-3 text-xs font-semibold tracking-tight text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/40 dark:text-yellow-200"
+                            className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold tracking-tight ${palette ? chipColors : "border-yellow-800/20 bg-yellow-50 text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/40 dark:text-yellow-200"}`}
                           >
                             <img src={`/openmoji/color/svg/${opt ? opt.openmojiCode : "26A0"}.svg`} alt="" width={16} height={16} aria-hidden />
                             {formatContentWarningLabel(id, sighting.rodentTypes)}
@@ -403,7 +406,7 @@ export function MovieSightingsCards({
                         );
                       })}
                       <span
-                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-amber-900/25 bg-amber-50 px-2.5 text-xs font-semibold tracking-tight tabular-nums text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"
+                        className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold tracking-tight tabular-nums ${palette ? chipColors : "border-amber-900/25 bg-amber-50 text-amber-950 dark:border-amber-400/35 dark:bg-amber-950/45 dark:text-amber-100"}`}
                         title="Estimated rats on screen for this moment"
                       >
                         <SightingRatPresenceVisual
