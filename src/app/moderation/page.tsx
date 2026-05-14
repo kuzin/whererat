@@ -182,7 +182,6 @@ export default async function ModerationPage({
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
             <span className="text-sm font-bold text-amber-800 dark:text-amber-300">Owner controls</span>
-            <span className="ml-auto rounded-full bg-amber-200/70 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700 dark:bg-amber-800/40 dark:text-amber-400">Owner only</span>
           </div>
           <div className="flex items-center gap-1">
             <form action={resyncAllMovies}>
