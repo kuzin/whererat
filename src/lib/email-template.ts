@@ -37,7 +37,7 @@ export type EmailImage = {
 
 export type EmailContentBlock =
   | { kind: "heading"; text: string }
-  | { kind: "paragraph"; text: string; muted?: boolean }
+  | { kind: "paragraph"; text: string; muted?: boolean; marginTop?: number; marginBottom?: number }
   | { kind: "keyValue"; rows: Array<{ label: string; value: string }> }
   | { kind: "quote"; text: string }
   | { kind: "gallery"; images: EmailImage[] }
@@ -74,8 +74,15 @@ function renderBlock(block: EmailContentBlock, centered?: boolean): string {
   switch (block.kind) {
     case "heading":
       return `<h2 style="margin:0 0 12px;font-family:${FONT_STACK};font-size:20px;line-height:1.3;color:${C.text};font-weight:700">${escapeHtml(block.text)}</h2>`;
-    case "paragraph":
+    case "paragraph": {
+      // Custom margin for tag/date block
+      if (typeof block.text === "string" && block.text.trim().startsWith("<span ")) {
+        const marginTop = typeof block.marginTop === "number" ? block.marginTop : 0;
+        const marginBottom = typeof block.marginBottom === "number" ? block.marginBottom : 14;
+        return `<p style="margin:${marginTop}px 0 ${marginBottom}px;font-family:${FONT_STACK};font-size:15px;line-height:1.55;color:${block.muted ? C.muted : C.text}${centered ? ";text-align:center" : ""}">${block.text}</p>`;
+      }
       return `<p style="margin:0 0 14px;font-family:${FONT_STACK};font-size:15px;line-height:1.55;color:${block.muted ? C.muted : C.text}${centered ? ";text-align:center" : ""}">${escapeHtml(block.text)}</p>`;
+    }
     case "keyValue": {
       const rowsHtml = block.rows
         .map(
@@ -99,6 +106,15 @@ function renderBlock(block: EmailContentBlock, centered?: boolean): string {
           </tr>
         </table>`;
     case "gallery": {
+      // If only one image, render as a full-width hero image (newsletter style)
+      if (block.images.length === 1) {
+        const img = block.images[0];
+        return `
+          <div style="margin:0 0 24px 0;width:100%">
+            <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.alt ?? "")}" width="544" height="216" style="display:block;width:100%;max-width:544px;height:216px;object-fit:cover;border-radius:18px;border:1px solid ${C.borderSoft};outline:none;margin:0 auto">
+          </div>`;
+      }
+      // Otherwise, render as a row of thumbnails (moderation style)
       const images = block.images.slice(0, 5);
       if (!images.length) return "";
       const cells = images

@@ -227,9 +227,20 @@ export default async function ManageNewsPage({
                                         </svg>
                                         <span className="sr-only">Edit</span>
                                     </Link>
-                                    <form action={togglePublishAction}>
+                                    <form action={togglePublishAction} className="flex items-center gap-1">
                                         <input type="hidden" name="id" value={item.id} />
                                         <input type="hidden" name="publish" value={item.publishedAt ? "false" : "true"} />
+                                        {!item.publishedAt && (
+                                            <label className="flex cursor-pointer items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400" title="Send newsletter email to opted-in subscribers">
+                                                <input
+                                                    name="sendNewsletter"
+                                                    type="checkbox"
+                                                    value="true"
+                                                    className="h-3.5 w-3.5 rounded accent-amber-600"
+                                                />
+                                                <span>Newsletter</span>
+                                            </label>
+                                        )}
                                         <button type="submit" className={ICON_BTN} title={item.publishedAt ? "Unpublish" : "Publish"}>
                                             {item.publishedAt ? (
                                                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>

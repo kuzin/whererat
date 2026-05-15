@@ -11,6 +11,8 @@
 import { sendBrandedEmail } from "@/lib/email-send";
 import { renderBrandedEmail, type EmailContentBlock } from "@/lib/email-template";
 import { type Submission } from "@/lib/whererat";
+import { getSubscriber } from "@/lib/email-preferences-store";
+import { getModeratorAccounts } from "@/lib/auth";
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://whererat.com";
@@ -25,9 +27,8 @@ function movieDisplay(submission: Submission): string {
     submission.seasonNumber &&
     submission.episodeNumber
   ) {
-    const ep = `S${submission.seasonNumber}E${submission.episodeNumber}${
-      submission.episodeTitle ? `: ${submission.episodeTitle}` : ""
-    }`;
+    const ep = `S${submission.seasonNumber}E${submission.episodeNumber}${submission.episodeTitle ? `: ${submission.episodeTitle}` : ""
+      }`;
     return `${base} — ${ep}`;
   }
   return base;
@@ -35,7 +36,16 @@ function movieDisplay(submission: Submission): string {
 
 const SUBMITTER_FOOTER = "You're receiving this because you submitted a sighting to WhereRat.";
 
-function buildReceiptEmail(submission: Submission) {
+async function getFooterNote(email?: string): Promise<string> {
+  if (!email) return SUBMITTER_FOOTER;
+  const subscriber = await getSubscriber(email);
+  if (!subscriber) return SUBMITTER_FOOTER;
+
+  const unsubLink = `${siteUrl()}/unsubscribed?token=${subscriber.unsubscribeToken}`;
+  return `${SUBMITTER_FOOTER}<br><br><span style="font-size:11px;color:#78716c">You also opted in to our news feed. <a href="${unsubLink}" style="color:inherit;text-decoration:underline">Unsubscribe</a>.</span>`;
+}
+
+async function buildReceiptEmail(submission: Submission) {
   const headline = submission.title?.trim() || movieDisplay(submission);
   const subject = `We got your sighting: ${headline}`;
 
@@ -59,7 +69,9 @@ function buildReceiptEmail(submission: Submission) {
     preheader: `Your sighting “${headline}” is in the moderation queue.`,
     heading: "Thanks for the sighting!",
     emoji: "🐀",
-    centered: true,    footerNote: SUBMITTER_FOOTER,    blocks,
+    centered: true,
+    footerNote: await getFooterNote(submission.submitterEmail),
+    blocks,
   });
 
   return { subject, html, text };
@@ -69,11 +81,15 @@ export async function notifySubmitterOfReceipt(submission: Submission): Promise<
   const to = submission.submitterEmail?.trim();
   if (!to) return;
 
-  const { subject, html, text } = buildReceiptEmail(submission);
+  // Prevent sending to moderators (by email match)
+  const moderatorEmails = getModeratorAccounts().map((m) => m.email.toLowerCase());
+  if (moderatorEmails.includes(to.toLowerCase())) return;
+
+  const { subject, html, text } = await buildReceiptEmail(submission);
   await sendBrandedEmail({ to, subject, html, text, logTag: "submitter-notify" });
 }
 
-function buildApprovedEmail(submission: Submission) {
+async function buildApprovedEmail(submission: Submission) {
   const headline = submission.title?.trim() || movieDisplay(submission);
   const subject = `Your sighting was approved: ${headline}`;
   const firstName = submission.submittedBy?.trim().split(/\s+/)[0];
@@ -94,14 +110,14 @@ function buildApprovedEmail(submission: Submission) {
     heading: "Your sighting was approved!",
     emoji: "🎉",
     centered: true,
-    footerNote: SUBMITTER_FOOTER,
+    footerNote: await getFooterNote(submission.submitterEmail),
     blocks,
   });
 
   return { subject, html, text };
 }
 
-function buildRejectedEmail(submission: Submission) {
+async function buildRejectedEmail(submission: Submission) {
   const headline = submission.title?.trim() || movieDisplay(submission);
   const subject = `Update on your WhereRat sighting: ${headline}`;
   const firstName = submission.submittedBy?.trim().split(/\s+/)[0];
@@ -122,7 +138,7 @@ function buildRejectedEmail(submission: Submission) {
     heading: "Not quite this time.",
     emoji: "🐭",
     centered: true,
-    footerNote: SUBMITTER_FOOTER,
+    footerNote: await getFooterNote(submission.submitterEmail),
     blocks,
   });
 
@@ -136,10 +152,14 @@ export async function notifySubmitterOfDecision(
   const to = submission.submitterEmail?.trim();
   if (!to) return;
 
+  // Prevent sending to moderators (by email match)
+  const moderatorEmails = getModeratorAccounts().map((m) => m.email.toLowerCase());
+  if (moderatorEmails.includes(to.toLowerCase())) return;
+
   const { subject, html, text } =
     decision === "approved"
-      ? buildApprovedEmail(submission)
-      : buildRejectedEmail(submission);
+      ? await buildApprovedEmail(submission)
+      : await buildRejectedEmail(submission);
 
   await sendBrandedEmail({ to, subject, html, text, logTag: "submitter-notify" });
 }

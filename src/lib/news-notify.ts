@@ -1,0 +1,126 @@
+/**
+ * Newsletter email sent to marketing opt-in subscribers when a news item is
+ * published with "Send newsletter" checked in the moderation UI.
+ *
+ * Best-effort — individual send failures are logged but never throw.
+ */
+
+import { sendBrandedEmail } from "@/lib/email-send";
+import { renderBrandedEmail, type EmailContentBlock } from "@/lib/email-template";
+import { getMarketingSubscribers } from "@/lib/email-preferences-store";
+import type { NewsItem } from "@/lib/news-store";
+
+function siteUrl(): string {
+    return process.env.NEXT_PUBLIC_SITE_URL ?? "https://whererat.com";
+}
+
+export function buildNewsletterEmail(
+    item: NewsItem,
+    unsubscribeToken: string,
+    baseUrl = siteUrl(),
+): { subject: string; html: string; text: string } {
+    const subject = item.title;
+    const unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
+
+    // Format date
+    const pubDate = item.publishedAt || item.createdAt;
+    const formattedDate = pubDate instanceof Date
+        ? pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+        : "";
+
+    // Type chip (inline style for email)
+    const typeColors: Record<string, { bg: string; color: string; border: string }> = {
+        announcement: { bg: "#e0edff", color: "#1e40af", border: "#93c5fd" },
+        "product-news": { bg: "#ede9fe", color: "#7c3aed", border: "#c4b5fd" },
+        community: { bg: "#d1fae5", color: "#047857", border: "#6ee7b7" },
+        update: { bg: "#f5f5f4", color: "#44403c", border: "#d6d3d1" },
+    };
+    const typeStyle = typeColors[item.type] || typeColors.update;
+    const typeLabel =
+        item.type === "announcement"
+            ? "Announcement"
+            : item.type === "product-news"
+                ? "Product news"
+                : item.type === "community"
+                    ? "Community"
+                    : item.type === "update"
+                        ? "Update"
+                        : item.type;
+
+
+        // --- Improved layout: tag chip, date, hero image, markdown body ---
+        const blocks: EmailContentBlock[] = [];
+
+        // Tag chip and date (as HTML block)
+        blocks.push({
+            kind: "paragraph",
+            text: `<span style="display:inline-block;padding:2px 10px 2px 8px;font-size:12px;font-weight:700;border-radius:8px;background:${typeStyle.bg};color:${typeStyle.color};border:1px solid ${typeStyle.border};margin-right:8px;vertical-align:middle;">${typeLabel}</span><span style="font-size:13px;color:#888;vertical-align:middle;">${formattedDate}</span>`,
+            // We'll allow HTML here and handle it in the renderer below
+            // Custom margin handled in email-template renderer
+            marginTop: 0,
+            marginBottom: 28,
+        });
+
+        // Title as heading (removed, handled by email shell)
+        // blocks.push({ kind: "heading", text: item.title });
+
+        // Hero image (if present)
+        if (item.imageUrl) {
+            blocks.push({
+                kind: "gallery",
+                images: [
+                    {
+                        url: item.imageUrl,
+                        alt: item.imageAlt || "News image",
+                    },
+                ],
+            });
+        }
+
+                // Body: show only the first 4 lines, add ellipsis if truncated
+                const bodyLines = item.body.split(/\r?\n/);
+                let previewBody = bodyLines.slice(0, 4).join("\n");
+                if (bodyLines.length > 4) {
+                    previewBody += "\n…";
+                }
+                blocks.push({ kind: "paragraph", text: previewBody });
+
+        // Author (avatar and name, if present)
+        // Removed from email content to match news page layout
+
+        // Read on WhereRat button
+        blocks.push({
+            kind: "button",
+            button: { label: "Read on WhereRat", href: `${baseUrl}/news` },
+        });
+
+    const { html, text } = renderBrandedEmail({
+        preheader: item.body.slice(0, 120),
+        // eyebrow: "WhereRat news", // Removed to match news page layout
+        heading: item.title,
+        footerNote: `You're receiving this because you opted in to WhereRat updates. · Unsubscribe: ${unsubscribeUrl}`,
+        blocks,
+        baseUrl,
+    });
+
+    // Append unsubscribe link to the HTML footer note — inject before closing body
+    const unsubscribeLink = `<a href="${unsubscribeUrl}" style="color:inherit;text-decoration:underline">Unsubscribe</a>`;
+    const htmlWithUnsub = html.replace(
+        `Unsubscribe: ${unsubscribeUrl}`,
+        unsubscribeLink,
+    );
+
+    return { subject, html: htmlWithUnsub, text };
+}
+
+export async function sendNewsletterToSubscribers(item: NewsItem): Promise<void> {
+    const subscribers = await getMarketingSubscribers();
+    if (!subscribers.length) return;
+
+    await Promise.allSettled(
+        subscribers.map(({ email, unsubscribeToken }) => {
+            const { subject, html, text } = buildNewsletterEmail(item, unsubscribeToken);
+            return sendBrandedEmail({ to: email, subject, html, text, logTag: "newsletter" });
+        }),
+    );
+}

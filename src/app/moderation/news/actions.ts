@@ -9,9 +9,11 @@ import {
     updateNewsItem,
     toggleNewsItemPublished,
     deleteNewsItem,
+    getNewsItemById,
     type NewsItemType,
 } from "@/lib/news-store";
 import { persistImageFile } from "@/lib/media-storage";
+import { sendNewsletterToSubscribers } from "@/lib/news-notify";
 
 const MAX_NEWS_IMAGE_BYTES = 8 * 1024 * 1024;
 
@@ -99,8 +101,13 @@ export async function togglePublishAction(formData: FormData) {
     await requireOwner();
     const id = (formData.get("id") as string | null)?.trim() ?? "";
     const publish = formData.get("publish") === "true";
+    const sendNewsletter = formData.get("sendNewsletter") === "true";
     if (!id) return;
     await toggleNewsItemPublished(id, publish);
+    if (publish && sendNewsletter) {
+        const item = await getNewsItemById(id);
+        if (item) void sendNewsletterToSubscribers(item).catch(() => { });
+    }
     revalidatePath("/news");
     revalidatePath("/moderation/news");
     redirect(`/moderation/news?toast=${publish ? "news-published" : "news-unpublished"}`);

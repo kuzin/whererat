@@ -14,6 +14,7 @@ import { getCatalogMovieByImdbId, getCatalogMovieByTitleSearch } from "@/lib/mov
 import { persistSightingFiles } from "@/lib/media-storage";
 import { notifyOwnerOfNewSubmission } from "@/lib/moderation-notify";
 import { notifySubmitterOfReceipt } from "@/lib/submitter-notify";
+import { upsertMarketingOptIn } from "@/lib/email-preferences-store";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 
@@ -62,15 +63,15 @@ export type PublicSightingSubmitFailureCode =
 
 export type PublicSightingSubmitResult =
   | {
-      ok: true;
-      submissionId: string;
-      catalogMatchSlug?: string;
-    }
+    ok: true;
+    submissionId: string;
+    catalogMatchSlug?: string;
+  }
   | {
-      ok: false;
-      code: PublicSightingSubmitFailureCode;
-      message?: string;
-    };
+    ok: false;
+    code: PublicSightingSubmitFailureCode;
+    message?: string;
+  };
 
 /**
  * Parses the same multipart field names as `src/app/submit/submit-form.tsx` /
@@ -79,6 +80,7 @@ export type PublicSightingSubmitResult =
 export async function executePublicSightingSubmit(
   formData: FormData,
   clientIp: string,
+  options?: { skipModerationNotify?: boolean },
 ): Promise<PublicSightingSubmitResult> {
   try {
     if (isPublicSubmissionRateLimited(clientIp)) {
@@ -165,8 +167,15 @@ export async function executePublicSightingSubmit(
       rodentTypes: rodentTypes.length ? rodentTypes : undefined,
     });
 
-    void notifyOwnerOfNewSubmission(submissionRow, existingMovie?.slug);
+    if (!options?.skipModerationNotify) {
+      void notifyOwnerOfNewSubmission(submissionRow, existingMovie?.slug);
+    }
     void notifySubmitterOfReceipt(submissionRow);
+
+    const marketingOptIn = formData.get("marketingOptIn") === "on";
+    if (submitterEmail && marketingOptIn) {
+      void upsertMarketingOptIn(submitterEmail).catch(() => { });
+    }
 
     return {
       ok: true,

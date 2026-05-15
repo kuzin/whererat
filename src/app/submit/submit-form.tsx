@@ -13,71 +13,7 @@ import {
 import { MovieSearchField } from "./movie-search-field";
 import { SightingImageUpload } from "./sighting-image-upload";
 
-// ── Small shared pieces ───────────────────────────────────────────────────────
-
-function RequiredMarker() {
-  return (
-    <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">
-      *
-    </span>
-  );
-}
-
-function SectionHeader({ title }: { title: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-1">
-      <h2 className="wr-display text-2xl font-bold text-stone-900 dark:text-amber-50">
-        {title}
-      </h2>
-      <div className="h-px flex-1 bg-amber-500/30 dark:bg-amber-500/20" />
-    </div>
-  );
-}
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button type="submit" disabled={pending} className="wr-btn-primary w-full sm:w-auto">
-      {pending ? (
-        <span className="flex items-center gap-2">
-          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          Submitting…
-        </span>
-      ) : (
-        "Submit for review"
-      )}
-    </button>
-  );
-}
-
-const FIELD_FOCUS_ORDER = [
-  "movieSelection",
-  "sightingTitle",
-  "timestamp",
-  "description",
-  "seasonNumber",
-  "episodeNumber",
-  "submitterName",
-  "submitterEmail",
-] as const;
-
-type FieldName = (typeof FIELD_FOCUS_ORDER)[number];
-
-function focusField(name: string) {
-  const el =
-    document.querySelector<HTMLElement>(`[data-field="${name}"]`) ??
-    document.querySelector<HTMLElement>(`[name="${name}"]`);
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-    el.focus();
-  }
-}
-
-// ── Types ─────────────────────────────────────────────────────────────────────
-
+// Main SubmitForm component (restored full implementation)
 type PreselectedMovie = {
   title: string;
   year: string;
@@ -101,8 +37,6 @@ type SubmitFormProps = {
   initialMovie?: PreselectedMovie;
 };
 
-// ── Main form ─────────────────────────────────────────────────────────────────
-
 export function SubmitForm({
   canAutoApprove,
   moderatorName,
@@ -125,8 +59,17 @@ export function SubmitForm({
   const errorFor = (name: string) => fieldErrors[name];
 
   // Errors in priority order for the summary
-  const orderedErrors = FIELD_FOCUS_ORDER.filter((f) => fieldErrors[f]).map((f) => ({
-    field: f as FieldName,
+  const orderedErrors = [
+    "movieSelection",
+    "sightingTitle",
+    "timestamp",
+    "description",
+    "seasonNumber",
+    "episodeNumber",
+    "submitterName",
+    "submitterEmail",
+  ].filter((f) => fieldErrors[f]).map((f) => ({
+    field: f,
     message: fieldErrors[f]!,
   }));
 
@@ -181,8 +124,17 @@ export function SubmitForm({
     if (Object.keys(nextFieldErrors).length > 0) {
       event.preventDefault();
       setFieldErrors(nextFieldErrors);
-      const first = FIELD_FOCUS_ORDER.find((f) => nextFieldErrors[f]);
-      if (first) requestAnimationFrame(() => focusField(first));
+      const first = [
+        "movieSelection",
+        "sightingTitle",
+        "timestamp",
+        "description",
+        "seasonNumber",
+        "episodeNumber",
+        "submitterName",
+        "submitterEmail",
+      ].find((f) => nextFieldErrors[f]);
+      if (first) requestAnimationFrame(() => focusField(first!));
       return;
     }
 
@@ -191,6 +143,13 @@ export function SubmitForm({
 
   return (
     <form action={submitAction} noValidate onSubmit={onSubmit} className="grid gap-12">
+      {/* Hidden fields for logged-in moderators so the submission logic gets their identity */}
+      {(canAutoApprove || moderatorName) && loggedInName && (
+        <>
+          <input type="hidden" name="submitterName" value={loggedInName} />
+          {loggedInEmail && <input type="hidden" name="submitterEmail" value={loggedInEmail} />}
+        </>
+      )}
 
       {/* Error summary — click each item to jump to the field */}
       {orderedErrors.length > 0 ? (
@@ -212,7 +171,7 @@ export function SubmitForm({
         </div>
       ) : null}
 
-      {/* ── 01 · Find the film ─────────────────────────────────────────────── */}
+      {/* -- 01 · Find the film ----------------------------------------------- */}
       <div className="grid gap-5">
         <SectionHeader title="Find the film" />
         <MovieSearchField
@@ -227,10 +186,9 @@ export function SubmitForm({
         />
       </div>
 
-      {/* ── 02 · The rat moment ────────────────────────────────────────────── */}
+      {/* -- 02 · The rat moment ---------------------------------------------- */}
       <div className="grid gap-5">
         <SectionHeader title="The sighting" />
-
         {/* Sighting title */}
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
           <span>
@@ -274,117 +232,176 @@ export function SubmitForm({
         />
 
         {/* Description */}
-        <SightingDescriptionField required errorMessage={errorFor("description")} />
+        <SightingDescriptionField required errorMessage={errorFor("description")}/>
 
         {/* Images — part of the sighting, not "about you" */}
         <SightingImageUpload />
       </div>
 
-      {/* ── 03 · Credit yourself ───────────────────────────────────────────── */}
-      <div className="grid gap-5">
-        <SectionHeader title="Credit yourself" />
-
+      {/* -- 03 · Credit yourself --------------------------------------------- */}
+      {!(canAutoApprove || moderatorName) && (
         <div className="grid gap-5">
-          <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-            <span>
-              Your name
-              <RequiredMarker />
-            </span>
-            {lockedSubmitterFields ? (
-              <input name="submitterName" type="hidden" value={loggedInName} />
-            ) : null}
-            <input
-              data-field="submitterName"
-              name={lockedSubmitterFields ? "submitterNameDisplay" : "submitterName"}
-              required
-              autoComplete="name"
-              placeholder="e.g. Jane Smith"
-              defaultValue={lockedSubmitterFields ? loggedInName : undefined}
-              disabled={lockedSubmitterFields}
-              readOnly={lockedSubmitterFields}
-              aria-invalid={Boolean(errorFor("submitterName"))}
-              className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterName") ? inputErrorClass : ""}`}
-            />
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-              Your name appears on the published sighting as the finder.
-            </p>
-            {errorFor("submitterName") ? (
-              <span className="text-xs font-semibold text-red-700 dark:text-red-300">
-                {errorFor("submitterName")}
+          <SectionHeader title="Credit yourself" />
+          <div className="grid gap-5">
+            <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+              <span>
+                Your name
+                <RequiredMarker />
               </span>
-            ) : null}
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-            <span className="flex items-baseline justify-between">
-              Email{" "}
-              <span className="text-xs font-medium text-stone-400 dark:text-stone-500">
-                (optional)
+              {lockedSubmitterFields ? (
+                <input name="submitterName" type="hidden" value={loggedInName} />
+              ) : null}
+              <input
+                data-field="submitterName"
+                name={lockedSubmitterFields ? "submitterNameDisplay" : "submitterName"}
+                required
+                autoComplete="name"
+                placeholder="e.g. Jane Smith"
+                defaultValue={lockedSubmitterFields ? loggedInName : undefined}
+                disabled={lockedSubmitterFields}
+                readOnly={lockedSubmitterFields}
+                aria-invalid={Boolean(errorFor("submitterName"))}
+                className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterName") ? inputErrorClass : ""}`}
+              />
+              {errorFor("submitterName") ? (
+                <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+                  {errorFor("submitterName")}
+                </span>
+              ) : null}
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
+              <span className="flex items-baseline">
+                Email
+                <span className="ml-1 text-xs font-medium text-stone-400 dark:text-stone-500">(optional)</span>
               </span>
-            </span>
-            {lockedSubmitterFields ? (
-              <input name="submitterEmail" type="hidden" value={loggedInEmail} />
-            ) : null}
-            <input
-              data-field="submitterEmail"
-              name={lockedSubmitterFields ? "submitterEmailDisplay" : "submitterEmail"}
-              type="email"
-              autoComplete="email"
-              inputMode="email"
-              placeholder="you@example.com"
-              defaultValue={lockedSubmitterFields ? loggedInEmail : undefined}
-              disabled={lockedSubmitterFields}
-              readOnly={lockedSubmitterFields}
-              aria-invalid={Boolean(errorFor("submitterEmail"))}
-              className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterEmail") ? inputErrorClass : ""}`}
-            />
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-              Only used if a moderator needs to follow up — never shown publicly.
-            </p>
-            {errorFor("submitterEmail") ? (
-              <span className="text-xs font-semibold text-red-700 dark:text-red-300">
-                {errorFor("submitterEmail")}
-              </span>
-            ) : null}
-          </label>
+              {lockedSubmitterFields ? (
+                <input name="submitterEmail" type="hidden" value={loggedInEmail} />
+              ) : null}
+              <input
+                data-field="submitterEmail"
+                name={lockedSubmitterFields ? "submitterEmailDisplay" : "submitterEmail"}
+                type="email"
+                autoComplete="email"
+                inputMode="email"
+                placeholder="you@example.com"
+                defaultValue={lockedSubmitterFields ? loggedInEmail : undefined}
+                disabled={lockedSubmitterFields}
+                readOnly={lockedSubmitterFields}
+                aria-invalid={Boolean(errorFor("submitterEmail"))}
+                className={`wr-input ${lockedSubmitterFields ? "opacity-80" : ""} ${errorFor("submitterEmail") ? inputErrorClass : ""}`}
+              />
+              <label
+                htmlFor="marketingOptIn"
+                className="mt-2 flex items-center gap-3 text-xs font-medium text-stone-700 dark:text-stone-300 select-none cursor-pointer"
+              >
+                <span className="relative inline-flex shrink-0 items-center">
+                  <input
+                    id="marketingOptIn"
+                    name="marketingOptIn"
+                    type="checkbox"
+                    className="peer sr-only"
+                    defaultChecked={false}
+                  />
+                  <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+                  <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+                </span>
+                <span>Turn on to subscribe to our news feed and updates</span>
+              </label>
+              {errorFor("submitterEmail") ? (
+                <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+                  {errorFor("submitterEmail")}
+                </span>
+              ) : null}
+            </label>
+          </div>
         </div>
+      )}
 
-        <div className="grid gap-4 mt-12">
-          <SectionHeader title="Other settings" />
-          <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">
-            <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
-              <span>Contains plot spoilers</span>
+      <div className="grid gap-4">
+        <SectionHeader title="Other settings" />
+        <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">
+          <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-white/5">
+            <span>Contains plot spoilers</span>
+            <span className="relative inline-flex shrink-0 items-center">
+              <input name="spoiler" type="checkbox" className="peer sr-only" />
+              <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
+              <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+            </span>
+          </label>
+
+          <SightingContentWarningsField embedded rodentTypes={selectedRodentTypes} />
+
+          {canAutoApprove ? (
+            <label className="flex cursor-pointer items-center justify-between gap-4 border-t border-stone-900/8 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/8 dark:text-stone-100 dark:hover:bg-white/5">
+              <span>
+                <span className="block">Auto-approve this submission</span>
+                <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
+                  Signed in as {moderatorName} · skips the pending queue
+                </span>
+              </span>
               <span className="relative inline-flex shrink-0 items-center">
-                <input name="spoiler" type="checkbox" className="peer sr-only" />
+                <input name="autoApprove" type="checkbox" className="peer sr-only" />
                 <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
                 <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
               </span>
             </label>
-
-            <SightingContentWarningsField embedded rodentTypes={selectedRodentTypes} />
-
-            {canAutoApprove ? (
-              <label className="flex cursor-pointer items-center justify-between gap-4 border-t border-stone-900/8 px-4 py-3 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-100 dark:border-white/8 dark:text-stone-100 dark:hover:bg-white/5">
-                <span>
-                  <span className="block">Auto-approve this submission</span>
-                  <span className="mt-0.5 block text-xs font-medium text-stone-500 dark:text-stone-400">
-                    Signed in as {moderatorName} · skips the pending queue
-                  </span>
-                </span>
-                <span className="relative inline-flex shrink-0 items-center">
-                  <input name="autoApprove" type="checkbox" className="peer sr-only" />
-                  <span className="block h-6 w-11 rounded-full bg-stone-300 transition-colors peer-checked:bg-amber-500 dark:bg-stone-600 dark:peer-checked:bg-amber-500" />
-                  <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
-                </span>
-              </label>
-            ) : null}
-          </div>
+          ) : null}
         </div>
+      </div>
 
-        <div>
-          <SubmitButton />
-        </div>
+      <div>
+        <SubmitButton />
       </div>
     </form>
   );
+}
+
+// -- Small shared pieces ------------------------------------------------------
+
+function RequiredMarker() {
+  return (
+    <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">
+      *
+    </span>
+  );
+}
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-1">
+      <h2 className="wr-display text-2xl font-bold text-stone-900 dark:text-amber-50">
+        {title}
+      </h2>
+      <div className="h-px flex-1 bg-amber-500/30 dark:bg-amber-500/20" />
+    </div>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button type="submit" disabled={pending} className="wr-btn-primary w-full sm:w-auto">
+      {pending ? (
+        <span className="flex items-center gap-2">
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          Submitting…
+        </span>
+      ) : (
+        "Submit for review"
+      )}
+    </button>
+  );
+}
+
+function focusField(name: string) {
+  const el =
+    document.querySelector<HTMLElement>(`[data-field="${name}"]`) ??
+    document.querySelector<HTMLElement>(`[name="${name}"]`);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.focus();
+  }
 }

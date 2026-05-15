@@ -23,7 +23,9 @@ export async function submitSighting(formData: FormData) {
   const shouldAutoApprove =
     wantsAutoApprove && canAutoApproveSubmissions(moderatorSession);
 
-  const result = await executePublicSightingSubmit(formData, ip);
+  const result = await executePublicSightingSubmit(formData, ip, {
+    skipModerationNotify: shouldAutoApprove,
+  });
 
   if (!result.ok) {
     if (result.code === "rate-limited") redirect("/submit?status=rate-limited");
