@@ -14,6 +14,7 @@ import { getCatalogMovieByImdbId, getCatalogMovieByTitleSearch } from "@/lib/mov
 import { persistSightingFiles } from "@/lib/media-storage";
 import { notifyOwnerOfNewSubmission } from "@/lib/moderation-notify";
 import { notifySubmitterOfReceipt } from "@/lib/submitter-notify";
+import { upsertMarketingOptIn } from "@/lib/email-preferences-store";
 
 const MAX_SIGHTING_UPLOAD_BYTES = 8 * 1024 * 1024;
 
@@ -167,6 +168,11 @@ export async function executePublicSightingSubmit(
 
     void notifyOwnerOfNewSubmission(submissionRow, existingMovie?.slug);
     void notifySubmitterOfReceipt(submissionRow);
+
+    const marketingOptIn = formData.get("marketingOptIn") === "on";
+    if (submitterEmail && marketingOptIn) {
+      void upsertMarketingOptIn(submitterEmail).catch(() => {});
+    }
 
     return {
       ok: true,

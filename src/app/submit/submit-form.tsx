@@ -347,6 +347,18 @@ export function SubmitForm({
               </span>
             ) : null}
           </label>
+
+          {!lockedSubmitterFields && (
+            <label className="flex cursor-pointer items-start gap-3 text-sm text-stone-600 dark:text-stone-400">
+              <input
+                name="marketingOptIn"
+                type="checkbox"
+                value="on"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 accent-amber-600 dark:border-stone-600"
+              />
+              <span>Email me about new rat sightings and site updates</span>
+            </label>
+          )}
         </div>
 
         <div className="grid gap-4 mt-12">

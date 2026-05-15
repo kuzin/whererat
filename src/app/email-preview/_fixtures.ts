@@ -38,6 +38,7 @@ const PREVIEWS = [
   { slug: "submitter-receipt", label: "Submitter", sublabel: "receipt" },
   { slug: "submitter-approved", label: "Submitter", sublabel: "approved" },
   { slug: "submitter-declined", label: "Submitter", sublabel: "declined" },
+  { slug: "newsletter", label: "Newsletter", sublabel: "news post" },
 ] as const;
 
 export type PreviewSlug = (typeof PREVIEWS)[number]["slug"];

@@ -199,3 +199,12 @@ create table if not exists news_items (
 alter table news_items add column if not exists image_position_x float not null default 50;
 alter table news_items add column if not exists image_position_y float not null default 50;
 alter table news_items add column if not exists image_zoom float not null default 1;
+
+-- Email preferences (marketing opt-in, keyed by email)
+create table if not exists email_preferences (
+  email text primary key,
+  marketing_opt_in boolean not null default false,
+  unsubscribe_token text not null unique default encode(gen_random_bytes(32), 'hex'),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
