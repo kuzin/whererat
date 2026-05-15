@@ -1,5 +1,5 @@
 /**
- * Local-only preview of the "we got your sighting" email sent to submitters.
+ * Local-only preview of the "your sighting wasn't approved" email sent to submitters.
  * Renders fake data — no emails are sent from this route.
  */
 
@@ -16,7 +16,7 @@ export function GET() {
   const blocks: EmailContentBlock[] = [
     {
       kind: "paragraph",
-      text: `We got it, ${firstName}! We'll email you when it's reviewed — usually within a few days.`,
+      text: `Thanks for the submission, ${firstName}. After review, this one wasn't a fit for the catalog.`,
     },
     {
       kind: "button",
@@ -25,16 +25,16 @@ export function GET() {
   ];
 
   const { html } = renderBrandedEmail({
-    preheader: `Your sighting "${s.title}" is in the moderation queue.`,
-    heading: "Thanks for the sighting!",
-    emoji: "🐀",
+    preheader: `An update on your sighting "${s.title}".`,
+    heading: "Not quite this time.",
+    emoji: "🐭",
     centered: true,
     footerNote: SUBMITTER_FOOTER,
     blocks,
     baseUrl: PREVIEW_BASE_URL,
   });
 
-  return new Response(wrapWithPreviewNav(html, "submitter-receipt"), {
+  return new Response(wrapWithPreviewNav(html, "submitter-declined"), {
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
 }

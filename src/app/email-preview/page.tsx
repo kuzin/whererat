@@ -31,6 +31,22 @@ export default function EmailPreviewIndex() {
             Submitter — sighting received
           </a>
         </li>
+        <li>
+          <a
+            className="text-orange-700 underline underline-offset-2 hover:decoration-orange-950 dark:text-amber-200"
+            href="/email-preview/submitter-approved"
+          >
+            Submitter — sighting approved
+          </a>
+        </li>
+        <li>
+          <a
+            className="text-orange-700 underline underline-offset-2 hover:decoration-orange-950 dark:text-amber-200"
+            href="/email-preview/submitter-declined"
+          >
+            Submitter — sighting declined
+          </a>
+        </li>
       </ul>
     </main>
   );

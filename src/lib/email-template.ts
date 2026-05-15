@@ -51,6 +51,12 @@ export type BrandedEmail = {
   eyebrow?: string;
   heading: string;
   blocks: EmailContentBlock[];
+  /** Optional large emoji shown centered at the top of the card, above the heading. */
+  emoji?: string;
+  /** When true, center all paragraph and button content inside the card. */
+  centered?: boolean;
+  /** Footer disclaimer line. Defaults to the moderator-team note. */
+  footerNote?: string;
   /** Override the base URL used for brand image links (defaults to siteUrl()). */
   baseUrl?: string;
 };
@@ -64,12 +70,12 @@ function escapeHtml(input: string): string {
     .replaceAll("'", "&#39;");
 }
 
-function renderBlock(block: EmailContentBlock): string {
+function renderBlock(block: EmailContentBlock, centered?: boolean): string {
   switch (block.kind) {
     case "heading":
       return `<h2 style="margin:0 0 12px;font-family:${FONT_STACK};font-size:20px;line-height:1.3;color:${C.text};font-weight:700">${escapeHtml(block.text)}</h2>`;
     case "paragraph":
-      return `<p style="margin:0 0 14px;font-family:${FONT_STACK};font-size:15px;line-height:1.55;color:${block.muted ? C.muted : C.text}">${escapeHtml(block.text)}</p>`;
+      return `<p style="margin:0 0 14px;font-family:${FONT_STACK};font-size:15px;line-height:1.55;color:${block.muted ? C.muted : C.text}${centered ? ";text-align:center" : ""}">${escapeHtml(block.text)}</p>`;
     case "keyValue": {
       const rowsHtml = block.rows
         .map(
@@ -109,6 +115,20 @@ function renderBlock(block: EmailContentBlock): string {
         </table>`;
     }
     case "button":
+      if (centered) {
+        return `
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:6px 0 12px;border-collapse:collapse">
+            <tr><td align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;border-spacing:0">
+                <tr>
+                  <td style="background:${C.accent};border:2px solid #0c0a09;border-radius:12px;box-shadow:3px 3px 0 0 rgba(87,83,78,0.5)">
+                    <a href="${escapeHtml(block.button.href)}" style="display:inline-block;padding:10px 20px;font-family:${FONT_STACK};font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;letter-spacing:-0.005em">${escapeHtml(block.button.label)}</a>
+                  </td>
+                </tr>
+              </table>
+            </td></tr>
+          </table>`;
+      }
       return `
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 12px;border-collapse:separate;border-spacing:0">
           <tr>
@@ -148,7 +168,7 @@ function blockToText(block: EmailContentBlock): string {
 
 export function renderBrandedEmail(email: BrandedEmail): { html: string; text: string } {
   const SITE = email.baseUrl ?? siteUrl();
-  const blocksHtml = email.blocks.map(renderBlock).join("\n");
+  const blocksHtml = email.blocks.map((b) => renderBlock(b, email.centered)).join("\n");
   const wordmarkUrl = `${SITE}/brand/email/wordmark.svg`;
   const ratUrl = `${SITE}/brand/email/rat-amber.svg`;
   const preheader = email.preheader
@@ -156,6 +176,9 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
     : "";
   const eyebrow = email.eyebrow
     ? `<p style="margin:0 0 6px;font-family:${FONT_STACK};font-size:11px;line-height:1.2;color:${C.accent};letter-spacing:0.08em;text-transform:uppercase;font-weight:600">${escapeHtml(email.eyebrow)}</p>`
+    : "";
+  const cardIcon = email.emoji
+    ? `<div style="text-align:center;padding:4px 0 16px;font-size:60px;line-height:1">${email.emoji}</div>`
     : "";
 
   const html = `<!doctype html>
@@ -185,8 +208,8 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
             <!-- Card -->
             <tr>
               <td style="background:${C.card};border:1px solid ${C.border};border-radius:18px;padding:28px 28px 24px">
-                ${eyebrow}
-                <h1 style="margin:0 0 16px;font-family:${FONT_STACK};font-size:22px;line-height:1.3;color:${C.text};font-weight:700">${escapeHtml(email.heading)}</h1>
+                ${cardIcon}${eyebrow}
+                <h1 style="margin:0 0 16px;font-family:${FONT_STACK};font-size:22px;line-height:1.3;color:${C.text};font-weight:700${email.centered ? ";text-align:center" : ""}">${escapeHtml(email.heading)}</h1>
                 ${blocksHtml}
               </td>
             </tr>
@@ -221,7 +244,7 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
             <tr>
               <td align="center" style="padding:4px 16px 0">
                 <p style="margin:8px 0 0;font-family:${FONT_STACK};font-size:11px;line-height:1.5;color:${C.muted}">
-                  You're receiving this because you're on the WhereRat moderation team.
+                  ${escapeHtml(email.footerNote ?? "You're receiving this because you're on the WhereRat moderation team.")}
                 </p>
               </td>
             </tr>
