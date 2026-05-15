@@ -59,7 +59,7 @@ export function buildNewsletterEmail(
             // Custom margin handled in email-template renderer
             marginTop: 0,
             marginBottom: 28,
-        } as any);
+        });
 
         // Title as heading (removed, handled by email shell)
         // blocks.push({ kind: "heading", text: item.title });

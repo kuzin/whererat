@@ -37,7 +37,7 @@ export type EmailImage = {
 
 export type EmailContentBlock =
   | { kind: "heading"; text: string }
-  | { kind: "paragraph"; text: string; muted?: boolean }
+  | { kind: "paragraph"; text: string; muted?: boolean; marginTop?: number; marginBottom?: number }
   | { kind: "keyValue"; rows: Array<{ label: string; value: string }> }
   | { kind: "quote"; text: string }
   | { kind: "gallery"; images: EmailImage[] }

@@ -12,6 +12,7 @@ import { sendBrandedEmail } from "@/lib/email-send";
 import { renderBrandedEmail, type EmailContentBlock } from "@/lib/email-template";
 import { type Submission } from "@/lib/whererat";
 import { getSubscriber } from "@/lib/email-preferences-store";
+import { getModeratorAccounts } from "@/lib/auth";
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://whererat.com";
@@ -81,7 +82,7 @@ export async function notifySubmitterOfReceipt(submission: Submission): Promise<
   if (!to) return;
 
   // Prevent sending to moderators (by email match)
-  const moderatorEmails = require("@/lib/auth").getModeratorAccounts().map((m: any) => m.email.toLowerCase());
+  const moderatorEmails = getModeratorAccounts().map((m) => m.email.toLowerCase());
   if (moderatorEmails.includes(to.toLowerCase())) return;
 
   const { subject, html, text } = await buildReceiptEmail(submission);
@@ -152,7 +153,7 @@ export async function notifySubmitterOfDecision(
   if (!to) return;
 
   // Prevent sending to moderators (by email match)
-  const moderatorEmails = require("@/lib/auth").getModeratorAccounts().map((m: any) => m.email.toLowerCase());
+  const moderatorEmails = getModeratorAccounts().map((m) => m.email.toLowerCase());
   if (moderatorEmails.includes(to.toLowerCase())) return;
 
   const { subject, html, text } =
