@@ -106,7 +106,7 @@ export async function togglePublishAction(formData: FormData) {
     await toggleNewsItemPublished(id, publish);
     if (publish && sendNewsletter) {
         const item = await getNewsItemById(id);
-        if (item) void sendNewsletterToSubscribers(item).catch(() => {});
+        if (item) void sendNewsletterToSubscribers(item).catch(() => { });
     }
     revalidatePath("/news");
     revalidatePath("/moderation/news");
