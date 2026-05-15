@@ -22,7 +22,6 @@ import {
   searchMovies,
   formatContentWarningLabel,
   getImdbTitleUrl,
-  formatRuntimeMinutes as fmt,
 } from "@/lib/whererat";
 import type { Sighting } from "@/lib/whererat";
 
