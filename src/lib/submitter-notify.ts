@@ -1,7 +1,8 @@
 /**
  * Transactional emails sent to the person who submitted a sighting:
  *   - "We got your sighting" — on submission
- *   - (future) "Approved" / "Declined" — after moderation review
+ *   - "Your sighting was approved" — after moderator approval
+ *   - "Your sighting wasn't approved" — after moderator rejection
  *
  * All sends are best-effort and never throw — submission flows are never
  * blocked by an email failure.
@@ -32,6 +33,8 @@ function movieDisplay(submission: Submission): string {
   return base;
 }
 
+const SUBMITTER_FOOTER = "You're receiving this because you submitted a sighting to WhereRat.";
+
 function buildReceiptEmail(submission: Submission) {
   const headline = submission.title?.trim() || movieDisplay(submission);
   const subject = `We got your sighting: ${headline}`;
@@ -56,8 +59,7 @@ function buildReceiptEmail(submission: Submission) {
     preheader: `Your sighting “${headline}” is in the moderation queue.`,
     heading: "Thanks for the sighting!",
     emoji: "🐀",
-    centered: true,
-    blocks,
+    centered: true,    footerNote: SUBMITTER_FOOTER,    blocks,
   });
 
   return { subject, html, text };
@@ -68,5 +70,76 @@ export async function notifySubmitterOfReceipt(submission: Submission): Promise<
   if (!to) return;
 
   const { subject, html, text } = buildReceiptEmail(submission);
+  await sendBrandedEmail({ to, subject, html, text, logTag: "submitter-notify" });
+}
+
+function buildApprovedEmail(submission: Submission) {
+  const headline = submission.title?.trim() || movieDisplay(submission);
+  const subject = `Your sighting was approved: ${headline}`;
+  const firstName = submission.submittedBy?.trim().split(/\s+/)[0];
+  const body = firstName
+    ? `Great eye, ${firstName}! Your sighting is now live on WhereRat.`
+    : "Your sighting is now live on WhereRat.";
+
+  const blocks: EmailContentBlock[] = [
+    { kind: "paragraph", text: body },
+    {
+      kind: "button",
+      button: { label: "Browse the catalog", href: `${siteUrl()}/catalog` },
+    },
+  ];
+
+  const { html, text } = renderBrandedEmail({
+    preheader: `Your sighting "${headline}" is now live on WhereRat.`,
+    heading: "Your sighting was approved!",
+    emoji: "🎉",
+    centered: true,
+    footerNote: SUBMITTER_FOOTER,
+    blocks,
+  });
+
+  return { subject, html, text };
+}
+
+function buildRejectedEmail(submission: Submission) {
+  const headline = submission.title?.trim() || movieDisplay(submission);
+  const subject = `Update on your WhereRat sighting: ${headline}`;
+  const firstName = submission.submittedBy?.trim().split(/\s+/)[0];
+  const body = firstName
+    ? `Thanks for the submission, ${firstName}. After review, this one wasn't a fit for the catalog.`
+    : "Thanks for the submission. After review, this one wasn't a fit for the catalog.";
+
+  const blocks: EmailContentBlock[] = [
+    { kind: "paragraph", text: body },
+    {
+      kind: "button",
+      button: { label: "Browse the catalog", href: `${siteUrl()}/catalog` },
+    },
+  ];
+
+  const { html, text } = renderBrandedEmail({
+    preheader: `An update on your sighting "${headline}".`,
+    heading: "Not quite this time.",
+    emoji: "🐭",
+    centered: true,
+    footerNote: SUBMITTER_FOOTER,
+    blocks,
+  });
+
+  return { subject, html, text };
+}
+
+export async function notifySubmitterOfDecision(
+  submission: Submission,
+  decision: "approved" | "rejected",
+): Promise<void> {
+  const to = submission.submitterEmail?.trim();
+  if (!to) return;
+
+  const { subject, html, text } =
+    decision === "approved"
+      ? buildApprovedEmail(submission)
+      : buildRejectedEmail(submission);
+
   await sendBrandedEmail({ to, subject, html, text, logTag: "submitter-notify" });
 }

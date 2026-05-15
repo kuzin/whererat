@@ -5,7 +5,7 @@
 
 import { renderBrandedEmail, type EmailContentBlock } from "@/lib/email-template";
 import { formatApproximateRatLine } from "@/lib/whererat";
-import { assertPreviewAllowed, FAKE_SUBMISSION, PREVIEW_BASE_URL } from "../_fixtures";
+import { assertPreviewAllowed, FAKE_SUBMISSION, PREVIEW_BASE_URL, wrapWithPreviewNav } from "../_fixtures";
 
 export function GET() {
   assertPreviewAllowed();
@@ -43,7 +43,7 @@ export function GET() {
     baseUrl: PREVIEW_BASE_URL,
   });
 
-  return new Response(html, {
+  return new Response(wrapWithPreviewNav(html, "moderation"), {
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });
 }

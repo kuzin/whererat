@@ -8,6 +8,7 @@ import {
   type Sighting,
   type Submission,
 } from "@/lib/whererat";
+import { notifySubmitterOfDecision } from "@/lib/submitter-notify";
 import type { ModeratorSession } from "@/lib/auth";
 import { getDeletedSightingIds, getSightingOverrides } from "@/lib/sighting-edit-store";
 import {
@@ -622,6 +623,11 @@ export async function reviewSubmission({
       nextReviewAction.note,
     ],
   );
+
+  if (decision === "approved" || decision === "edited and approved" || decision === "rejected") {
+    const emailDecision = decision === "rejected" ? "rejected" : "approved";
+    notifySubmitterOfDecision(reviewedSubmission, emailDecision).catch(() => {});
+  }
 }
 
 export async function deleteSubmissionById(submissionId: string) {
