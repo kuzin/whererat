@@ -55,6 +55,8 @@ export type BrandedEmail = {
   emoji?: string;
   /** When true, center all paragraph and button content inside the card. */
   centered?: boolean;
+  /** Footer disclaimer line. Defaults to the moderator-team note. */
+  footerNote?: string;
   /** Override the base URL used for brand image links (defaults to siteUrl()). */
   baseUrl?: string;
 };
@@ -242,7 +244,7 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
             <tr>
               <td align="center" style="padding:4px 16px 0">
                 <p style="margin:8px 0 0;font-family:${FONT_STACK};font-size:11px;line-height:1.5;color:${C.muted}">
-                  You're receiving this because you're on the WhereRat moderation team.
+                  ${escapeHtml(email.footerNote ?? "You're receiving this because you're on the WhereRat moderation team.")}
                 </p>
               </td>
             </tr>
