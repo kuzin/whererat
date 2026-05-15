@@ -9,7 +9,7 @@
 
 import { sendBrandedEmail } from "@/lib/email-send";
 import { renderBrandedEmail, type EmailContentBlock } from "@/lib/email-template";
-import { formatApproximateRatLine, type Submission } from "@/lib/whererat";
+import { type Submission } from "@/lib/whererat";
 
 function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://whererat.com";
@@ -35,53 +35,28 @@ function movieDisplay(submission: Submission): string {
 function buildReceiptEmail(submission: Submission) {
   const headline = submission.title?.trim() || movieDisplay(submission);
   const subject = `We got your sighting: ${headline}`;
-  const isSeries = submission.imdbKind === "series";
 
   const firstName = submission.submittedBy?.trim().split(/\s+/)[0];
   const greeting = firstName
-    ? `Thanks, ${firstName}! We received your sighting and it's now in the moderation queue.`
-    : `Thanks! We received your sighting and it's now in the moderation queue.`;
+    ? `We got it, ${firstName}! We’ll email you when it’s reviewed — usually within a few days.`
+    : `We got it! We’ll email you when it’s reviewed — usually within a few days.`;
 
   const blocks: EmailContentBlock[] = [
-    { kind: "paragraph", text: greeting },
     {
       kind: "paragraph",
-      muted: true,
-      text: "We'll review it shortly and email you when it's approved or declined. Approvals usually go out within a few days.",
+      text: greeting,
     },
     {
-      kind: "keyValue",
-      rows: [
-        { label: "Movie", value: movieDisplay(submission) },
-        { label: `Point in ${isSeries ? "episode" : "film"}`, value: submission.timestamp },
-        {
-          label: "Count",
-          value: `~${formatApproximateRatLine(
-            submission.approximateRatCount,
-            submission.rodentTypes,
-          )}`,
-        },
-      ],
+      kind: "button",
+      button: { label: "Browse the catalog", href: `${siteUrl()}/catalog` },
     },
-    { kind: "quote", text: submission.description },
   ];
 
-  if (submission.images?.length) {
-    blocks.push({
-      kind: "gallery",
-      images: submission.images.map((img) => ({ url: img.url, alt: img.alt })),
-    });
-  }
-
-  blocks.push({
-    kind: "button",
-    button: { label: "Browse the catalog", href: `${siteUrl()}/catalog` },
-  });
-
   const { html, text } = renderBrandedEmail({
-    preheader: `Your sighting "${headline}" is in the moderation queue.`,
-    eyebrow: "Sighting received",
+    preheader: `Your sighting “${headline}” is in the moderation queue.`,
     heading: "Thanks for the sighting!",
+    emoji: "🐀",
+    centered: true,
     blocks,
   });
 
