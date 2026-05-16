@@ -5,7 +5,7 @@ import {
 } from "./movie-sightings-toolbar";
 
 const meta: Meta = {
-  title: "App/Movies/SightingsToolbar",
+  title: "Components/Movie/SightingsToolbar",
   parameters: {
     docs: {
       description: {

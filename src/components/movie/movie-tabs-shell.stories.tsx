@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { MovieTabsShell } from "./movie-tabs-shell";
 
 const meta: Meta<typeof MovieTabsShell> = {
-  title: "App/Movies/MovieTabsShell",
+  title: "Components/Movie/MovieTabsShell",
   component: MovieTabsShell,
   tags: ["autodocs"],
   parameters: {

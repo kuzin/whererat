@@ -3,7 +3,7 @@ import type { Sighting } from "@/lib/whererat";
 import { MovieSightingsCards } from "./movie-sightings-cards";
 
 const meta: Meta<typeof MovieSightingsCards> = {
-  title: "App/Movies/MovieSightingsCards",
+  title: "Components/Movie/MovieSightingsCards",
   component: MovieSightingsCards,
   tags: ["autodocs"],
   parameters: {
