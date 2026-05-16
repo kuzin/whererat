@@ -24,7 +24,7 @@ function applyTheme(mode: ThemeMode) {
   document.body.style.colorScheme = mode;
 }
 
-export function CaitlinEasterEggToggle({
+export function VisualModeSwitcher({
   label = "For Kaitlyn. ❤️",
   className = "",
 }: {

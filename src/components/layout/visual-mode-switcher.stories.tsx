@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { CaitlinEasterEggToggle } from "./caitlin-easter-egg-toggle";
+import { VisualModeSwitcher } from "./visual-mode-switcher";
 
-const meta: Meta<typeof CaitlinEasterEggToggle> = {
-  title: "Components/Dev/CaitlinEasterEggToggle",
-  component: CaitlinEasterEggToggle,
+const meta: Meta<typeof VisualModeSwitcher> = {
+  title: "Components/Layout/VisualModeSwitcher",
+  component: VisualModeSwitcher,
   tags: ["autodocs"],
   parameters: {
     docs: {
@@ -16,7 +16,7 @@ const meta: Meta<typeof CaitlinEasterEggToggle> = {
 };
 export default meta;
 
-type Story = StoryObj<typeof CaitlinEasterEggToggle>;
+type Story = StoryObj<typeof VisualModeSwitcher>;
 
 export const Default: Story = {};
 
