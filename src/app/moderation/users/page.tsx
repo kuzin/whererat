@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import { MODERATOR_SESSION_COOKIE, parseModeratorSession, type ModeratorAccount } from "@/lib/auth";
 import { readUserStore } from "@/lib/user-store";
 import { ModalShell } from "@/components/modal-shell";
-import { AvatarUploadField } from "@/app/profile/avatar-upload-field";
+import { AvatarUploadField } from "@/components/forms/avatar-upload-field";
 import { ActionMenuRow, type Action } from "@/components/action-menu-row";
 import { PageHeader } from "@/components/page-header";
 import { createUserAction, updateUserAction, deleteUserAction } from "./actions";

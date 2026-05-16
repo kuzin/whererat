@@ -8,7 +8,7 @@ import {
 } from "@/lib/auth";
 import { getStoredModeratorById } from "@/lib/user-store";
 import { updatePassword, updateProfile } from "./actions";
-import { AvatarUploadField } from "./avatar-upload-field";
+import { AvatarUploadField } from "@/components/forms/avatar-upload-field";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
