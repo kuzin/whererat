@@ -81,12 +81,11 @@ function buildSubmissionEmail(submission: Submission) {
 
   blocks.push({
     kind: "button",
-    button: { label: "Review in moderation queue", href: moderationUrl },
+    button: { label: "Review in moderation queue", href: moderationUrl, fullWidth: true },
   });
 
   const { html, text } = renderBrandedEmail({
     preheader: `${movieLine}${episodePart} — submitted by ${submission.submittedBy}`,
-    eyebrow: "New sighting",
     heading: headline,
     blocks,
   });

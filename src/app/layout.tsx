@@ -8,6 +8,7 @@ import {
   type ModeratorSession,
 } from "@/lib/auth";
 import { SiteMasthead } from "@/components/site-masthead";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { TooltipProvider } from "@/components/tooltip-provider";
 import { Suspense } from "react";
 import { ToastNotifications } from "./toast-notifications";
@@ -205,6 +206,7 @@ export default async function RootLayout({
               </footer>
             </div>
           </div>
+          <ScrollToTop />
           <Suspense><ToastNotifications /></Suspense>
         </TooltipProvider>
         <Analytics />

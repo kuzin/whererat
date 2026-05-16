@@ -1,4 +1,4 @@
-import { Fragment, type CSSProperties } from "react";
+import { Fragment, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -16,7 +16,9 @@ import { tabCardClass, tabHeaderBorderClass } from "./movie-tab-classes";
 import { MovieSightingsPagingBar, MovieSightingsSortControl } from "./movie-sightings-toolbar";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { AccentColorField } from "@/components/accent-color-field";
-import { ResyncButton } from "@/components/resync-button";
+import { ResyncButton, ResyncMenuButton } from "@/components/resync-button";
+import { PageHeader } from "@/components/page-header";
+import type { Action } from "@/components/action-menu-row";
 import { EditSightingForm } from "./edit-sighting-form";
 import {
   deleteMovie,
@@ -144,6 +146,114 @@ function readSeriesTotalEpisodes(snapshot: Record<string, unknown> | undefined):
   const n = Number.parseInt(String(raw ?? "").trim(), 10);
   if (!Number.isFinite(n) || n < 1) return undefined;
   return n;
+}
+
+// ---- Movie-page header icons + action builder ----
+
+const TrashIcon = (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14H6L5 6" />
+    <path d="M10 11v6M14 11v6" />
+    <path d="M9 6V4h6v2" />
+  </svg>
+);
+
+const EditIcon = (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+
+const ExternalIcon = (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+
+const PlusIcon = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+function buildMovieHeader(opts: {
+  slug: string;
+  moviePath: string;
+  movie: Movie;
+  imdbTitleUrlResolved: string | null;
+  canEditMovie: boolean;
+  deleteMovie: (formData: FormData) => Promise<void>;
+  resyncMovieFromImdb: (formData: FormData) => Promise<void>;
+}): { actions: Action[]; primaryAction: { href: string; label: string; icon: ReactNode } } {
+  const { slug, moviePath, movie, imdbTitleUrlResolved, canEditMovie, deleteMovie, resyncMovieFromImdb } = opts;
+  // Ordered: most-used first (stays inline when overflow collapses).
+  // Delete is intentionally LAST so it sits at the bottom of the dropdown.
+  const actions: Action[] = [];
+
+  if (canEditMovie) {
+    actions.push({
+      kind: "link",
+      key: "edit",
+      label: "Edit movie information",
+      icon: EditIcon,
+      href: `${moviePath}?editMovie=1`,
+    });
+    actions.push({
+      kind: "custom",
+      key: "resync",
+      label: "Resync from IMDb",
+      icon: null,
+      iconNode: (
+        <form action={resyncMovieFromImdb}>
+          <input type="hidden" name="slug" value={slug} />
+          <ResyncButton />
+        </form>
+      ),
+      menuNode: (
+        <form action={resyncMovieFromImdb} className="contents">
+          <input type="hidden" name="slug" value={slug} />
+          <ResyncMenuButton />
+        </form>
+      ),
+    });
+  }
+
+  if (imdbTitleUrlResolved) {
+    actions.push({
+      kind: "link",
+      key: "imdb",
+      label: "Open on IMDb",
+      icon: ExternalIcon,
+      href: imdbTitleUrlResolved,
+      external: true,
+    });
+  }
+
+  if (canEditMovie) {
+    // Destructive action — bottom of the flyout, danger styling.
+    actions.push({
+      kind: "confirm-form",
+      key: "delete",
+      label: "Delete movie",
+      icon: TrashIcon,
+      formAction: deleteMovie,
+      hidden: { slug },
+      confirmMessage: "Delete this movie? This cannot be undone.",
+      danger: true,
+    });
+  }
+
+  const primaryAction = {
+    href: `/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`,
+    label: "Submit a Sighting",
+    icon: PlusIcon,
+  };
+
+  return { actions, primaryAction };
 }
 
 function movieHeroMetaLine(movie: Movie, isSeriesTitle: boolean): string | null {
@@ -391,66 +501,26 @@ export async function MoviePage({
         style={rootStyle}
         className="wr-page-shell py-8 sm:py-10"
       >
-        <div className="flex items-center justify-between gap-2">
-          <Link
-            href="/#catalog"
-            aria-label="Back to catalog"
-            title="Back to catalog"
-            className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
-          </Link>
-          <div className="flex items-center gap-1.5">
-            {canEditMovie ? (
-              <div className="flex items-center gap-1.5">
-                <form action={deleteMovie}>
-                  <input type="hidden" name="slug" value={slug} />
-                  <ConfirmSubmitButton
-                    confirmMessage="Delete this movie? This cannot be undone."
-                    type="submit"
-                    aria-label="Delete movie"
-                    title="Delete movie"
-                    className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border-2 border-red-700/30 bg-red-50/80 text-red-700 outline-none transition shadow-[2px_2px_0_0_rgb(185_28_28/0.28)] hover:border-red-700/45 hover:bg-red-100 hover:shadow-[2px_2px_0_0_rgb(185_28_28/0.35)] active:brightness-95 active:shadow-none dark:border-red-400/25 dark:bg-red-950/40 dark:text-red-400 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.32)] dark:hover:bg-red-950/60"
-                  >
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" /></svg>
-                  </ConfirmSubmitButton>
-                </form>
-                <form action={resyncMovieFromImdb}>
-                  <input type="hidden" name="slug" value={slug} />
-                  <ResyncButton />
-                </form>
-                <Link
-                  href={`${moviePath}?editMovie=1`}
-                  aria-label="Edit movie information"
-                  title="Edit movie information"
-                  className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
-                >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
-                </Link>
-              </div>
-            ) : null}
-            {imdbTitleUrlResolved ? (
-              <a
-                href={imdbTitleUrlResolved}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Open on IMDb"
-                title="Open on IMDb"
-                className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
-              </a>
-            ) : null}
-            <Link
-              href={`/submit?for=${encodeURIComponent(movie.externalIds.imdb)}&title=${encodeURIComponent(movie.title)}&year=${encodeURIComponent(String(movie.releaseYear))}&poster=${encodeURIComponent(movie.posterUrl)}`}
-              aria-label="Submit a Sighting"
-              title="Submit a Sighting"
-              className="wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-            </Link>
-          </div>
-        </div>
+        {(() => {
+          const { actions: headerActions, primaryAction: headerPrimary } = buildMovieHeader({
+            slug,
+            moviePath,
+            movie,
+            imdbTitleUrlResolved,
+            canEditMovie,
+            deleteMovie,
+            resyncMovieFromImdb,
+          });
+          return (
+            <PageHeader
+              back={{ href: "/#catalog", label: "Catalog" }}
+              actions={headerActions}
+              primaryAction={headerPrimary}
+              themed={Boolean(palette)}
+              className="mb-0"
+            />
+          );
+        })()}
 
         <section
           className={`wr-cheese-panel mt-6 overflow-hidden ${palette ? "movie-page-palette-bg" : "wr-cheese-tile-cream"}`}

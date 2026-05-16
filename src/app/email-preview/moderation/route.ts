@@ -32,12 +32,11 @@ export function GET() {
     },
     { kind: "quote", text: s.description },
     { kind: "gallery", images: s.images!.map((i) => ({ url: i.url, alt: i.alt })) },
-    { kind: "button", button: { label: "Review in moderation queue", href: moderationUrl } },
+    { kind: "button", button: { label: "Review in moderation queue", href: moderationUrl, fullWidth: true } },
   ];
 
   const { html } = renderBrandedEmail({
     preheader: `${s.movieTitle} (${s.movieYear}) — submitted by ${s.submittedBy}`,
-    eyebrow: "New sighting",
     heading: s.title!,
     blocks,
     baseUrl: PREVIEW_BASE_URL,

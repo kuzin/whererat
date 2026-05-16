@@ -132,10 +132,14 @@ export async function sendNewsletterDigestAction(formData: FormData) {
     }
     const rawSubject = String(formData.get("subject") ?? "").trim();
     const subject = rawSubject || defaultDigestSubject(items);
+    const heading = String(formData.get("heading") ?? "").trim() || undefined;
+    const subhead = String(formData.get("subhead") ?? "").trim() || undefined;
     const result = await sendDigestNewsletterToSubscribers(
         items,
         { id: session.id, name: session.name },
         subject,
+        heading,
+        subhead,
     );
     if (result.recipientCount === 0) {
         redirect("/moderation/news?toast=newsletter-no-subscribers");
@@ -152,7 +156,9 @@ export async function sendNewsletterDigestTestAction(formData: FormData) {
     }
     const rawSubject = String(formData.get("subject") ?? "").trim();
     const subject = rawSubject || defaultDigestSubject(items);
-    await sendDigestNewsletterTest(items, session.email, subject);
+    const heading = String(formData.get("heading") ?? "").trim() || undefined;
+    const subhead = String(formData.get("subhead") ?? "").trim() || undefined;
+    await sendDigestNewsletterTest(items, session.email, subject, heading, subhead);
     redirect("/moderation/news?toast=newsletter-test-sent&compose=1");
 }
 

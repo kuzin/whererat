@@ -8,6 +8,8 @@ type ModalShellProps = {
     containerClassName?: string;
     /** Extra classes shared by the header and footer bars — include border-color and optional bg */
     headerFooterClassName?: string;
+    /** Extra classes for the scrollable body div. When provided, replaces the default px-5 sm:px-6 padding classes. */
+    bodyClassName?: string;
     children: ReactNode;
     footer: ReactNode;
 };
@@ -15,15 +17,16 @@ type ModalShellProps = {
 export function ModalShell({
     title,
     closeHref,
-    containerClassName = "bg-white dark:border-white/20 dark:bg-stone-900",
+    containerClassName = "max-w-3xl bg-white dark:border-white/20 dark:bg-stone-900",
     headerFooterClassName = "border-stone-900/10 dark:border-white/10",
+    bodyClassName,
     children,
     footer,
 }: ModalShellProps) {
     return (
         <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/55 p-6">
             <div
-                className={`flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-2 border-stone-950/22 shadow-[0_20px_60px_rgb(0_0_0/0.45)] ${containerClassName}`}
+                className={`flex w-full flex-col overflow-hidden rounded-2xl border-2 border-stone-950/22 shadow-[0_20px_60px_rgb(0_0_0/0.45)] ${containerClassName}`}
                 style={{ maxHeight: "min(92dvh, calc(100dvh - 3rem))" }}
             >
                 {/* Header */}
@@ -44,7 +47,7 @@ export function ModalShell({
                 </div>
 
                 {/* Scrollable body */}
-                <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-5 sm:px-6">
+                <div className={`min-h-0 flex-1 ${bodyClassName ?? "overflow-x-hidden overflow-y-auto px-5 sm:px-6"}`}>
                     {children}
                 </div>
 
