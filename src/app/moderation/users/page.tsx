@@ -7,6 +7,8 @@ import { MODERATOR_SESSION_COOKIE, parseModeratorSession, type ModeratorAccount 
 import { readUserStore } from "@/lib/user-store";
 import { ModalShell } from "@/components/modal-shell";
 import { AvatarUploadField } from "@/app/profile/avatar-upload-field";
+import { ActionMenuRow, type Action } from "@/components/action-menu-row";
+import { PageHeader } from "@/components/page-header";
 import { createUserAction, updateUserAction, deleteUserAction } from "./actions";
 
 export const metadata: Metadata = {
@@ -20,11 +22,54 @@ function single(v: string | string[] | undefined) {
     return Array.isArray(v) ? v[0] : v;
 }
 
-const ICON_BTN =
-    "wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0";
+const EditIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+);
 
-const ICON_BTN_DANGER =
-    "inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border-2 border-red-700/30 bg-red-50/80 text-red-700 outline-none transition shadow-[2px_2px_0_0_rgb(185_28_28/0.28)] hover:border-red-700/45 hover:bg-red-100 hover:shadow-[2px_2px_0_0_rgb(185_28_28/0.35)] active:brightness-95 active:shadow-none dark:border-red-400/25 dark:bg-red-950/40 dark:text-red-400 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.32)] dark:hover:bg-red-950/60";
+const TrashIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <polyline points="3 6 5 6 21 6" />
+        <path d="M19 6l-1 14H6L5 6" />
+        <path d="M10 11v6M14 11v6" />
+        <path d="M9 6V4h6v2" />
+    </svg>
+);
+
+const PlusIcon = (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+);
+
+function buildUserRowActions(account: ModeratorAccount, canDelete: boolean): Action[] {
+    const actions: Action[] = [
+        {
+            kind: "link",
+            key: "edit",
+            label: "Edit",
+            icon: EditIcon,
+            href: `/moderation/users?edit=${account.id}`,
+        },
+    ];
+    if (canDelete) {
+        actions.push({
+            kind: "confirm-form",
+            key: "delete",
+            label: "Delete",
+            icon: TrashIcon,
+            formAction: deleteUserAction,
+            hidden: { userId: account.id },
+            confirmMessage: `Permanently delete user "${account.name}"? This cannot be undone.`,
+            danger: true,
+        });
+    }
+    return actions;
+}
+
 
 const ERROR_MESSAGES: Record<string, string> = {
     missing: "All required fields must be filled in.",
@@ -143,22 +188,15 @@ export default async function ManageUsersPage({
 
     return (
         <main className="wr-page-shell py-10">
-            {/* Page header */}
-            <div className="mb-6 flex items-center gap-2">
-                <Link href="/moderation" className={ICON_BTN} title="Back to Moderation">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                        <path d="M15 18l-6-6 6-6" />
-                    </svg>
-                    <span className="sr-only">Back to Moderation</span>
-                </Link>
-                <h1 className="ml-1 text-2xl font-black text-stone-950 dark:text-stone-50">
-                    Manage Users
-                </h1>
-                <div className="flex-1" />
-                <Link href="/moderation/users?create=1" className="wr-btn-primary text-sm">
-                    + New user
-                </Link>
-            </div>
+            <PageHeader
+                back={{ href: "/moderation", label: "Moderation" }}
+                title="Manage Users"
+                primaryAction={{
+                    href: "/moderation/users?create=1",
+                    label: "New User",
+                    icon: PlusIcon,
+                }}
+            />
 
             {/* Users list */}
             <section>
@@ -176,7 +214,10 @@ export default async function ManageUsersPage({
                 ) : (
                     <div className="divide-y divide-stone-900/10 rounded-2xl border border-stone-900/12 bg-white dark:divide-white/10 dark:border-white/10 dark:bg-stone-900/70">
                         {accounts.map((account) => (
-                            <div key={account.id} className="flex items-center gap-4 px-5 py-4">
+                            <div
+                                key={account.id}
+                                className="flex items-center gap-3 px-4 py-4 sm:gap-4 sm:px-5"
+                            >
                                 <Image
                                     src={account.avatarUrl}
                                     alt=""
@@ -194,33 +235,10 @@ export default async function ManageUsersPage({
                                     </div>
                                 </div>
 
-                                <div className="flex shrink-0 items-center gap-2">
-                                    <Link
-                                        href={`/moderation/users?edit=${account.id}`}
-                                        className={ICON_BTN}
-                                        title="Edit user"
-                                    >
-                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                        </svg>
-                                        <span className="sr-only">Edit</span>
-                                    </Link>
-                                    {account.id !== session.id && (
-                                        <form action={deleteUserAction}>
-                                            <input type="hidden" name="userId" value={account.id} />
-                                            <button type="submit" className={ICON_BTN_DANGER} title="Delete user">
-                                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                                    <polyline points="3 6 5 6 21 6" />
-                                                    <path d="M19 6l-1 14H6L5 6" />
-                                                    <path d="M10 11v6M14 11v6" />
-                                                    <path d="M9 6V4h6v2" />
-                                                </svg>
-                                                <span className="sr-only">Delete</span>
-                                            </button>
-                                        </form>
-                                    )}
-                                </div>
+                                <ActionMenuRow
+                                    className="justify-end"
+                                    actions={buildUserRowActions(account, account.id !== session.id)}
+                                />
                             </div>
                         ))}
                     </div>

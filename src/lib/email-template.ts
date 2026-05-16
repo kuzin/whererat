@@ -28,6 +28,7 @@ const FONT_STACK =
 export type EmailButton = {
   label: string;
   href: string;
+  fullWidth?: boolean;
 };
 
 export type EmailImage = {
@@ -42,7 +43,8 @@ export type EmailContentBlock =
   | { kind: "quote"; text: string }
   | { kind: "gallery"; images: EmailImage[] }
   | { kind: "button"; button: EmailButton }
-  | { kind: "divider" };
+  | { kind: "divider" }
+  | { kind: "html"; html: string; text?: string };
 
 export type BrandedEmail = {
   /** Pre-header text — shows in the inbox preview line, hidden in the body. */
@@ -74,6 +76,12 @@ export type BrandedEmail = {
   };
 };
 
+function renderInlineMarkdown(input: string): string {
+  return escapeHtml(input)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/_(.+?)_/g, "<em>$1</em>");
+}
+
 function escapeHtml(input: string): string {
   return input
     .replaceAll("&", "&amp;")
@@ -88,13 +96,15 @@ function renderBlock(block: EmailContentBlock, centered?: boolean): string {
     case "heading":
       return `<h2 style="margin:0 0 12px;font-family:${FONT_STACK};font-size:20px;line-height:1.3;color:${C.text};font-weight:700">${escapeHtml(block.text)}</h2>`;
     case "paragraph": {
-      // Custom margin for tag/date block
+      const marginTop = typeof block.marginTop === "number" ? block.marginTop : 0;
+      const marginBottom = typeof block.marginBottom === "number" ? block.marginBottom : 14;
+      const marginStyle = marginTop === 0 && marginBottom === 14 ? "" : `margin:${marginTop}px 0 ${marginBottom}px;`;
+      const baseStyle = `${marginStyle || "margin:0 0 14px;"}font-family:${FONT_STACK};font-size:15px;line-height:1.55;color:${block.muted ? C.muted : C.text}${centered ? ";text-align:center" : ""}`;
+      // Tag/date blocks contain raw HTML spans — pass through without escaping
       if (typeof block.text === "string" && block.text.trim().startsWith("<span ")) {
-        const marginTop = typeof block.marginTop === "number" ? block.marginTop : 0;
-        const marginBottom = typeof block.marginBottom === "number" ? block.marginBottom : 14;
-        return `<p style="margin:${marginTop}px 0 ${marginBottom}px;font-family:${FONT_STACK};font-size:15px;line-height:1.55;color:${block.muted ? C.muted : C.text}${centered ? ";text-align:center" : ""}">${block.text}</p>`;
+        return `<p style="${baseStyle}">${block.text}</p>`;
       }
-      return `<p style="margin:0 0 14px;font-family:${FONT_STACK};font-size:15px;line-height:1.55;color:${block.muted ? C.muted : C.text}${centered ? ";text-align:center" : ""}">${escapeHtml(block.text)}</p>`;
+      return `<p style="${baseStyle}">${escapeHtml(block.text)}</p>`;
     }
     case "keyValue": {
       const rowsHtml = block.rows
@@ -158,6 +168,16 @@ function renderBlock(block: EmailContentBlock, centered?: boolean): string {
             </td></tr>
           </table>`;
       }
+      if (block.button.fullWidth) {
+        return `
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:6px 0 12px;border-collapse:separate;border-spacing:0">
+            <tr>
+              <td style="background:${C.accent};border:2px solid #0c0a09;border-radius:12px;box-shadow:3px 3px 0 0 rgba(87,83,78,0.5)">
+                <a href="${escapeHtml(block.button.href)}" style="display:block;padding:10px 20px;font-family:${FONT_STACK};font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;letter-spacing:-0.005em;text-align:center">${escapeHtml(block.button.label)}</a>
+              </td>
+            </tr>
+          </table>`;
+      }
       return `
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 12px;border-collapse:separate;border-spacing:0">
           <tr>
@@ -168,6 +188,8 @@ function renderBlock(block: EmailContentBlock, centered?: boolean): string {
         </table>`;
     case "divider":
       return `<div style="height:1px;background:${C.borderSoft};margin:18px 0"></div>`;
+    case "html":
+      return block.html;
   }
 }
 
@@ -192,6 +214,8 @@ function blockToText(block: EmailContentBlock): string {
       return `${block.button.label}: ${block.button.href}`;
     case "divider":
       return "---";
+    case "html":
+      return block.text ?? "";
   }
 }
 
@@ -221,7 +245,7 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
                 ${email.topMasthead.emoji ? `<div style="font-size:44px;line-height:1;margin-bottom:10px" aria-hidden="true">${email.topMasthead.emoji}</div>` : ""}
                 ${email.topMasthead.eyebrow ? `<p style="margin:0 0 6px;font-size:11px;line-height:1.2;color:${C.accent};letter-spacing:0.10em;text-transform:uppercase;font-weight:700">${escapeHtml(email.topMasthead.eyebrow)}</p>` : ""}
                 <h1 style="margin:0;font-family:${FONT_STACK};font-size:26px;line-height:1.25;color:${C.text};font-weight:800;letter-spacing:-0.01em">${escapeHtml(email.topMasthead.heading)}</h1>
-                ${email.topMasthead.subhead ? `<p style="margin:8px 0 0;font-size:14px;line-height:1.4;color:${C.muted}">${escapeHtml(email.topMasthead.subhead)}</p>` : ""}
+                ${email.topMasthead.subhead ? `<p style="margin:8px 0 0;font-size:14px;line-height:1.4;color:${C.muted}">${renderInlineMarkdown(email.topMasthead.subhead)}</p>` : ""}
               </td>
             </tr>`
     : "";

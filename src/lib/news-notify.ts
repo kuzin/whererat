@@ -114,7 +114,7 @@ export function buildNewsletterEmail(
     // Read on WhereRat button
     blocks.push({
         kind: "button",
-        button: { label: "Read on WhereRat", href: `${baseUrl}/news` },
+        button: { label: "Read on WhereRat", href: `${baseUrl}/news?post=${encodeURIComponent(item.id)}`, fullWidth: true },
     });
 
     const { html, text } = renderBrandedEmail({
@@ -177,6 +177,8 @@ export function buildNewsletterDigestEmail(
     unsubscribeToken: string,
     subject: string,
     baseUrl = siteUrl(),
+    headingOverride?: string,
+    subheadOverride?: string,
 ): { subject: string; html: string; text: string } {
     const unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
 
@@ -223,20 +225,20 @@ export function buildNewsletterDigestEmail(
         }
 
         const bodyLines = item.body.split(/\r?\n/);
-        let previewBody = bodyLines.slice(0, 4).join("\n");
-        if (bodyLines.length > 4) previewBody += "\n…";
-        blocks.push({ kind: "paragraph", text: previewBody });
+        const previewBody = bodyLines.slice(0, 4).join("\n");
+        const articleUrl = `${baseUrl}/news?post=${encodeURIComponent(item.id)}`;
+        blocks.push({ kind: "paragraph", text: previewBody, marginBottom: 6 });
+        blocks.push({
+            kind: "html",
+            html: `<p style="margin:0 0 14px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.4"><a href="${articleUrl}" style="color:#ea580c;text-decoration:none;font-weight:600">Read more →</a></p>`,
+            text: `Read more: ${articleUrl}`,
+        });
     });
 
-    blocks.push({
-        kind: "button",
-        button: { label: "Read all on WhereRat", href: `${baseUrl}/news` },
-    });
-
-    const heading = items.length === 1 ? items[0].title : "Fresh from WhereRat";
-    const subhead = items.length === 1
+    const heading = headingOverride?.trim() || (items.length === 1 ? items[0].title : "Fresh from WhereRat");
+    const subhead = subheadOverride?.trim() || (items.length === 1
         ? "A fresh update from the WhereRat catalog."
-        : `${items.length} new updates from the WhereRat catalog.`;
+        : `${items.length} new updates from the WhereRat catalog.`);
     const preheaderSource = items[0]?.body ?? "";
 
     const { html, text } = renderBrandedEmail({
@@ -244,7 +246,6 @@ export function buildNewsletterDigestEmail(
         heading,
         topMasthead: {
             emoji: "🐀",
-            eyebrow: "WhereRat Newsletter",
             heading,
             subhead,
         },
@@ -272,6 +273,8 @@ export async function sendDigestNewsletterToSubscribers(
     items: NewsItem[],
     moderator: { id: string; name: string },
     subject: string,
+    headingOverride?: string,
+    subheadOverride?: string,
 ): Promise<{ recipientCount: number; sendId: string | null }> {
     if (items.length === 0) return { recipientCount: 0, sendId: null };
     const subscribers = await getMarketingSubscribers();
@@ -287,7 +290,7 @@ export async function sendDigestNewsletterToSubscribers(
 
     await Promise.allSettled(
         subscribers.map(({ email, unsubscribeToken }) => {
-            const built = buildNewsletterDigestEmail(items, unsubscribeToken, subject);
+            const built = buildNewsletterDigestEmail(items, unsubscribeToken, subject, undefined, headingOverride, subheadOverride);
             return sendBrandedEmail({
                 to: email,
                 subject: built.subject,
@@ -313,11 +316,13 @@ export async function sendDigestNewsletterTest(
     items: NewsItem[],
     toEmail: string,
     subject: string,
+    headingOverride?: string,
+    subheadOverride?: string,
 ): Promise<{ delivered: boolean }> {
     if (items.length === 0 || !toEmail) return { delivered: false };
     const existing = await getSubscriber(toEmail);
     const token = existing?.unsubscribeToken ?? "test-preview";
-    const built = buildNewsletterDigestEmail(items, token, `[TEST] ${subject}`);
+    const built = buildNewsletterDigestEmail(items, token, `[TEST] ${subject}`, undefined, headingOverride, subheadOverride);
     await sendBrandedEmail({
         to: toEmail,
         subject: built.subject,

@@ -130,10 +130,10 @@ export function NewsImageUpload({
 
             {displayPreview ? (
                 <div className="overflow-hidden rounded-xl border border-stone-900/15 dark:border-white/12">
-                    {/* Draggable image editor */}
+                    {/* Draggable image editor — matches ArticleView aspect ratios */}
                     <div
                         ref={containerRef}
-                        className="group relative h-48 w-full cursor-grab overflow-hidden select-none active:cursor-grabbing"
+                        className="group relative aspect-[5/3] w-full cursor-grab overflow-hidden select-none active:cursor-grabbing sm:aspect-[5/2]"
                         onMouseDown={handleMouseDown}
                     >
                         <img

@@ -48,8 +48,9 @@ export function SightingRatPresenceVisual({
         <TooltipContent
           side="top"
           align="end"
-          sideOffset={8}
-          className="z-[100] max-w-[min(100vw-1rem,16rem)] rounded-lg border-2 border-stone-950/22 bg-[#fdfbf7] px-2.5 py-2 text-left text-xs text-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.45)] dark:border-white/20 dark:bg-[rgb(34_29_24)] dark:text-stone-100 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.4)]"
+          sideOffset={12}
+          collisionPadding={16}
+          className="z-[100] w-[calc(100vw-2rem)] max-w-[16rem] rounded-lg border-2 border-stone-950/22 bg-[#fdfbf7] px-2.5 py-2 text-left text-xs text-stone-900 shadow-[2px_2px_0_0_rgb(28_25_23/0.45)] sm:w-auto dark:border-white/20 dark:bg-[rgb(34_29_24)] dark:text-stone-100 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.4)]"
         >
           <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-stone-600 dark:text-stone-400">
             On-screen intensity

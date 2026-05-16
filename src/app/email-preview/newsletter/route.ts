@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { buildNewsletterDigestEmail, defaultDigestSubject } from "@/lib/news-notify";
+import { getNewsItemById } from "@/lib/news-store";
 import { assertPreviewAllowed, wrapWithPreviewNav, PREVIEW_BASE_URL } from "../_fixtures";
 
 export const dynamic = "force-dynamic";
@@ -60,14 +61,31 @@ const FAKE_NEWS_ITEMS = [
 
 const FAKE_UNSUBSCRIBE_TOKEN = "preview-token-abc123";
 
-export async function GET() {
+export async function GET(request: Request) {
   assertPreviewAllowed();
-  const subject = defaultDigestSubject(FAKE_NEWS_ITEMS);
+  const { searchParams } = new URL(request.url);
+  const headingOverride = searchParams.get("heading") ?? undefined;
+  const subheadOverride = searchParams.get("subhead") ?? undefined;
+
+  const ids = searchParams.getAll("id");
+  let newsItems = FAKE_NEWS_ITEMS;
+
+  if (ids.length > 0) {
+    const loaded = await Promise.all(ids.map((id) => getNewsItemById(id)));
+    const real = loaded.filter((item) => item != null && item.publishedAt != null);
+    if (real.length > 0) {
+      newsItems = real as typeof FAKE_NEWS_ITEMS;
+    }
+  }
+
+  const subject = defaultDigestSubject(newsItems);
   const { html } = buildNewsletterDigestEmail(
-    FAKE_NEWS_ITEMS,
+    newsItems,
     FAKE_UNSUBSCRIBE_TOKEN,
     subject,
     PREVIEW_BASE_URL,
+    headingOverride,
+    subheadOverride,
   );
   return new NextResponse(wrapWithPreviewNav(html, "newsletter"), {
     headers: { "Content-Type": "text/html; charset=utf-8" },

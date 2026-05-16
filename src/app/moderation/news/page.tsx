@@ -9,6 +9,8 @@ import { NewsBodyEditor } from "./news-body-editor";
 import { ModalShell } from "@/components/modal-shell";
 import { NewsImageUpload } from "./news-image-upload";
 import { ComposeNewsletterModal } from "./compose-newsletter-modal";
+import { ActionMenuRow, type Action } from "@/components/action-menu-row";
+import { PageHeader } from "@/components/page-header";
 import {
     createNewsItemAction,
     updateNewsItemAction,
@@ -44,11 +46,105 @@ function TypeBadge({ type }: { type: string }) {
     );
 }
 
-const ICON_BTN =
-    "wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0";
+const EditIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+);
 
-const ICON_BTN_DANGER =
-    "inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border-2 border-red-700/30 bg-red-50/80 text-red-700 outline-none transition shadow-[2px_2px_0_0_rgb(185_28_28/0.28)] hover:border-red-700/45 hover:bg-red-100 hover:shadow-[2px_2px_0_0_rgb(185_28_28/0.35)] active:brightness-95 active:shadow-none dark:border-red-400/25 dark:bg-red-950/40 dark:text-red-400 dark:shadow-[2px_2px_0_0_rgb(0_0_0/0.32)] dark:hover:bg-red-950/60";
+const EyeIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
+    </svg>
+);
+
+const EyeOffIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+        <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+);
+
+const TrashIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <polyline points="3 6 5 6 21 6" />
+        <path d="M19 6l-1 14H6L5 6" />
+        <path d="M10 11v6M14 11v6" />
+        <path d="M9 6V4h6v2" />
+    </svg>
+);
+
+const LinkChainIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </svg>
+);
+
+const MailIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <rect width="20" height="16" x="2" y="4" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
+);
+
+const ExternalIcon = (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+        <polyline points="15 3 21 3 21 9" />
+        <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+);
+
+const PlusIcon = (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+);
+
+function buildNewsRowActions(item: NewsItem): Action[] {
+    const actions: Action[] = [];
+    if (item.publishedAt) {
+        actions.push({
+            kind: "copy",
+            key: "copy",
+            label: "Copy direct link",
+            icon: LinkChainIcon,
+            url: `/news?post=${item.id}`,
+        });
+    }
+    actions.push({
+        kind: "link",
+        key: "edit",
+        label: "Edit",
+        icon: EditIcon,
+        href: `/moderation/news?edit=${item.id}`,
+    });
+    actions.push({
+        kind: "form",
+        key: "toggle",
+        label: item.publishedAt ? "Unpublish" : "Publish",
+        icon: item.publishedAt ? EyeOffIcon : EyeIcon,
+        formAction: togglePublishAction,
+        hidden: { id: item.id, publish: item.publishedAt ? "false" : "true" },
+    });
+    actions.push({
+        kind: "confirm-form",
+        key: "delete",
+        label: "Delete",
+        icon: TrashIcon,
+        formAction: deleteNewsItemAction,
+        hidden: { id: item.id },
+        confirmMessage: `Permanently delete "${item.title}"? This cannot be undone.`,
+        danger: true,
+    });
+    return actions;
+}
+
 
 function NewsFormFields({ item, showPublishToggle }: { item?: NewsItem; showPublishToggle?: boolean }) {
     return (
@@ -156,41 +252,31 @@ export default async function ManageNewsPage({
 
     return (
         <main className="wr-page-shell py-10">
-            {/* Page header */}
-            <div className="mb-6 flex items-center gap-2">
-                <Link
-                    href="/moderation"
-                    className={ICON_BTN}
-                    title="Back to Moderation"
-                >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                        <path d="M15 18l-6-6 6-6" />
-                    </svg>
-                    <span className="sr-only">Back to Moderation</span>
-                </Link>
-                <h1 className="ml-1 text-2xl font-black text-stone-950 dark:text-stone-50">
-                    Manage News
-                </h1>
-                <div className="flex-1" />
-                <Link href="/moderation/news?compose=1" className="wr-btn-ghost text-sm" title="Compose a newsletter from published posts">
-                    Compose newsletter
-                </Link>
-                <Link href="/moderation/news?create=1" className="wr-btn-primary text-sm">
-                    + New post
-                </Link>
-                <Link
-                    href="/news"
-                    className={ICON_BTN}
-                    title="View /news"
-                >
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                        <polyline points="15 3 21 3 21 9" />
-                        <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                    <span className="sr-only">View /news</span>
-                </Link>
-            </div>
+            <PageHeader
+                back={{ href: "/moderation", label: "Moderation" }}
+                title="Manage News"
+                actions={[
+                    {
+                        kind: "link",
+                        key: "compose",
+                        label: "Compose newsletter",
+                        icon: MailIcon,
+                        href: "/moderation/news?compose=1",
+                    },
+                    {
+                        kind: "link",
+                        key: "view",
+                        label: "View /news",
+                        icon: ExternalIcon,
+                        href: "/news",
+                    },
+                ]}
+                primaryAction={{
+                    href: "/moderation/news?create=1",
+                    label: "New Post",
+                    icon: PlusIcon,
+                }}
+            />
 
             {/* All posts list */}
             <section>
@@ -208,10 +294,19 @@ export default async function ManageNewsPage({
                 ) : (
                     <div className="divide-y divide-stone-900/10 rounded-2xl border border-stone-900/12 bg-white dark:divide-white/10 dark:border-white/10 dark:bg-stone-900/70">
                         {allItems.map((item) => (
-                            <div key={item.id} className="flex items-center gap-4 px-5 py-4">
+                            <div
+                                key={item.id}
+                                className="flex items-center gap-3 px-4 py-4 sm:gap-4 sm:px-5"
+                            >
                                 {/* Content */}
                                 <div className="min-w-0 flex-1">
-                                    <p className="font-bold text-stone-950 dark:text-stone-100">{item.title}</p>
+                                    {item.publishedAt ? (
+                                        <Link href={`/news?post=${item.id}`} className="font-bold text-stone-950 hover:underline dark:text-stone-100">
+                                            {item.title}
+                                        </Link>
+                                    ) : (
+                                        <p className="font-bold text-stone-950 dark:text-stone-100">{item.title}</p>
+                                    )}
                                     <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
                                         {item.authorName} ·{" "}
                                         {item.publishedAt
@@ -232,51 +327,11 @@ export default async function ManageNewsPage({
                                     </div>
                                 </div>
 
-                                {/* Icon action buttons */}
-                                <div className="flex shrink-0 items-center gap-2">
-                                    <Link
-                                        href={`/moderation/news?edit=${item.id}`}
-                                        className={ICON_BTN}
-                                        title="Edit post"
-                                    >
-                                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                        </svg>
-                                        <span className="sr-only">Edit</span>
-                                    </Link>
-                                    <form action={togglePublishAction} className="flex items-center gap-1">
-                                        <input type="hidden" name="id" value={item.id} />
-                                        <input type="hidden" name="publish" value={item.publishedAt ? "false" : "true"} />
-                                        <button type="submit" className={ICON_BTN} title={item.publishedAt ? "Unpublish" : "Publish"}>
-                                            {item.publishedAt ? (
-                                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                                                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                                                    <line x1="1" y1="1" x2="23" y2="23" />
-                                                </svg>
-                                            ) : (
-                                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                                                    <circle cx="12" cy="12" r="3" />
-                                                </svg>
-                                            )}
-                                            <span className="sr-only">{item.publishedAt ? "Unpublish" : "Publish"}</span>
-                                        </button>
-                                    </form>
-                                    <form action={deleteNewsItemAction}>
-                                        <input type="hidden" name="id" value={item.id} />
-                                        <button type="submit" className={ICON_BTN_DANGER} title="Delete post">
-                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                                                <polyline points="3 6 5 6 21 6" />
-                                                <path d="M19 6l-1 14H6L5 6" />
-                                                <path d="M10 11v6M14 11v6" />
-                                                <path d="M9 6V4h6v2" />
-                                            </svg>
-                                            <span className="sr-only">Delete</span>
-                                        </button>
-                                    </form>
-                                </div>
+                                {/* Icon action buttons (collapses to overflow when > 2) */}
+                                <ActionMenuRow
+                                    className="justify-end"
+                                    actions={buildNewsRowActions(item)}
+                                />
                             </div>
                         ))}
                     </div>

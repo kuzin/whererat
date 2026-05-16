@@ -55,16 +55,21 @@ const sightingMarkdownComponents: Components = {
     </a>
   ),
   ul: ({ children }) => (
-    <ul className="my-3 list-disc space-y-1.5 pl-6 text-stone-700 dark:text-stone-300">
+    <ul className="my-3 space-y-2 pl-1 text-stone-700 dark:text-stone-300">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="my-3 list-decimal space-y-1.5 pl-6 text-stone-700 dark:text-stone-300">
+    <ol className="my-3 list-decimal space-y-2 pl-6 text-stone-700 dark:text-stone-300">
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+  li: ({ children }) => (
+    <li className="flex items-baseline gap-2.5 leading-relaxed">
+      <span className="mt-0.5 shrink-0 text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_70%,rgb(120_113_108/0.6))] dark:text-[color-mix(in_srgb,var(--movie-accent,#ea580c)_55%,rgb(245_240_232/0.6))]">▸</span>
+      <span>{children}</span>
+    </li>
+  ),
   blockquote: ({ children }) => (
     <blockquote className="my-3 border-l-4 border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_55%,rgb(120_113_108/0.55))] pl-4 text-stone-600 italic dark:border-[color-mix(in_srgb,var(--movie-accent,#ea580c)_48%,rgb(245_240_232/0.35))] dark:text-stone-400">
       {children}

@@ -45,33 +45,35 @@ export type PreviewSlug = (typeof PREVIEWS)[number]["slug"];
 
 /** Injects a sticky preview-switcher nav bar into the email HTML. */
 export function wrapWithPreviewNav(html: string, current: PreviewSlug): string {
-  const links = PREVIEWS.map(({ slug, label, sublabel }) => {
-    const active = slug === current;
-    return `<a href="/email-preview/${slug}" style="
-      display:inline-flex;flex-direction:column;align-items:center;
-      padding:6px 14px;border-radius:8px;text-decoration:none;
-      background:${active ? "#1c1410" : "transparent"};
-      color:${active ? "#fff" : "#57534e"};
-      transition:background 0.15s;
-    ">
-      <span style="font-size:12px;font-weight:600;line-height:1.3">${label}</span>
-      <span style="font-size:11px;opacity:${active ? "0.7" : "0.8"};line-height:1.3">${sublabel}</span>
-    </a>`;
-  }).join("");
+  const options = PREVIEWS.map(({ slug, label, sublabel }) =>
+    `<option value="/email-preview/${slug}"${slug === current ? " selected" : ""}>${label} — ${sublabel}</option>`
+  ).join("");
 
   const nav = `<div style="
     position:sticky;top:0;z-index:100;
     background:#fff8ed;border-bottom:1px solid #e6dfd1;
-    padding:8px 16px;display:flex;align-items:center;gap:4px;
+    padding:8px 12px;display:flex;align-items:center;gap:8px;
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   ">
-    <a href="/email-preview" style="
-      margin-right:8px;padding:6px 10px;border-radius:8px;
+    <a href="/moderation" style="
+      flex-shrink:0;padding:6px 10px;border-radius:8px;
       font-size:12px;font-weight:600;color:#57534e;text-decoration:none;
-      display:inline-flex;align-items:center;gap:4px;
-    ">← All</a>
-    <div style="width:1px;height:28px;background:#e6dfd1;margin-right:8px"></div>
-    ${links}
+      display:inline-flex;align-items:center;gap:4px;white-space:nowrap;
+    ">← Moderation</a>
+    <select
+      onchange="window.location.href=this.value"
+      style="
+        flex:1;min-width:0;height:34px;padding:0 10px;border-radius:8px;
+        border:1px solid #d6cfc4;background:#fff;color:#1c1410;
+        font-size:13px;font-weight:600;font-family:inherit;
+        cursor:pointer;outline:none;appearance:none;
+        background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22%2357534e%22><path d=%22M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z%22/></svg>');
+        background-repeat:no-repeat;background-position:right 8px center;background-size:16px;
+        padding-right:28px;
+      "
+    >
+      ${options}
+    </select>
   </div>`;
 
   return html.replace("<body", `<body data-preview-nav="true"`).replace(
