@@ -3,7 +3,7 @@ import type { NewsItem } from "@/lib/news-store";
 import { NewsDesktopLayout } from "./news-desktop-layout";
 
 const meta: Meta<typeof NewsDesktopLayout> = {
-  title: "App/News/NewsDesktopLayout",
+  title: "Components/News/NewsDesktopLayout",
   component: NewsDesktopLayout,
   tags: ["autodocs"],
   parameters: {

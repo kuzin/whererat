@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { NewsItem } from "@/lib/news-store";
-import { TYPE_STYLES, ArticleView } from "./article-view";
+import { TYPE_STYLES, ArticleView } from "@/components/news/article-view";
 
 const CONTENT_GAP = 24; // px below header where content starts
 

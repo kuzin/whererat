@@ -3,7 +3,7 @@ import type { NewsItem, NewsItemType } from "@/lib/news-store";
 import { ArticleView, TypeChip } from "./article-view";
 
 const meta: Meta = {
-  title: "App/News/ArticleView",
+  title: "Components/News/ArticleView",
   parameters: {
     docs: {
       description: {
