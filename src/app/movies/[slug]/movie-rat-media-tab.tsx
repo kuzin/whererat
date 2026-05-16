@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { ImdbImage, ImdbVideo } from "@/lib/whererat";
-import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
+import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "@/lib/movie-tab-classes";
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;

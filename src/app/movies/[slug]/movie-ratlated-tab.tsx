@@ -1,5 +1,5 @@
 import type { ImdbRelatedTitle } from "@/lib/whererat";
-import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "./movie-tab-classes";
+import { tabCardColors, tabHeaderBorderClass, tabMediaCardClass } from "@/lib/movie-tab-classes";
 
 function formatRating(rating: number) {
   return rating.toFixed(1);

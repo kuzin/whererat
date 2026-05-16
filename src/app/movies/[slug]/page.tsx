@@ -12,7 +12,7 @@ import { MovieTabsShell } from "./movie-tabs-shell";
 import { MovieRatviewsTab } from "./movie-ratviews-tab";
 import { MovieRatlatedTab } from "./movie-ratlated-tab";
 import { MovieRatMediaTab } from "./movie-rat-media-tab";
-import { tabCardClass, tabHeaderBorderClass } from "./movie-tab-classes";
+import { tabCardClass, tabHeaderBorderClass } from "@/lib/movie-tab-classes";
 import { MovieSightingsPagingBar, MovieSightingsSortControl } from "./movie-sightings-toolbar";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { AccentColorField } from "@/components/accent-color-field";

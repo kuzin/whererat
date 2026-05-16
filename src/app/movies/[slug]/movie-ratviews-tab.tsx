@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import type { ImdbReview } from "@/lib/whererat";
-import { tabCardClass, tabCardColors, tabHeaderBorderClass } from "./movie-tab-classes";
+import { tabCardClass, tabCardColors, tabHeaderBorderClass } from "@/lib/movie-tab-classes";
 
 const RODENT_RE =
   /\b(rats?|ratty|rat-like|ratcatcher|mice|mouse|rodents?|gerbils?|hamsters?|squirrels?|voles?|beavers?|marmots?|guinea\s+pigs?|murine|vermin)\b/gi;

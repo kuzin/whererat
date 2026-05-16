@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
-import { tabCardColors } from "./movie-tab-classes";
+import { tabCardColors } from "@/lib/movie-tab-classes";
 import {
   estimateRatsForAppearance,
   formatApproximateRatLine,
