@@ -306,8 +306,16 @@ h6 {
 }
 
 @utility wr-btn-primary {
-  @apply wr-btn text-white;
+  @apply wr-btn;
   background-color: var(--wr-accent-btn);
+  /* Text color follows the contrast of the button's background. On non-movie
+   * pages `--movie-accent-ink` is unset, so we fall back to white (which is
+   * correct for the default orange accent). Movie pages compute the ink via
+   * `pickReadableInk`, returning a darkened accent for light palettes.
+   * The same ink is used in dark mode because dark-mode `--wr-accent-btn` is
+   * just a slightly-lightened version of `palette.accent` — visually the same
+   * color, so the text should stay the same too. */
+  color: var(--movie-accent-ink, #fff);
 }
 
 .wr-btn-primary:hover {

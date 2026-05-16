@@ -13,7 +13,12 @@ import {
 } from "@/lib/whererat";
 import { addSubmission } from "@/lib/moderation-store";
 import { getCatalogMovieByImdbId, getCatalogMovieByTitleSearch } from "@/lib/movie-catalog";
-import { persistSightingFiles } from "@/lib/media-storage";
+import {
+  persistSightingFiles,
+  parseSightingImageGalleryForm,
+  SIGHTING_GALLERY_FIELD_NAMES,
+  SIGHTING_GALLERY_SENTINEL,
+} from "@/lib/media-storage";
 import { notifyOwnerOfNewSubmission } from "@/lib/moderation-notify";
 import { notifySubmitterOfReceipt } from "@/lib/submitter-notify";
 import { upsertMarketingOptIn } from "@/lib/email-preferences-store";
@@ -34,6 +39,13 @@ function normalizeOptionalSubmitterEmail(value: unknown): string | undefined {
 }
 
 async function persistSightingUploadsFromForm(formData: FormData): Promise<SightingImageSlot[]> {
+  // New gallery payload: per-slot fields with positioning
+  if (formData.get(SIGHTING_GALLERY_SENTINEL)) {
+    return parseSightingImageGalleryForm(formData, SIGHTING_GALLERY_FIELD_NAMES, {
+      maxBytes: MAX_SIGHTING_UPLOAD_BYTES,
+    });
+  }
+  // Legacy multi-file payload (still used by the native API client)
   const raw = formData.getAll("sightingImages");
   const files = raw.filter((e): e is File => e instanceof File && e.size > 0);
   const capped = files.slice(0, 5);

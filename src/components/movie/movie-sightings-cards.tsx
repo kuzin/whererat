@@ -407,7 +407,7 @@ export function MovieSightingsCards({
                             key={id}
                             className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold tracking-tight ${palette ? chipColors : "border-stone-700/20 bg-stone-100 text-stone-900 dark:border-white/15 dark:bg-stone-800/70 dark:text-stone-100"}`}
                           >
-                            <img src={`/openmoji/color/svg/${code}.svg`} alt="" width={16} height={16} aria-hidden />
+                            <img src={`/openmoji/color/svg/${code}.svg`} alt="" width={20} height={20} aria-hidden />
                             {display}
                           </span>
                         );
@@ -419,7 +419,7 @@ export function MovieSightingsCards({
                             key={id}
                             className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold tracking-tight ${palette ? chipColors : "border-yellow-800/20 bg-yellow-50 text-yellow-900 dark:border-yellow-400/25 dark:bg-yellow-950/40 dark:text-yellow-200"}`}
                           >
-                            <img src={`/openmoji/color/svg/${opt ? opt.openmojiCode : "26A0"}.svg`} alt="" width={16} height={16} aria-hidden />
+                            <img src={`/openmoji/color/svg/${opt ? opt.openmojiCode : "26A0"}.svg`} alt="" width={20} height={20} aria-hidden />
                             {formatContentWarningLabel(id, sighting.rodentTypes)}
                           </span>
                         );

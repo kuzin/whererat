@@ -133,6 +133,19 @@ export function SightingImageCarousel({
             width={900}
             height={500}
             className={`h-full w-full object-cover ${spoilerHidden ? "scale-[1.03] blur-2xl brightness-[0.65]" : ""}`}
+            style={
+              spoilerHidden
+                ? undefined
+                : {
+                    objectPosition: `${current.positionX ?? 50}% ${current.positionY ?? 50}%`,
+                    ...(current.zoom && current.zoom !== 1
+                      ? {
+                          transform: `scale(${current.zoom})`,
+                          transformOrigin: `${current.positionX ?? 50}% ${current.positionY ?? 50}%`,
+                        }
+                      : {}),
+                  }
+            }
             sizes="(min-width: 1024px) 900px, 100vw"
             priority={index === 0}
           />

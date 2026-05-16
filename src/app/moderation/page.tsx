@@ -501,7 +501,7 @@ export default async function ModerationPage({
                                     const code = isOther ? "270F" : (opt?.openmojiCode ?? "26A0");
                                     return (
                                       <span key={id} className="inline-flex items-center gap-1 rounded-md border border-amber-700/35 bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-950 dark:border-amber-400/25 dark:bg-amber-950/35 dark:text-amber-200">
-                                        <img src={`/openmoji/color/svg/${code}.svg`} alt="" width={14} height={14} aria-hidden />
+                                        <img src={`/openmoji/color/svg/${code}.svg`} alt="" width={18} height={18} aria-hidden />
                                         {display}
                                       </span>
                                     );
@@ -515,7 +515,7 @@ export default async function ModerationPage({
                                     const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
                                     return (
                                       <span key={id} className="inline-flex items-center gap-1 rounded-md border border-yellow-700/35 bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-950 dark:border-yellow-400/25 dark:bg-yellow-950/35 dark:text-yellow-200">
-                                        <img src={`/openmoji/color/svg/${opt?.openmojiCode ?? "26A0"}.svg`} alt="" width={14} height={14} aria-hidden />
+                                        <img src={`/openmoji/color/svg/${opt?.openmojiCode ?? "26A0"}.svg`} alt="" width={18} height={18} aria-hidden />
                                         {formatContentWarningLabel(id, submission.rodentTypes)}
                                       </span>
                                     );

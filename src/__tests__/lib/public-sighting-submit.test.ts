@@ -10,6 +10,16 @@ vi.mock("@/lib/movie-catalog", () => ({
 }));
 vi.mock("@/lib/media-storage", () => ({
   persistSightingFiles: vi.fn().mockResolvedValue([]),
+  parseSightingImageGalleryForm: vi.fn().mockResolvedValue([]),
+  SIGHTING_GALLERY_FIELD_NAMES: {
+    file: "sightingImageFile",
+    url: "sightingImageUrl",
+    alt: "sightingImageAlt",
+    positionX: "sightingImagePositionX",
+    positionY: "sightingImagePositionY",
+    zoom: "sightingImageZoom",
+  },
+  SIGHTING_GALLERY_SENTINEL: "sightingImageListManaged",
 }));
 
 import {

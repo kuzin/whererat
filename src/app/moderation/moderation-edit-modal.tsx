@@ -9,7 +9,7 @@ import {
   SightingContentWarningsField,
   SightingRodentTypesField,
 } from "@/components/forms/sighting-fields";
-import { EditableSightingImagesField } from "@/components/forms/editable-sighting-images-field";
+import { ImageUploadGallery, type InitialGalleryImage } from "@/components/forms/image-upload-gallery";
 import {
   getSightingTimestampPercent,
   getSubmissionImageRefs,
@@ -123,7 +123,28 @@ export function ModerationEditModal({
         </label>
 
         {/* Images */}
-        <EditableSightingImagesField initialImages={initialImages} />
+        <ImageUploadGallery
+          label="Sighting images"
+          hintSuffix="(optional, max 5)"
+          aspectRatio="wide"
+          maxImages={5}
+          initialImages={initialImages.map(
+            (slot): InitialGalleryImage => ({
+              url: slot.url,
+              alt: slot.alt,
+              x: slot.positionX,
+              y: slot.positionY,
+              zoom: slot.zoom,
+            }),
+          )}
+          fileFieldName="sightingImageFile"
+          urlFieldName="sightingImageUrl"
+          altFieldName="sightingImageAlt"
+          positionXFieldName="sightingImagePositionX"
+          positionYFieldName="sightingImagePositionY"
+          zoomFieldName="sightingImageZoom"
+          sentinelFieldName="sightingImageListManaged"
+        />
 
         {/* Spoiler + content warnings */}
         <div className="overflow-hidden rounded-xl border border-stone-900/12 bg-stone-50 dark:border-white/10 dark:bg-stone-900/50">

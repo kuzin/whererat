@@ -213,6 +213,12 @@ export type Source = {
 export type SightingImageSlot = {
   url: string;
   alt?: string;
+  /** 0–100, object-position X percentage. Defaults to 50 (centered). */
+  positionX?: number;
+  /** 0–100, object-position Y percentage. Defaults to 50 (centered). */
+  positionY?: number;
+  /** ≥ 1, CSS scale factor applied at the position. Defaults to 1. */
+  zoom?: number;
 };
 
 /**
@@ -393,20 +399,26 @@ function isNonPlaceholderImageUrl(url: string): boolean {
 export function getSightingImageRefs(sighting: Sighting): SightingImageSlot[] {
   const out: SightingImageSlot[] = [];
   const seen = new Set<string>();
-  const push = (url: string, alt?: string) => {
-    if (!isNonPlaceholderImageUrl(url)) return;
-    const key = url.trim().split("?")[0] ?? url.trim();
+  const push = (slot: SightingImageSlot) => {
+    if (!isNonPlaceholderImageUrl(slot.url)) return;
+    const key = slot.url.trim().split("?")[0] ?? slot.url.trim();
     if (seen.has(key)) return;
     seen.add(key);
-    out.push({ url: url.trim(), alt: alt?.trim() || undefined });
+    out.push({
+      url: slot.url.trim(),
+      alt: slot.alt?.trim() || undefined,
+      positionX: slot.positionX,
+      positionY: slot.positionY,
+      zoom: slot.zoom,
+    });
   };
 
   for (const slot of sighting.images ?? []) {
     if (out.length >= 5) break;
-    push(slot.url, slot.alt);
+    push(slot);
   }
   if (out.length < 5 && sighting.imageUrl) {
-    push(sighting.imageUrl, sighting.imageAlt);
+    push({ url: sighting.imageUrl, alt: sighting.imageAlt });
   }
   return out.slice(0, 5);
 }
@@ -420,20 +432,26 @@ export function sightingHasUploadedImage(sighting: Sighting): boolean {
 export function getSubmissionImageRefs(submission: Submission): SightingImageSlot[] {
   const out: SightingImageSlot[] = [];
   const seen = new Set<string>();
-  const push = (url: string, alt?: string) => {
-    if (!isNonPlaceholderImageUrl(url)) return;
-    const key = url.trim().split("?")[0] ?? url.trim();
+  const push = (slot: SightingImageSlot) => {
+    if (!isNonPlaceholderImageUrl(slot.url)) return;
+    const key = slot.url.trim().split("?")[0] ?? slot.url.trim();
     if (seen.has(key)) return;
     seen.add(key);
-    out.push({ url: url.trim(), alt: alt?.trim() || undefined });
+    out.push({
+      url: slot.url.trim(),
+      alt: slot.alt?.trim() || undefined,
+      positionX: slot.positionX,
+      positionY: slot.positionY,
+      zoom: slot.zoom,
+    });
   };
 
   for (const slot of submission.images ?? []) {
     if (out.length >= 5) break;
-    push(slot.url, slot.alt);
+    push(slot);
   }
   if (out.length < 5 && submission.imageUrl) {
-    push(submission.imageUrl, submission.imageAlt);
+    push({ url: submission.imageUrl, alt: submission.imageAlt });
   }
   return out.slice(0, 5);
 }

@@ -181,7 +181,7 @@ export function MovieRatviewsTab({ reviews, palette }: Props) {
                         : "translate-x-0.5 bg-white opacity-70",
                     ].join(" ")}
                   >
-                    <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={18} height={18} />
+                    <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={22} height={22} />
                   </span>
                 </button>
               </div>
@@ -278,7 +278,7 @@ function ReviewCard({
               className="cursor-default leading-none"
               title="This review mentions rats!"
             >
-              <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={20} height={20} />
+              <img src="/openmoji/color/svg/1F400.svg" alt="Rat" width={24} height={24} />
             </span>
           ) : null}
         </div>
