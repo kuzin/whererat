@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { AccentColorField } from "./accent-color-field";
 
 const meta: Meta<typeof AccentColorField> = {
-  title: "Components/AccentColorField",
+  title: "Components/Forms/AccentColorField",
   component: AccentColorField,
   tags: ["autodocs"],
   parameters: {

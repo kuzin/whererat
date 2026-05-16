@@ -5,10 +5,10 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { MODERATOR_SESSION_COOKIE, parseModeratorSession, type ModeratorAccount } from "@/lib/auth";
 import { readUserStore } from "@/lib/user-store";
-import { ModalShell } from "@/components/modal-shell";
+import { ModalShell } from "@/components/ui/modal-shell";
 import { AvatarUploadField } from "@/components/forms/avatar-upload-field";
-import { ActionMenuRow, type Action } from "@/components/action-menu-row";
-import { PageHeader } from "@/components/page-header";
+import { ActionMenuRow, type Action } from "@/components/ui/action-menu-row";
+import { PageHeader } from "@/components/layout/page-header";
 import { createUserAction, updateUserAction, deleteUserAction } from "./actions";
 
 export const metadata: Metadata = {

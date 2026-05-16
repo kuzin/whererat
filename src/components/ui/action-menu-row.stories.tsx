@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ActionMenuRow, type Action } from "./action-menu-row";
 
 const meta: Meta<typeof ActionMenuRow> = {
-  title: "Components/ActionMenuRow",
+  title: "Components/UI/ActionMenuRow",
   component: ActionMenuRow,
   tags: ["autodocs"],
   parameters: {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ActionMenuRow, type Action } from "./action-menu-row";
+import { ActionMenuRow, type Action } from "@/components/ui/action-menu-row";
 
 type PrimaryAction = {
     href: string;

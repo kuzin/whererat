@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { SightingMarkdown } from "./sighting-markdown";
 
 const meta: Meta<typeof SightingMarkdown> = {
-  title: "Components/SightingMarkdown",
+  title: "Components/UI/SightingMarkdown",
   component: SightingMarkdown,
   tags: ["autodocs"],
   parameters: {

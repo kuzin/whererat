@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ModalShell } from "./modal-shell";
 
 const meta: Meta<typeof ModalShell> = {
-  title: "Components/ModalShell",
+  title: "Components/UI/ModalShell",
   component: ModalShell,
   tags: ["autodocs"],
   parameters: {

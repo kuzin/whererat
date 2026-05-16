@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { RodentTypeIcon } from "./rodent-type-icon";
 
 const meta: Meta<typeof RodentTypeIcon> = {
-  title: "Components/RodentTypeIcon",
+  title: "Components/UI/RodentTypeIcon",
   component: RodentTypeIcon,
   tags: ["autodocs"],
   args: {

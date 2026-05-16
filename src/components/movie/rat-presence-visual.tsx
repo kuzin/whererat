@@ -9,7 +9,7 @@ import {
   formatApproximateRatLine,
   getRatPresenceScale,
 } from "@/lib/whererat";
-import { RodentTypeIcon } from "@/components/rodent-type-icon";
+import { RodentTypeIcon } from "@/components/ui/rodent-type-icon";
 
 const MAX_SLOTS = 6;
 

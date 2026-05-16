@@ -10,7 +10,7 @@ import {
   SightingRodentTypesField,
 } from "@/components/forms/sighting-fields";
 import { EditableSightingImagesField } from "@/components/forms/editable-sighting-images-field";
-import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import { ConfirmSubmitButton } from "@/components/forms/confirm-submit-button";
 import {
   getSightingTimestampPercent,
   getSightingImageRefs,

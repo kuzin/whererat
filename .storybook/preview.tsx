@@ -1,5 +1,5 @@
 import type { Decorator, Preview } from "@storybook/react";
-import { TooltipProvider } from "../src/components/tooltip-provider";
+import { TooltipProvider } from "../src/components/ui/tooltip-provider";
 import "../src/app/globals.css";
 
 const withProviders: Decorator = (Story, context) => {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ExternalLinkIcon } from "./external-link-icon";
 
 const meta: Meta<typeof ExternalLinkIcon> = {
-  title: "Components/ExternalLinkIcon",
+  title: "Components/UI/ExternalLinkIcon",
   component: ExternalLinkIcon,
   tags: ["autodocs"],
   parameters: {

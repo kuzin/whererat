@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ScrollToTop } from "./scroll-to-top";
 
 const meta: Meta<typeof ScrollToTop> = {
-  title: "Components/ScrollToTop",
+  title: "Components/UI/ScrollToTop",
   component: ScrollToTop,
   parameters: {
     layout: "fullscreen",

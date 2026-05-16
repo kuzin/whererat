@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { InfoPageShell, InfoHero, InfoSection, OM } from "@/components/info-page";
+import { InfoPageShell, InfoHero, InfoSection, OM } from "@/components/layout/info-page";
 
 export const metadata: Metadata = {
   title: "Submission Guidelines",

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { ExternalLinkIcon } from "@/components/external-link-icon";
+import { ExternalLinkIcon } from "@/components/ui/external-link-icon";
 import {
   formatSubmissionEpisodeContext,
   formatApproximateRatLine,
@@ -23,7 +23,7 @@ import { InlineApproveForm } from "@/components/moderation/inline-approve-form";
 import { HistoryList } from "@/components/moderation/history-list";
 import { SightingsTabs } from "@/components/moderation/sightings-tabs";
 import { SubmissionImageThumbs } from "@/components/moderation/submission-image-thumbs";
-import { SightingMarkdown } from "@/components/sighting-markdown";
+import { SightingMarkdown } from "@/components/ui/sighting-markdown";
 import {
   MODERATOR_SESSION_COOKIE,
   parseModeratorSession,

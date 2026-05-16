@@ -6,11 +6,11 @@ import { MODERATOR_SESSION_COOKIE, parseModeratorSession } from "@/lib/auth";
 import { getAllNewsItems, getNewsItemById, NEWS_ITEM_TYPES, type NewsItem } from "@/lib/news-store";
 import { getSentNewsItemIds } from "@/lib/newsletter-sends-store";
 import { NewsBodyEditor } from "@/components/forms/news-body-editor";
-import { ModalShell } from "@/components/modal-shell";
+import { ModalShell } from "@/components/ui/modal-shell";
 import { NewsImageUpload } from "@/components/forms/news-image-upload";
 import { ComposeNewsletterModal } from "./compose-newsletter-modal";
-import { ActionMenuRow, type Action } from "@/components/action-menu-row";
-import { PageHeader } from "@/components/page-header";
+import { ActionMenuRow, type Action } from "@/components/ui/action-menu-row";
+import { PageHeader } from "@/components/layout/page-header";
 import {
     createNewsItemAction,
     updateNewsItemAction,

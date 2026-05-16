@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ModalShell } from "@/components/modal-shell";
+import { ModalShell } from "@/components/ui/modal-shell";
 import {
   SightingTimestampField,
   SightingRatCountField,

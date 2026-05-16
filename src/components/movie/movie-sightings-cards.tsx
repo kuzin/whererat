@@ -16,7 +16,7 @@ import {
   RODENT_TYPE_OPTIONS,
   type Sighting,
 } from "@/lib/whererat";
-import { SightingMarkdown } from "@/components/sighting-markdown";
+import { SightingMarkdown } from "@/components/ui/sighting-markdown";
 import { SightingImageCarousel } from "@/components/movie/sighting-image-carousel";
 import { SightingRatPresenceVisual } from "@/components/movie/rat-presence-visual";
 

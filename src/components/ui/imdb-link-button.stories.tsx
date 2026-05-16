@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ImdbLinkButton } from "./imdb-link-button";
 
 const meta: Meta<typeof ImdbLinkButton> = {
-  title: "Components/ImdbLinkButton",
+  title: "Components/UI/ImdbLinkButton",
   component: ImdbLinkButton,
   tags: ["autodocs"],
   args: {

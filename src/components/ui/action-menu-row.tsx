@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ConfirmSubmitButton } from "./confirm-submit-button";
+import { ConfirmSubmitButton } from "@/components/forms/confirm-submit-button";
 
 const ICON_BTN_GHOST =
     "wr-btn-ghost inline-flex h-11 w-11 items-center justify-center px-0 py-0";

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { SightingMarkdown } from "@/components/sighting-markdown";
-import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
+import { SightingMarkdown } from "@/components/ui/sighting-markdown";
+import { ConfirmSubmitButton } from "@/components/forms/confirm-submit-button";
 import type { Submission } from "@/lib/whererat";
 
 export function HistoryCard({

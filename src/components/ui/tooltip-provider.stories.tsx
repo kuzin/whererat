@@ -7,7 +7,7 @@ import {
 import { TooltipProvider } from "./tooltip-provider";
 
 const meta: Meta<typeof TooltipProvider> = {
-  title: "Components/TooltipProvider",
+  title: "Components/UI/TooltipProvider",
   component: TooltipProvider,
   tags: ["autodocs"],
   parameters: {

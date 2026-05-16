@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ConfirmSubmitButton } from "./confirm-submit-button";
 
 const meta: Meta<typeof ConfirmSubmitButton> = {
-  title: "Components/ConfirmSubmitButton",
+  title: "Components/Forms/ConfirmSubmitButton",
   component: ConfirmSubmitButton,
   tags: ["autodocs"],
   parameters: {

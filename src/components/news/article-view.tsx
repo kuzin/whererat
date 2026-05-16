@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SightingMarkdown } from "@/components/sighting-markdown";
+import { SightingMarkdown } from "@/components/ui/sighting-markdown";
 import type { NewsItem, NewsItemType } from "@/lib/news-store";
 
 const NEWS_TYPE_LABELS: Record<NewsItemType, string> = {

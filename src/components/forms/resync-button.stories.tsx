@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { ResyncButton, ResyncMenuButton } from "./resync-button";
 
 const meta: Meta = {
-  title: "Components/ResyncButton",
+  title: "Components/Forms/ResyncButton",
   tags: ["autodocs"],
   parameters: {
     docs: {

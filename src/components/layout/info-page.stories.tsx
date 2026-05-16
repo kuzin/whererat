@@ -10,7 +10,7 @@ import {
 } from "./info-page";
 
 const meta: Meta = {
-  title: "Components/InfoPage",
+  title: "Components/Layout/InfoPage",
   tags: ["autodocs"],
   parameters: {
     layout: "fullscreen",

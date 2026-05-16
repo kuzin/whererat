@@ -6,8 +6,8 @@
  */
 
 import { useState, useId, useRef } from "react";
-import { SightingMarkdown } from "@/components/sighting-markdown";
-import { RodentTypeIcon } from "@/components/rodent-type-icon";
+import { SightingMarkdown } from "@/components/ui/sighting-markdown";
+import { RodentTypeIcon } from "@/components/ui/rodent-type-icon";
 import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, MAX_OTHER_RODENT_LABEL_LENGTH, OTHER_RODENT_ID, formatContentWarningLabel, formatPercentAsTimestamp } from "@/lib/whererat";
 
 // ─── Swarm signal ────────────────────────────────────────────────────────────

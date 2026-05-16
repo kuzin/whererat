@@ -8,8 +8,8 @@ import {
   type ModeratorSession,
 } from "@/lib/auth";
 import { SiteMasthead } from "@/components/layout/site-masthead";
-import { ScrollToTop } from "@/components/scroll-to-top";
-import { TooltipProvider } from "@/components/tooltip-provider";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { TooltipProvider } from "@/components/ui/tooltip-provider";
 import { Suspense } from "react";
 import { ToastNotifications } from "./toast-notifications";
 import { logoutModerator } from "./login/actions";

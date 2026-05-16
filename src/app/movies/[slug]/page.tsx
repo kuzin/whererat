@@ -14,11 +14,11 @@ import { MovieRatlatedTab } from "@/components/movie/movie-ratlated-tab";
 import { MovieRatMediaTab } from "@/components/movie/movie-rat-media-tab";
 import { tabCardClass, tabHeaderBorderClass } from "@/lib/movie-tab-classes";
 import { MovieSightingsPagingBar, MovieSightingsSortControl } from "@/components/movie/movie-sightings-toolbar";
-import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
-import { AccentColorField } from "@/components/accent-color-field";
-import { ResyncButton, ResyncMenuButton } from "@/components/resync-button";
-import { PageHeader } from "@/components/page-header";
-import type { Action } from "@/components/action-menu-row";
+import { ConfirmSubmitButton } from "@/components/forms/confirm-submit-button";
+import { AccentColorField } from "@/components/forms/accent-color-field";
+import { ResyncButton, ResyncMenuButton } from "@/components/forms/resync-button";
+import { PageHeader } from "@/components/layout/page-header";
+import type { Action } from "@/components/ui/action-menu-row";
 import { EditSightingForm } from "@/components/movie/edit-sighting-form";
 import {
   deleteMovie,
