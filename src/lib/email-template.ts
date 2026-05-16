@@ -59,6 +59,19 @@ export type BrandedEmail = {
   footerNote?: string;
   /** Override the base URL used for brand image links (defaults to siteUrl()). */
   baseUrl?: string;
+  /**
+   * Optional centered masthead rendered OUTSIDE the card, between the
+   * wordmark and the card body. Used by digest-style emails so the section
+   * title doesn't compete visually with the first item's heading inside
+   * the card. When set, the inside-card eyebrow/heading are suppressed
+   * (the document <title> still uses `email.heading`).
+   */
+  topMasthead?: {
+    emoji?: string;
+    eyebrow?: string;
+    heading: string;
+    subhead?: string;
+  };
 };
 
 function escapeHtml(input: string): string {
@@ -190,11 +203,27 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
   const preheader = email.preheader
     ? `<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${C.bg};opacity:0">${escapeHtml(email.preheader)}</div>`
     : "";
-  const eyebrow = email.eyebrow
+  const useTopMasthead = Boolean(email.topMasthead);
+  const eyebrow = !useTopMasthead && email.eyebrow
     ? `<p style="margin:0 0 6px;font-family:${FONT_STACK};font-size:11px;line-height:1.2;color:${C.accent};letter-spacing:0.08em;text-transform:uppercase;font-weight:600">${escapeHtml(email.eyebrow)}</p>`
     : "";
-  const cardIcon = email.emoji
+  const cardIcon = !useTopMasthead && email.emoji
     ? `<div style="text-align:center;padding:4px 0 16px;font-size:60px;line-height:1">${email.emoji}</div>`
+    : "";
+  const insideHeading = useTopMasthead
+    ? ""
+    : `<h1 style="margin:0 0 16px;font-family:${FONT_STACK};font-size:22px;line-height:1.3;color:${C.text};font-weight:700${email.centered ? ";text-align:center" : ""}">${escapeHtml(email.heading)}</h1>`;
+  const topMasthead = useTopMasthead && email.topMasthead
+    ? `
+            <!-- Top masthead (digest style — sits outside the card) -->
+            <tr>
+              <td align="center" style="padding:8px 16px 22px;font-family:${FONT_STACK}">
+                ${email.topMasthead.emoji ? `<div style="font-size:44px;line-height:1;margin-bottom:10px" aria-hidden="true">${email.topMasthead.emoji}</div>` : ""}
+                ${email.topMasthead.eyebrow ? `<p style="margin:0 0 6px;font-size:11px;line-height:1.2;color:${C.accent};letter-spacing:0.10em;text-transform:uppercase;font-weight:700">${escapeHtml(email.topMasthead.eyebrow)}</p>` : ""}
+                <h1 style="margin:0;font-family:${FONT_STACK};font-size:26px;line-height:1.25;color:${C.text};font-weight:800;letter-spacing:-0.01em">${escapeHtml(email.topMasthead.heading)}</h1>
+                ${email.topMasthead.subhead ? `<p style="margin:8px 0 0;font-size:14px;line-height:1.4;color:${C.muted}">${escapeHtml(email.topMasthead.subhead)}</p>` : ""}
+              </td>
+            </tr>`
     : "";
 
   const html = `<!doctype html>
@@ -221,11 +250,13 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
               </td>
             </tr>
 
+            ${topMasthead}
+
             <!-- Card -->
             <tr>
               <td style="background:${C.card};border:1px solid ${C.border};border-radius:18px;padding:28px 28px 24px">
                 ${cardIcon}${eyebrow}
-                <h1 style="margin:0 0 16px;font-family:${FONT_STACK};font-size:22px;line-height:1.3;color:${C.text};font-weight:700${email.centered ? ";text-align:center" : ""}">${escapeHtml(email.heading)}</h1>
+                ${insideHeading}
                 ${blocksHtml}
               </td>
             </tr>
@@ -272,15 +303,26 @@ export function renderBrandedEmail(email: BrandedEmail): { html: string; text: s
   </body>
 </html>`;
 
-  const textParts = [
-    email.eyebrow ? email.eyebrow.toUpperCase() : null,
-    email.heading,
-    "",
-    ...email.blocks.map(blockToText),
-    "",
-    "—",
-    `WhereRat · ${SITE}`,
-  ].filter((x): x is string => x !== null);
+  const textParts = useTopMasthead && email.topMasthead
+    ? [
+        email.topMasthead.eyebrow ? email.topMasthead.eyebrow.toUpperCase() : null,
+        email.topMasthead.heading,
+        email.topMasthead.subhead ?? null,
+        "",
+        ...email.blocks.map(blockToText),
+        "",
+        "—",
+        `WhereRat · ${SITE}`,
+      ].filter((x): x is string => x !== null)
+    : [
+        email.eyebrow ? email.eyebrow.toUpperCase() : null,
+        email.heading,
+        "",
+        ...email.blocks.map(blockToText),
+        "",
+        "—",
+        `WhereRat · ${SITE}`,
+      ].filter((x): x is string => x !== null);
   const text = textParts.join("\n");
 
   return { html, text };

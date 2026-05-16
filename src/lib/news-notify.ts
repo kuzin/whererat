@@ -195,6 +195,7 @@ export function buildNewsletterDigestEmail(
     };
 
     const blocks: EmailContentBlock[] = [];
+
     items.forEach((item, index) => {
         if (index > 0) blocks.push({ kind: "divider" });
 
@@ -233,11 +234,20 @@ export function buildNewsletterDigestEmail(
     });
 
     const heading = items.length === 1 ? items[0].title : "Fresh from WhereRat";
+    const subhead = items.length === 1
+        ? "A fresh update from the WhereRat catalog."
+        : `${items.length} new updates from the WhereRat catalog.`;
     const preheaderSource = items[0]?.body ?? "";
 
     const { html, text } = renderBrandedEmail({
         preheader: preheaderSource.slice(0, 120),
         heading,
+        topMasthead: {
+            emoji: "🐀",
+            eyebrow: "WhereRat Newsletter",
+            heading,
+            subhead,
+        },
         footerNote: `You're receiving this because you opted in to WhereRat updates. · Unsubscribe: ${unsubscribeUrl}`,
         blocks,
         baseUrl,
