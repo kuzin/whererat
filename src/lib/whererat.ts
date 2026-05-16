@@ -64,6 +64,14 @@ export const RODENT_TYPE_OPTIONS = [
 ] as const;
 export type RodentTypeId = (typeof RODENT_TYPE_OPTIONS)[number]["id"];
 
+/**
+ * Sentinel id used when the submitter picks "Other" and provides a free-text
+ * species name (`otherRodentLabel`). Not part of `RODENT_TYPE_OPTIONS` — public
+ * display helpers fall back to generic "rodent"/"Rodents" wording.
+ */
+export const OTHER_RODENT_ID = "other";
+export const MAX_OTHER_RODENT_LABEL_LENGTH = 60;
+
 export const CONTENT_WARNING_OPTIONS = [
   { id: "rat-dies", emoji: "💀", openmojiCode: "1F480", label: "Rat dies" },
   { id: "rat-harmed", emoji: "🩹", openmojiCode: "1FA79", label: "Rat is harmed" },
@@ -250,6 +258,8 @@ export type Sighting = {
   contentWarnings?: string[];
   /** One or more rodent type ids (from RODENT_TYPE_OPTIONS). Defaults to ["rat"] when absent. */
   rodentTypes?: string[];
+  /** Free-text species name when `rodentTypes` is `["other"]`. Rendered as a public chip. */
+  otherRodentLabel?: string;
 };
 
 export function clampApproximateRatCount(value: unknown): number {
@@ -296,6 +306,8 @@ export type Submission = {
   moviePosterUrl?: string;
   contentWarnings?: string[];
   rodentTypes?: string[];
+  /** Free-text species name when `rodentTypes` is `["other"]`. Moderator-visible only. */
+  otherRodentLabel?: string;
 };
 
 export function formatSubmissionEpisodeContext(submission: Pick<
@@ -430,6 +442,9 @@ export function getSubmissionImageRefs(submission: Submission): SightingImageSlo
 export function formatApproximateRatLine(count: number, rodentTypes?: string[]): string {
   const n = Math.max(1, Math.min(9999, Math.floor(Number(count))));
   if (rodentTypes && rodentTypes.length === 1) {
+    if (rodentTypes[0] === OTHER_RODENT_ID) {
+      return n === 1 ? "Approx. 1 rodent" : `Approx. ${n} rodents`;
+    }
     const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === rodentTypes[0]);
     const singular = opt?.label ?? "rat";
     const plural = opt?.plural ?? "rats";
@@ -448,6 +463,7 @@ export function formatApproximateRatLine(count: number, rodentTypes?: string[]):
 export function rodentCountFieldLabel(rodentTypes?: string[]): string {
   const types = rodentTypes && rodentTypes.length > 0 ? rodentTypes : ["rat"];
   if (types.length === 1) {
+    if (types[0] === OTHER_RODENT_ID) return "Rodents on screen";
     const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === types[0]);
     const plural = opt?.plural ?? "rats";
     return `${plural.charAt(0).toUpperCase()}${plural.slice(1)} on screen`;
@@ -459,6 +475,7 @@ export function rodentCountFieldLabel(rodentTypes?: string[]): string {
 export function rodentSwarmNoun(rodentTypes?: string[]): string {
   const types = rodentTypes && rodentTypes.length > 0 ? rodentTypes : ["rat"];
   if (types.length === 1) {
+    if (types[0] === OTHER_RODENT_ID) return "Rodent";
     const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === types[0]);
     return opt?.label ?? "Rat";
   }
@@ -469,6 +486,7 @@ export function rodentSwarmNoun(rodentTypes?: string[]): string {
 export function rodentSwarmNounPlural(rodentTypes?: string[]): string {
   const types = rodentTypes && rodentTypes.length > 0 ? rodentTypes : ["rat"];
   if (types.length === 1) {
+    if (types[0] === OTHER_RODENT_ID) return "Rodents";
     const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === types[0]) as typeof RODENT_TYPE_OPTIONS[number] | undefined;
     const plural = opt?.plural;
     const label = opt?.label ?? "Rat";
@@ -937,9 +955,9 @@ export function estimateRatsForAppearance(sighting: Sighting): number {
 export type RatPresenceCaption =
   | "Lone scout"
   | "Small pack"
+  | "Merry mischief"
   | "Growing colony"
-  | "Swarm forming"
-  | "Full swarm"
+  | "Rat Swarm"
   | "Rat apocalypse";
 
 export type RatPresenceScale = {
@@ -954,9 +972,9 @@ export function getRatPresenceScale(estimatedCount: number): RatPresenceScale {
   n = Math.min(999, n);
   if (n === 1) return { slotsFilled: 1, caption: "Lone scout", sublabel: "A solitary rat. Brave." };
   if (n <= 3) return { slotsFilled: 2, caption: "Small pack", sublabel: "A couple of friends." };
-  if (n <= 7) return { slotsFilled: 3, caption: "Growing colony", sublabel: "Things are getting ratty." };
-  if (n <= 15) return { slotsFilled: 4, caption: "Swarm forming", sublabel: "Someone call an exterminator." };
-  if (n <= 40) return { slotsFilled: 5, caption: "Full swarm", sublabel: "Absolute chaos." };
+  if (n <= 6) return { slotsFilled: 3, caption: "Merry mischief", sublabel: "The proper collective noun." };
+  if (n <= 15) return { slotsFilled: 4, caption: "Growing colony", sublabel: "Things are getting ratty." };
+  if (n <= 40) return { slotsFilled: 5, caption: "Rat Swarm", sublabel: "Someone call an exterminator." };
   return { slotsFilled: 6, caption: "Rat apocalypse", sublabel: "We bow to our new overlords." };
 }
 

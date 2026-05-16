@@ -8,16 +8,16 @@
 import { useState, useId, useRef } from "react";
 import { SightingMarkdown } from "@/components/sighting-markdown";
 import { RodentTypeIcon } from "@/components/rodent-type-icon";
-import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, formatContentWarningLabel, formatPercentAsTimestamp } from "@/lib/whererat";
+import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, MAX_OTHER_RODENT_LABEL_LENGTH, OTHER_RODENT_ID, formatContentWarningLabel, formatPercentAsTimestamp } from "@/lib/whererat";
 
 // ─── Swarm signal ────────────────────────────────────────────────────────────
 
 function swarmLabel(count: number, noun = "Rat"): { label: string; sublabel: string; fill: number } {
   if (count === 1) return { label: "Lone scout", sublabel: "A solitary one. Brave.", fill: 1 };
   if (count <= 3) return { label: "Small pack", sublabel: "A cozy little crew.", fill: 2 };
-  if (count <= 7) return { label: "Growing colony", sublabel: "Now we're talking.", fill: 3 };
-  if (count <= 15) return { label: "Swarm forming", sublabel: "A glorious gathering.", fill: 4 };
-  if (count <= 40) return { label: "Full swarm", sublabel: "An absolute delight.", fill: 5 };
+  if (count <= 6) return { label: "Merry mischief", sublabel: "The proper collective noun.", fill: 3 };
+  if (count <= 15) return { label: "Growing colony", sublabel: "Now we're talking.", fill: 4 };
+  if (count <= 40) return { label: `${noun} Swarm`, sublabel: "A glorious gathering.", fill: 5 };
   return { label: `${noun} apocalypse`, sublabel: "We bow to our new overlords.", fill: 6 };
 }
 
@@ -424,18 +424,25 @@ export function SightingContentWarningsField({
  */
 export function SightingRodentTypesField({
   initialTypes,
+  initialOtherLabel,
   onTypesChange,
 }: {
   initialTypes?: string[];
+  initialOtherLabel?: string;
   onTypesChange?: (types: string[]) => void;
 }) {
   const [selected, setSelected] = useState<string>(
     initialTypes?.[0] ?? "rat",
   );
+  const [otherLabel, setOtherLabel] = useState<string>(initialOtherLabel ?? "");
+  const otherInputRef = useRef<HTMLInputElement | null>(null);
 
   function select(id: string) {
     setSelected(id);
     onTypesChange?.([id]);
+    if (id === OTHER_RODENT_ID) {
+      requestAnimationFrame(() => otherInputRef.current?.focus());
+    }
   }
 
   const pillBase =
@@ -444,6 +451,8 @@ export function SightingRodentTypesField({
     "border-stone-300/80 bg-white text-stone-600 hover:border-stone-400 hover:text-stone-800 dark:border-white/12 dark:bg-stone-800/60 dark:text-stone-400 dark:hover:border-white/25 dark:hover:text-stone-200";
   const pillOn =
     "border-amber-500/70 bg-amber-50 text-amber-900 dark:border-amber-400/50 dark:bg-amber-900/30 dark:text-amber-200";
+
+  const otherOn = selected === OTHER_RODENT_ID;
 
   return (
     <div className="flex flex-col gap-2">
@@ -474,7 +483,45 @@ export function SightingRodentTypesField({
             </label>
           );
         })}
+        <label className={`${pillBase} ${otherOn ? pillOn : pillOff}`}>
+          <input
+            type="radio"
+            name="rodentTypes"
+            value={OTHER_RODENT_ID}
+            checked={otherOn}
+            onChange={() => select(OTHER_RODENT_ID)}
+            className="sr-only"
+          />
+          <span aria-hidden>
+            <img
+              src="/openmoji/color/svg/270F.svg"
+              alt=""
+              width={16}
+              height={16}
+              style={{ display: "inline", verticalAlign: "middle" }}
+            />
+          </span>
+          Other
+        </label>
       </div>
+      {otherOn ? (
+        <div className="mt-1 flex flex-col gap-1">
+          <input
+            ref={otherInputRef}
+            type="text"
+            name="otherRodentLabel"
+            value={otherLabel}
+            onChange={(e) => setOtherLabel(e.target.value)}
+            placeholder="e.g., capybara, porcupine, vole…"
+            maxLength={MAX_OTHER_RODENT_LABEL_LENGTH}
+            required
+            className="wr-input w-full text-sm"
+          />
+          <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            Will display as &ldquo;Rodent&rdquo; on the public site. Helps moderators verify the species.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

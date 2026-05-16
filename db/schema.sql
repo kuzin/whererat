@@ -177,6 +177,11 @@ alter table submissions add column if not exists content_warnings text[] not nul
 alter table sightings add column if not exists rodent_types text[] not null default '{rat}';
 alter table submissions add column if not exists rodent_types text[] not null default '{rat}';
 
+-- Free-text species label submitted when the user picks "Other" as the rodent
+-- type. Stored on both submissions and sightings and shown publicly as a chip.
+alter table submissions add column if not exists other_rodent_label text;
+alter table sightings add column if not exists other_rodent_label text;
+
 -- News items (owner-curated posts shown on /news)
 create table if not exists news_items (
   id text primary key,

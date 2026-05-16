@@ -4,6 +4,8 @@
  */
 
 import {
+  MAX_OTHER_RODENT_LABEL_LENGTH,
+  OTHER_RODENT_ID,
   clampApproximateRatCount,
   normalizeImdbId,
   normalizeSightingTimestampInput,
@@ -110,11 +112,22 @@ export async function executePublicSightingSubmit(
     const rodentTypes = formData.getAll("rodentTypes")
       .map((v) => String(v).trim())
       .filter(Boolean);
+    const otherRodentLabel = String(formData.get("otherRodentLabel") ?? "")
+      .trim()
+      .slice(0, MAX_OTHER_RODENT_LABEL_LENGTH);
     const otherWarning = String(formData.get("contentWarningOther") ?? "").trim().slice(0, 200);
     if (otherWarning) contentWarnings.push(otherWarning);
 
     if (!movieTitle || !sightingTitle || !timestamp || !description || !submitterName) {
       return { ok: false, code: "missing" };
+    }
+
+    if (rodentTypes.includes(OTHER_RODENT_ID) && !otherRodentLabel) {
+      return {
+        ok: false,
+        code: "missing",
+        message: "Tell us the species when choosing 'Other'.",
+      };
     }
 
     if (!imdbId) {
@@ -165,6 +178,10 @@ export async function executePublicSightingSubmit(
       imageAlt: firstImage?.alt,
       contentWarnings: contentWarnings.length ? contentWarnings : undefined,
       rodentTypes: rodentTypes.length ? rodentTypes : undefined,
+      otherRodentLabel:
+        rodentTypes.includes(OTHER_RODENT_ID) && otherRodentLabel
+          ? otherRodentLabel
+          : undefined,
     });
 
     if (!options?.skipModerationNotify) {

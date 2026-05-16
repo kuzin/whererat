@@ -106,6 +106,7 @@ export async function moderateSubmission(formData: FormData) {
   const otherWarning = String(formData.get("contentWarningOther") ?? "").trim().slice(0, 200);
   if (otherWarning) contentWarnings.push(otherWarning);
   const rodentTypes = formData.getAll("rodentTypes").map((v) => String(v).trim()).filter(Boolean);
+  const otherRodentLabel = String(formData.get("otherRodentLabel") ?? "").trim().slice(0, 60);
 
   const hasEditFields =
     formData.has("sightingTitle") ||
@@ -146,6 +147,8 @@ export async function moderateSubmission(formData: FormData) {
       curatorNote: curatorNote || undefined,
       contentWarnings: contentWarnings.length ? contentWarnings : undefined,
       rodentTypes: rodentTypes.length ? rodentTypes : undefined,
+      otherRodentLabel:
+        rodentTypes.includes("other") && otherRodentLabel ? otherRodentLabel : undefined,
     }
     : curatorNote
       ? { curatorNote }

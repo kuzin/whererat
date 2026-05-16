@@ -542,6 +542,7 @@ export async function updateSightingInfo(formData: FormData) {
   const otherWarning = String(formData.get("contentWarningOther") ?? "").trim().slice(0, 200);
   if (otherWarning) contentWarnings.push(otherWarning);
   const rodentTypes = formData.getAll("rodentTypes").map((v) => String(v).trim()).filter(Boolean);
+  const otherRodentLabel = String(formData.get("otherRodentLabel") ?? "").trim().slice(0, 60);
   const reason = "Edited from movie page.";
   const imageListManaged = String(formData.get("imageListManaged") ?? "") === "1";
   let nextImages: SightingImageSlot[] = [];
@@ -606,6 +607,8 @@ export async function updateSightingInfo(formData: FormData) {
         imageAlt: leadImage?.alt,
         contentWarnings: contentWarnings.length ? contentWarnings : undefined,
         rodentTypes: rodentTypes.length ? rodentTypes : undefined,
+        otherRodentLabel:
+          rodentTypes.includes("other") && otherRodentLabel ? otherRodentLabel : undefined,
       },
     });
   } else {
@@ -621,6 +624,8 @@ export async function updateSightingInfo(formData: FormData) {
       imageAlt: leadImage?.alt,
       contentWarnings: contentWarnings.length ? contentWarnings : undefined,
       rodentTypes: rodentTypes.length ? rodentTypes : undefined,
+      otherRodentLabel:
+        rodentTypes.includes("other") && otherRodentLabel ? otherRodentLabel : undefined,
     });
   }
 

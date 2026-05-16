@@ -306,6 +306,11 @@ describe("formatApproximateRatLine", () => {
   it("uses generic rodent label for multiple types", () => {
     expect(formatApproximateRatLine(3, ["rat", "mouse"])).toBe("Approx. 3 rodents");
   });
+
+  it("uses generic rodent label for the 'other' write-in", () => {
+    expect(formatApproximateRatLine(1, ["other"])).toBe("Approx. 1 rodent");
+    expect(formatApproximateRatLine(4, ["other"])).toBe("Approx. 4 rodents");
+  });
 });
 
 // ── getSightingCardHeadline ───────────────────────────────────────────────────
@@ -484,16 +489,19 @@ describe("getRatPresenceScale", () => {
     expect(getRatPresenceScale(3).caption).toBe("Small pack");
   });
 
-  it("growing colony for 4–7", () => {
-    expect(getRatPresenceScale(5).caption).toBe("Growing colony");
+  it("merry mischief for 4–6", () => {
+    expect(getRatPresenceScale(4).caption).toBe("Merry mischief");
+    expect(getRatPresenceScale(6).caption).toBe("Merry mischief");
   });
 
-  it("swarm forming for 8–15", () => {
-    expect(getRatPresenceScale(10).caption).toBe("Swarm forming");
+  it("growing colony for 7–15", () => {
+    expect(getRatPresenceScale(7).caption).toBe("Growing colony");
+    expect(getRatPresenceScale(15).caption).toBe("Growing colony");
   });
 
-  it("full swarm for 16–40", () => {
-    expect(getRatPresenceScale(25).caption).toBe("Full swarm");
+  it("rat swarm for 16–40", () => {
+    expect(getRatPresenceScale(16).caption).toBe("Rat Swarm");
+    expect(getRatPresenceScale(40).caption).toBe("Rat Swarm");
   });
 
   it("rat apocalypse for 41+", () => {
@@ -990,6 +998,10 @@ describe("rodentCountFieldLabel", () => {
   it("uses generic label for multiple types", () => {
     expect(rodentCountFieldLabel(["rat", "mouse"])).toBe("Rodents on screen");
   });
+
+  it("uses generic label for the 'other' write-in", () => {
+    expect(rodentCountFieldLabel(["other"])).toBe("Rodents on screen");
+  });
 });
 
 // ── rodentSwarmNoun ───────────────────────────────────────────────────────────
@@ -1008,6 +1020,10 @@ describe("rodentSwarmNoun", () => {
   it("returns Rodent for multiple types", () => {
     expect(rodentSwarmNoun(["rat", "mouse"])).toBe("Rodent");
   });
+
+  it("returns Rodent for the 'other' write-in", () => {
+    expect(rodentSwarmNoun(["other"])).toBe("Rodent");
+  });
 });
 
 // ── rodentSwarmNounPlural ─────────────────────────────────────────────────────
@@ -1025,6 +1041,10 @@ describe("rodentSwarmNounPlural", () => {
 
   it("returns Rodents for multiple types", () => {
     expect(rodentSwarmNounPlural(["rat", "mouse"])).toBe("Rodents");
+  });
+
+  it("returns Rodents for the 'other' write-in", () => {
+    expect(rodentSwarmNounPlural(["other"])).toBe("Rodents");
   });
 });
 

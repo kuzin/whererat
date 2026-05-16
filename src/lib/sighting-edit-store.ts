@@ -42,6 +42,7 @@ export async function updateSightingOverride(
             approximate_rat_count = coalesce($7, approximate_rat_count),
             content_warnings = case when $8::text[] is not null then $8 else content_warnings end,
             rodent_types = case when $9::text[] is not null then $9 else rodent_types end,
+            other_rodent_label = coalesce($10, other_rodent_label),
             updated_at = now()
       where id = $1`,
     [
@@ -54,6 +55,7 @@ export async function updateSightingOverride(
       override.approximateRatCount ?? null,
       override.contentWarnings ?? null,
       override.rodentTypes ?? null,
+      override.otherRodentLabel ?? null,
     ],
   );
   if (override.images) {

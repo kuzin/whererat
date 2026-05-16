@@ -13,6 +13,7 @@ import {
   getSightingCardHeadline,
   getSightingImageRefs,
   CONTENT_WARNING_OPTIONS,
+  RODENT_TYPE_OPTIONS,
   type Sighting,
 } from "@/lib/whererat";
 import { SightingMarkdown } from "@/components/sighting-markdown";
@@ -393,6 +394,24 @@ export function MovieSightingsCards({
                           {isSeries ? "into episode" : "into film"}
                         </span>
                       </p>
+                      {(sighting.rodentTypes ?? []).map((id) => {
+                        const isOther = id === "other";
+                        const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
+                        const otherLabel = sighting.otherRodentLabel?.trim();
+                        if (isOther && !otherLabel) return null;
+                        const display = isOther ? otherLabel : opt?.label;
+                        if (!display) return null;
+                        const code = isOther ? "270F" : (opt?.openmojiCode ?? "1F400");
+                        return (
+                          <span
+                            key={id}
+                            className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold tracking-tight ${palette ? chipColors : "border-stone-700/20 bg-stone-100 text-stone-900 dark:border-white/15 dark:bg-stone-800/70 dark:text-stone-100"}`}
+                          >
+                            <img src={`/openmoji/color/svg/${code}.svg`} alt="" width={16} height={16} aria-hidden />
+                            {display}
+                          </span>
+                        );
+                      })}
                       {(sighting.contentWarnings ?? []).map((id) => {
                         const opt = CONTENT_WARNING_OPTIONS.find((o) => o.id === id);
                         return (
