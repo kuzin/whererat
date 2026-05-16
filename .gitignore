@@ -41,7 +41,8 @@ yarn-error.log*
 .vercel
 
 # claude code
-.claude/
+.claude/*
+!.claude/settings.json
 
 # yarn 4 (not tracked in this repo)
 .yarnrc.yml
@@ -55,4 +56,3 @@ yarn.lock
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
-.claude/
