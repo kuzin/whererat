@@ -48,51 +48,51 @@ export function buildNewsletterEmail(
                         : item.type;
 
 
-        // --- Improved layout: tag chip, date, hero image, markdown body ---
-        const blocks: EmailContentBlock[] = [];
+    // --- Improved layout: tag chip, date, hero image, markdown body ---
+    const blocks: EmailContentBlock[] = [];
 
-        // Tag chip and date (as HTML block)
+    // Tag chip and date (as HTML block)
+    blocks.push({
+        kind: "paragraph",
+        text: `<span style="display:inline-block;padding:2px 10px 2px 8px;font-size:12px;font-weight:700;border-radius:8px;background:${typeStyle.bg};color:${typeStyle.color};border:1px solid ${typeStyle.border};margin-right:8px;vertical-align:middle;">${typeLabel}</span><span style="font-size:13px;color:#888;vertical-align:middle;">${formattedDate}</span>`,
+        // We'll allow HTML here and handle it in the renderer below
+        // Custom margin handled in email-template renderer
+        marginTop: 0,
+        marginBottom: 28,
+    });
+
+    // Title as heading (removed, handled by email shell)
+    // blocks.push({ kind: "heading", text: item.title });
+
+    // Hero image (if present)
+    if (item.imageUrl) {
         blocks.push({
-            kind: "paragraph",
-            text: `<span style="display:inline-block;padding:2px 10px 2px 8px;font-size:12px;font-weight:700;border-radius:8px;background:${typeStyle.bg};color:${typeStyle.color};border:1px solid ${typeStyle.border};margin-right:8px;vertical-align:middle;">${typeLabel}</span><span style="font-size:13px;color:#888;vertical-align:middle;">${formattedDate}</span>`,
-            // We'll allow HTML here and handle it in the renderer below
-            // Custom margin handled in email-template renderer
-            marginTop: 0,
-            marginBottom: 28,
+            kind: "gallery",
+            images: [
+                {
+                    url: item.imageUrl,
+                    alt: item.imageAlt || "News image",
+                },
+            ],
         });
+    }
 
-        // Title as heading (removed, handled by email shell)
-        // blocks.push({ kind: "heading", text: item.title });
+    // Body: show only the first 4 lines, add ellipsis if truncated
+    const bodyLines = item.body.split(/\r?\n/);
+    let previewBody = bodyLines.slice(0, 4).join("\n");
+    if (bodyLines.length > 4) {
+        previewBody += "\n…";
+    }
+    blocks.push({ kind: "paragraph", text: previewBody });
 
-        // Hero image (if present)
-        if (item.imageUrl) {
-            blocks.push({
-                kind: "gallery",
-                images: [
-                    {
-                        url: item.imageUrl,
-                        alt: item.imageAlt || "News image",
-                    },
-                ],
-            });
-        }
+    // Author (avatar and name, if present)
+    // Removed from email content to match news page layout
 
-                // Body: show only the first 4 lines, add ellipsis if truncated
-                const bodyLines = item.body.split(/\r?\n/);
-                let previewBody = bodyLines.slice(0, 4).join("\n");
-                if (bodyLines.length > 4) {
-                    previewBody += "\n…";
-                }
-                blocks.push({ kind: "paragraph", text: previewBody });
-
-        // Author (avatar and name, if present)
-        // Removed from email content to match news page layout
-
-        // Read on WhereRat button
-        blocks.push({
-            kind: "button",
-            button: { label: "Read on WhereRat", href: `${baseUrl}/news` },
-        });
+    // Read on WhereRat button
+    blocks.push({
+        kind: "button",
+        button: { label: "Read on WhereRat", href: `${baseUrl}/news` },
+    });
 
     const { html, text } = renderBrandedEmail({
         preheader: item.body.slice(0, 120),
