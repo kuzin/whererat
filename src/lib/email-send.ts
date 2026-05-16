@@ -16,6 +16,11 @@ export type SendBrandedEmailInput = {
   from?: string;
   /** Tag for log lines, e.g. "moderation-notify", "submitter-notify". */
   logTag?: string;
+  /**
+   * Extra SMTP headers (e.g. List-Unsubscribe, List-Unsubscribe-Post).
+   * Resend's API accepts a flat string→string map and forwards them verbatim.
+   */
+  headers?: Record<string, string>;
 };
 
 export async function sendBrandedEmail({
@@ -25,6 +30,7 @@ export async function sendBrandedEmail({
   text,
   from,
   logTag = "email-send",
+  headers,
 }: SendBrandedEmailInput): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -39,7 +45,14 @@ export async function sendBrandedEmail({
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: fromAddr, to, subject, html, text }),
+      body: JSON.stringify({
+        from: fromAddr,
+        to,
+        subject,
+        html,
+        text,
+        ...(headers && Object.keys(headers).length ? { headers } : {}),
+      }),
     });
     if (!res.ok) {
       const body = await res.text().catch(() => "");
