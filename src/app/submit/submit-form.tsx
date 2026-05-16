@@ -232,7 +232,7 @@ export function SubmitForm({
         />
 
         {/* Description */}
-        <SightingDescriptionField required errorMessage={errorFor("description")} />
+        <SightingDescriptionField required errorMessage={errorFor("description")}/>
 
         {/* Images — part of the sighting, not "about you" */}
         <SightingImageUpload />

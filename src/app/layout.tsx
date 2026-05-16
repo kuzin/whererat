@@ -13,6 +13,7 @@ import { Suspense } from "react";
 import { ToastNotifications } from "./toast-notifications";
 import { logoutModerator } from "./login/actions";
 import { getStoredModeratorById } from "@/lib/user-store";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -205,6 +206,7 @@ export default async function RootLayout({
           </div>
           <Suspense><ToastNotifications /></Suspense>
         </TooltipProvider>
+        <Analytics />
       </body>
     </html>
   );
