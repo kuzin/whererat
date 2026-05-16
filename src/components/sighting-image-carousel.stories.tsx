@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { SightingImageCarousel } from "./sighting-image-carousel";
 
 const meta: Meta<typeof SightingImageCarousel> = {
-  title: "App/Movies/SightingImageCarousel",
+  title: "Components/SightingImageCarousel",
   component: SightingImageCarousel,
   tags: ["autodocs"],
   parameters: {

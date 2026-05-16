@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { SightingRatPresenceVisual } from "./rat-presence-visual";
 
 const meta: Meta<typeof SightingRatPresenceVisual> = {
-  title: "App/Movies/RatPresenceVisual",
+  title: "Components/RatPresenceVisual",
   component: SightingRatPresenceVisual,
   tags: ["autodocs"],
   parameters: {

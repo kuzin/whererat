@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CatalogFilters, CatalogPendingProvider } from "./catalog-filters";
 
 const meta: Meta<typeof CatalogFilters> = {
-  title: "App/CatalogFilters",
+  title: "Components/CatalogFilters",
   component: CatalogFilters,
   tags: ["autodocs"],
   parameters: {

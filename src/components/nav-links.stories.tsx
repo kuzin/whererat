@@ -3,7 +3,7 @@ import type { ModeratorSession } from "@/lib/auth";
 import { NavLinks } from "./nav-links";
 
 const meta: Meta<typeof NavLinks> = {
-  title: "App/NavLinks",
+  title: "Components/NavLinks",
   component: NavLinks,
   tags: ["autodocs"],
   parameters: {

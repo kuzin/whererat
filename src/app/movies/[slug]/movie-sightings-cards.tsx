@@ -17,8 +17,8 @@ import {
   type Sighting,
 } from "@/lib/whererat";
 import { SightingMarkdown } from "@/components/sighting-markdown";
-import { SightingImageCarousel } from "./sighting-image-carousel";
-import { SightingRatPresenceVisual } from "./rat-presence-visual";
+import { SightingImageCarousel } from "@/components/sighting-image-carousel";
+import { SightingRatPresenceVisual } from "@/components/rat-presence-visual";
 
 function trimNote(value: string | undefined): string {
   return value?.trim() ?? "";

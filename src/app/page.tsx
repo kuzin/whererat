@@ -19,7 +19,7 @@ import {
   CatalogResultsWrapper,
   type CatalogSortOption,
   type CatalogView,
-} from "./catalog-filters";
+} from "@/components/catalog-filters";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
