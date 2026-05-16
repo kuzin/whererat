@@ -7,7 +7,7 @@ import {
   parseModeratorSession,
   type ModeratorSession,
 } from "@/lib/auth";
-import { SiteMasthead } from "@/components/site-masthead";
+import { SiteMasthead } from "@/components/layout/site-masthead";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { TooltipProvider } from "@/components/tooltip-provider";
 import { Suspense } from "react";

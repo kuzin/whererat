@@ -9,7 +9,7 @@ import {
 } from "./sighting-fields";
 
 const meta: Meta = {
-  title: "Components/SightingFields",
+  title: "Components/Forms/SightingFields",
   parameters: {
     layout: "padded",
     docs: {

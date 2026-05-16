@@ -6,12 +6,12 @@
  * - **Bar surface & border:** `--wr-header-bg`, `--wr-header-border` in `src/app/globals.css` (`:root` and `.dark`).
  * - **Logo tint (mask fill):** `--wr-brand-mark`, `--wr-brand-wordmark` in the same file.
  * - **SVG assets:** replace `public/brand/rat.svg` and `public/brand/logo.svg` (paths: `BRAND_MARK_SRC` / `BRAND_LOGO_SRC` in `src/lib/brand.ts`). Masks are defined on `.wr-brand-mark` / `.wr-brand-wordmark` in `globals.css`.
- * - **Nav labels & mobile menu:** `src/components/nav-links.tsx`
+ * - **Nav labels & mobile menu:** `src/components/layout/nav-links.tsx`
  */
 import Link from "next/link";
 import type { ModeratorSession } from "@/lib/auth";
-import { NavLinks } from "@/components/nav-links";
-import { CaitlinEasterEggToggle } from "./caitlin-easter-egg-toggle";
+import { NavLinks } from "@/components/layout/nav-links";
+import { CaitlinEasterEggToggle } from "@/components/dev/caitlin-easter-egg-toggle";
 
 type SiteMastheadProps = {
   session?: ModeratorSession;

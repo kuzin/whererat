@@ -9,7 +9,7 @@ import {
   SightingDescriptionField,
   SightingContentWarningsField,
   SightingRodentTypesField,
-} from "@/components/sighting-fields";
+} from "@/components/forms/sighting-fields";
 import { MovieSearchField } from "./movie-search-field";
 import { SightingImageUpload } from "./sighting-image-upload";
 

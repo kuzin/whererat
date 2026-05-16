@@ -3,7 +3,7 @@ import type { ModeratorSession } from "@/lib/auth";
 import { SiteMasthead } from "./site-masthead";
 
 const meta: Meta<typeof SiteMasthead> = {
-  title: "Components/SiteMasthead",
+  title: "Components/Layout/SiteMasthead",
   component: SiteMasthead,
   tags: ["autodocs"],
   parameters: {

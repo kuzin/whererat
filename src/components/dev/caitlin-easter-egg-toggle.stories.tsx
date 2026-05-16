@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CaitlinEasterEggToggle } from "./caitlin-easter-egg-toggle";
 
 const meta: Meta<typeof CaitlinEasterEggToggle> = {
-  title: "Components/CaitlinEasterEggToggle",
+  title: "Components/Dev/CaitlinEasterEggToggle",
   component: CaitlinEasterEggToggle,
   tags: ["autodocs"],
   parameters: {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { SubmissionImageThumbs } from "./submission-image-thumbs";
 
 const meta: Meta<typeof SubmissionImageThumbs> = {
-  title: "Components/SubmissionImageThumbs",
+  title: "Components/Moderation/SubmissionImageThumbs",
   component: SubmissionImageThumbs,
   tags: ["autodocs"],
   parameters: {

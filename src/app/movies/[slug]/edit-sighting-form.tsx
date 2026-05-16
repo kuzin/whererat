@@ -8,8 +8,8 @@ import {
   SightingDescriptionField,
   SightingContentWarningsField,
   SightingRodentTypesField,
-} from "@/components/sighting-fields";
-import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
+} from "@/components/forms/sighting-fields";
+import { EditableSightingImagesField } from "@/components/forms/editable-sighting-images-field";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import {
   getSightingTimestampPercent,

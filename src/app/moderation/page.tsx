@@ -22,7 +22,7 @@ import { ModerationEditModal } from "./moderation-edit-modal";
 import { InlineApproveForm } from "./inline-approve-form";
 import { HistoryList } from "./history-list";
 import { SightingsTabs } from "./sightings-tabs";
-import { SubmissionImageThumbs } from "@/components/submission-image-thumbs";
+import { SubmissionImageThumbs } from "@/components/moderation/submission-image-thumbs";
 import { SightingMarkdown } from "@/components/sighting-markdown";
 import {
   MODERATOR_SESSION_COOKIE,
