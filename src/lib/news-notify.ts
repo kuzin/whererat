@@ -7,8 +7,9 @@
 
 import { sendBrandedEmail } from "@/lib/email-send";
 import { renderBrandedEmail, type EmailContentBlock } from "@/lib/email-template";
-import { getMarketingSubscribers } from "@/lib/email-preferences-store";
+import { getMarketingSubscribers, getSubscriber } from "@/lib/email-preferences-store";
 import type { NewsItem } from "@/lib/news-store";
+import { recordNewsletterSend } from "@/lib/newsletter-sends-store";
 
 function siteUrl(): string {
     return process.env.NEXT_PUBLIC_SITE_URL ?? "https://whererat.com";
@@ -123,4 +124,164 @@ export async function sendNewsletterToSubscribers(item: NewsItem): Promise<void>
             return sendBrandedEmail({ to: email, subject, html, text, logTag: "newsletter" });
         }),
     );
+}
+
+/**
+ * Auto-suggested subject for a digest. Caller can override before sending.
+ * Single-item digests reuse the post title for continuity with the legacy
+ * single-post newsletter.
+ */
+export function defaultDigestSubject(items: NewsItem[]): string {
+    if (items.length === 0) return "WhereRat news";
+    if (items.length === 1) return items[0].title;
+    return `WhereRat — ${items.length} new posts`;
+}
+
+/**
+ * Render a digest email containing multiple news items as stacked cards.
+ * Each card mirrors the single-item newsletter layout (type chip + date +
+ * optional hero image + 4-line preview) and is separated by a divider.
+ */
+export function buildNewsletterDigestEmail(
+    items: NewsItem[],
+    unsubscribeToken: string,
+    subject: string,
+    baseUrl = siteUrl(),
+): { subject: string; html: string; text: string } {
+    const unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
+
+    const typeColors: Record<string, { bg: string; color: string; border: string }> = {
+        announcement: { bg: "#e0edff", color: "#1e40af", border: "#93c5fd" },
+        "product-news": { bg: "#ede9fe", color: "#7c3aed", border: "#c4b5fd" },
+        community: { bg: "#d1fae5", color: "#047857", border: "#6ee7b7" },
+        update: { bg: "#f5f5f4", color: "#44403c", border: "#d6d3d1" },
+    };
+
+    const typeLabelMap: Record<string, string> = {
+        announcement: "Announcement",
+        "product-news": "Product news",
+        community: "Community",
+        update: "Update",
+    };
+
+    const blocks: EmailContentBlock[] = [];
+    items.forEach((item, index) => {
+        if (index > 0) blocks.push({ kind: "divider" });
+
+        const pubDate = item.publishedAt || item.createdAt;
+        const formattedDate = pubDate instanceof Date
+            ? pubDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+            : "";
+        const typeStyle = typeColors[item.type] || typeColors.update;
+        const typeLabel = typeLabelMap[item.type] ?? item.type;
+
+        blocks.push({
+            kind: "paragraph",
+            text: `<span style="display:inline-block;padding:2px 10px 2px 8px;font-size:12px;font-weight:700;border-radius:8px;background:${typeStyle.bg};color:${typeStyle.color};border:1px solid ${typeStyle.border};margin-right:8px;vertical-align:middle;">${typeLabel}</span><span style="font-size:13px;color:#888;vertical-align:middle;">${formattedDate}</span>`,
+            marginTop: index === 0 ? 0 : 20,
+            marginBottom: 12,
+        });
+
+        blocks.push({ kind: "heading", text: item.title });
+
+        if (item.imageUrl) {
+            blocks.push({
+                kind: "gallery",
+                images: [{ url: item.imageUrl, alt: item.imageAlt || "News image" }],
+            });
+        }
+
+        const bodyLines = item.body.split(/\r?\n/);
+        let previewBody = bodyLines.slice(0, 4).join("\n");
+        if (bodyLines.length > 4) previewBody += "\n…";
+        blocks.push({ kind: "paragraph", text: previewBody });
+    });
+
+    blocks.push({
+        kind: "button",
+        button: { label: "Read all on WhereRat", href: `${baseUrl}/news` },
+    });
+
+    const heading = items.length === 1 ? items[0].title : "Fresh from WhereRat";
+    const preheaderSource = items[0]?.body ?? "";
+
+    const { html, text } = renderBrandedEmail({
+        preheader: preheaderSource.slice(0, 120),
+        heading,
+        footerNote: `You're receiving this because you opted in to WhereRat updates. · Unsubscribe: ${unsubscribeUrl}`,
+        blocks,
+        baseUrl,
+    });
+
+    const unsubscribeLink = `<a href="${unsubscribeUrl}" style="color:inherit;text-decoration:underline">Unsubscribe</a>`;
+    const htmlWithUnsub = html.replace(
+        `Unsubscribe: ${unsubscribeUrl}`,
+        unsubscribeLink,
+    );
+
+    return { subject, html: htmlWithUnsub, text };
+}
+
+/**
+ * Send a digest of the given items to every marketing-opt-in subscriber.
+ * Records the send (with intended recipient count) BEFORE fanning out so a
+ * partial Resend failure still leaves a complete history record. Best-effort
+ * on individual sends.
+ */
+export async function sendDigestNewsletterToSubscribers(
+    items: NewsItem[],
+    moderator: { id: string; name: string },
+    subject: string,
+): Promise<{ recipientCount: number; sendId: string | null }> {
+    if (items.length === 0) return { recipientCount: 0, sendId: null };
+    const subscribers = await getMarketingSubscribers();
+    if (!subscribers.length) return { recipientCount: 0, sendId: null };
+
+    const sendId = await recordNewsletterSend({
+        subject,
+        sentById: moderator.id,
+        sentByName: moderator.name,
+        recipientCount: subscribers.length,
+        newsItemIds: items.map((item) => item.id),
+    });
+
+    await Promise.allSettled(
+        subscribers.map(({ email, unsubscribeToken }) => {
+            const built = buildNewsletterDigestEmail(items, unsubscribeToken, subject);
+            return sendBrandedEmail({
+                to: email,
+                subject: built.subject,
+                html: built.html,
+                text: built.text,
+                logTag: "newsletter-digest",
+            });
+        }),
+    );
+
+    return { recipientCount: subscribers.length, sendId };
+}
+
+/**
+ * Send a test digest to a single email address. Uses the recipient's own
+ * unsubscribe token when they are an existing subscriber, otherwise mints a
+ * dummy token (test emails should never expose a real-looking unsubscribe
+ * link to a non-subscriber).
+ */
+export async function sendDigestNewsletterTest(
+    items: NewsItem[],
+    toEmail: string,
+    subject: string,
+): Promise<{ delivered: boolean }> {
+    if (items.length === 0 || !toEmail) return { delivered: false };
+    const existing = await getSubscriber(toEmail);
+    const token = existing?.unsubscribeToken ?? "test-preview";
+    const built = buildNewsletterDigestEmail(items, token, `[TEST] ${subject}`);
+    await sendBrandedEmail({
+        to: toEmail,
+        subject: built.subject,
+        html: built.html,
+        text: built.text,
+        logTag: "newsletter-digest-test",
+    });
+    return { delivered: true };
 }

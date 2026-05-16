@@ -13,7 +13,11 @@ import {
     type NewsItemType,
 } from "@/lib/news-store";
 import { persistImageFile } from "@/lib/media-storage";
-import { sendNewsletterToSubscribers } from "@/lib/news-notify";
+import {
+    defaultDigestSubject,
+    sendDigestNewsletterToSubscribers,
+    sendDigestNewsletterTest,
+} from "@/lib/news-notify";
 
 const MAX_NEWS_IMAGE_BYTES = 8 * 1024 * 1024;
 
@@ -101,16 +105,55 @@ export async function togglePublishAction(formData: FormData) {
     await requireOwner();
     const id = (formData.get("id") as string | null)?.trim() ?? "";
     const publish = formData.get("publish") === "true";
-    const sendNewsletter = formData.get("sendNewsletter") === "true";
     if (!id) return;
     await toggleNewsItemPublished(id, publish);
-    if (publish && sendNewsletter) {
-        const item = await getNewsItemById(id);
-        if (item) void sendNewsletterToSubscribers(item).catch(() => { });
-    }
     revalidatePath("/news");
     revalidatePath("/moderation/news");
     redirect(`/moderation/news?toast=${publish ? "news-published" : "news-unpublished"}`);
+}
+
+async function loadSelectedPublishedItems(formData: FormData) {
+    const ids = formData
+        .getAll("newsItemId")
+        .map((v) => String(v).trim())
+        .filter(Boolean);
+    if (ids.length === 0) return [];
+    const items = await Promise.all(ids.map((id) => getNewsItemById(id)));
+    return items
+        .filter((item): item is NonNullable<typeof item> => Boolean(item))
+        .filter((item) => item.publishedAt !== null);
+}
+
+export async function sendNewsletterDigestAction(formData: FormData) {
+    const session = await requireOwner();
+    const items = await loadSelectedPublishedItems(formData);
+    if (items.length === 0) {
+        redirect("/moderation/news?toast=newsletter-empty");
+    }
+    const rawSubject = String(formData.get("subject") ?? "").trim();
+    const subject = rawSubject || defaultDigestSubject(items);
+    const result = await sendDigestNewsletterToSubscribers(
+        items,
+        { id: session.id, name: session.name },
+        subject,
+    );
+    if (result.recipientCount === 0) {
+        redirect("/moderation/news?toast=newsletter-no-subscribers");
+    }
+    revalidatePath("/moderation/news");
+    redirect(`/moderation/news?toast=newsletter-sent&count=${result.recipientCount}`);
+}
+
+export async function sendNewsletterDigestTestAction(formData: FormData) {
+    const session = await requireOwner();
+    const items = await loadSelectedPublishedItems(formData);
+    if (items.length === 0) {
+        redirect("/moderation/news?toast=newsletter-empty");
+    }
+    const rawSubject = String(formData.get("subject") ?? "").trim();
+    const subject = rawSubject || defaultDigestSubject(items);
+    await sendDigestNewsletterTest(items, session.email, subject);
+    redirect("/moderation/news?toast=newsletter-test-sent&compose=1");
 }
 
 export async function deleteNewsItemAction(formData: FormData) {
