@@ -19,9 +19,9 @@ import {
   RODENT_TYPE_OPTIONS,
 } from "@/lib/whererat";
 import { ModerationEditModal } from "./moderation-edit-modal";
-import { InlineApproveForm } from "./inline-approve-form";
-import { HistoryList } from "./history-list";
-import { SightingsTabs } from "./sightings-tabs";
+import { InlineApproveForm } from "@/components/moderation/inline-approve-form";
+import { HistoryList } from "@/components/moderation/history-list";
+import { SightingsTabs } from "@/components/moderation/sightings-tabs";
 import { SubmissionImageThumbs } from "@/components/moderation/submission-image-thumbs";
 import { SightingMarkdown } from "@/components/sighting-markdown";
 import {
@@ -35,7 +35,7 @@ import {
   getCatalogMovieByTitleSearch,
   getCatalogStatsWithCommunity,
 } from "@/lib/movie-catalog";
-import { ResyncAllButton } from "./resync-all-button";
+import { ResyncAllButton } from "@/components/moderation/resync-all-button";
 import { readUserStore } from "@/lib/user-store";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

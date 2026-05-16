@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { HistoryCard } from "./history-card";
+import { HistoryCard } from "@/components/moderation/history-card";
 import type { Submission } from "@/lib/whererat";
 
 const PAGE_SIZE = 20;

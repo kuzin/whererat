@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { SightingsTabs } from "./sightings-tabs";
 
 const meta: Meta<typeof SightingsTabs> = {
-  title: "App/Moderation/SightingsTabs",
+  title: "Components/Moderation/SightingsTabs",
   component: SightingsTabs,
   tags: ["autodocs"],
   parameters: {

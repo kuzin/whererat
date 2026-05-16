@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { InlineApproveForm } from "./inline-approve-form";
 
 const meta: Meta<typeof InlineApproveForm> = {
-  title: "App/Moderation/InlineApproveForm",
+  title: "Components/Moderation/InlineApproveForm",
   component: InlineApproveForm,
   tags: ["autodocs"],
   parameters: {

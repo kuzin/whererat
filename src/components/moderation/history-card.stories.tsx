@@ -3,7 +3,7 @@ import type { Submission } from "@/lib/whererat";
 import { HistoryCard } from "./history-card";
 
 const meta: Meta<typeof HistoryCard> = {
-  title: "App/Moderation/HistoryCard",
+  title: "Components/Moderation/HistoryCard",
   component: HistoryCard,
   tags: ["autodocs"],
   parameters: {
