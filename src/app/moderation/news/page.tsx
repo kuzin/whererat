@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { MODERATOR_SESSION_COOKIE, parseModeratorSession } from "@/lib/auth";
 import { getAllNewsItems, getNewsItemById, NEWS_ITEM_TYPES, type NewsItem } from "@/lib/news-store";
+import { getSentNewsItemIds } from "@/lib/newsletter-sends-store";
 import { NewsBodyEditor } from "./news-body-editor";
 import { ModalShell } from "@/components/modal-shell";
 import { NewsImageUpload } from "./news-image-upload";
+import { ComposeNewsletterModal } from "./compose-newsletter-modal";
 import {
     createNewsItemAction,
     updateNewsItemAction,
@@ -135,9 +137,22 @@ export default async function ManageNewsPage({
     const params = searchParams ? await searchParams : {};
     const editingId = single(params.edit);
     const isCreating = single(params.create) === "1";
+    const isComposing = single(params.compose) === "1";
     const editingItem = editingId ? await getNewsItemById(editingId) : undefined;
 
     const allItems = await getAllNewsItems();
+    const sentIds = isComposing ? await getSentNewsItemIds() : new Set<string>();
+    const composeItems = isComposing
+        ? allItems
+            .filter((item) => item.publishedAt !== null)
+            .map((item) => ({
+                id: item.id,
+                title: item.title,
+                type: NEWS_ITEM_TYPES.find((t) => t.value === item.type)?.label ?? item.type,
+                publishedAt: (item.publishedAt as Date).toISOString(),
+                alreadySent: sentIds.has(item.id),
+            }))
+        : [];
 
     return (
         <main className="wr-page-shell py-10">
@@ -157,6 +172,9 @@ export default async function ManageNewsPage({
                     Manage News
                 </h1>
                 <div className="flex-1" />
+                <Link href="/moderation/news?compose=1" className="wr-btn-ghost text-sm" title="Compose a newsletter from published posts">
+                    Compose newsletter
+                </Link>
                 <Link href="/moderation/news?create=1" className="wr-btn-primary text-sm">
                     + New post
                 </Link>
@@ -230,17 +248,6 @@ export default async function ManageNewsPage({
                                     <form action={togglePublishAction} className="flex items-center gap-1">
                                         <input type="hidden" name="id" value={item.id} />
                                         <input type="hidden" name="publish" value={item.publishedAt ? "false" : "true"} />
-                                        {!item.publishedAt && (
-                                            <label className="flex cursor-pointer items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400" title="Send newsletter email to opted-in subscribers">
-                                                <input
-                                                    name="sendNewsletter"
-                                                    type="checkbox"
-                                                    value="true"
-                                                    className="h-3.5 w-3.5 rounded accent-amber-600"
-                                                />
-                                                <span>Newsletter</span>
-                                            </label>
-                                        )}
                                         <button type="submit" className={ICON_BTN} title={item.publishedAt ? "Unpublish" : "Publish"}>
                                             {item.publishedAt ? (
                                                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -303,6 +310,15 @@ export default async function ManageNewsPage({
                         <NewsFormFields />
                     </form>
                 </ModalShell>
+            )}
+
+            {/* Compose newsletter modal */}
+            {isComposing && (
+                <ComposeNewsletterModal
+                    items={composeItems}
+                    moderatorEmail={session.email}
+                    initialShowAlreadySent={false}
+                />
             )}
 
             {/* Edit modal */}

@@ -205,6 +205,26 @@ alter table news_items add column if not exists image_position_x float not null 
 alter table news_items add column if not exists image_position_y float not null default 50;
 alter table news_items add column if not exists image_zoom float not null default 1;
 
+-- Newsletter digest sends: one row per "Send digest" action from the
+-- moderation Compose newsletter modal, plus a join table of which news
+-- items were included. Lets us hide already-newslettered posts in the
+-- composer and surface a history of past sends.
+create table if not exists newsletter_sends (
+  id text primary key,
+  sent_at timestamptz not null default now(),
+  sent_by_id text not null,
+  sent_by_name text not null,
+  recipient_count int not null default 0,
+  subject text not null
+);
+create table if not exists newsletter_send_items (
+  newsletter_send_id text not null references newsletter_sends(id) on delete cascade,
+  news_item_id text not null references news_items(id) on delete cascade,
+  sort_order int not null default 0,
+  primary key (newsletter_send_id, news_item_id)
+);
+create index if not exists newsletter_send_items_news_idx on newsletter_send_items(news_item_id);
+
 -- Email preferences (marketing opt-in, keyed by email)
 create table if not exists email_preferences (
   email text primary key,

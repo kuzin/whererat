@@ -151,6 +151,26 @@ const toastMessages: Record<string, { title: string; body: string; tone: ToastTo
     body: "The news post has been permanently removed.",
     tone: "info",
   },
+  "newsletter-sent": {
+    title: "Newsletter sent",
+    body: "Your digest is on its way to subscribers.",
+    tone: "success",
+  },
+  "newsletter-empty": {
+    title: "No posts selected",
+    body: "Pick at least one published post before sending.",
+    tone: "info",
+  },
+  "newsletter-no-subscribers": {
+    title: "No subscribers yet",
+    body: "Nobody has opted in to newsletters yet.",
+    tone: "info",
+  },
+  "newsletter-test-sent": {
+    title: "Test sent",
+    body: "Check your inbox for the test newsletter.",
+    tone: "success",
+  },
   error: {
     title: "Something went wrong",
     body: "An unexpected error occurred. Please try again.",
