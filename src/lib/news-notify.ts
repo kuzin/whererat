@@ -15,6 +15,28 @@ function siteUrl(): string {
     return process.env.NEXT_PUBLIC_SITE_URL ?? "https://whererat.com";
 }
 
+/** From address for newsletter / digest sends. Avoids `no-reply@` which is a
+ *  spam-score nudge for bulk mail; falls back to a friendlier news@ identity. */
+function newsletterFromAddr(): string {
+    return process.env.NEWSLETTER_FROM ?? "WhereRat News <news@whererat.com>";
+}
+
+/** Build the standard List-Unsubscribe header pair for a given unsubscribe URL.
+ *  Per RFC 8058 + Gmail/Apple/Yahoo bulk-sender guidance, mail clients use these
+ *  to expose a native one-click unsubscribe and to weight legitimacy of the
+ *  message far more heavily than an in-body unsubscribe link alone. */
+function newsletterListHeaders(unsubscribeUrl: string): Record<string, string> {
+    return {
+        "List-Unsubscribe": `<${unsubscribeUrl}>, <mailto:unsubscribe@whererat.com>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    };
+}
+
+/** Compute the unsubscribe URL the digest/single-post emails use. */
+function unsubscribeUrlFor(token: string, baseUrl = siteUrl()): string {
+    return `${baseUrl}/api/unsubscribe?token=${encodeURIComponent(token)}`;
+}
+
 export function buildNewsletterEmail(
     item: NewsItem,
     unsubscribeToken: string,
@@ -121,7 +143,15 @@ export async function sendNewsletterToSubscribers(item: NewsItem): Promise<void>
     await Promise.allSettled(
         subscribers.map(({ email, unsubscribeToken }) => {
             const { subject, html, text } = buildNewsletterEmail(item, unsubscribeToken);
-            return sendBrandedEmail({ to: email, subject, html, text, logTag: "newsletter" });
+            return sendBrandedEmail({
+                to: email,
+                subject,
+                html,
+                text,
+                from: newsletterFromAddr(),
+                headers: newsletterListHeaders(unsubscribeUrlFor(unsubscribeToken)),
+                logTag: "newsletter",
+            });
         }),
     );
 }
@@ -253,6 +283,8 @@ export async function sendDigestNewsletterToSubscribers(
                 subject: built.subject,
                 html: built.html,
                 text: built.text,
+                from: newsletterFromAddr(),
+                headers: newsletterListHeaders(unsubscribeUrlFor(unsubscribeToken)),
                 logTag: "newsletter-digest",
             });
         }),
@@ -281,6 +313,8 @@ export async function sendDigestNewsletterTest(
         subject: built.subject,
         html: built.html,
         text: built.text,
+        from: newsletterFromAddr(),
+        headers: newsletterListHeaders(unsubscribeUrlFor(token)),
         logTag: "newsletter-digest-test",
     });
     return { delivered: true };
