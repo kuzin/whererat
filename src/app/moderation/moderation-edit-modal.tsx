@@ -84,6 +84,7 @@ export function ModerationEditModal({
         {/* Rodent types */}
         <SightingRodentTypesField
           initialTypes={initialRodentTypes}
+          initialOtherLabel={submission.otherRodentLabel}
           onTypesChange={setSelectedRodentTypes}
         />
 

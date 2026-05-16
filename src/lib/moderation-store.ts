@@ -44,6 +44,7 @@ type SubmissionEdits = Partial<
     | "curatorNote"
     | "contentWarnings"
     | "rodentTypes"
+    | "otherRodentLabel"
   >
 >;
 
@@ -80,6 +81,7 @@ function toDbSubmission(row: {
   images_json: unknown;
   content_warnings: string[] | null;
   rodent_types: string[] | null;
+  other_rodent_label: string | null;
   created_at: string | Date;
 }): Submission {
   const images = Array.isArray(row.images_json)
@@ -130,6 +132,7 @@ function toDbSubmission(row: {
     images,
     contentWarnings: (row.content_warnings?.length ? row.content_warnings : undefined) as string[] | undefined,
     rodentTypes: (row.rodent_types?.length ? row.rodent_types : undefined) as string[] | undefined,
+    otherRodentLabel: row.other_rodent_label?.trim() || undefined,
   };
 }
 
@@ -252,6 +255,7 @@ export async function readModerationStore() {
       images_json: unknown;
       content_warnings: string[] | null;
       rodent_types: string[] | null;
+      other_rodent_label: string | null;
       created_at: string;
     }>(
       `select s.*,
@@ -307,8 +311,8 @@ export async function addSubmission(
   };
   await pool.query(
     `insert into submissions
-      (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url, content_warnings, rodent_types)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
+      (id, movie_title, movie_year, imdb_id, imdb_kind, season_number, episode_number, episode_title, timestamp_code, title, description, spoiler, approximate_rat_count, status, submitted_by, submitter_email, curator_note, duplicate_hint, movie_poster_url, content_warnings, rodent_types, other_rodent_label)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)`,
     [
       nextSubmission.id,
       nextSubmission.movieTitle,
@@ -331,6 +335,7 @@ export async function addSubmission(
       nextSubmission.moviePosterUrl ?? null,
       nextSubmission.contentWarnings ?? [],
       nextSubmission.rodentTypes ?? ["rat"],
+      nextSubmission.otherRodentLabel ?? null,
     ],
   );
   for (const [index, slot] of (nextSubmission.images ?? []).entries()) {
@@ -399,6 +404,7 @@ async function submissionToSyntheticSighting(
     episodeTitle: submission.episodeTitle,
     contentWarnings: submission.contentWarnings,
     rodentTypes: submission.rodentTypes,
+    otherRodentLabel: submission.otherRodentLabel,
   };
 }
 
@@ -434,8 +440,9 @@ export async function getMergedSightingsForMovie(movieId: string): Promise<Sight
         submission_reviewed_at: string | null;
         content_warnings: string[] | null;
         rodent_types: string[] | null;
+        other_rodent_label: string | null;
       }>(
-        `select id, movie_id, timestamp_code, title, description, prominence, scene_type, spoiler, confidence, verification_state, verified_by, source_ids, curator_note, approximate_rat_count, submitter_name, submission_reviewed_at, content_warnings, rodent_types
+        `select *
          from sightings
          where movie_id = $1 and is_deleted = false`,
         [movieId],
@@ -462,6 +469,7 @@ export async function getMergedSightingsForMovie(movieId: string): Promise<Sight
     submissionReviewedAtISO: row.submission_reviewed_at ?? undefined,
     contentWarnings: (row.content_warnings?.length ? row.content_warnings : undefined),
     rodentTypes: (row.rodent_types?.length ? row.rodent_types : undefined),
+    otherRodentLabel: row.other_rodent_label?.trim() || undefined,
   }));
 
   const queueCandidates = storedSubs.filter((s) => s.status === "approved");
@@ -571,6 +579,7 @@ export async function reviewSubmission({
             movie_poster_url = $19,
             content_warnings = $20,
             rodent_types = $21,
+            other_rodent_label = $22,
             updated_at = now()
       where id = $1`,
     [
@@ -595,6 +604,7 @@ export async function reviewSubmission({
       reviewedSubmission.moviePosterUrl ?? null,
       reviewedSubmission.contentWarnings ?? [],
       reviewedSubmission.rodentTypes ?? ["rat"],
+      reviewedSubmission.otherRodentLabel ?? null,
     ],
   );
   await pool.query(

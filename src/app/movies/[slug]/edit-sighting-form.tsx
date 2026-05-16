@@ -69,6 +69,7 @@ export function EditSightingForm({
       {/* Rodent type picker */}
       <SightingRodentTypesField
         initialTypes={initialRodentTypes}
+        initialOtherLabel={sighting.otherRodentLabel}
         onTypesChange={setSelectedRodentTypes}
       />
 

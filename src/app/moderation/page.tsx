@@ -480,10 +480,18 @@ export default async function ModerationPage({
                                 <div className="flex flex-wrap gap-1.5">
                                   {rodentTypes.map((id) => {
                                     const opt = RODENT_TYPE_OPTIONS.find((o) => o.id === id);
+                                    const isOther = id === "other";
+                                    const otherLabel = submission.otherRodentLabel?.trim();
+                                    const display = isOther
+                                      ? otherLabel
+                                        ? `Other: ${otherLabel}`
+                                        : "Other"
+                                      : (opt?.label ?? id);
+                                    const code = isOther ? "270F" : (opt?.openmojiCode ?? "26A0");
                                     return (
                                       <span key={id} className="inline-flex items-center gap-1 rounded-md border border-amber-700/35 bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-950 dark:border-amber-400/25 dark:bg-amber-950/35 dark:text-amber-200">
-                                        <img src={`/openmoji/color/svg/${opt?.openmojiCode ?? "26A0"}.svg`} alt="" width={14} height={14} aria-hidden />
-                                        {opt?.label ?? id}
+                                        <img src={`/openmoji/color/svg/${code}.svg`} alt="" width={14} height={14} aria-hidden />
+                                        {display}
                                       </span>
                                     );
                                   })}

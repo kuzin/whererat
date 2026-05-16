@@ -199,6 +199,47 @@ describe("executePublicSightingSubmit — validation", () => {
     );
   });
 
+  it("passes otherRodentLabel when 'other' is selected", async () => {
+    mockAddSubmission.mockResolvedValueOnce({ id: "sub-other" } as never);
+    const fd = makeValidFormData();
+    fd.set("rodentTypes", "other");
+    fd.set("otherRodentLabel", "capybara");
+    const result = await executePublicSightingSubmit(fd, "1.2.3.110");
+    expect(result.ok).toBe(true);
+    expect(mockAddSubmission).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rodentTypes: ["other"],
+        otherRodentLabel: "capybara",
+      }),
+    );
+  });
+
+  it("rejects 'other' rodent type with no species label", async () => {
+    mockAddSubmission.mockClear();
+    const fd = makeValidFormData();
+    fd.set("rodentTypes", "other");
+    fd.set("otherRodentLabel", "   ");
+    const result = await executePublicSightingSubmit(fd, "1.2.3.111");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.code).toBe("missing");
+    expect(mockAddSubmission).not.toHaveBeenCalled();
+  });
+
+  it("ignores otherRodentLabel when 'other' is not selected", async () => {
+    mockAddSubmission.mockResolvedValueOnce({ id: "sub-other-ignored" } as never);
+    const fd = makeValidFormData();
+    fd.set("rodentTypes", "mouse");
+    fd.set("otherRodentLabel", "stowaway text");
+    const result = await executePublicSightingSubmit(fd, "1.2.3.112");
+    expect(result.ok).toBe(true);
+    expect(mockAddSubmission).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rodentTypes: ["mouse"],
+        otherRodentLabel: undefined,
+      }),
+    );
+  });
+
   it("strips invalid submitter email", async () => {
     mockAddSubmission.mockResolvedValueOnce({ id: "sub-email" } as never);
     const fd = makeValidFormData();
