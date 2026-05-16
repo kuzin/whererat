@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ModalShell } from "@/components/modal-shell";
+import { ModalShell } from "@/components/ui/modal-shell";
 import {
   SightingTimestampField,
   SightingRatCountField,
   SightingDescriptionField,
   SightingContentWarningsField,
   SightingRodentTypesField,
-} from "@/components/sighting-fields";
-import { EditableSightingImagesField } from "@/components/editable-sighting-images-field";
+} from "@/components/forms/sighting-fields";
+import { EditableSightingImagesField } from "@/components/forms/editable-sighting-images-field";
 import {
   getSightingTimestampPercent,
   getSubmissionImageRefs,

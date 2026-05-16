@@ -9,9 +9,9 @@ import {
   SightingDescriptionField,
   SightingContentWarningsField,
   SightingRodentTypesField,
-} from "@/components/sighting-fields";
-import { MovieSearchField } from "./movie-search-field";
-import { SightingImageUpload } from "./sighting-image-upload";
+} from "@/components/forms/sighting-fields";
+import { MovieSearchField } from "@/components/forms/movie-search-field";
+import { SightingImageUpload } from "@/components/forms/sighting-image-upload";
 
 // Main SubmitForm component (restored full implementation)
 type PreselectedMovie = {

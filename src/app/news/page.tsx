@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 import { getPublishedNewsItems, type NewsItemType } from "@/lib/news-store";
-import { TYPE_STYLES, ArticleView } from "./article-view";
-import { NewsDesktopLayout } from "./news-desktop-layout";
+import { TYPE_STYLES, ArticleView } from "@/components/news/article-view";
+import { NewsDesktopLayout } from "@/components/news/news-desktop-layout";
 
 export const metadata: Metadata = {
     title: "News",

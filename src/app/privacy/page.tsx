@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { InfoPageShell, InfoHero, InfoSection, InfoNote, OM } from "@/components/info-page";
+import { InfoPageShell, InfoHero, InfoSection, InfoNote, OM } from "@/components/layout/info-page";
 
 export const metadata: Metadata = {
   title: "Privacy",

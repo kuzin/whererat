@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ModalShell } from "@/components/modal-shell";
+import { ModalShell } from "@/components/ui/modal-shell";
 import { sendNewsletterDigestAction, sendNewsletterDigestTestAction } from "./actions";
 
 type ComposeItem = {
