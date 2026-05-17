@@ -118,13 +118,16 @@ export function ImageUploadGallery({
     hintSuffix,
 }: Props) {
     // Stable, monotonic ID generator (see comment above makeSlotFromInitial).
+    // Initial slots use index-based IDs ("init-N") so the useState initializer
+    // stays pure — no ref read during render. Subsequently added slots use the
+    // counter ref via `nextSlotId()`, which only fires inside event handlers.
     const idCounterRef = useRef(0);
     const nextSlotId = useCallback(() => `slot-${++idCounterRef.current}`, []);
 
     const [slots, setSlots] = useState<Slot[]>(() =>
         initialImages
             .slice(0, maxImages)
-            .map((img) => makeSlotFromInitial(img, `slot-${++idCounterRef.current}`)),
+            .map((img, i) => makeSlotFromInitial(img, `init-${i}`)),
     );
     const [activeId, setActiveId] = useState<string | null>(() => slots[0]?.id ?? null);
     const [isFileDragging, setIsFileDragging] = useState(false);

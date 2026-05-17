@@ -100,14 +100,6 @@ function relativeLuminance([r, g, b]: [number, number, number]): number {
   return 0.2126 * sRgbToLinear(r) + 0.7152 * sRgbToLinear(g) + 0.0722 * sRgbToLinear(b);
 }
 
-function contrastRatio(a: [number, number, number], b: [number, number, number]): number {
-  const l1 = relativeLuminance(a);
-  const l2 = relativeLuminance(b);
-  const lighter = Math.max(l1, l2);
-  const darker = Math.min(l1, l2);
-  return (lighter + 0.05) / (darker + 0.05);
-}
-
 function pickReadableInk(accentHex: string): string {
   const accent = parseHexColor(accentHex);
   if (!accent) return "#fff";
