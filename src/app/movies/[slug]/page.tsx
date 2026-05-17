@@ -100,22 +100,19 @@ function relativeLuminance([r, g, b]: [number, number, number]): number {
   return 0.2126 * sRgbToLinear(r) + 0.7152 * sRgbToLinear(g) + 0.0722 * sRgbToLinear(b);
 }
 
-function contrastRatio(a: [number, number, number], b: [number, number, number]): number {
-  const l1 = relativeLuminance(a);
-  const l2 = relativeLuminance(b);
-  const lighter = Math.max(l1, l2);
-  const darker = Math.min(l1, l2);
-  return (lighter + 0.05) / (darker + 0.05);
-}
-
 function pickReadableInk(accentHex: string): string {
   const accent = parseHexColor(accentHex);
   if (!accent) return "#fff";
-  const softBlack: [number, number, number] = [28, 25, 23];
-  const white: [number, number, number] = [255, 255, 255];
-  return contrastRatio(accent, white) >= contrastRatio(accent, softBlack)
-    ? "#fff"
-    : "rgb(28 25 23)";
+  // Mid-tone and darker accents stay with white ink — that includes the default
+  // orange and most movie palettes. The threshold of 0.45 keeps borderline colors
+  // (e.g. red, teal) on white; only genuinely light hues (mint, pale yellow, sky)
+  // trip into the dark-ink branch.
+  const luminance = relativeLuminance(accent);
+  if (luminance < 0.45) return "#fff";
+  // Light accent → a darkened version of the same hue (not pure black), so the
+  // text keeps the brand association.
+  const [r, g, b] = accent.map((c) => Math.round(c * 0.25)) as [number, number, number];
+  return `rgb(${r} ${g} ${b})`;
 }
 
 function trimMeta(value: string | undefined): string {
@@ -491,9 +488,9 @@ export async function MoviePage({
       {palette && (
         <style dangerouslySetInnerHTML={{
           __html: [
-            `:root { --wr-header-bg: color-mix(in srgb, ${palette.accent} 14%, rgb(255 248 237 / 0.92)) !important; --wr-surface-cream: color-mix(in srgb, ${palette.accent} 11%, #fff8ed) !important; --wr-surface-cream-soft: color-mix(in srgb, ${palette.accent} 8%, #fffdf8) !important; --wr-surface-cream-muted: color-mix(in srgb, ${palette.accent} 9%, #faf7f2) !important; --wr-accent-btn: ${palette.accent} !important; --wr-accent-btn-hover: color-mix(in srgb, ${palette.accent} 88%, #000) !important; --wr-btn-ghost-bg: color-mix(in srgb, ${palette.accent} 8%, rgb(255 255 255 / 0.94)) !important; --wr-btn-ghost-border: color-mix(in srgb, ${palette.accent} 28%, rgb(87 83 78 / 0.58)) !important; --wr-btn-ghost-hover: color-mix(in srgb, ${palette.accent} 13%, rgb(245 245 244)) !important; --wr-btn-ghost-active: color-mix(in srgb, ${palette.accent} 17%, rgb(231 229 228)) !important; --wr-input-bg: color-mix(in srgb, ${palette.accent} 6%, rgb(255 253 249)) !important; --wr-input-border: color-mix(in srgb, ${palette.accent} 20%, rgb(28 25 23 / 0.22)) !important; --wr-input-border-focus: ${palette.accent} !important; --wr-shadow-input-focus: color-mix(in srgb, ${palette.accent} 40%, transparent) !important; --wr-footer-bg: color-mix(in srgb, ${palette.accent} 14%, #fff8ed) !important; --wr-brand-wordmark: color-mix(in srgb, ${palette.accent} 50%, #57534e) !important; }`,
-            `.dark { --wr-header-bg: color-mix(in srgb, ${palette.accent} 12%, rgb(41 37 36 / 0.94)) !important; --wr-accent-btn: color-mix(in srgb, ${palette.accent} 82%, white) !important; --wr-accent-btn-hover: color-mix(in srgb, ${palette.accent} 90%, white) !important; --wr-btn-ghost-bg: color-mix(in srgb, ${palette.accent} 14%, rgb(68 64 60 / 0.88)) !important; --wr-btn-ghost-border: color-mix(in srgb, ${palette.accent} 26%, rgb(214 211 209 / 0.24)) !important; --wr-btn-ghost-hover: color-mix(in srgb, ${palette.accent} 20%, rgb(53 46 41)) !important; --wr-btn-ghost-active: color-mix(in srgb, ${palette.accent} 24%, rgb(63 54 46)) !important; --wr-input-bg: color-mix(in srgb, ${palette.accent} 14%, rgb(22 16 10)) !important; --wr-input-border: color-mix(in srgb, ${palette.accent} 18%, rgb(254 243 199 / 0.16)) !important; --wr-input-border-focus: color-mix(in srgb, ${palette.accent} 82%, white) !important; --wr-shadow-input-focus: color-mix(in srgb, ${palette.accent} 35%, transparent) !important; --wr-footer-bg: color-mix(in srgb, ${palette.accent} 10%, #292524) !important; --wr-brand-wordmark: color-mix(in srgb, ${palette.accent} 45%, #fef3c7) !important; }`,
-            `.wr-shell { background: color-mix(in srgb, ${palette.accent} 14%, var(--background)) !important; }`,
+            `:root { --wr-header-bg: color-mix(in srgb, ${palette.accent} 24%, rgb(255 248 237 / 0.92)) !important; --wr-surface-cream: color-mix(in srgb, ${palette.accent} 22%, #fff8ed) !important; --wr-surface-cream-soft: color-mix(in srgb, ${palette.accent} 16%, #fffdf8) !important; --wr-surface-cream-muted: color-mix(in srgb, ${palette.accent} 18%, #faf7f2) !important; --wr-accent-btn: ${palette.accent} !important; --wr-accent-btn-hover: color-mix(in srgb, ${palette.accent} 88%, #000) !important; --movie-accent-ink: ${pickReadableInk(palette.accent)} !important; --wr-btn-ghost-bg: color-mix(in srgb, ${palette.accent} 8%, rgb(255 255 255 / 0.94)) !important; --wr-btn-ghost-border: color-mix(in srgb, ${palette.accent} 28%, rgb(87 83 78 / 0.58)) !important; --wr-btn-ghost-hover: color-mix(in srgb, ${palette.accent} 13%, rgb(245 245 244)) !important; --wr-btn-ghost-active: color-mix(in srgb, ${palette.accent} 17%, rgb(231 229 228)) !important; --wr-input-bg: color-mix(in srgb, ${palette.accent} 6%, rgb(255 253 249)) !important; --wr-input-border: color-mix(in srgb, ${palette.accent} 20%, rgb(28 25 23 / 0.22)) !important; --wr-input-border-focus: ${palette.accent} !important; --wr-shadow-input-focus: color-mix(in srgb, ${palette.accent} 40%, transparent) !important; --wr-footer-bg: color-mix(in srgb, ${palette.accent} 24%, #fff8ed) !important; --wr-brand-wordmark: color-mix(in srgb, ${palette.accent} 50%, #57534e) !important; }`,
+            `.dark { --wr-header-bg: color-mix(in srgb, ${palette.accent} 12%, rgb(41 37 36 / 0.94)) !important; --wr-accent-btn: color-mix(in srgb, ${palette.accent} 82%, white) !important; --wr-accent-btn-hover: color-mix(in srgb, ${palette.accent} 90%, white) !important; --movie-accent-ink-dark: ${pickReadableInk(darkPalette?.accent ?? palette.accent)} !important; --wr-btn-ghost-bg: color-mix(in srgb, ${palette.accent} 14%, rgb(68 64 60 / 0.88)) !important; --wr-btn-ghost-border: color-mix(in srgb, ${palette.accent} 26%, rgb(214 211 209 / 0.24)) !important; --wr-btn-ghost-hover: color-mix(in srgb, ${palette.accent} 20%, rgb(53 46 41)) !important; --wr-btn-ghost-active: color-mix(in srgb, ${palette.accent} 24%, rgb(63 54 46)) !important; --wr-input-bg: color-mix(in srgb, ${palette.accent} 14%, rgb(22 16 10)) !important; --wr-input-border: color-mix(in srgb, ${palette.accent} 18%, rgb(254 243 199 / 0.16)) !important; --wr-input-border-focus: color-mix(in srgb, ${palette.accent} 82%, white) !important; --wr-shadow-input-focus: color-mix(in srgb, ${palette.accent} 35%, transparent) !important; --wr-footer-bg: color-mix(in srgb, ${palette.accent} 10%, #292524) !important; --wr-brand-wordmark: color-mix(in srgb, ${palette.accent} 45%, #fef3c7) !important; }`,
+            `.wr-shell { background: color-mix(in srgb, ${palette.accent} 24%, var(--background)) !important; }`,
           ].join(' ')
         }} />
       )}

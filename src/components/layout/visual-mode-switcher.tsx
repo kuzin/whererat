@@ -69,17 +69,29 @@ export function VisualModeSwitcher({
     }
   }, []);
 
+  const nextLabel = mode === "dark" ? "light" : "dark";
   return (
     <button
       type="button"
       onClick={toggle}
-      aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-      title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-      className={`rounded-md border border-stone-950/25 bg-white/70 px-2 py-1 text-xs font-bold text-stone-700 transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 dark:border-white/25 dark:bg-stone-900/60 dark:text-amber-100 dark:hover:bg-stone-900/80 ${className}`}
+      aria-label={`Switch to ${nextLabel} mode`}
+      title={`Switch to ${nextLabel} mode`}
+      className={`inline-flex h-8 w-8 items-center justify-center rounded-md border border-stone-950/25 bg-white/70 text-stone-700 transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 dark:border-white/25 dark:bg-stone-900/60 dark:text-amber-100 dark:hover:bg-stone-900/80 ${className}`}
       data-mode={mode}
     >
-      {mode === "dark" ? "Switch to Light" : "Switch to Dark"}
-      <span className="sr-only"> — {label}</span>
+      {mode === "dark" ? (
+        // Currently dark → show a sun (will switch to light)
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        </svg>
+      ) : (
+        // Currently light → show a moon (will switch to dark)
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+        </svg>
+      )}
+      <span className="sr-only">Switch to {nextLabel} mode — {label}</span>
     </button>
   );
 }

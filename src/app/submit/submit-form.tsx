@@ -11,7 +11,7 @@ import {
   SightingRodentTypesField,
 } from "@/components/forms/sighting-fields";
 import { MovieSearchField } from "@/components/forms/movie-search-field";
-import { SightingImageUpload } from "@/components/forms/sighting-image-upload";
+import { ImageUploadGallery } from "@/components/forms/image-upload-gallery";
 
 // Main SubmitForm component (restored full implementation)
 type PreselectedMovie = {
@@ -203,9 +203,6 @@ export function SubmitForm({
             aria-invalid={Boolean(errorFor("sightingTitle"))}
             className={`wr-input ${errorFor("sightingTitle") ? inputErrorClass : ""}`}
           />
-          <p className="text-xs font-medium text-stone-500 dark:text-stone-400">
-            Short and vivid — something anyone who&apos;s seen it would instantly picture.
-          </p>
           {errorFor("sightingTitle") ? (
             <span className="text-xs font-semibold text-red-700 dark:text-red-300">
               {errorFor("sightingTitle")}
@@ -214,10 +211,11 @@ export function SubmitForm({
         </label>
 
         {/* Rodent type */}
-        <SightingRodentTypesField onTypesChange={setSelectedRodentTypes} />
+        <SightingRodentTypesField required onTypesChange={setSelectedRodentTypes} />
 
         {/* Timestamp */}
         <SightingTimestampField
+          required
           label={`When in the ${selectedImdbKind === "series" ? "episode" : "movie"}?`}
           errorMessage={errorFor("timestamp")}
           runtimeMinutes={selectedMovie?.runtime ? Number.parseInt(selectedMovie.runtime, 10) : undefined}
@@ -225,6 +223,7 @@ export function SubmitForm({
 
         {/* Rat count */}
         <SightingRatCountField
+          required
           label={rodentCountFieldLabel(selectedRodentTypes)}
           openmojiCode={RODENT_TYPE_OPTIONS.find((o) => o.id === selectedRodentTypes[0])?.openmojiCode ?? "1F400"}
           rodentId={selectedRodentTypes[0]}
@@ -235,7 +234,19 @@ export function SubmitForm({
         <SightingDescriptionField required errorMessage={errorFor("description")}/>
 
         {/* Images — part of the sighting, not "about you" */}
-        <SightingImageUpload />
+        <ImageUploadGallery
+          label="Sighting images"
+          hintSuffix="(optional, max 5)"
+          aspectRatio="wide"
+          maxImages={5}
+          fileFieldName="sightingImageFile"
+          urlFieldName="sightingImageUrl"
+          altFieldName="sightingImageAlt"
+          positionXFieldName="sightingImagePositionX"
+          positionYFieldName="sightingImagePositionY"
+          zoomFieldName="sightingImageZoom"
+          sentinelFieldName="sightingImageListManaged"
+        />
       </div>
 
       {/* -- 03 · Credit yourself --------------------------------------------- */}

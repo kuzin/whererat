@@ -66,3 +66,89 @@ export async function persistSightingFiles(files: File[], maxBytes: number): Pro
   }
   return out.slice(0, 5);
 }
+
+/**
+ * Field-name set for the per-slot gallery payload. Each field is repeated once
+ * per image (in slot order). Server reads them via `formData.getAll(...)` and
+ * pairs by index.
+ */
+export type GalleryFormFieldNames = {
+  file: string;
+  url: string;
+  alt: string;
+  positionX: string;
+  positionY: string;
+  zoom: string;
+};
+
+function clampPercent(v: number) {
+  if (!Number.isFinite(v)) return 50;
+  return Math.max(0, Math.min(100, v));
+}
+function clampZoom(v: number) {
+  if (!Number.isFinite(v)) return 1;
+  return Math.max(1, Math.min(4, v));
+}
+
+/**
+ * Parse an `<ImageUploadGallery>` payload from FormData into ordered slots.
+ * Newly-picked files are persisted to the sightings folder; existing slots
+ * pass through their persisted URL. The result includes per-image
+ * position/zoom data.
+ */
+export async function parseSightingImageGalleryForm(
+  formData: FormData,
+  fields: GalleryFormFieldNames,
+  options?: { maxBytes?: number; maxImages?: number },
+): Promise<SightingImageSlot[]> {
+  const maxImages = options?.maxImages ?? 5;
+  const maxBytes = options?.maxBytes ?? 8 * 1024 * 1024;
+
+  const files = formData.getAll(fields.file);
+  const urls = formData.getAll(fields.url).map((v) => String(v ?? "").trim());
+  const alts = formData.getAll(fields.alt).map((v) => String(v ?? "").trim());
+  const xs = formData.getAll(fields.positionX).map((v) => String(v ?? ""));
+  const ys = formData.getAll(fields.positionY).map((v) => String(v ?? ""));
+  const zooms = formData.getAll(fields.zoom).map((v) => String(v ?? ""));
+
+  const len = Math.max(files.length, urls.length);
+  const out: SightingImageSlot[] = [];
+
+  for (let i = 0; i < len && out.length < maxImages; i++) {
+    const file = files[i];
+    const persistedUrl = urls[i] ?? "";
+    const alt = alts[i] ?? "";
+    const positionX = clampPercent(parseFloat(xs[i] ?? "50"));
+    const positionY = clampPercent(parseFloat(ys[i] ?? "50"));
+    const zoom = clampZoom(parseFloat(zooms[i] ?? "1"));
+
+    let finalUrl: string | undefined;
+    let finalAlt: string | undefined = alt || undefined;
+
+    if (file instanceof File && file.size > 0) {
+      const uploaded = await persistImageFile(file, { folder: "sightings", maxBytes });
+      if (uploaded) {
+        finalUrl = uploaded;
+        if (!finalAlt) finalAlt = sanitizeAlt(file.name);
+      }
+    } else if (persistedUrl) {
+      finalUrl = persistedUrl;
+    }
+
+    if (finalUrl) {
+      out.push({ url: finalUrl, alt: finalAlt, positionX, positionY, zoom });
+    }
+  }
+  return out;
+}
+
+export const SIGHTING_GALLERY_FIELD_NAMES: GalleryFormFieldNames = {
+  file: "sightingImageFile",
+  url: "sightingImageUrl",
+  alt: "sightingImageAlt",
+  positionX: "sightingImagePositionX",
+  positionY: "sightingImagePositionY",
+  zoom: "sightingImageZoom",
+};
+
+export const SIGHTING_GALLERY_SENTINEL = "sightingImageListManaged";

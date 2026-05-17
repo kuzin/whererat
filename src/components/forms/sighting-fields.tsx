@@ -5,7 +5,9 @@
  * moderator Edit Sighting modal. Any visual change here applies to both.
  */
 
-import { useState, useId, useRef } from "react";
+import { useState, useId, useRef, useCallback } from "react";
+import { MarkdownToolbar, applyAction } from "@/components/forms/markdown-toolbar";
+import type { ToolAction } from "@/components/forms/markdown-toolbar";
 import { SightingMarkdown } from "@/components/ui/sighting-markdown";
 import { RodentTypeIcon } from "@/components/ui/rodent-type-icon";
 import { CONTENT_WARNING_OPTIONS, RODENT_TYPE_OPTIONS, MAX_OTHER_RODENT_LABEL_LENGTH, OTHER_RODENT_ID, formatContentWarningLabel, formatPercentAsTimestamp } from "@/lib/whererat";
@@ -30,7 +32,7 @@ export function SwarmSignal({ count, openmojiCode = "1F400", rodentId, noun = "R
       <div className="flex gap-0.5 items-center leading-none" aria-hidden>
         {Array.from({ length: MAX_SLOTS }).map((_, i) => (
           <span key={i} className={`transition-all duration-200 ${i < fill ? "opacity-100" : "opacity-15 grayscale"}`}>
-            <RodentTypeIcon openmojiCode={openmojiCode} label="" rodentId={rodentId} size={18} />
+            <RodentTypeIcon openmojiCode={openmojiCode} label="" rodentId={rodentId} size={22} />
           </span>
         ))}
       </div>
@@ -49,18 +51,23 @@ export function SightingTimestampField({
   label = "Approx. point in movie",
   errorMessage,
   runtimeMinutes,
+  required = false,
 }: {
   defaultValue?: number;
   label?: string;
   errorMessage?: string;
   runtimeMinutes?: number;
+  required?: boolean;
 }) {
   const [percent, setPercent] = useState(defaultValue);
   const calculatedTimestamp = runtimeMinutes ? formatPercentAsTimestamp(`${percent}%`, runtimeMinutes) : null;
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">{label}</p>
+      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
+        {label}
+        {required ? <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">*</span> : null}
+      </p>
       <div className="mt-1 flex items-center gap-6">
         <div className="relative flex-1">
           <div className="h-5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700">
@@ -121,18 +128,23 @@ export function SightingRatCountField({
   openmojiCode,
   rodentId,
   noun,
+  required = false,
 }: {
   defaultValue?: number;
   label?: string;
   openmojiCode?: string;
   rodentId?: string;
   noun?: string;
+  required?: boolean;
 }) {
   const [count, setCount] = useState(Math.max(1, defaultValue));
 
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">{label ?? "Rats on screen"}</p>
+      <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
+        {label ?? "Rats on screen"}
+        {required ? <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">*</span> : null}
+      </p>
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex items-center rounded-xl border-2 border-stone-900/12 bg-white dark:border-white/12 dark:bg-stone-900">
           <button
@@ -181,64 +193,111 @@ export function SightingDescriptionField({
   minRows?: number;
 }) {
   const [draft, setDraft] = useState(defaultValue);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const previewId = useId();
+  const [activeTab, setActiveTab] = useState<"write" | "preview">("write");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const writeAreaRef = useRef<HTMLDivElement>(null);
+  const [capturedHeight, setCapturedHeight] = useState<number | null>(null);
+  const labelId = useId();
 
-  const inputErrorClass =
-    "border-red-700/70 focus-visible:border-red-700 dark:border-red-400/65 dark:focus-visible:border-red-400";
+  const handleTool = useCallback((action: ToolAction) => {
+    if (!textareaRef.current) return;
+    applyAction(textareaRef.current, action);
+    setDraft(textareaRef.current.value);
+  }, []);
+
+  const handleTabSwitch = useCallback((tab: "write" | "preview") => {
+    if (tab === "preview" && writeAreaRef.current) {
+      setCapturedHeight(writeAreaRef.current.offsetHeight);
+    }
+    setActiveTab(tab);
+  }, []);
+
+  const borderError = "border-red-700/70 dark:border-red-400/65";
+  const borderNormal =
+    "border-[var(--wr-input-border)] focus-within:border-[var(--wr-input-border-focus)] focus-within:shadow-[0_0_0_3px_var(--wr-shadow-input-focus)]";
+  const tabBase =
+    "px-4 py-2 text-xs font-semibold transition-colors focus-visible:outline-none";
+  const tabActive =
+    "border-b-2 border-orange-500 -mb-px text-stone-900 dark:text-stone-100";
+  const tabInactive =
+    "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200";
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
-        <span>
-          Description{required ? <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">*</span> : null}
-        </span>
-        <textarea
-          name="description"
-          required={required}
-          rows={minRows}
-          value={draft}
-          onChange={(e) => setDraft(e.currentTarget.value)}
-          placeholder="Describe exactly where the rat appears and what it is doing."
-          aria-invalid={Boolean(errorMessage)}
-          className={`wr-input h-auto resize-y py-3 leading-relaxed ${errorMessage ? inputErrorClass : ""}`}
-          style={{ minHeight: `${minRows * 1.6}rem` }}
-        />
-        <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-          <p className="max-w-prose text-xs leading-relaxed text-stone-500 dark:text-stone-400">
-            <span className="font-semibold text-stone-600 dark:text-stone-300">Markdown</span>{" "}
-            is supported — bold, lists, links, headings. Open preview to check formatting.
-          </p>
+      <span id={labelId} className="text-sm font-bold text-stone-700 dark:text-stone-200">
+        Description{required ? <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">*</span> : null}
+      </span>
+
+      <div
+        className={`overflow-hidden rounded-xl border bg-[var(--wr-input-bg)] transition-colors ${errorMessage ? borderError : borderNormal}`}
+        role="group"
+        aria-labelledby={labelId}
+      >
+        {/* Tab row */}
+        <div className="flex border-b border-[var(--wr-input-border)] bg-stone-50 dark:bg-stone-900/50">
           <button
             type="button"
-            onClick={() => setPreviewOpen((o) => !o)}
-            aria-expanded={previewOpen}
-            aria-controls={previewId}
-            aria-label={previewOpen ? "Hide markdown preview" : "Show markdown preview"}
-            className="wr-btn-ghost shrink-0 self-start px-3 py-1.5 text-xs"
+            onClick={() => handleTabSwitch("write")}
+            className={`${tabBase} ${activeTab === "write" ? tabActive : tabInactive}`}
           >
-            {previewOpen ? "Hide preview" : "Show preview"}
+            Write
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabSwitch("preview")}
+            className={`${tabBase} ${activeTab === "preview" ? tabActive : tabInactive}`}
+          >
+            Preview
           </button>
         </div>
-        {errorMessage ? (
-          <span className="text-xs font-semibold text-red-700 dark:text-red-300">{errorMessage}</span>
-        ) : null}
-      </label>
-      {previewOpen ? (
-        <div
-          id={previewId}
-          role="region"
-          aria-label="Markdown preview"
-          className="rounded-xl border border-stone-900/12 bg-stone-50/90 p-4 shadow-sm sm:p-5 dark:border-white/12 dark:bg-stone-950/45"
-        >
-          {draft.trim() ? (
-            <SightingMarkdown markdown={draft} />
-          ) : (
-            <p className="text-sm italic text-stone-500 dark:text-stone-500">
-              Start typing above — formatted output appears here.
-            </p>
-          )}
+
+        {/* Toolbar row — separate row so it wraps cleanly on narrow screens */}
+        {activeTab === "write" && (
+          <div className="flex flex-wrap items-center gap-0.5 border-b border-[var(--wr-input-border)] bg-stone-50 px-2 py-1.5 dark:bg-stone-900/50">
+            <MarkdownToolbar onAction={handleTool} />
+          </div>
+        )}
+
+        {/* Textarea — always mounted so form values survive tab switches */}
+        <div ref={writeAreaRef} style={{ display: activeTab === "write" ? undefined : "none" }}>
+          <textarea
+            ref={textareaRef}
+            name="description"
+            required={required}
+            rows={minRows}
+            defaultValue={defaultValue}
+            onChange={(e) => setDraft(e.currentTarget.value)}
+            placeholder="Describe exactly where the rat appears and what it is doing."
+            aria-invalid={Boolean(errorMessage)}
+            aria-labelledby={labelId}
+            className="h-auto w-full resize-y bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-[var(--wr-input-text)] outline-none placeholder:text-stone-400 dark:placeholder:text-stone-600"
+            style={{ minHeight: `${minRows * 1.6}rem` }}
+          />
         </div>
+
+        {/* Preview panel — locked to the write area's captured height so no jump on switch */}
+        {activeTab === "preview" && (
+          <div
+            role="region"
+            aria-label="Markdown preview"
+            className="overflow-y-auto px-4 py-3"
+            style={{
+              height: capturedHeight !== null ? `${capturedHeight}px` : `${minRows * 1.6}rem`,
+            }}
+          >
+            {draft.trim() ? (
+              <SightingMarkdown markdown={draft} />
+            ) : (
+              <p className="text-sm italic text-stone-500 dark:text-stone-500">
+                Start typing in the Write tab — formatted output appears here.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {errorMessage ? (
+        <span className="text-xs font-semibold text-red-700 dark:text-red-300">{errorMessage}</span>
       ) : null}
     </div>
   );
@@ -371,7 +430,7 @@ export function SightingContentWarningsField({
             onChange={handleToggleOther}
             className="sr-only"
           />
-          <span aria-hidden><img src="/openmoji/color/svg/270F.svg" alt="" width={16} height={16} style={{ display: "inline", verticalAlign: "middle" }} /></span>
+          <span aria-hidden><img src="/openmoji/color/svg/270F.svg" alt="" width={20} height={20} style={{ display: "inline", verticalAlign: "middle" }} /></span>
           Other
         </label>
       </div>
@@ -426,10 +485,12 @@ export function SightingRodentTypesField({
   initialTypes,
   initialOtherLabel,
   onTypesChange,
+  required = false,
 }: {
   initialTypes?: string[];
   initialOtherLabel?: string;
   onTypesChange?: (types: string[]) => void;
+  required?: boolean;
 }) {
   const [selected, setSelected] = useState<string>(
     initialTypes?.[0] ?? "rat",
@@ -457,7 +518,10 @@ export function SightingRodentTypesField({
   return (
     <div className="flex flex-col gap-2">
       <div>
-        <p className="text-sm font-bold text-stone-700 dark:text-stone-200">Rodent type</p>
+        <p className="text-sm font-bold text-stone-700 dark:text-stone-200">
+          Rodent type
+          {required ? <span aria-hidden className="ml-1 text-red-600 dark:text-red-400">*</span> : null}
+        </p>
         <p className="text-xs font-medium text-stone-400 dark:text-stone-500">Select one</p>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -477,7 +541,7 @@ export function SightingRodentTypesField({
                 openmojiCode={option.openmojiCode}
                 label={option.label}
                 rodentId={option.id}
-                size={20}
+                size={24}
               />
               {option.label}
             </label>

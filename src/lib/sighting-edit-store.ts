@@ -62,9 +62,17 @@ export async function updateSightingOverride(
     await pool.query(`delete from sighting_images where sighting_id = $1`, [sightingId]);
     for (const [index, slot] of override.images.entries()) {
       await pool.query(
-        `insert into sighting_images (sighting_id, image_url, image_alt, sort_order)
-         values ($1,$2,$3,$4)`,
-        [sightingId, slot.url, slot.alt ?? null, index],
+        `insert into sighting_images (sighting_id, image_url, image_alt, sort_order, image_position_x, image_position_y, image_zoom)
+         values ($1,$2,$3,$4,$5,$6,$7)`,
+        [
+          sightingId,
+          slot.url,
+          slot.alt ?? null,
+          index,
+          slot.positionX ?? 50,
+          slot.positionY ?? 50,
+          slot.zoom ?? 1,
+        ],
       );
     }
   }

@@ -88,20 +88,34 @@ function toDbSubmission(row: {
     ? row.images_json
       .map((slot) => {
         if (!slot || typeof slot !== "object") return undefined;
-        const rec = slot as { url?: unknown; alt?: unknown };
+        const rec = slot as {
+          url?: unknown;
+          alt?: unknown;
+          positionX?: unknown;
+          positionY?: unknown;
+          zoom?: unknown;
+        };
         const url = String(rec.url ?? "").trim();
         if (!url) return undefined;
+        const numOr = (v: unknown, fallback: number) => {
+          const n = typeof v === "number" ? v : Number(v);
+          return Number.isFinite(n) ? n : fallback;
+        };
         return {
           url,
           alt: rec.alt ? String(rec.alt) : undefined,
+          positionX: numOr(rec.positionX, 50),
+          positionY: numOr(rec.positionY, 50),
+          zoom: numOr(rec.zoom, 1),
         };
       })
       .filter(
-        (
-          slot,
-        ): slot is {
+        (slot): slot is {
           url: string;
           alt: string | undefined;
+          positionX: number;
+          positionY: number;
+          zoom: number;
         } => Boolean(slot),
       )
     : undefined;
@@ -199,11 +213,23 @@ async function ensureSeedModerationStore() {
     );
     for (const [index, slot] of (submission.images ?? []).entries()) {
       await pool.query(
-        `insert into submission_images (submission_id, image_url, image_alt, sort_order)
-         values ($1,$2,$3,$4)
+        `insert into submission_images (submission_id, image_url, image_alt, sort_order, image_position_x, image_position_y, image_zoom)
+         values ($1,$2,$3,$4,$5,$6,$7)
          on conflict (submission_id, sort_order) do update
-           set image_url = excluded.image_url, image_alt = excluded.image_alt`,
-        [submission.id, slot.url, slot.alt ?? null, index],
+           set image_url = excluded.image_url,
+               image_alt = excluded.image_alt,
+               image_position_x = excluded.image_position_x,
+               image_position_y = excluded.image_position_y,
+               image_zoom = excluded.image_zoom`,
+        [
+          submission.id,
+          slot.url,
+          slot.alt ?? null,
+          index,
+          slot.positionX ?? 50,
+          slot.positionY ?? 50,
+          slot.zoom ?? 1,
+        ],
       );
     }
   }
@@ -260,7 +286,13 @@ export async function readModerationStore() {
     }>(
       `select s.*,
               (
-                select json_agg(json_build_object('url', si.image_url, 'alt', si.image_alt) order by si.sort_order)
+                select json_agg(json_build_object(
+                  'url', si.image_url,
+                  'alt', si.image_alt,
+                  'positionX', si.image_position_x,
+                  'positionY', si.image_position_y,
+                  'zoom', si.image_zoom
+                ) order by si.sort_order)
                 from submission_images si
                 where si.submission_id = s.id
               ) as images_json
@@ -340,9 +372,17 @@ export async function addSubmission(
   );
   for (const [index, slot] of (nextSubmission.images ?? []).entries()) {
     await pool.query(
-      `insert into submission_images (submission_id, image_url, image_alt, sort_order)
-       values ($1,$2,$3,$4)`,
-      [nextSubmission.id, slot.url, slot.alt ?? null, index],
+      `insert into submission_images (submission_id, image_url, image_alt, sort_order, image_position_x, image_position_y, image_zoom)
+       values ($1,$2,$3,$4,$5,$6,$7)`,
+      [
+        nextSubmission.id,
+        slot.url,
+        slot.alt ?? null,
+        index,
+        slot.positionX ?? 50,
+        slot.positionY ?? 50,
+        slot.zoom ?? 1,
+      ],
     );
   }
 
@@ -613,9 +653,17 @@ export async function reviewSubmission({
   );
   for (const [index, slot] of (reviewedSubmission.images ?? []).entries()) {
     await pool.query(
-      `insert into submission_images (submission_id, image_url, image_alt, sort_order)
-       values ($1,$2,$3,$4)`,
-      [reviewedSubmission.id, slot.url, slot.alt ?? null, index],
+      `insert into submission_images (submission_id, image_url, image_alt, sort_order, image_position_x, image_position_y, image_zoom)
+       values ($1,$2,$3,$4,$5,$6,$7)`,
+      [
+        reviewedSubmission.id,
+        slot.url,
+        slot.alt ?? null,
+        index,
+        slot.positionX ?? 50,
+        slot.positionY ?? 50,
+        slot.zoom ?? 1,
+      ],
     );
   }
   await pool.query(

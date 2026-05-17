@@ -159,14 +159,10 @@ export function MovieSearchField({
   const visibleResults = canSearch && !selectedMovie ? results : [];
   const visibleError = canSearch && !selectedMovie ? error : undefined;
   const helperText = useMemo(() => {
-    if (!canSearch) {
-      return "Type at least two characters to search IMDb titles.";
-    }
-
+    if (!canSearch) return "";
     if (!isConfigured) {
       return "OMDb is not configured, so this is searching the local seed catalog.";
     }
-
     return "Search is powered by OMDb and resolves the IMDb ID automatically.";
   }, [canSearch, isConfigured]);
 
@@ -307,7 +303,7 @@ export function MovieSearchField({
               handleSelectMovie(undefined);
               setError(undefined);
             }}
-            placeholder="Start typing: The Departed, Ratatouille..."
+            placeholder="Type 2+ characters — The Departed, Ratatouille…"
             aria-invalid={Boolean(fieldErrors.movieSelection)}
             aria-describedby={helperId}
             className={`wr-input ${fieldErrors.movieSelection
@@ -320,12 +316,14 @@ export function MovieSearchField({
               {fieldErrors.movieSelection}
             </span>
           ) : null}
-          <p
-            id={helperId}
-            className="text-xs font-medium text-stone-500 dark:text-stone-400"
-          >
-            {helperText}
-          </p>
+          {helperText ? (
+            <p
+              id={helperId}
+              className="text-xs font-medium text-stone-500 dark:text-stone-400"
+            >
+              {helperText}
+            </p>
+          ) : null}
         </label>
       )}
 

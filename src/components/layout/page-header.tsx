@@ -58,10 +58,12 @@ export function PageHeader({
 }: Props) {
     const backTooltip = back ? `Back to ${back.label}` : undefined;
 
-    // Themed: pick up the page's `--wr-accent-btn` palette override (75% opacity
-    // at rest, 100% on hover). Untheme: muted stone with near-black hover.
+    // Themed: blend the page's `--wr-accent-btn` with the surrounding tone so the
+    // link stays readable on a tinted background — light mode pulls the accent
+    // toward near-black, dark mode keeps the airier accent-only treatment.
+    // Untheme: muted stone with near-black hover.
     const backLinkColor = themed
-        ? "text-[color-mix(in_srgb,var(--wr-accent-btn)_75%,transparent)] hover:text-[var(--wr-accent-btn)]"
+        ? "text-[color-mix(in_srgb,var(--wr-accent-btn)_55%,#1c1917)] hover:text-[color-mix(in_srgb,var(--wr-accent-btn)_75%,#000)] dark:text-[color-mix(in_srgb,var(--wr-accent-btn)_75%,transparent)] dark:hover:text-[var(--wr-accent-btn)]"
         : "text-stone-500 hover:text-stone-950 dark:text-stone-400 dark:hover:text-stone-50";
     const chevron = (
         <svg

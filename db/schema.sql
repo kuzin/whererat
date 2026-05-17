@@ -205,6 +205,16 @@ alter table news_items add column if not exists image_position_x float not null 
 alter table news_items add column if not exists image_position_y float not null default 50;
 alter table news_items add column if not exists image_zoom float not null default 1;
 
+-- Per-image positioning (drag-to-reposition / scroll-to-zoom) on submission + sighting
+-- galleries. Legacy rows default to centered, 1× zoom — visually identical to the old
+-- object-cover behavior.
+alter table sighting_images add column if not exists image_position_x float not null default 50;
+alter table sighting_images add column if not exists image_position_y float not null default 50;
+alter table sighting_images add column if not exists image_zoom float not null default 1;
+alter table submission_images add column if not exists image_position_x float not null default 50;
+alter table submission_images add column if not exists image_position_y float not null default 50;
+alter table submission_images add column if not exists image_zoom float not null default 1;
+
 -- Newsletter digest sends: one row per "Send digest" action from the
 -- moderation Compose newsletter modal, plus a join table of which news
 -- items were included. Lets us hide already-newslettered posts in the

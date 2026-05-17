@@ -14,7 +14,12 @@ import {
   type ImdbTitleKind,
   type SightingImageSlot,
 } from "@/lib/whererat";
-import { persistSightingFiles } from "@/lib/media-storage";
+import {
+  persistSightingFiles,
+  parseSightingImageGalleryForm,
+  SIGHTING_GALLERY_FIELD_NAMES,
+  SIGHTING_GALLERY_SENTINEL,
+} from "@/lib/media-storage";
 import { resyncAllCatalogMoviesFromImdb } from "@/lib/movie-imdb-sync";
 import { createStoredModerator, updateUserByOwner } from "@/lib/user-store";
 import { persistImageFile } from "@/lib/media-storage";
@@ -58,9 +63,15 @@ export async function moderateSubmission(formData: FormData) {
   const seasonNumberRaw = Number.parseInt(String(formData.get("seasonNumber") ?? "").trim(), 10);
   const episodeNumberRaw = Number.parseInt(String(formData.get("episodeNumber") ?? "").trim(), 10);
   const episodeTitle = String(formData.get("episodeTitle") ?? "").trim();
-  const imageListManaged = String(formData.get("imageListManaged") ?? "") === "1";
+  const galleryManaged = Boolean(formData.get(SIGHTING_GALLERY_SENTINEL));
+  const legacyListManaged = String(formData.get("imageListManaged") ?? "") === "1";
   let nextImages: SightingImageSlot[] = [];
-  if (imageListManaged) {
+  if (galleryManaged) {
+    nextImages = await parseSightingImageGalleryForm(
+      formData,
+      SIGHTING_GALLERY_FIELD_NAMES,
+    );
+  } else if (legacyListManaged) {
     const finalImageAlts = formData
       .getAll("finalImageAlt")
       .map((value) => String(value ?? "").trim());
@@ -117,6 +128,7 @@ export async function moderateSubmission(formData: FormData) {
     formData.has("timestamp") ||
     formData.has("description") ||
     formData.has("approximateRatCount") ||
+    formData.has(SIGHTING_GALLERY_SENTINEL) ||
     formData.has("imageListManaged") ||
     formData.has("existingImageUrl") ||
     formData.has("sightingImages");

@@ -40,7 +40,7 @@ export function SightingRatPresenceVisual({
                 aria-hidden
                 className={`transition-all duration-200 ${i < scale.slotsFilled ? "opacity-100" : "opacity-15 grayscale"}`}
               >
-                <RodentTypeIcon openmojiCode="1F400" label="Rat" size={20} />
+                <RodentTypeIcon openmojiCode="1F400" label="Rat" size={24} />
               </span>
             ))}
           </button>

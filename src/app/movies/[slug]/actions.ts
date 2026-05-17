@@ -23,7 +23,12 @@ import { fetchImdbMedia, fetchImdbRelated } from "@/lib/movie-imdb-sync";
 import { reviewSubmission } from "@/lib/moderation-store";
 import { deleteSightingById, updateSightingOverride } from "@/lib/sighting-edit-store";
 import { getCatalogMovieBySlug } from "@/lib/movie-catalog";
-import { persistSightingFiles } from "@/lib/media-storage";
+import {
+  persistSightingFiles,
+  parseSightingImageGalleryForm,
+  SIGHTING_GALLERY_FIELD_NAMES,
+  SIGHTING_GALLERY_SENTINEL,
+} from "@/lib/media-storage";
 import { getSyncedMoviePageVisuals } from "@/lib/movie-page-visuals";
 import { getTmdbBackdropUrl } from "@/lib/tmdb-banner";
 
@@ -544,9 +549,15 @@ export async function updateSightingInfo(formData: FormData) {
   const rodentTypes = formData.getAll("rodentTypes").map((v) => String(v).trim()).filter(Boolean);
   const otherRodentLabel = String(formData.get("otherRodentLabel") ?? "").trim().slice(0, 60);
   const reason = "Edited from movie page.";
-  const imageListManaged = String(formData.get("imageListManaged") ?? "") === "1";
+  const galleryManaged = Boolean(formData.get(SIGHTING_GALLERY_SENTINEL));
+  const legacyListManaged = String(formData.get("imageListManaged") ?? "") === "1";
   let nextImages: SightingImageSlot[] = [];
-  if (imageListManaged) {
+  if (galleryManaged) {
+    nextImages = await parseSightingImageGalleryForm(
+      formData,
+      SIGHTING_GALLERY_FIELD_NAMES,
+    );
+  } else if (legacyListManaged) {
     const finalImageAlts = formData
       .getAll("finalImageAlt")
       .map((value) => String(value ?? "").trim());
