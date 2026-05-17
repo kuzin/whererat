@@ -172,7 +172,7 @@ export function SubmitForm({
       ) : null}
 
       {/* -- 01 · Find the film ----------------------------------------------- */}
-      <div className="grid gap-5">
+      <div className="grid gap-7">
         <SectionHeader title="Find the film" />
         <MovieSearchField
           fieldErrors={fieldErrors}
@@ -187,7 +187,7 @@ export function SubmitForm({
       </div>
 
       {/* -- 02 · The rat moment ---------------------------------------------- */}
-      <div className="grid gap-5">
+      <div className="grid gap-7">
         <SectionHeader title="The sighting" />
         {/* Sighting title */}
         <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
@@ -251,9 +251,9 @@ export function SubmitForm({
 
       {/* -- 03 · Credit yourself --------------------------------------------- */}
       {!(canAutoApprove || moderatorName) && (
-        <div className="grid gap-5">
+        <div className="grid gap-7">
           <SectionHeader title="Credit yourself" />
-          <div className="grid gap-5">
+          <div className="grid gap-7">
             <label className="flex flex-col gap-2 text-sm font-bold text-stone-700 dark:text-stone-200">
               <span>
                 Your name
